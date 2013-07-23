@@ -14,8 +14,9 @@ class Cdrr_Item extends Doctrine_Record {
 		$this -> hasColumn('Aggr_On_Hand', 'varchar', 10);
 		$this -> hasColumn('Publish', 'varchar', 10);
 		//The cdrr id is a foreign key from the facility order table
-		$this -> hasColumn('Cdrr_Id', 'varchar', 10);
+		$this -> hasColumn('Cdrr_Id','varchar','150');
 		$this -> hasColumn('Drug_Id', 'varchar', 10);
+		$this -> hasColumn('Unique_Id', 'varchar','150');
 	}//end setTableDefinition
 
 	public function setUp() {

@@ -5,7 +5,8 @@ class Maps_Item extends Doctrine_Record {
 		$this -> hasColumn('Total', 'varchar', 10);
 		$this -> hasColumn('Regimen_Id', 'varchar', 10);
 		//The maps id is the foreign key from the facility order table
-		$this -> hasColumn('Maps_Id', 'varchar', 10);
+		$this -> hasColumn('Maps_Id', 'varchar','150');
+		$this -> hasColumn('Unique_Id', 'varchar','150');
 	}//end setTableDefinition
 
 	public function setUp() {

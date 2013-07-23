@@ -21,7 +21,7 @@ class Synchronization_Management extends MY_Controller {
 			$strSQl = "";
 			$table_name = $table_list;
 			if ($table_list == "facility_order") {
-				$sql = "select * from $table_name where code='1' and facility_id='$facility' or central_facility='$facility'";
+				$sql = "select * from $table_name where code >='1' and central_facility='$facility'";
 			} else if ($table_list == "cdrr_item") {
 				$sql = "select * from  $table_name where cdrr_id IN($id_str)";
 				$temp_str = $id_str;
@@ -41,13 +41,15 @@ class Synchronization_Management extends MY_Controller {
 					$id_str = "";
 					$strSQl .= "INSERT INTO $table_list (";
 					foreach ($value_array as $col => $value) {
-						$temp_val .= "," . $col . "=" . "\"" . trim($value) . "\"";
-						$fields .= "," . $col;
-						$values .= ",\"" . trim($value) . "\"";
-						if ($col == "id" && $table_list == "facility_order") {
+						if ($col != 'id') {
+							$temp_val .= "," . $col . "=" . "\"" . trim($value) . "\"";
+							$fields .= "," . $col;
+							$values .= ",\"" . trim($value) . "\"";
+						}
+						if ($col == "unique_id" && $table_list == "facility_order") {
 							$id_array[] = $value;
 							foreach ($id_array as $temp_id) {
-								$id_str .= "," . $temp_id;
+								$id_str .= ",\"" . $temp_id."\"";
 							}
 							$id_str = substr($id_str, 1);
 						}
