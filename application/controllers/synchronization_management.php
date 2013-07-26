@@ -70,7 +70,7 @@ class Synchronization_Management extends MY_Controller {
 	public function getSQL($facility) {
 		$sql = "";
 		if ($this -> input -> post("sql")) {
-			$sql = $this -> input -> post("sql");
+			$sql = $this -> encrypt -> decode($this -> input -> post("sql"));
 			$queries = explode(";", $sql);
 			foreach ($queries as $query) {
 				if (strlen($query) > 0) {
@@ -79,7 +79,7 @@ class Synchronization_Management extends MY_Controller {
 			}
 		}
 		$sql = $this -> synchronize_orders($facility);
-		echo $sql;
+		echo $sql=$this->encrypt->encode($sql);
 	}
 
 	public function base_params($data) {
