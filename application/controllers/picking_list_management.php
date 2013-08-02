@@ -112,7 +112,7 @@ class Picking_List_Management extends MY_Controller {
 		$data['_type']='picking';
 		$data['title'] = "Warehouse Picking Lists";
 		$data['link'] = "order_management";
-		$this -> load -> view('template_order', $data);
+		$this -> load -> view('template', $data);
 	}
 
 	public function print_list($list) {

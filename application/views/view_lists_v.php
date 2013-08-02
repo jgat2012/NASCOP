@@ -27,7 +27,7 @@
 		window.location = url;
 		}
 </script>
-
+<div class="center-content">
 <table class="table table-striped table-bordered">
 	<thead>
 		<tr>
@@ -64,3 +64,4 @@
 	<?php echo $pagination;?>
 </div>
 <?php endif;?>
+</div>

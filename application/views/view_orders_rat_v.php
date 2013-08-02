@@ -32,7 +32,7 @@
 				<td><?php echo date('d-M-Y',strtotime($period_begin));?></td>
 				<td><?php echo date('d-M-Y',strtotime($period_end));?></td>
 				<td align="center"><?php echo $numberDays; ?> Day (s)</td>
-				<td style="text-align: center"><a class="btn" href="<?php echo base_url()."order_rationalization/rationalize_order/".$order->id;?>">View</a></td>
+				<td style="text-align: center"><a href="<?php echo base_url()."order_rationalization/rationalize_order/".$order->id;?>">View</a></td>
 				
 			</tr>
 		<?php }

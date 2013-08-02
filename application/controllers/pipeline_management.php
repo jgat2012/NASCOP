@@ -11,8 +11,9 @@ class Pipeline_Import extends MY_Controller {
 	}
 
 	public function index() {
-		$data['settings_view'] = "pipeline_upload";
-		$this -> base_params($data);
+$this->load->view("pipeline_upload");
+		//$data['content_view'] = "pipeline_upload";
+		//$this -> base_params($data);
 	}
 
 	public function upload() {
@@ -1267,9 +1268,9 @@ class Pipeline_Import extends MY_Controller {
 	public function base_params($data) {
 		$data['title'] = "Pipleline Stock Data";
 		$data['banner_text'] = "Pipeline Monthly Stock Data Upload";
-		$data['content_view'] = "settings_v";
+		//$data['content_view'] = "settings_v";
 		$data['quick_link'] = "pipeline";
-		$this -> load -> view('template', $data);
+		//$this -> load -> view('template', $data);
 	}
 
 }
