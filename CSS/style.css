@@ -1,16 +1,3 @@
-font-face {
-	font-family: 'ProcionoRegular';
-	src: url('Prociono-Regular-webfont.eot');
-	src: url('Prociono-Regular-webfont.eot?#iefix') format('embedded-opentype'), url('Prociono-Regular-webfont.woff') format('woff'), url('Prociono-Regular-webfont.ttf') format('truetype'), url('Prociono-Regular-webfont.svg#ProcionoRegular') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-font-face {
-	font-family: 'AllerRegular';
-	src: url('fonts/Aller_Rg.ttf');
-	font-weight: normal;
-	font-style: normal;
-}
 body {
 	margin: 0;
 	padding: 0;
@@ -99,7 +86,6 @@ header {
 	overflow: hidden;
 	text-shadow: 0 1px rgba(0, 0, 0, 0.1);
 }
-
 #wrapper {
 	width: 100%;
 	min-width: 980px;
@@ -297,8 +283,8 @@ input[type =
 	background-image: -webkit-linear-gradient(top,#46EB59,#36D148);
 	background-image: -moz-linear-gradient(top,#46EB59,#36D148);
 }
-.f_left{
-	float:left;
+.f_left {
+	float: left;
 }
 .action_button {
 
@@ -481,7 +467,7 @@ fieldset {
 	margin-top: 20px;
 }
 /*NOTIFICATION MESSAGES*/
-.message ,.msg{
+.message, .msg {
 	display: block;
 	color: white;
 	padding: 1%;
@@ -532,7 +518,7 @@ fieldset {
 	background: -o-linear-gradient(top, #74ff6b 0%,#00bc2c 51%,#005700 100%); /* Opera 11.10+ */
 	background: -ms-linear-gradient(top, #74ff6b 0%,#00bc2c 51%,#005700 100%); /* IE10+ */
 	background: linear-gradient(to bottom, #74ff6b 0%,#00bc2c 51%,#005700 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#74ff6b', endColorstr='#005700',GradientType=0 ); /* IE6-9 */
+	filter: progid :DXImageTransform.Microsoft.gradient( startColorstr='#74ff6b', endColorstr='#005700',GradientType=0 ); /* IE6-9 */
 }
 .info {
 	background: #6697e8; /* Old browsers */
@@ -542,7 +528,7 @@ fieldset {
 	background: -o-linear-gradient(top, #6697e8 0%,#2f83f9 49%,#2c55ea 100%); /* Opera 11.10+ */
 	background: -ms-linear-gradient(top, #6697e8 0%,#2f83f9 49%,#2c55ea 100%); /* IE10+ */
 	background: linear-gradient(to bottom, #6697e8 0%,#2f83f9 49%,#2c55ea 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6697e8', endColorstr='#2c55ea',GradientType=0 ); /* IE6-9 */
+	filter: progid :DXImageTransform.Microsoft.gradient( startColorstr='#6697e8', endColorstr='#2c55ea',GradientType=0 ); /* IE6-9 */
 }
 .information {
 	border: 1px solid #688fdc;
@@ -574,9 +560,14 @@ fieldset {
 }
 .green {
 	color: green;
+	font-weight: bold;
+}
+#regimens_table td+ td {
+	text-align: center;
 }
 .red {
 	color: red;
+	font-weight: bold;
 }
 #start_date, #end_date, #date_of_appointment, #display_year {
 	color: rgb(45, 173, 13);
@@ -599,7 +590,7 @@ hr {
 	position: static;
 	top: 5px;
 	margin-bottom: 20px;
-	float:left;
+	float: left;
 }
 @media print {
 	#inf_patient_listing, #inf_drug_listing, #inf_drug_summary {
@@ -754,7 +745,6 @@ table.setting_table {
 
 	max-width: 300px;
 }
-
 .sidebar-nav-fixed {
 	/*/*padding: 9px 0;**/
 	position: fixed;
@@ -762,7 +752,6 @@ table.setting_table {
 	top: 157px;
 	width: 250px;
 }
-
 .well {
 	margin-bottom: 0px;
 }
@@ -776,6 +765,11 @@ table.setting_table {
 	padding: 0px;
 }
 .btn {
+	margin: 3px;
+	padding-left: 25px;
+	padding-right: 25px;
+}
+.btn_small {
 	margin: 3px;
 	padding-left: 25px;
 	padding-right: 25px;
@@ -808,8 +802,8 @@ table.setting_table {
 	font-weight: bold;
 	font-size: 1.1em;
 }
-.full-content #facility_name{
-	font-size:1.5em;
+.full-content #facility_name {
+	font-size: 1.5em;
 }
 #synchronize_button {
 	display: none;
@@ -860,8 +854,6 @@ table.setting_table {
 	background: #2B597E;
 	color: #fff;
 }
-
-
 .btn .caret {
 	margin: 0 auto;
 	vertical-align: middle;
@@ -922,7 +914,6 @@ table.setting_table {
 .login-form input[type="checkbox"] {
 	width: 5%;
 }
-
 #login-other {
 
 	display: block;
@@ -950,12 +941,10 @@ table.setting_table {
 .forgotten-password {
 	float: right;
 }
-
 #main_wrapper {
 	width: auto;
 	border: 0px;
 }
-
 /**
  * 	Dashboard Tiles
  */
@@ -963,17 +952,18 @@ table.setting_table {
 	display: inline-block;
 	float: left;
 	width: 49%;
-	height: 99.5%;
+	height: 50%;
 	padding: 0 0.5% 0.5% 0.5%;
+	margin-bottom: 2%;
 }
 .tile-half {
 	height: 50%;
 	display: block;
 }
-.graph{
-	height:100%;
-	overflow-x:hidden;
-	overflow-y:auto;
+.graph {
+	height: 99%;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 /**
  * 	Styling for Dashboard
@@ -1037,7 +1027,6 @@ table.setting_table {
 	border: 1px solid #FFF;
 	padding: 5px;
 }
-
 .tleft {
 	float: left;
 }
@@ -1213,7 +1202,6 @@ input[readonly] {
 .mid-row:nth-child(even) {
 	float: right;
 }
-
 /**
  * 	Users Styling
  */
@@ -1304,10 +1292,10 @@ legend {
 .report_category a {
 	font-size: 12px;
 }
-#patient_listing,.dataTable {
+#patient_listing, .dataTable {
 	margin: 0 auto;
 	width: 100%;
-	border:none;
+	border: none;
 	font-size: 13px;
 	letter-spacing: 0.8px;
 }
@@ -1369,7 +1357,6 @@ table#history_table td {
 .add, .remove {
 	cursor: pointer;
 }
-
 #patient_information, #patient_pill_count, #patient_regimen_history, #patient_appointment_history {
 	margin: 0 auto;
 	border-top: 1px solid #B9B9B9;
@@ -1398,7 +1385,6 @@ table#history_table td {
 #sub_title a:hover {
 	color: #2B597E;
 }
-
 /**
  * 	Media Screens
  */
@@ -1450,11 +1436,9 @@ table#history_table td {
 .short {
 	color: #FF0000;
 }
-
 .weak {
 	color: #E66C2C;
 }
-
 .good {
 	color: #2D98F3;
 }
@@ -1466,20 +1450,18 @@ table#history_table td {
 	height: 54%;
 	overflow: auto;
 }
-.settings_title{
-	margin-left:40px;
-	margin-bottom:10px;
-	width:500px;
+.settings_title {
+	margin-left: 40px;
+	margin-bottom: 10px;
+	width: 500px;
 }
-
 /**
  * 	Orders
  */
 #commodity-table {
 	width: 70%;
-	display:inline-block;
+	display: inline-block;
 }
-
 .regimen-table {
 	width: 28%;
 	float: right;
@@ -1502,12 +1484,10 @@ table#history_table td {
 .big-table td.number {
 	text-align: center;
 }
-
 .button {
 	width: 100px;
 	margin: 10px;
 }
-
 #comments-section td {
 	border: 0px;
 }
@@ -1519,34 +1499,31 @@ td {
 }
 .col_drug {
 	width: 400px !important;
-	font-size: 13px;
+	font-size: 0.8em;
 }
 .accordion {
 	height: 25px;
 }
-
 .facility_info {
 	border: 1px solid #FFF;
 	width: 60%;
 	margin: 0 auto;
-	margin-bottom:5%;
-	background:#eee;
+	margin-bottom: 5%;
+	background: #eee;
 }
 .table-bordered input {
-	width: 70px;
+	width: 4.7em;
 	height: 23px;
 	margin: 0 auto;
 }
 #commodity-table tbody tr {
 	font-size: 14px;
 }
-
 .regimen-table tbody td {
-	font-size: 13px;
+	font-size: 0.75em;
 	color: #000;
-	padding: 5px;
+	padding: 3px;
 }
-
 .ui-state-active {
 	background: #e6e6e6 url(images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x;
 }

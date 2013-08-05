@@ -4,24 +4,27 @@ if (!defined('BASEPATH'))
 class User_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
-		$this->session->set_userdata("link_id","index");
-		$this->session->set_userdata("linkSub","user_management");
-		$this->session->set_userdata("linkTitle","Users Management");
+		$this -> session -> set_userdata("link_id", "index");
+		$this -> session -> set_userdata("linkSub", "user_management");
+		$this -> session -> set_userdata("linkTitle", "Users Management");
 		$this -> load -> library('encrypt');
 		$this -> load -> helper('geoiploc');
 		ini_set("SMTP", 'ssl://smtp.googlemail.com');
 		ini_set("smtp_port", '465');
 		ini_set("sendmail_from", 'webadt.chai@gmail.com');
+		date_default_timezone_set('Africa/Nairobi');
 	}
 
 	public function index() {
 		$this -> listing();
+
 	}
 
 	public function login() {
 		$data = array();
-		$data['title'] = "NASCOP | System Login";
+		$data['title'] = "webADT | System Login";
 		$this -> load -> view("login_v", $data);
+
 	}
 
 	public function listing() {
@@ -110,36 +113,27 @@ class User_Management extends MY_Controller {
 		$data['content_view'] = "change_password_v";
 		$data['link'] = "settings_management";
 		$data['banner_text'] = "Change Pass";
+		$data['hide_side_menu'] = 1;
 		$this -> load -> view('template', $data);
-	}
-
-	public function activation_view() {
-		$data = array();
-		$data['title'] = "Activate User";
-		$data['invalid'] = $data['content_view'] = "activation_code_v";
-		$data['link'] = "settings_management";
-		$data['banner_text'] = "Activate User";
-		$this -> load -> view('template', $data);
-
 	}
 
 	public function activation() {
 		$activation_code = $_POST['activation_code'];
 		$user_id = $this -> session -> userdata('user_id');
 		$this -> load -> database();
-		$query = $this -> db -> query("select * from users where id='$user_id' and Signature='$activation_code' and Active='1'");
+		$query = $this -> db -> query("select * from users where Signature='$activation_code' and Active='1'");
 		$results = $query -> result_array();
 		if ($results) {
-			$query = $this -> db -> query("update users set Signature='1' where id='$user_id' and Active='1'");
+			$query = $this -> db -> query("update users set Signature='1' where Signature='$activation_code' and Active='1'");
 			$this -> session -> set_userdata("changed_password", "Your Account Has Been Activated");
-			redirect("home_controller/home");
+			redirect("user_management/login");
 		} else {
 			$this -> session -> set_userdata("changed_password", "Your Actvation code was incorrect");
-			redirect("user_management/activation_view");
+			redirect("user_management/login");
 		}
 	}
 
-	public function save_new_password() {
+	public function save_new_password($type = "") {
 		$old_password = $this -> input -> post("old_password");
 		$new_password = $this -> input -> post("new_password");
 		$valid_old_password = $this -> correct_current_password($old_password);
@@ -155,13 +149,19 @@ class User_Management extends MY_Controller {
 
 		//Check if old password is correct
 		if ($valid_old_password == FALSE) {
-			$response = array('msg_password_change' => 'password_no_exist');
-			echo json_encode($response);
+			if ($type == 2) {
+				$response = array('msg_password_change' => 'password_no_exist');
+				echo json_encode($response);
+			} else {
+				$this -> session -> set_userdata("matching_password", "This is not your current password");
+			}
 		} else if ($check_results) {
-			$this -> session -> set_userdata("matching_password", "The current password Matches a Previous Password");
-			//$this -> change_password();
-			$response = array('msg_password_change' => 'password_exist');
-			echo json_encode($response);
+			if ($type == 2) {
+				$response = array('msg_password_change' => 'password_exist');
+				echo json_encode($response);
+			} else {
+				$this -> session -> set_userdata("matching_password", "The current password Matches a Previous Password");
+			}
 		} else {
 			$query = $this -> db -> query("update users set Password='$encrypted_password',Time_Created='$timestamp' where id='$user_id'");
 			$new_password_log = new Password_Log();
@@ -169,10 +169,17 @@ class User_Management extends MY_Controller {
 			$new_password_log -> password = $encrypted_password;
 			$new_password_log -> save();
 			$data['expired'] = true;
-			$this -> session -> set_userdata("msg_password_change", "Your Password Has Been Changed");
-			$response = array('msg_password_change' => 'password_changed');
-			echo json_encode($response);
-			//redirect("user_management/login");
+			if ($type == 2) {
+				$response = array('msg_password_change' => 'password_changed');
+				echo json_encode($response);
+			} else {
+				$this -> session -> set_userdata("changed_password", "Your Password Has Been Changed");
+				delete_cookie("actual_page");
+				redirect("user_management/login");
+			}
+		}
+		if ($type != 2) {
+			redirect("user_management/change_password");
 		}
 
 	}
@@ -216,7 +223,6 @@ class User_Management extends MY_Controller {
 			$remember = $this -> input -> post("remember");
 			$key = $this -> encrypt -> get_key();
 			$encrypted_password = $key . $password;
-
 			$logged_in = Users::login($username, $encrypted_password);
 			//This code checks if the credentials are valid
 			if ($logged_in == false) {
@@ -300,40 +306,23 @@ class User_Management extends MY_Controller {
 					$data['unactivated'] = true;
 					$data['title'] = "System Login";
 					$this -> load -> view("login_v", $data);
-					//$session_data = array('user_id' => $logged_in -> id, 'user_indicator' => $logged_in -> Access -> Indicator, 'facility_name' => $logged_in -> Facility -> name, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'Email_Address' => $logged_in -> Email_Address, 'Phone_Number' => $logged_in -> Phone_Number, 'facility' => $logged_in -> Facility_Code, 'facility_id' => $facility_details[0]['id'], 'county' => $facility_details[0]['county']);
-					//$this -> session -> set_userdata($session_data);
-					//$this -> activation_view();
-					
 				}
 				//looks good. Continue!
 				else {
-
 					$facility_details = Facilities::getCurrentFacility($logged_in -> Facility_Code);
 					$session_data = array('user_id' => $logged_in -> id, 'user_indicator' => $logged_in -> Access -> Indicator, 'facility_name' => $logged_in -> Facility -> name, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'Email_Address' => $logged_in -> Email_Address, 'Phone_Number' => $logged_in -> Phone_Number, 'facility' => $logged_in -> Facility_Code, 'facility_id' => $facility_details[0]['id'], 'county' => $facility_details[0]['county']);
 					$this -> session -> set_userdata($session_data);
-					//Execute queries that update the patient statuses
-					/*
-					 $sql_pep = "update patient set current_status = '3' WHERE service='2' and current_status = '1' AND datediff(now(),date_enrolled)>=30;";
-					 $sql_pmtct = "update patient set current_status = '4' WHERE service='3' and current_status = '1' AND datediff(now(),date_enrolled)>=270;";
-					 $sql_inactive = "update patient,(SELECT patient from patient_appointment pa left join patient p on p.patient_number_ccc = pa.patient where  datediff(now(),appointment)>90 and p.current_status = '1' and p.service = '1' group by patient) patient_ids set current_status = '5' where patient_number_ccc  = patient_ids.patient ;";
-					 $this -> load -> database();
-					 $this -> db -> query($sql_pep);
-					 $this -> db -> query($sql_pmtct);
-					 $this -> db -> query($sql_inactive);
-					 *
-					 *
-					 */
-
 					$new_access_log = new Access_Log();
-					$new_access_log -> ip_address = $_SERVER['REMOTE_ADDR'];
-					$new_access_log -> location = $this -> getIPLocation();
+					$new_access_log -> machine_code = implode(",", $session_data);
 					$new_access_log -> user_id = $this -> session -> userdata('user_id');
+					$new_access_log -> access_level = $this -> session -> userdata('access_level');
+					$new_access_log -> start_time =date("Y-m-d H:i:s");
 					$new_access_log -> facility_code = $this -> session -> userdata('facility');
 					$new_access_log -> access_type = "Login";
 					$new_access_log -> save();
-
+					//Set session to redirect the page to the previous page before logged out
+					$this -> session -> set_userdata("prev_page", "1");
 					redirect("home_controller/home");
-
 				}
 
 			}
@@ -370,7 +359,15 @@ class User_Management extends MY_Controller {
 		$user -> Name = $this -> input -> post('fullname');
 		$user -> Username = $this -> input -> post('username');
 		$key = $this -> encrypt -> get_key();
-		$password="md5(123456)";
+		$characters = strtoupper("abcdefghijklmnopqrstuvwxyz");
+		$characters = $characters . 'abcdefghijklmnopqrstuvwxyz0123456789';
+		$random_string_length = 8;
+		$string = '';
+		for ($i = 0; $i < $random_string_length; $i++) {
+			$string .= $characters[rand(0, strlen($characters) - 1)];
+		}
+		$password = $string;
+
 		$encrypted_password = $key . $password;
 		$user -> Password = $encrypted_password;
 		$user -> Access_Level = $this -> input -> post('access_level');
@@ -381,20 +378,15 @@ class User_Management extends MY_Controller {
 		$user -> Email_Address = $this -> input -> post('email');
 		$phone = $this -> input -> post('phone');
 		$email = $this -> input -> post('email');
-		$username = $this -> input -> post('username');
-		if ($phone != "") {
-			$code = rand(11111, 99999);
-			$user -> Signature = $code;
-			$this -> sendActivationCode($username, $phone, $code, 'phone');
-		} else {
-			$code = md5($user . $email);
-			$user -> Signature = $code;
-			$this -> sendActivationCode($username, $email, $code, 'email');
-		}
+		$username = $this -> input -> post('fullname');
+
+		$code = md5($user . $email);
+		$user -> Signature = $code;
+		$this -> sendActivationCode($username, $email, $password, $code, 'email');
+
 		$user -> Active = "1";
 
 		$user -> save();
-		//$this -> session -> set_userdata('message_counter', '1');
 		$this -> session -> set_userdata('msg_success', $this -> input -> post('username') . ' \' s details were successfully saved!');
 		redirect('settings_management');
 	}
@@ -454,17 +446,15 @@ class User_Management extends MY_Controller {
 		redirect('settings_management');
 	}
 
-	public function logout() {
+	public function logout($param = "1") {
 		$machine_code = $this -> session -> userdata("machine_code_id");
-		$new_access_log = new Access_Log();
-		$new_access_log -> machine_code = $machine_code;
-		$new_access_log -> ip_address = $_SERVER['REMOTE_ADDR'];
-		$new_access_log -> location = $this -> getIPLocation();
-		$new_access_log -> user_id = $this -> session -> userdata('user_id');
-		$new_access_log -> facility_code = $this -> session -> userdata('facility');
-		$new_access_log -> access_type = "Logout";
-		$new_access_log -> save();
+		$last_id = Access_Log::getLastUser($this -> session -> userdata('user_id'));
+		$this -> db -> where('id', $last_id);
+		$this -> db -> update("access_log", array('access_type' =>"Logout",'end_time'=>date("Y-m-d H:i:s")));
 		$this -> session -> sess_destroy();
+		if ($param == "2") {
+			delete_cookie("actual_page");
+		}
 		redirect("user_management/login");
 	}
 
@@ -481,7 +471,7 @@ class User_Management extends MY_Controller {
 		$this -> db -> query("UPDATE access_log al,(SELECT MAX( id ) AS id FROM  `access_log` WHERE user_id = '$user_id' AND access_type =  'Login') as temp_log SET al.machine_code='$machine_code' WHERE al.id=temp_log.id");
 	}
 
-	public function sendActivationCode($username, $contact, $code = "", $type = "phone") {
+	public function sendActivationCode($username, $contact, $password, $code = "", $type = "phone") {
 
 		//If activation code is to be sent through email
 		if ($type == "email") {
@@ -500,7 +490,7 @@ class User_Management extends MY_Controller {
 			$this -> email -> from('webadt.chai@gmail.com', "WEB_ADT CHAI");
 			$this -> email -> to("$email");
 			$this -> email -> subject("Account Activation");
-			$this -> email -> message("Dear $username, Please click the following link to activate your account.
+			$this -> email -> message("Dear $username,<p> You account has been created and your password is <b>$password</b></p>Please click the following link to activate your account.
 			<form action='" . base_url() . "user_management/activation' method='post'>
 			<input type='submit' value='Activate account' id='btn_activate_account'>
 			<input type='hidden' name='activation_code' id='activation_code' value='" . $code . "'>
@@ -517,9 +507,9 @@ class User_Management extends MY_Controller {
 				$this -> email -> clear(TRUE);
 
 			} else {
-				show_error($this -> email -> print_debugger());
+				//show_error($this -> email -> print_debugger());
 			}
-			ob_end_flush();
+			//ob_end_flush();
 
 		}
 
@@ -533,21 +523,32 @@ class User_Management extends MY_Controller {
 		}
 
 	}
-	public function resetPassword($data = "") {
 
+	public function resetPassword($message = "") {
+		$data = array();
+		if ($message) {
+			$data['error'] = $message;
+		}
 		$data['title'] = "Reset password";
-		$this -> load -> view("resend_password_v", $data);
+		$data['content_view'] = "resend_password_v";
+		$data['link'] = "settings_management";
+		$data['banner_text'] = "Reset Password";
+		$data['hide_side_menu'] = 1;
+		$this -> load -> view('template', $data);
 
 	}
 
 	public function resendPassword() {
 
 		$type = $this -> input -> post("type");
-
-		//If user want to reset his password using email
-		$input = array("Jpqw_!90)", "Jpqop_!290-", "Ksqop_!293-", "W9qip_!290", "W01ip_!134", "T41tf_!126", "442et_!237", "CJai34_*5", "34Tgd!*_", "Jat_23@*");
-		$rand_keys = array_rand($input, 2);
-		$password = $input[$rand_keys[0]];
+		$characters = strtoupper("abcdefghijklmnopqrstuvwxyz");
+		$characters = $characters . 'abcdefghijklmnopqrstuvwxyz0123456789';
+		$random_string_length = 8;
+		$string = '';
+		for ($i = 0; $i < $random_string_length; $i++) {
+			$string .= $characters[rand(0, strlen($characters) - 1)];
+		}
+		$password = $string;
 		$key = $this -> encrypt -> get_key();
 		$encrypted_password = md5($key . $password);
 		$timestamp = date("Y-m-d");
@@ -560,8 +561,8 @@ class User_Management extends MY_Controller {
 			$count = count($arr);
 			$user_id = "";
 			if ($count == 0) {
-				$data['error'] = '<p class="alert-error">The email you entered was not found ! </p>';
-				$this -> resetPassword($data);
+				$message = '<p class="message error">The email you entered was not found ! </p>';
+				$this -> resetPassword($message);
 			} else {
 				foreach ($arr as $us_id) {
 					$user_id = $us_id['id'];
@@ -619,7 +620,7 @@ class User_Management extends MY_Controller {
 			$this -> email -> from('webadt.chai@gmail.com', "WEB_ADT CHAI");
 			$this -> email -> to("$email");
 			$this -> email -> subject("Account Activation");
-			$this -> email -> message("Dear $contact, This is your new password: $code.<br>
+			$this -> email -> message("Dear $contact, This is your new password:<b> $code </b><br>
 										<br>
 										Regards,<br>
 										Web ADT Team
@@ -627,29 +628,21 @@ class User_Management extends MY_Controller {
 
 			//success message else show the error
 			if ($this -> email -> send()) {
-				$data['message'] = '<span class="alert-info">An email was successfully sent to <b>' . $email . '</b>. Please Click <a href="' . base_url() . 'user_management/login">Here</a> to proceed to login</span><br/>';
+				$data['message'] = 'Email address was sent to <b>' . $email . '</b> <br/>Your Password was Reset';
 				//unlink($file);
 				$this -> email -> clear(TRUE);
 
 			} else {
-				$data['error'] = $this -> email -> print_debugger();
+				//$data['error'] = $this -> email -> print_debugger();
 				//show_error($this -> email -> print_debugger());
 			}
-			ob_end_flush();
-			$this -> load -> view("resend_password_success_v", $data);
+			//ob_end_flush();
+			$data['reset'] = true;
+			delete_cookie("actual_page");
+			$data['title'] = "webADT | System Login";
+			$this -> load -> view("login_v", $data);
 
 		}
-
-		//If activatio code is to be sent via sms
-		else if ($type == 'phone') {
-
-			$phone = $contact;
-			$message = "Your Web adt verification code is : " . $code;
-			//$x= file_get_contents("http://41.57.109.238:13000cgi-bin/sendsms?username=clinton&password=ch41sms&to=$phone&text=$message");
-			//ob_flush();
-
-		}
-
 	}
 
 	public function profile($data = "") {

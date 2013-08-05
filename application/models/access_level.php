@@ -16,5 +16,11 @@ class Access_Level extends Doctrine_Record {
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
 	}
+	
+	public function getAllHydrated() {
+		$query = Doctrine_Query::create() -> select("al.Id as Id,al.Level_Name as Access") -> from("access_level al");
+		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $users;
+	}
 
 }

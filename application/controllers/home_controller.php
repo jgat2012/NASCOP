@@ -8,6 +8,7 @@ class Home_Controller extends MY_Controller {
 	}
 
 	public function index() {
+
 		$this -> platform_home();
 	}
 
@@ -26,6 +27,7 @@ class Home_Controller extends MY_Controller {
 	}
 
 	public function home() {
+	
 		$rights = User_Right::getRights($this -> session -> userdata('access_level'));
 		$menu_data = array();
 		$menus = array();
@@ -48,18 +50,18 @@ class Home_Controller extends MY_Controller {
 			$timestamp = strtotime($today);
 			$data['scheduled_patients'] = Patient_Appointment::getAllScheduled($timestamp);
 		}
-
+		
 		$data['title'] = "webADT | System Home";
 		$data['content_view'] = "home_v";
 		$data['banner_text'] = "Home";
 		$data['link'] = "home";
 
-       //Get mac address
+		//Get mac address
 		$get_mac = "getmac";
 		exec($get_mac, $output, $ret);
 		$value = explode('\\', $output[3]);
 		$data['mac'] = $value[0];
-		$data['user']=$this->session->userdata['full_name'];
+		$data['user'] = $this -> session -> userdata['full_name'];
 		$this -> load -> view("template", $data);
 
 	}

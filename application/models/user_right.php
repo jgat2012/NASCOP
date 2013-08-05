@@ -4,6 +4,7 @@ class User_Right extends Doctrine_Record {
 		$this -> hasColumn('Access_Level', 'varchar', 50);
 		$this -> hasColumn('Menu', 'varchar', 100);
 		$this -> hasColumn('Access_Type', 'text');
+		$this -> hasColumn('active', 'int', 5);
 	}
 
 	public function setUp() {
@@ -12,9 +13,8 @@ class User_Right extends Doctrine_Record {
 	}
 
 	public static function getRights($access_level) {
-		$query = Doctrine_Query::create() -> select("*") -> from("User_Right") -> where("Access_Level = '" . $access_level . "'");
+		$query = Doctrine_Query::create() -> select("*") -> from("User_Right") -> where("Access_Level = '" . $access_level . "' and active='1'");
 		$rights = $query -> execute();
 		return $rights;
 	}
-
 }

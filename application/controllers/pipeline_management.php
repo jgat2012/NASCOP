@@ -2,7 +2,7 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-class Pipeline_Import extends MY_Controller {
+class Pipeline_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$data = array();
@@ -11,7 +11,7 @@ class Pipeline_Import extends MY_Controller {
 	}
 
 	public function index() {
-		$data['settings_view'] = "pipeline_upload";
+		$data['content_view'] = "pipeline_upload";
 		$this -> base_params($data);
 	}
 
@@ -1266,8 +1266,7 @@ class Pipeline_Import extends MY_Controller {
 
 	public function base_params($data) {
 		$data['title'] = "Pipleline Stock Data";
-		$data['banner_text'] = "Pipeline Monthly Stock Data Upload";
-		$data['content_view'] = "settings_v";
+		$data['banner_text'] = "Monthly Pipeline Upload";
 		$data['quick_link'] = "pipeline";
 		$this -> load -> view('template', $data);
 	}
