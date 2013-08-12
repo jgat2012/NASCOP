@@ -27,8 +27,9 @@
 		window.location = url;
 		}
 </script>
-
-<table class="table table-striped table-bordered">
+<div class="center-content">
+<?php $this->load->view("picking_list_sub_menu"); ?>
+<table class="table table-striped table-bordered dataTables">
 	<thead>
 		<tr>
 			<th width="50px">List No</th>
@@ -55,6 +56,7 @@
 		?>
 	</tbody>
 </table>
+</div>
 <div title="Confirm Delete!" id="confirm_delete" style="width: 300px; height: 150px; margin: 5px auto 5px auto;">
 	Are you sure you want to delete this picking list? Individual orders will <b>Not</b> be deleted
 </div>

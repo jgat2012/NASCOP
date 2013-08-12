@@ -8,7 +8,7 @@ $user_is_facilityadmin = false;
 if ($access_level == "nascop_administrator") {
 	$user_is_administrator = true;
 }
-if ($access_level == "nascop_administrator") {
+if ($access_level == "nascop_pharmacist") {
 	$user_is_pharmacist = true;
 
 }
@@ -38,7 +38,9 @@ if($this->session->userdata("changed_password")){
 
 <script type="text/javascript">
 $(document).ready(function() {
-	
+	  <?php
+	  if($user_is_nascop){
+	  ?>
       var period=30;
       var location=2;
       $('h3 .btn-danger').hide();
@@ -74,7 +76,7 @@ $(document).ready(function() {
 				$('#stock_level').dataTable({
 					"bJQueryUI": true,
 	        		"sPaginationType": "full_numbers"
-	            });
+	            });       
 	   });
     //Toggle
 var chartID;
@@ -181,78 +183,73 @@ var chartLink;
                  	 $('#chart_area78').load('<?php echo base_url().'admin_management/getWeeklySumary/'?>'+from_date+'/'+to_date);	
                  }
             });
+             <?php } ?>
 		});
     </script>
 
 <div class="main-content">
 	<?php
-	if(!$user_is_administrator){
+	if($user_is_pharmacist){
 	?>
 	<div class="center-content">
 		<div id="expDiv>"></div>
 		<div class="tile" id="drugs-chart">
-			<h3>Summary of Drugs <br/>Expiring in 
+			<h3>Top
 				<select style="width:auto" class="period">
-					<option value="7">7 Days</option>
-					<option value="14">14 Days</option>
-				   <option value="30" selected=selected>1 Month</option>
-				   <option value="90">3 Months</option>
-				   <option value="180">6 Months</option>
-			</select> at
-			<select style="width:auto" class="location">
-				   <option value="1">Main Store</option>
-				   <option  selected=selected value="2">Pharmacy</option>
-			</select> 
+				   <option value="5" selected=selected>5</option>
+				   <option value="10">10</option>
+				   <option value="15">15</option>
+				   <option value="20">20</option>
+				   <option value="25">25</option>
+			</select> Commodities Ordered in 
+			<input type="text"  class="input-medium" id="reporting_period"/>
 			<button class="generate btn" id="expiry_btn">Get</button>
+			<br/>
 			<button class="btn btn-success more" id="drugs-more">Larger</button>
 			<button class="btn btn-danger less" id="drugs-less">Smaller</button>
 			</h3>
 			
 			<div id="chart_area">
-				<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'images//loading_spin.gif' ?>"></div>
+				<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
 			</div>
 			
 		</div>
 
 		<div class="tile" id="enrollment-chart">
-			<h3>Weekly Summary of Patient Enrollment <br/>From
-				<input type="text" placeholder="Start" class="input-medium" id="enrollment_start"/> To
-				<input type="text" placeholder="End" class=" input-medium" id="enrollment_end" readonly="readonly"/>
+			<h3>Facilities Ordering using webADT in 
+				<input type="text"  class="input-medium"/>
 				<button class="btn generate" id="enrollment_btn">Get</button>
+			    </br/>
 				<button class="btn btn-success more" id="enrollment-more">Larger</button>
 			<button class="btn btn-danger less" id="enrollment-less">Smaller</button>
 				 </h3>
 			<div id="chart_area2">
-				<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'images/loading_spin.gif' ?>"></div>
+				<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
 			</div>
 		</div>
 		<div class="tile" id="appointments-chart">
-			<h3>Weekly Summary of Patient Appointments
-				<br/>From
-				<input type="text" placeholder="Start" class="input-medium" id="visit_start"/> To
-				<input type="text" placeholder="End" class=" input-medium" id="visit_end" readonly="readonly" />
+			<h3>Pipeline Picking Lists for
+				<input type="text"  class="input-medium"/>
 				<button class="generate btn" id="appointment_btn">Get</button>
+				<br/>
 				<button class="btn btn-success more" id="appointment-more">Larger</button>
 			<button class="btn btn-danger less" id="appointment-less">Smaller</button>
 				</h3>
 			<div id="chart_area3">
-						<div class="loadingDiv" style="margin:20% 0 20% 0;"><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'images/loading_spin.gif' ?>"></div>		
+						<div class="loadingDiv" style="margin:20% 0 20% 0;"><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>		
 			</div>
 		</div>
 		<div class="tile" id="stocks-chart">
-			<h3>Stocks About to Run Out at
-			<select style="width:auto" class="location" id="store_location"> 
-				   <option value="1">Main Store</option>
-				   <option  selected=selected value="2">Pharmacy</option>
-			</select> 	
+			<h3>Facilities Delaying Orders in 
+			<input type="text"  class="input-medium"/>
 			<button class="generate btn" id="stockout_btn">Get</button>
+			<br/>
 			<button class="btn btn-success more" id="stock-more">Larger</button>
 			<button class="btn btn-danger less" id="stock-less">Smaller</button>
-			<p>&nbsp;</p>
 			</h3>
 			
 			<div id="table1">
-			 	<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'images/loading_spin.gif' ?>"></div>
+			 	<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
 			</div>
 		</div>
 </div>
@@ -312,5 +309,29 @@ $(document).ready(function(){
 				$("#enrollment_end").val(someFormattedDate);
 			});
 			
+		$("#reporting_period").datepicker({
+			yearRange : "-120:+0",
+			maxDate : "0D",
+			changeMonth : true,
+			changeYear : true,
+			showButtonPanel : true,
+			dateFormat : 'MM-yy',
+			onClose : function(dateText, inst) {
+				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+				month = parseInt(month);
+				var last_day_month = LastDayOfMonth(year, month + 1);
+
+				$("#period_start_date").val("01");
+				$("#period_end_date").val(last_day_month);
+				$(this).datepicker('setDate', new Date(year, month, 1));
+			}
+		});
+			
 		      });
 </script>
+<style type="text/css">
+	.ui-datepicker-calendar {
+		display: none;
+	}
+</style>

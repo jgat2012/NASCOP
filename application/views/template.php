@@ -52,7 +52,7 @@ $user_is_pharmacist = false;
 
 if ($access_level == "nascop_administrator") {
 	$user_is_administrator = true;
-} else if ($access_level == "nascop_administrator") {
+} else if ($access_level == "nascop_pharmacist") {
 	$user_is_facility_administrator = true;
 } else if ($access_level == "pharmacist") {
 	$user_is_pharmacist = true;
@@ -101,7 +101,7 @@ if (isset($styles)) {
 <script>
    	$(document).ready(function(){
    	<?php 
-	 if($user_is_pharmacist){
+	 if($user_is_nascop){
 	 ?>
 	    $('#notification1').load('<?php echo base_url() . 'facilitydashboard_management/order_notification';?>');
 	<?php
@@ -262,12 +262,7 @@ if(isset($reports)|| isset($report_title)){
 			    <?php 
 			    if($user_is_pharmacist){
 				?>
-				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-user"></i>Add Patients</a></li>
-			    <li><a href="<?php echo base_url().'inventory_management/stock_transaction/1' ?>"><i class="icon-inbox"></i>Receive/Issue - Main Store</a></li>
-			    <li><a href="<?php echo base_url().'inventory_management/stock_transaction/2' ?>"><i class="icon-inbox"></i>Receive/Issue - Pharmacy</a></li>
-            
-				<li class="divider"></li>
-				<li><a href="<?php echo base_url().'auto_management/export' ?>"><i class="icon-book"></i>Export Patient List</a></li>			
+				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
 				
 				
@@ -276,11 +271,7 @@ if(isset($reports)|| isset($report_title)){
 
 				if($user_is_facility_administrator){
 				?>
-				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-user"></i>Add Patients</a></li>
-			    <li><a href="<?php echo base_url().'inventory_management/stock_transaction/1' ?>"><i class="icon-inbox"></i>Receive/Issue - Main Store</a></li>
-			    <li><a href="<?php echo base_url().'inventory_management/stock_transaction/2' ?>"><i class="icon-inbox"></i>Receive/Issue - Pharmacy</a></li>
-			    <li class="divider"></li>
-				<li><a href="<?php echo base_url().'auto_management/export' ?>"><i class="icon-book"></i>Export Patient List</a></li>			
+				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-plus"></i>Add Picking List</a></li>		
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
 				
 				<?php
@@ -328,9 +319,7 @@ if(isset($reports)|| isset($report_title)){
 	//Load modals view
 	$this -> load -> view('sections/modals_v');
 	//Load modals view end
-?>
-     
-
+    ?>
  <div id="bottom_ribbon">
  	<div id="footer">
  		<?php $this -> load -> view('footer_v');?>
