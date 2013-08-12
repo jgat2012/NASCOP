@@ -186,7 +186,7 @@ if(isset($report_title)){
  	<a href="<?php  echo site_url('home_controller');?>" class="top_menu_link  first_link <?php
 	if ($current == "home_controller") {echo " top_menu_active ";
 	}
-?>">Home </a><?php }?>
+?>"><i class="icon-home"></i>Home </a><?php }?>
 <?php
 if($menus){
 foreach($menus as $menu){?>
@@ -218,7 +218,7 @@ if($menus){
 	</ul>
 </div>
 <div class="welcome_msg">
-	<span>Welcome <b style="font-weight: bolder;font-size: 20px;"><?php echo $this -> session -> userdata('full_name');?></b>. <a id="logout_btn" href="<?php echo base_url().'user_management/logout/2' ?>">Logout</a></span>
+	<span>Welcome <b style="font-weight: bolder;font-size: 20px;"><?php echo $this -> session -> userdata('full_name');?></b>. <a id="logout_btn" href="<?php echo base_url().'user_management/logout/2' ?>"><i class="icon-off"></i>Logout</a></span>
 	<br>
 	<span class="date"><?php echo date('l, jS \of F Y') ?></span>
 	<input type="hidden" id="facility_hidden" />
