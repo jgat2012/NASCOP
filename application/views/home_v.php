@@ -39,45 +39,51 @@ if($this->session->userdata("changed_password")){
 <script type="text/javascript">
 $(document).ready(function() {
 	  <?php
-	  if($user_is_nascop){
+	  if($user_is_pharmacist){
 	  ?>
       var period=30;
-      var location=2;
+      var limit=5;
+      
+      var date = new Date(), y = date.getFullYear(), m = date.getMonth();
+      var firstDay = new Date(y, m, 1);
+      var lastDay = new Date(y, m + 1, 0);
+      
       $('h3 .btn-danger').hide();
       
       //Get Today's Date and Upto Saturday
       var someDate = new Date();
-      var dd = ("0" + someDate.getDate()).slice(-2);
-      var mm = ("0" + (someDate.getMonth() + 1)).slice(-2);
-      var y = someDate.getFullYear();
-      var fromDate =y+'-'+mm+'-'+dd;
+      var dd = ("0" + firstDay.getDate()).slice(-2);
+      var mm = ("0" + (firstDay.getMonth() + 1)).slice(-2);
+      var y = firstDay.getFullYear();
+      var firstDay =y+'-'+mm+'-'+dd;
       
       var numberOfDaysToAdd = 5;
       var to_date=new Date(someDate.setDate(someDate.getDate() + numberOfDaysToAdd)); 
-      var dd = ("0" + to_date.getDate()).slice(-2);
-      var mm = ("0" + (to_date.getMonth() + 1)).slice(-2);
-      var y = to_date.getFullYear();
-      var endDate =y+'-'+mm+'-'+dd;
+      var dd = ("0" + lastDay.getDate()).slice(-2);
+      var mm = ("0" + (lastDay.getMonth() + 1)).slice(-2);
+      var y = lastDay.getFullYear();
+      var lastDay =y+'-'+mm+'-'+dd;
       
-      $("#enrollment_start").val(fromDate);
-      $("#enrollment_end").val(endDate);
-      
-      $("#visit_start").val(fromDate);
-      $("#visit_end").val(endDate);
-    
 	   $(".loadingDiv").show();
-	   var expiry_link="<?php echo base_url().'facilitydashboard_management/getExpiringDrugs/';?>"+period+'/'+location;
-	   var enrollment_link="<?php echo base_url().'facilitydashboard_management/getPatientEnrolled/';?>"+fromDate+'/'+endDate;
-	   var visits_link="<?php echo base_url().'facilitydashboard_management/getExpectedPatients/';?>"+fromDate+'/'+endDate;
-       $('#chart_area').load(expiry_link);
-       $('#chart_area2').load(enrollment_link);
-       $('#chart_area3').load(visits_link);
-       $('#table1').load('<?php echo base_url().'facilitydashboard_management/stock_notification'?>',function(){
-				$('#stock_level').dataTable({
-					"bJQueryUI": true,
-	        		"sPaginationType": "full_numbers"
-	            });       
-	   });
+	  
+	   var first_link="<?php echo base_url().'pharmacist_management/getTopCommodities/';?>"+limit+"/"+firstDay+"/"+lastDay;
+	   var second_link="<?php echo base_url().'pharmacist_management/getFacilitiesUsing/';?>"+firstDay+"/"+lastDay;
+	   var third_link="<?php echo base_url().'pharmacist_management/getPickingList/';?>"+firstDay+"/"+lastDay;
+	   var fourth_link="<?php echo base_url().'pharmacist_management/getFacilitiesDelay/';?>"+firstDay+"/"+lastDay;
+       $('#chart_area').load(first_link);
+       $('#chart_area2').load(second_link);
+       $('#chart_area3').load(third_link);
+       $('#chart_area4').load(fourth_link);
+       
+       $("#period_start_date_1").val(firstDay);
+       $("#period_end_date_1").val(lastDay);
+       $("#period_start_date_2").val(firstDay);
+       $("#period_end_date_2").val(lastDay);
+       $("#period_start_date_3").val(firstDay);
+       $("#period_end_date_3").val(lastDay);
+       $("#period_start_date_4").val(firstDay);
+       $("#period_end_date_4").val(lastDay);
+      
     //Toggle
 var chartID;
 var graphID;
@@ -92,7 +98,7 @@ var chartLink;
 		$('#drugs-chart').show();
 		chartID='#drugs-chart';
 		graphID="#chart_area";
-		chartLink="<?php echo base_url().'facilitydashboard_management/getExpiringDrugs/';?>"+period+'/'+location;
+		chartLink="<?php echo base_url().'facilitydashboard_management/getTopCommodities/';?>"+period+'/'+location;
 	
 		break;
 		case'enrollment-more':
@@ -100,7 +106,7 @@ var chartLink;
 		$('#enrollment-chart').show();
 		chartID='#enrollment-chart';
 		graphID="#chart_area2";
-		chartLink="<?php echo base_url().'facilitydashboard_management/getPatientEnrolled/';?>"+fromDate+'/'+endDate;
+		chartLink="<?php echo base_url().'facilitydashboard_management/getFacilitiesUsing/';?>"+fromDate+'/'+endDate;
 	  
 		break;
 		case'appointment-more':
@@ -108,7 +114,7 @@ var chartLink;
 		$('#appointments-chart').show();
 		chartID='#appointments-chart';
 		graphID="#chart_area3";
-		chartLink="<?php echo base_url().'facilitydashboard_management/getExpectedPatients/';?>"+fromDate+'/'+endDate;
+		chartLink="<?php echo base_url().'facilitydashboard_management/getPickingList/';?>"+fromDate+'/'+endDate;
 
 		break;
 		case'stock-more':
@@ -156,26 +162,28 @@ var chartLink;
                  var button_id=$(this).attr("id");
                  if(button_id=="expiry_btn"){
                  	 period = $('.period').val();
-		    	     location = $('.location').val();
-		    	     var expiry_link="<?php echo base_url().'facilitydashboard_management/getExpiringDrugs/';?>"+period+'/'+location;
+		    	     var from_date = $('#period_start_date_1').val();
+		    	     var to_date= $('#period_end_date_1').val();
+		    	     var expiry_link="<?php echo base_url().'pharmacist_management/getTopCommodities/';?>"+period+'/'+from_date+'/'+to_date;
 		    	 	 $('#chart_area').load(expiry_link);           	
                  }else if(button_id=="enrollment_btn"){
-                 	 var from_date=$("#enrollment_start").val();
-                 	 var to_date=$("#enrollment_end").val();
-                 	 var enrollment_link="<?php echo base_url().'facilitydashboard_management/getPatientEnrolled/';?>"+from_date+'/'+to_date;
+                 	 var from_date=$("#period_start_date_2").val();
+                 	 var to_date=$("#period_end_date_2").val();
+                 	 var enrollment_link="<?php echo base_url().'pharmacist_management/getFacilitiesUsing/';?>"+from_date+'/'+to_date;
                  	 $('#chart_area2').load(enrollment_link);
                  }else if(button_id=="appointment_btn"){
-                 	 var from_date=$("#visit_start").val();
-                 	 var to_date=$("#visit_end").val();
-                 	 var visits_link="<?php echo base_url().'facilitydashboard_management/getExpectedPatients/';?>"+from_date+'/'+to_date;
+                 	 var from_date=$("#period_start_date_3").val();
+                 	 var to_date=$("#period_end_date_3").val();
+                 	 var visits_link="<?php echo base_url().'pharmacist_management/getPickingList/';?>"+from_date+'/'+to_date;
                      $('#chart_area3').load(visits_link);
                  }else if(button_id=="stockout_btn"){
-                 	 period=$("#store_location").val();
-                 	 $('#table1').load('<?php echo base_url().'facilitydashboard_management/stock_notification/'?>'+period,function(){
-
-	                 });
+                 	 var from_date=$("#period_start_date_4").val();
+                 	 var to_date=$("#period_end_date_4").val();
+                 	 var visits_link="<?php echo base_url().'pharmacist_management/getFacilitiesDelay/';?>"+from_date+'/'+to_date;
+                     $('#chart_area4').load(visits_link);
                  } else if(button_id=="usage_btn"){                	
-                 	 period=$("#usage_period").val();
+                 	 var from_date=$("#period_start_date_4").val();
+                 	 var to_date=$("#period_end_date_4").val();
                  	 $('#chart_area77').load('<?php echo base_url().'admin_management/getSystemUsage/'?>'+period);
                  } else if(button_id=="access_btn"){                	
                  	 var from_date=$("#enrollment_start").val();
@@ -257,7 +265,7 @@ var chartLink;
 			<button class="btn btn-danger less" id="stock-less">Smaller</button>
 			</h3>
 			
-			<div id="table1">
+			<div id="chart_area4">
 			 	<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
 			</div>
 		</div>
@@ -317,7 +325,6 @@ $(document).ready(function(){
                 var someFormattedDate =y+'-'+mm+'-'+dd;
 				$("#enrollment_end").val(someFormattedDate);
 			});
-			
 		$("#reporting_period_1").datepicker({
 			yearRange : "-120:+0",
 			maxDate : "0D",
@@ -328,11 +335,11 @@ $(document).ready(function(){
 			onClose : function(dateText, inst) {
 				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
 				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-				month = parseInt(month);
+				month = parseInt(month);				
 				var last_day_month = LastDayOfMonth(year, month + 1);
-
-				$("#period_start_date_1").val("01");
-				$("#period_end_date_1").val(last_day_month);
+                var mm=("0" + (month + 1)).slice(-2);
+				$("#period_start_date_1").val(year+"-"+mm+"-01");
+				$("#period_end_date_1").val(year+"-"+mm+"-"+last_day_month);
 				$(this).datepicker('setDate', new Date(year, month, 1));
 			}
 		});
@@ -351,9 +358,9 @@ $(document).ready(function(){
 				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
 				month = parseInt(month);
 				var last_day_month = LastDayOfMonth(year, month + 1);
-
-				$("#period_start_date_2").val("01");
-				$("#period_end_date_2").val(last_day_month);
+                var mm=("0" + (month + 1)).slice(-2);
+				$("#period_start_date_2").val(year+"-"+mm+"-01");
+				$("#period_end_date_2").val(year+"-"+mm+"-"+last_day_month);
 				$(this).datepicker('setDate', new Date(year, month, 1));
 			}
 		});
@@ -372,9 +379,9 @@ $(document).ready(function(){
 				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
 				month = parseInt(month);
 				var last_day_month = LastDayOfMonth(year, month + 1);
-
-				$("#period_start_date_3").val("01");
-				$("#period_end_date_3").val(last_day_month);
+                var mm=("0" + (month + 1)).slice(-2);
+				$("#period_start_date_3").val(year+"-"+mm+"-01");
+				$("#period_end_date_3").val(year+"-"+mm+"-"+last_day_month);
 				$(this).datepicker('setDate', new Date(year, month, 1));
 			}
 		});
@@ -394,9 +401,9 @@ $(document).ready(function(){
 				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
 				month = parseInt(month);
 				var last_day_month = LastDayOfMonth(year, month + 1);
-
-				$("#period_start_date_4").val("01");
-				$("#period_end_date_4").val(last_day_month);
+                var mm=("0" + (month + 1)).slice(-2);
+				$("#period_start_date_4").val(year+"-"+mm+"-01");
+				$("#period_end_date_4").val(year+"-"+mm+"-"+last_day_month);
 				$(this).datepicker('setDate', new Date(year, month, 1));
 			}
 		});
