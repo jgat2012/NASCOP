@@ -202,7 +202,9 @@ var chartLink;
 				   <option value="20">20</option>
 				   <option value="25">25</option>
 			</select> Commodities Ordered in 
-			<input type="text"  class="input-medium" id="reporting_period"/>
+			<input type="text"  class="input-medium" id="reporting_period_1"/>
+			<input type="hidden"  class="input-medium" id="period_start_date_1"/>
+			<input type="hidden"  class="input-medium" id="period_end_date_1"/>
 			<button class="generate btn" id="expiry_btn">Get</button>
 			<br/>
 			<button class="btn btn-success more" id="drugs-more">Larger</button>
@@ -217,7 +219,9 @@ var chartLink;
 
 		<div class="tile" id="enrollment-chart">
 			<h3>Facilities Ordering using webADT in 
-				<input type="text"  class="input-medium"/>
+			<input type="text"  class="input-medium" id="reporting_period_2"/>
+			<input type="hidden"  class="input-medium" id="period_start_date_2"/>
+			<input type="hidden"  class="input-medium" id="period_end_date_2"/>
 				<button class="btn generate" id="enrollment_btn">Get</button>
 			    </br/>
 				<button class="btn btn-success more" id="enrollment-more">Larger</button>
@@ -229,7 +233,9 @@ var chartLink;
 		</div>
 		<div class="tile" id="appointments-chart">
 			<h3>Pipeline Picking Lists for
-				<input type="text"  class="input-medium"/>
+			<input type="text"  class="input-medium" id="reporting_period_3"/>
+			<input type="hidden"  class="input-medium" id="period_start_date_3"/>
+			<input type="hidden"  class="input-medium" id="period_end_date_3"/>
 				<button class="generate btn" id="appointment_btn">Get</button>
 				<br/>
 				<button class="btn btn-success more" id="appointment-more">Larger</button>
@@ -241,7 +247,10 @@ var chartLink;
 		</div>
 		<div class="tile" id="stocks-chart">
 			<h3>Facilities Delaying Orders in 
-			<input type="text"  class="input-medium"/>
+			<input type="text"  class="input-medium" id="reporting_period_4"/>
+			<input type="hidden"  class="input-medium" id="period_start_date_4"/>
+			<input type="hidden"  class="input-medium" id="period_end_date_4"/>
+			<input type="hidden"  class="input-medium"/>
 			<button class="generate btn" id="stockout_btn">Get</button>
 			<br/>
 			<button class="btn btn-success more" id="stock-more">Larger</button>
@@ -309,7 +318,7 @@ $(document).ready(function(){
 				$("#enrollment_end").val(someFormattedDate);
 			});
 			
-		$("#reporting_period").datepicker({
+		$("#reporting_period_1").datepicker({
 			yearRange : "-120:+0",
 			maxDate : "0D",
 			changeMonth : true,
@@ -322,13 +331,82 @@ $(document).ready(function(){
 				month = parseInt(month);
 				var last_day_month = LastDayOfMonth(year, month + 1);
 
-				$("#period_start_date").val("01");
-				$("#period_end_date").val(last_day_month);
+				$("#period_start_date_1").val("01");
+				$("#period_end_date_1").val(last_day_month);
 				$(this).datepicker('setDate', new Date(year, month, 1));
 			}
 		});
+		
+		$("#reporting_period_1").datepicker('setDate', new Date());
+		
+		$("#reporting_period_2").datepicker({
+			yearRange : "-120:+0",
+			maxDate : "0D",
+			changeMonth : true,
+			changeYear : true,
+			showButtonPanel : true,
+			dateFormat : 'MM-yy',
+			onClose : function(dateText, inst) {
+				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+				month = parseInt(month);
+				var last_day_month = LastDayOfMonth(year, month + 1);
+
+				$("#period_start_date_2").val("01");
+				$("#period_end_date_2").val(last_day_month);
+				$(this).datepicker('setDate', new Date(year, month, 1));
+			}
+		});
+		
+		$("#reporting_period_2").datepicker('setDate', new Date());
+		
+		$("#reporting_period_3").datepicker({
+			yearRange : "-120:+0",
+			maxDate : "0D",
+			changeMonth : true,
+			changeYear : true,
+			showButtonPanel : true,
+			dateFormat : 'MM-yy',
+			onClose : function(dateText, inst) {
+				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+				month = parseInt(month);
+				var last_day_month = LastDayOfMonth(year, month + 1);
+
+				$("#period_start_date_3").val("01");
+				$("#period_end_date_3").val(last_day_month);
+				$(this).datepicker('setDate', new Date(year, month, 1));
+			}
+		});
+		
+		$("#reporting_period_3").datepicker('setDate', new Date());
+		
+		
+		$("#reporting_period_4").datepicker({
+			yearRange : "-120:+0",
+			maxDate : "0D",
+			changeMonth : true,
+			changeYear : true,
+			showButtonPanel : true,
+			dateFormat : 'MM-yy',
+			onClose : function(dateText, inst) {
+				var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+				var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+				month = parseInt(month);
+				var last_day_month = LastDayOfMonth(year, month + 1);
+
+				$("#period_start_date_4").val("01");
+				$("#period_end_date_4").val(last_day_month);
+				$(this).datepicker('setDate', new Date(year, month, 1));
+			}
+		});
+		
+		$("#reporting_period_4").datepicker('setDate', new Date());
 			
-		      });
+	});
+		function LastDayOfMonth(Year, Month) {
+			return (new Date((new Date(Year, Month, 1)) - 1)).getDate();
+		}
 </script>
 <style type="text/css">
 	.ui-datepicker-calendar {
