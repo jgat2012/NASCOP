@@ -11,7 +11,7 @@ class Pipeline_Import extends MY_Controller {
 	}
 
 	public function index() {
-$this->load->view("pipeline_upload");
+		$this -> load -> view("pipeline_upload");
 		//$data['content_view'] = "pipeline_upload";
 		//$this -> base_params($data);
 	}
