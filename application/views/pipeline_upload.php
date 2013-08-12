@@ -141,6 +141,8 @@
 	}
 	legend {
 		font-size: 1.4em;
+
+		height:70px;
 	}
 	h3 {
 		font-size: 1.2em;
@@ -157,17 +159,26 @@
 	
 
 </style>
-<div id="view_content">
-	<div class="container-fluid">
-		<div class="row-fluid row">
+
+<div id="view_content" class="center-content">
+	    <div>
+		<ul class="breadcrumb">
+		  <li><a href="<?php echo site_url().'home_controller/home' ?>"  id='goHome'><i class="icon-home"></i><strong>Home</strong></a> 
+		  	<span class="divider">/</span></li>
+		  <li class="active" id="actual_page">Pipeline Upload</li>
+		</ul>
+	</div>
+	<div class="container-fluid" >
+		<div class="row-fluid row" >
 			<!-- Side bar menus -->
-			<?php echo $this -> load -> view('settings_side_bar_menus_v.php');?>
+			<?php //echo $this -> load -> view('settings_side_bar_menus_v.php');?>
 			<!-- SIde bar menus end -->
-			<div class="span9 span-fixed-sidebar">
-				<div class="hero-unit">
+			<div class="span9 span-fixed-sidebar" >
+				<div class="hero-unit" >
 					<div class="passmessage"></div>
 					<div class="errormessage"></div>
-					<div class="well">
+					<div class="well" style="background:#9CF">
+
 						
 						<form name="frm" method="post" enctype="multipart/form-data" id="frm" action="<?php echo base_url()."pipeline_import/upload"?>">
 							<legend>
@@ -178,6 +189,8 @@
 								<option value="1">Single Sheet</option>
 							</select>
 							<label class="show_worksheets">
+
+								<span>Select Worksheet</span>
 							<select name="test_type" id="test_type" style="width:300px;float:right;">
 								<option value="0">-Select One--</option>
 								<option value="1">Current Patients By Regimen</option>
@@ -199,13 +212,7 @@
 									<span style="margin-right:20px;">KEMSA</span>
 									<input type="radio" name="pipeline_name" value="2" required="required"/>
 									KENYA PHARMA </label>
-								<!--
-								<label class="checkbox">
-								<input type="radio" name="pipeline_name" value="2" required="required"/> KENYA PHARMA
-								</label>
 
-								</p>
-								-->
 								<b><u><h4>Upload Period</h4></u></b>
 							<p>
 								<input type="text" name="upload_date" id="upload_date" class="input-xlarge" required="required" />

@@ -1,3 +1,4 @@
+<div class="center-content">
 <table class="table table-bordered ">
 	<thead>
 		<tr>
@@ -51,3 +52,4 @@ foreach($orders as $order){
 	</tbody>
 </table>
 <?php }?>
+</div>
