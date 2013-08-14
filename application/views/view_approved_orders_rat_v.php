@@ -20,6 +20,37 @@
 	});
 </script>
 <div class="center-content">
+	<div>
+		<ul class="breadcrumb">
+		  <li><a href="<?php echo site_url().'order_rationalization' ?>">Orders</a> <span class="divider">/</span></li>
+		 
+		  	<?php
+		  	if(isset($page_title)){
+		  		?>
+		  		 <li class="active" id="actual_page"><?php echo $page_title;?> </li>
+		  		<?php
+		  	}
+		  	?>
+		 
+		</ul>
+	</div>
+	<div>
+	<?php
+  	if($this->session->userdata("msg_success")){
+  		?>
+  		<span class="message success"><?php echo $this->session->userdata("msg_success")  ?></span>
+  	<?php
+  	$this->session->unset_userdata("msg_success");
+	}
+  		
+  	elseif($this->session->userdata("msg_error")){
+  		?>
+  		<span class="message error"><?php echo $this->session->userdata("msg_error")  ?></span>
+  	<?php
+  	$this->session->unset_userdata("msg_error");
+  	}
+	?>
+	</div>
 	<?php
 	$this->load->view('orders_rat_sub_menu');
 	?>
