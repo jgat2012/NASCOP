@@ -14,7 +14,7 @@
 |
 */
 
-$config['script_dir'] = 'assets/scripts/';
+$config['script_dir'] = 'assets/js/';
 
 
 /*
@@ -26,7 +26,7 @@ $config['script_dir'] = 'assets/scripts/';
 |
 */
 
-$config['style_dir'] = 'assets/styles/';
+$config['style_dir'] = 'assets/css/';
 
 /*
 |--------------------------------------------------------------------------
@@ -96,7 +96,7 @@ $config['combine'] = TRUE;
 |
 */
 
-$config['minify_js'] = TRUE;
+$config['minify_js'] = FALSE;
 
 
 /*

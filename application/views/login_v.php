@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		<header>
-			<img src='<?php echo base_url();?>Images/nascop.jpg'>
+			<?=img('nascop.jpg')?>
 		</header>
 		        <script>
 					$(document).ready(function(){

@@ -135,7 +135,7 @@ header {
 	width: 100px;
 	height: 100px;
 	position: relative;
-	background: url("../Images/coat_of_arms-resized.png") no-repeat;
+	background: url("../img/coat_of_arms-resized.png") no-repeat;
 }
 #main_wrapper {
 	/*overflow: hidden;*/
@@ -479,7 +479,7 @@ fieldset {
 	-o--box-shadow: 0 2px 6px 0.5px #000;
 	text-align: center;
 	margin: 0% auto 1% auto;
-	width: auto;
+	width: 30%;
 	text-align: center;
 	font-weight: bold;
 }
@@ -506,7 +506,6 @@ fieldset {
 	-o--box-shadow: 0 2px 6px 0.5px #000;
 	text-align: center;
 	margin: 3% auto 1% auto;
-	width: auto;
 	text-align: center;
 	font-weight: bold;
 }

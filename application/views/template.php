@@ -77,25 +77,7 @@ if ($user_is_pharmacist || $user_is_facility_administrator || $user_is_administr
  * Load View with Head Section
  */
 
-if (isset($script_urls)) {
-	foreach ($script_urls as $script_url) {
-		echo "<script src=\"" . $script_url . "\" type=\"text/javascript\"></script>";
-	}
-}
-?>
 
-<?php
-if (isset($scripts)) {
-	foreach ($scripts as $script) {
-		echo "<script src=\"" . base_url() . "Scripts/" . $script . "\" type=\"text/javascript\"></script>";
-	}
-}
-
-if (isset($styles)) {
-	foreach ($styles as $style) {
-		echo "<link href=\"" . base_url() . "CSS/" . $style . "\" type=\"text/css\" rel=\"stylesheet\"/>";
-	}
-}
 ?> 
 
 <script>
