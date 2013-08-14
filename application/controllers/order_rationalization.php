@@ -10,27 +10,24 @@ class Order_Rationalization extends MY_Controller {
 	}
 
 	public function submitted_orders($status = 0, $offset = 0) {
-		if($status==0){
-			$data['page_title']="Pending Orders";
-			$data['days_pending']="Approval";
-		}
-		elseif($status==1){
-			$data['page_title']="Approved Orders";
-			$data['days_pending']="Dispatched";
-		}
-		elseif($status==2){
-			$data['page_title']="Declined Orders";
-			$data['days_pending']="Resubmission";
-		}
-		elseif($status==3){
-			$data['page_title']="Dispatched Orders";
-			$data['days_pending']="Delivery";
+		if ($status == 0) {
+			$data['page_title'] = "Pending Orders";
+			$data['days_pending'] = "Approval";
+		} elseif ($status == 1) {
+			$data['page_title'] = "Approved Orders";
+			$data['days_pending'] = "Dispatched";
+		} elseif ($status == 2) {
+			$data['page_title'] = "Declined Orders";
+			$data['days_pending'] = "Resubmission";
+		} elseif ($status == 3) {
+			$data['page_title'] = "Dispatched Orders";
+			$data['days_pending'] = "Delivery";
 		}
 		$items_per_page = 20;
 		$number_of_orders = Facility_Order::getTotalNumber($status);
 		$orders = Facility_Order::getPagedOrders($offset, $items_per_page, $status);
 		if ($number_of_orders > $items_per_page) {
-			$config['base_url'] = base_url() . "order_rationalization/submitted_orders/".$status."/";
+			$config['base_url'] = base_url() . "order_rationalization/submitted_orders/" . $status . "/";
 			$config['total_rows'] = $number_of_orders;
 			$config['per_page'] = $items_per_page;
 			$config['uri_segment'] = 4;
@@ -38,16 +35,15 @@ class Order_Rationalization extends MY_Controller {
 			$this -> pagination -> initialize($config);
 			$data['pagination'] = $this -> pagination -> create_links();
 		}
-		
+
 		$data['orders'] = $orders;
 		$data['quick_link'] = $status;
 		$data['content_view'] = "view_orders_rat_v";
 		//If the orders being viewed are approved, display the view for generating the picking list
-		if($status == 1){
+		if ($status == 1) {
 			$data['content_view'] = "view_approved_orders_rat_v";
 		}
 		$data['banner_text'] = "Submitted Orders";
-		$data['styles'] = array("pagination.css");
 		//get all submitted orders that have not been rationalized (fresh orders)
 		$this -> base_params($data);
 	}
@@ -55,22 +51,23 @@ class Order_Rationalization extends MY_Controller {
 	public function rationalize_order($order) {
 		//First retrieve the order and its particulars from the database
 		$data = array();
-		$data['order_no']=$order;
-		$data['hide_side_menu']=1;
-		$data['order_details_page']='edit_order';
+		$data['order_no'] = $order;
+		$data['hide_side_menu'] = 1;
+		$data['order_details_page'] = 'edit_order';
 		$data['order_details'] = Facility_Order::getOrder($order);
+		$order = $data['order_details'] -> Unique_Id;
 		$data['commodities'] = Cdrr_Item::getOrderItems($order);
 		$data['regimens'] = Maps_Item::getOrderItems($order);
 		$data['comments'] = Order_Comment::getOrderComments($order);
 		$data['content_view'] = "rationalize_order_v";
 		$data['banner_text'] = "Order Particulars";
-		$order_type=$data['order_details']['Code'];
-		$data['order_type']=$order_type;
+		$order_type = $data['order_details']['Code'];
+		$data['order_type'] = $order_type;
 		//get all submitted orders that have not been rationalized (fresh orders)
 		$this -> base_params($data);
 	}
 
-	public function save() { 
+	public function save() {
 		//save the changes made and change the status
 		$updated_on = date("U");
 		$user_id = $this -> session -> userdata('user_id');
@@ -89,7 +86,7 @@ class Order_Rationalization extends MY_Controller {
 		$patient_numbers = $this -> input -> post('patient_numbers');
 		$mos = $this -> input -> post('mos');
 		$comments = $this -> input -> post('comments');
-		$transaction_type= $this -> input -> post('transaction_type');
+		$transaction_type = $this -> input -> post('transaction_type');
 		//$approve_order = $this -> input -> post('approve_order');
 		//$decline_order = $this -> input -> post('decline_order');
 		$order_number = $this -> input -> post('order_number');
@@ -101,17 +98,16 @@ class Order_Rationalization extends MY_Controller {
 		$order_object = Facility_Order::getOrder($order_number);
 		$status = 0;
 		//Check which button was pressed
-		
+
 		if (isset($transaction_type)) {
-			if($transaction_type=='approved'){
+			if ($transaction_type == 'approved') {
 				$url = "order_rationalization/submitted_orders/1";
 				$status = 1;
-			}
-			elseif ($transaction_type=='declined') {
+			} elseif ($transaction_type == 'declined') {
 				$url = "order_rationalization/submitted_orders/2";
 				$status = 2;
 			}
-			
+
 			$order_object -> Status = $status;
 			$order_object -> Updated = $updated_on;
 			//code = 0 i.e. fcdrr
@@ -122,11 +118,11 @@ class Order_Rationalization extends MY_Controller {
 			$order_object -> save();
 			$order_id = $order_object -> id;
 			//Now save the comment that has been made
-			$old_comments=Order_Comment::getOrderComments($order_id);
+			$old_comments = Order_Comment::getOrderComments($order_id);
 			foreach ($old_comments as $old_comment) {
 				$old_comment -> delete();
 			}
-			
+
 			$order_comment = new Order_Comment();
 			$order_comment -> Order_Number = $order_id;
 			$order_comment -> Timestamp = date('U');
@@ -138,23 +134,23 @@ class Order_Rationalization extends MY_Controller {
 			if ($commodities != null) {
 				foreach ($commodities as $commodity) {
 					//First check if any quantitites are required for resupply to avoid empty entriesv
-						$cdrr_item = Cdrr_Item::getItem($commodity);
-						$cdrr_item -> Balance = $opening_balances[$commodity_counter];
-						$cdrr_item -> Received = $quantities_received[$commodity_counter];
-						$cdrr_item -> Dispensed_Units = $quantities_dispensed[$commodity_counter];
-						//For fcdrr, packs are not used.
-						//$cdrr_item->Dispensed_Packs = $opening_balances[$commodity_counter];
-						$cdrr_item -> Losses = $losses[$commodity_counter];
-						$cdrr_item -> Adjustments = $adjustments[$commodity_counter];
-						$cdrr_item -> Count = $physical_count[$commodity_counter];
-						$cdrr_item -> Resupply = $resupply[$commodity_counter];
-						//The following not required for fcdrrs
-						/*$cdrr_item->Aggr_Consumed = $opening_balances[$commodity_counter];
-						 $cdrr_item->Aggr_On_Hand = $opening_balances[$commodity_counter];
-						 $cdrr_item->Publish = $opening_balances[$commodity_counter];*/
-						$cdrr_item -> Cdrr_Id = $order_id;
-						$cdrr_item -> save();
-						echo $cdrr_item -> id . "<br>";
+					$cdrr_item = Cdrr_Item::getItem($commodity);
+					$cdrr_item -> Balance = $opening_balances[$commodity_counter];
+					$cdrr_item -> Received = $quantities_received[$commodity_counter];
+					$cdrr_item -> Dispensed_Units = $quantities_dispensed[$commodity_counter];
+					//For fcdrr, packs are not used.
+					//$cdrr_item->Dispensed_Packs = $opening_balances[$commodity_counter];
+					$cdrr_item -> Losses = $losses[$commodity_counter];
+					$cdrr_item -> Adjustments = $adjustments[$commodity_counter];
+					$cdrr_item -> Count = $physical_count[$commodity_counter];
+					$cdrr_item -> Resupply = $resupply[$commodity_counter];
+					//The following not required for fcdrrs
+					/*$cdrr_item->Aggr_Consumed = $opening_balances[$commodity_counter];
+					 $cdrr_item->Aggr_On_Hand = $opening_balances[$commodity_counter];
+					 $cdrr_item->Publish = $opening_balances[$commodity_counter];*/
+					$cdrr_item -> Cdrr_Id = $order_id;
+					$cdrr_item -> save();
+					echo $cdrr_item -> id . "<br>";
 					$commodity_counter++;
 				}
 			}
@@ -175,13 +171,12 @@ class Order_Rationalization extends MY_Controller {
 			}
 			redirect($url);
 		}
-		
-		
+
 	}
 
 	public function base_params($data) {
 		$data['title'] = "Commodity Orders";
-		$data['_type']='order';
+		$data['_type'] = 'order';
 		$data['link'] = "order_management";
 		$this -> load -> view('template', $data);
 	}
