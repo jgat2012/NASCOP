@@ -65,14 +65,15 @@
 		<tr>
 			<th width="80px">Order No</th>
 			<th >Facility Name</th>
-			<th>Beginning Period</th>
-			<th>Ending Period</th>
+			<th>Type of Order</th>
+			<th>Reporting Period</th>
 			<th>Days pending <div style="<?php if($days_pending=="Approval"){ ?> color:rgb(255, 167, 11);  <?php } elseif ($days_pending=="Dispatched") { ?> color:green; <?php } elseif ($days_pending=="Resubmission") { ?> color:red; <?php } elseif ($days_pending=="Delivery") { ?> color:rgb(1, 167, 146); <?php } ?>">(<?php echo $days_pending ?>)</div></th>
 			<th width="80px">Action</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php 
+		$order_types = array(0=>"Central",1=>"Aggregated",2=>"Satellite");
 		foreach($orders as $order){
 			$period_begin=$order->Period_Begin;
 			$period_end=$order->Period_End;
@@ -87,8 +88,8 @@
 			<tr>
 				<td><?php echo $order->id;?></td>
 				<td><?php echo $order->Facility_Object->name;?></td>
-				<td><?php echo date('d-M-Y',strtotime($period_begin));?></td>
-				<td><?php echo date('d-M-Y',strtotime($period_end));?></td>
+				<td><b><?php echo @$order_types[$order->Code];?></b></td>
+				<td><?php echo date('M-Y',strtotime($period_begin));?></td>
 				<td align="center"><?php echo $numberDays; ?> Day (s)</td>
 				<td><input name="order[]" type="checkbox" value="<?php echo $order->id;?>" /></td>
 				
