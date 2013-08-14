@@ -245,6 +245,8 @@ if(isset($reports)|| isset($report_title)){
 			    if($user_is_pharmacist){
 				?>
 				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			
+			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			
+                <li class="divider"></li>
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
 				
 				
@@ -253,7 +255,9 @@ if(isset($reports)|| isset($report_title)){
 
 				if($user_is_facility_administrator){
 				?>
-				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-plus"></i>Add Picking List</a></li>		
+				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			
+			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			
+                <li class="divider"></li>
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
 				
 				<?php

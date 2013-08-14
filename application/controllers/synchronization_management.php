@@ -7,14 +7,11 @@ class Synchronization_Management extends MY_Controller {
 		parent::__construct();
 	}
 
-	public function index() {
-
-	}
-
 	public function synchronize_orders($facility) {
 		$mainstrSQl = "";
 		$id_str = "";
 		$temp_str = "";
+		$sql = "";
 		$table_lists = array("facility_order", "cdrr_item", "maps_item", "order_comment");
 		$id_array = array();
 		foreach ($table_lists as $table_list) {
@@ -23,63 +20,76 @@ class Synchronization_Management extends MY_Controller {
 			if ($table_list == "facility_order") {
 				$sql = "select * from $table_name where code >='1' and central_facility='$facility'";
 			} else if ($table_list == "cdrr_item") {
-				$sql = "select * from  $table_name where cdrr_id IN($id_str)";
+				if ($id_str) {
+					$sql = "select * from  $table_name where cdrr_id IN($id_str)";
+				}
 				$temp_str = $id_str;
 			} else if ($table_list == "maps_item") {
-				$sql = "select * from  $table_name where maps_id IN($temp_str)";
+				if ($temp_str) {
+					$sql = "select * from  $table_name where maps_id IN($temp_str)";
+				}
 			} else if ($table_list == "order_comment") {
-				$sql = "select * from  $table_name where order_number IN($temp_str)";
-			}
-
-			$query = $this -> db -> query($sql);
-			$results = $query -> result_array();
-			if ($results) {
-				foreach ($results as $val => $value_array) {
-					$fields = "";
-					$values = "";
-					$temp_val = "";
-					$id_str = "";
-					$strSQl .= "INSERT INTO $table_list (";
-					foreach ($value_array as $col => $value) {
-						if ($col != 'id') {
-							$temp_val .= "," . $col . "=" . "\"" . trim($value) . "\"";
-							$fields .= "," . $col;
-							$values .= ",\"" . trim($value) . "\"";
-						}
-						if ($col == "unique_id" && $table_list == "facility_order") {
-							$id_array[] = $value;
-							foreach ($id_array as $temp_id) {
-								$id_str .= ",\"" . $temp_id."\"";
-							}
-							$id_str = substr($id_str, 1);
-						}
-					}
-					$fields = substr($fields, 1);
-					$values = substr($values, 1);
-					$temp_val = substr($temp_val, 1);
-					$strSQl .= $fields . ")VALUES(" . $values . ") ON DUPLICATE KEY UPDATE $temp_val ;";
+				if ($temp_str) {
+					$sql = "select * from  $table_name where order_number IN($temp_str)";
 				}
 			}
-
+			if ($sql) {
+				$query = $this -> db -> query($sql);
+				$results = $query -> result_array();
+				if ($results) {
+					foreach ($results as $val => $value_array) {
+						$fields = "";
+						$values = "";
+						$temp_val = "";
+						$id_str = "";
+						$strSQl .= "INSERT INTO $table_list (";
+						foreach ($value_array as $col => $value) {
+							if ($col != 'id') {
+								$temp_val .= "," . $col . "=" . "\"" . trim($value) . "\"";
+								$fields .= "," . $col;
+								$values .= ",\"" . trim($value) . "\"";
+							}
+							if ($col == "unique_id" && $table_list == "facility_order") {
+								$id_array[] = $value;
+								foreach ($id_array as $temp_id) {
+									$id_str .= ",\"" . $temp_id . "\"";
+								}
+								echo $id_str = substr($id_str, 1);
+							}
+						}
+						$fields = substr($fields, 1);
+						$values = substr($values, 1);
+						$temp_val = substr($temp_val, 1);
+						$strSQl .= $fields . ")VALUES(" . $values . ") ON DUPLICATE KEY UPDATE $temp_val ;";
+					}
+				}
+			}
 			$mainstrSQl .= $strSQl;
 		}
-		return $mainstrSQl;
+		echo $mainstrSQl;
 
 	}
 
 	public function getSQL($facility) {
 		$sql = "";
 		if ($this -> input -> post("sql")) {
-			$sql = $this -> encrypt -> decode($this -> input -> post("sql"));
-			$queries = explode(";", $sql);
-			foreach ($queries as $query) {
-				if (strlen($query) > 0) {
-					$this -> db -> query($query);
+			$sql = $this -> input -> post("sql");
+			if ($sql != '') {
+				$sql = base64_decode($sql);
+				$queries = explode(";", $sql);
+				foreach ($queries as $query) {
+					if (strlen($query) > 0) {
+						$this -> db -> query($query);
+					}
 				}
 			}
 		}
 		$sql = $this -> synchronize_orders($facility);
-		echo $sql=$this->encrypt->encode($sql);
+		if ($sql != '') {
+			echo $sql = base64_encode($sql);
+		} else {
+			echo $sql = "";
+		}
 	}
 
 	public function base_params($data) {
