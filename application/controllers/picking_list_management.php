@@ -100,7 +100,13 @@ class Picking_List_Management extends MY_Controller {
 
 	public function assign_orders() {
 		$data = array();
-		$data['orders'] = $this -> input -> post("order");
+		
+		if($this -> input -> post("order")==''){
+			$data['orders'] = $this -> input -> post("order");
+		}else{
+			$data['orders']='';
+		}
+		
 		$data['page_title']='Assign Picking List';
 		$data['banner_text'] = "Assign Picking List";
 		$data['picking_lists'] = Picking_List_Details::getAllOpen();

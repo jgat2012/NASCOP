@@ -3,6 +3,7 @@ class Order_Rationalization extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
+		date_default_timezone_set('Africa/Nairobi');
 	}
 
 	public function index() {
@@ -70,7 +71,7 @@ class Order_Rationalization extends MY_Controller {
 	public function save() {
 		//save the changes made and change the status
 		$updated_on = date("U");
-		$user_id = $this -> session -> userdata('user_id');
+		$user_id = $this -> session -> userdata('full_name');
 		$opening_balances = $this -> input -> post('opening_balance');
 		$quantities_received = $this -> input -> post('quantity_received');
 		$quantities_dispensed = $this -> input -> post('quantity_dispensed');
@@ -81,12 +82,15 @@ class Order_Rationalization extends MY_Controller {
 		$expiry_date = $this -> input -> post('expiry_date');
 		$out_of_stock = $this -> input -> post('out_of_stock');
 		$resupply = $this -> input -> post('resupply');
+		$newresupply = $this -> input -> post('newresupply');
 		$commodities = $this -> input -> post('commodity');
 		$regimens = $this -> input -> post('patient_regimens');
 		$patient_numbers = $this -> input -> post('patient_numbers');
 		$mos = $this -> input -> post('mos');
 		$comments = $this -> input -> post('comments');
+		$o_comments = $this -> input -> post('o_comments');
 		$transaction_type = $this -> input -> post('transaction_type');
+		$unique_id = $this -> input -> post("unique_id");
 		//$approve_order = $this -> input -> post('approve_order');
 		//$decline_order = $this -> input -> post('decline_order');
 		$order_number = $this -> input -> post('order_number');
@@ -103,9 +107,11 @@ class Order_Rationalization extends MY_Controller {
 			if ($transaction_type == 'approved') {
 				$url = "order_rationalization/submitted_orders/1";
 				$status = 1;
+				$this -> session -> set_userdata('msg_success', 'Order was Approved');
 			} elseif ($transaction_type == 'declined') {
 				$url = "order_rationalization/submitted_orders/2";
 				$status = 2;
+				$this -> session -> set_userdata('msg_error', 'Order was Declined');
 			}
 
 			$order_object -> Status = $status;
@@ -116,18 +122,27 @@ class Order_Rationalization extends MY_Controller {
 			/*$order_object->Reports_Expected = 0;
 			 $order_object->Reports_Actual = 0;*/
 			$order_object -> save();
-			$order_id = $order_object -> id;
+			//$order_id = $order_object -> id;
 			//Now save the comment that has been made
-			$old_comments = Order_Comment::getOrderComments($order_id);
-			foreach ($old_comments as $old_comment) {
-				$old_comment -> delete();
-			}
+			$facility="nascop";
 
+			if ($o_comments == $comments){
+				$old_comments = Order_Comment::getOrderComments($unique_id);
+				foreach ($old_comments as $old_comment) {
+					$old_comment -> delete();
+				}
+				$sql = "select max(id)as last from order_comment";
+				$query = $this -> db -> query($sql);
+				$results = $query -> result_array();
+				$last_id = $results[0]['last'];
+				$last_id++;
+			}
 			$order_comment = new Order_Comment();
-			$order_comment -> Order_Number = $order_id;
+			$order_comment -> Order_Number = $unique_id;
 			$order_comment -> Timestamp = date('U');
 			$order_comment -> User = $user_id;
 			$order_comment -> Comment = $comments;
+			$order_comment -> Unique_Id = md5($last_id . $facility);
 			$order_comment -> save();
 			//Now save the cdrr items
 			$commodity_counter = 0;
@@ -143,12 +158,13 @@ class Order_Rationalization extends MY_Controller {
 					$cdrr_item -> Losses = $losses[$commodity_counter];
 					$cdrr_item -> Adjustments = $adjustments[$commodity_counter];
 					$cdrr_item -> Count = $physical_count[$commodity_counter];
-					$cdrr_item -> Resupply = $resupply[$commodity_counter];
+					$cdrr_item -> Resupply = $newresupply[$commodity_counter];
+					$cdrr_item -> Newresupply = $resupply[$commodity_counter];
 					//The following not required for fcdrrs
 					/*$cdrr_item->Aggr_Consumed = $opening_balances[$commodity_counter];
 					 $cdrr_item->Aggr_On_Hand = $opening_balances[$commodity_counter];
 					 $cdrr_item->Publish = $opening_balances[$commodity_counter];*/
-					$cdrr_item -> Cdrr_Id = $order_id;
+					$cdrr_item -> Cdrr_Id = $unique_id;
 					$cdrr_item -> save();
 					echo $cdrr_item -> id . "<br>";
 					$commodity_counter++;
@@ -162,7 +178,7 @@ class Order_Rationalization extends MY_Controller {
 					if ($patient_numbers[$regimen_counter] > 0) {
 						$maps_item = Maps_Item::getItem($regimen);
 						$maps_item -> Total = $patient_numbers[$regimen_counter];
-						$maps_item -> Maps_Id = $maps_id;
+						$maps_item -> Maps_Id = $unique_id;
 						$maps_item -> save();
 						echo $maps_item -> id . "<br>";
 					}

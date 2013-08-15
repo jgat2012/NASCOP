@@ -1,3 +1,10 @@
+<script type="text/javascript">
+	$(document).ready(function(){
+		setTimeout(function(){
+			$(".message").fadeOut("2000");
+		},6000);
+	});
+</script>
 <div class="center-content">
 	<div>
 		<ul class="breadcrumb">
@@ -63,9 +70,8 @@
 				<td><?php echo $order->Facility_Object->name;?></td>
 				<td><b><?php echo @$order_types[$order->Code];?></b></td>
 				<td><?php echo date('M-Y',strtotime($period_begin));?></td>
-				<td align="center"><?php echo $numberDays; ?> Day (s)</td>
-				<td style="text-align: center"><a href="<?php echo base_url()."order_rationalization/rationalize_order/".$order->id;?>">View</a></td>
-				
+				<td align="center"><?php echo $numberDays; ?> Day (s)</td>			
+				<td style="text-align: center"><a href="<?php echo base_url()."order_rationalization/rationalize_order/".$order->id;?>"><?php if($quick_link != 2){?>View<?php }?></a></td>			
 			</tr>
 		<?php }
 		?>

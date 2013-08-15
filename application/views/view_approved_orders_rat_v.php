@@ -17,6 +17,9 @@
 		      return false;
 		    }
 		});
+		setTimeout(function(){
+			$(".message").fadeOut("2000");
+		},6000);
 	});
 </script>
 <div class="center-content">

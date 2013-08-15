@@ -4,14 +4,14 @@ class Order_Comment extends Doctrine_Record {
 	public function setTableDefinition() {
 		$this -> hasColumn('Order_Number','varchar','150');
 		$this -> hasColumn('Timestamp', 'varchar', 32);
-		$this -> hasColumn('User', 'varchar', 10);
+		$this -> hasColumn('User', 'varchar', 150);
 		$this -> hasColumn('Comment', 'text');
 		$this -> hasColumn('Unique_Id', 'varchar','150');
 	}//end setTableDefinition
 
 	public function setUp() {
 		$this -> setTableName('order_comment');
-		$this -> hasOne('Users as User_Object', array('local' => 'User', 'foreign' => 'id'));
+		$this -> hasOne('Users as User_Object', array('local' => 'User', 'foreign' => 'Name'));
 	}//end setUp
 
 	public static function getOrderComments($order) {

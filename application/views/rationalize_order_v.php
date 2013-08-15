@@ -5,6 +5,7 @@
 		//Set all input to be readonly
 		$("#generate_order").find("input").attr("readonly","readonly");
 		$(".research").find("input").attr("readonly","readonly");
+		$(".resupply").removeAttr("readonly");
 		//$(".research").find("input").attr("readonly","readonly");
 		//$("#facility_info").find("input").attr("readonly","readonly");
 		
@@ -186,7 +187,9 @@
 					<th>Reporting Period : </th>
 					<td colspan="3"><input name="reporting_period" id="reporting_period" type="text" placeholder="Click here to select period" value="<?php echo date('F-Y',strtotime($order_details->Period_Begin)); ?>" disabled="disabled"/></td>
 					<input name="start_date" id="period_start_date" type="hidden" value="<?php echo $order_details->Period_Begin;?>">
-					<input name="end_date" id="period_end_date" type="hidden" value="<?php echo $order_details->Period_End;?>"></td>
+					<input name="end_date" id="period_end_date" type="hidden" value="<?php echo $order_details->Period_End;?>">
+					<input name="unique_id" id="unique_id" type="hidden" value="<?php echo $order_details->Unique_Id;?>">
+					</td>
 				</tr>
 				
 			</tbody>
@@ -275,7 +278,8 @@
 				</td>
 				<!-- aggregate -->
 				<td class="number col_resupply">
-				<input tabindex="-1" name="resupply[]" id="CdrrItem_10_resupply" type="text" class="resupply" value="<?php echo $commodity -> Resupply;?>">
+				<input tabindex="-1" name="newresupply[]" id="CdrrItem_10_newresupply" type="text" class="resupply" value="<?php echo $commodity -> Resupply;?>">
+				<input tabindex="-1" name="resupply[]" id="CdrrItem_10_resupply" type="hidden" class="resupply" value="<?php echo $commodity -> Resupply;?>">
 				</td>
 				<input type="hidden" name="commodity[]" value="<?php echo $commodity -> id;?>"/>
 			</tr>
@@ -291,15 +295,15 @@
 	foreach($comments as $comment){
 		$has_comment=1;
 		?>
-	
+	    
 		<span class="label" style="vertical-align: bottom;background:#999;">Comment </span>
-		<textarea style="width:98%" rows="3" name="comments"><?php echo $comment->Comment ?></textarea>
+		<textarea style="width:98%" rows="3" name="o_comments" disabled="disbled"><?php echo $comment->Comment ?></textarea>
 		<table class="table table-bordered">
 			<thead>
 				<tr><th>Last Update</th><th>Accessed By</th><th>Access Level</th></tr>
 			</thead>
 			<tbody>
-				<tr><td><span class="green"><?php echo date('l d-M-Y h:i:s a', $comment -> Timestamp);?></span></td><td><span class="green"><?php echo $comment -> User_Object -> Name;?></span></td><td><span class="green"><?php echo $comment -> User_Object -> Access -> Level_Name;?></span></td></tr>
+				<tr><td><span class="green"><?php echo date('l d-M-Y h:i:s a', $comment -> Timestamp);?></span></td><td><span class="green"><?php if($comment -> User_Object -> Name){echo $comment -> User_Object -> Name;}else{echo $comment->User;}?></span></td><td><span class="green"><?php  if($comment -> User_Object -> Access -> Level_Name){echo $comment -> User_Object -> Access -> Level_Name;}else{ echo "Facility Administrator";}?></span></td></tr>
 			</tbody>
 		</table>
 		
@@ -308,11 +312,23 @@
 	?>
 		<span class="label" style="vertical-align: bottom"> Add Comment </span>
 		<textarea style="width:98%" rows="3" name="comments"></textarea>
+		<textarea style="display:none;" rows="3" name="o_comments"></textarea>
 	<?php	
-	}
+	}else{
 	?>
-	<input type="button" class="save_changes btn btn-success btn-small" id="approve_order" value="Approve Order" name="approve_order" />
-	<input type="button" class="save_changes btn btn-danger btn-small" id="decline_order" value="Decline Order" name="decline_order"/>
+	  <span class="label" style="vertical-align: bottom;background:#999;">Comment </span>
+		<textarea style="width:98%" rows="3" name="comments" ></textarea>
+		<table class="table table-bordered">
+			<thead>
+				<tr><th>Last Update</th><th>Accessed By</th><th>Access Level</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><span class="green"><?php echo date('l d-M-Y h:i:s a');?></span></td><td><span class="green"><?php echo $this->session->userdata("full_name");?></td><td><span class="green"><?php echo "Nascop Pharmacist";  ?></td></tr>
+			</tbody>
+		</table>
+	<?php }?>
+	<input type="button" class="save_changes btn green" id="approve_order" value="Approve Order" name="approve_order" />
+	<input type="button" class="save_changes btn red" id="decline_order" value="Decline Order" name="decline_order"/>
 	</div>
 </div>
 	<table class=" table table-bordered regimen-table big-table research">

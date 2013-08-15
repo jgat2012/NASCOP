@@ -12,7 +12,7 @@ class Synchronization_Management extends MY_Controller {
 		$id_str = "";
 		$temp_str = "";
 		$sql = "";
-		$table_lists = array("facility_order", "cdrr_item", "maps_item", "order_comment");
+		$table_lists = array("facility_order", "cdrr_item", "maps_item", "order_comment");		
 		$id_array = array();
 		foreach ($table_lists as $table_list) {
 			$strSQl = "";
@@ -42,7 +42,7 @@ class Synchronization_Management extends MY_Controller {
 						$values = "";
 						$temp_val = "";
 						$id_str = "";
-						$strSQl .= "INSERT INTO $table_list (";
+						$strSQl .= "<br/>INSERT INTO $table_list (";
 						foreach ($value_array as $col => $value) {
 							if ($col != 'id') {
 								$temp_val .= "," . $col . "=" . "\"" . trim($value) . "\"";
@@ -54,7 +54,7 @@ class Synchronization_Management extends MY_Controller {
 								foreach ($id_array as $temp_id) {
 									$id_str .= ",\"" . $temp_id . "\"";
 								}
-								echo $id_str = substr($id_str, 1);
+								 $id_str = substr($id_str, 1);
 							}
 						}
 						$fields = substr($fields, 1);
