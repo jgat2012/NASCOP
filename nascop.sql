@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 14, 2013 at 05:25 PM
+-- Generation Time: Aug 15, 2013 at 12:32 PM
 -- Server version: 5.5.27
 -- PHP Version: 5.4.7
 
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `access_log` (
   `facility_code` varchar(150) NOT NULL,
   `access_type` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=49 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=57 ;
 
 --
 -- Dumping data for table `access_log`
@@ -112,7 +112,15 @@ INSERT INTO `access_log` (`id`, `machine_code`, `user_id`, `access_level`, `star
 (45, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-14 15:45:49', '2013-08-14 16:12:15', 'NASCOP', 'Logout'),
 (46, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-14 17:54:26', '2013-08-14 18:09:09', 'NASCOP', 'Logout'),
 (47, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-14 18:10:41', '2013-08-14 18:15:26', 'NASCOP', 'Logout'),
-(48, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-14 18:16:58', '2013-08-14 18:24:48', 'NASCOP', 'Logout');
+(48, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-14 18:16:58', '2013-08-14 18:24:48', 'NASCOP', 'Logout'),
+(49, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-14 18:27:24', '2013-08-14 18:31:46', 'NASCOP', 'Logout'),
+(50, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 09:31:10', '2013-08-15 09:41:15', 'NASCOP', 'Logout'),
+(51, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 09:44:24', '2013-08-15 10:01:40', 'NASCOP', 'Logout'),
+(52, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 10:02:07', '2013-08-15 10:37:22', 'NASCOP', 'Logout'),
+(53, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 10:40:42', '2013-08-15 11:10:57', 'NASCOP', 'Logout'),
+(54, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 11:13:54', '2013-08-15 11:26:33', 'NASCOP', 'Logout'),
+(55, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 12:57:10', '2013-08-15 12:58:52', 'NASCOP', 'Logout'),
+(56, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 13:01:16', '2013-08-15 13:30:21', 'NASCOP', 'Logout');
 
 -- --------------------------------------------------------
 
@@ -166,6 +174,7 @@ CREATE TABLE IF NOT EXISTS `cdrr_item` (
   `adjustments` varchar(10) DEFAULT NULL,
   `count` varchar(10) DEFAULT NULL,
   `resupply` varchar(10) DEFAULT NULL,
+  `newresupply` varchar(10) NOT NULL,
   `aggr_consumed` varchar(10) DEFAULT NULL,
   `aggr_on_hand` varchar(10) DEFAULT NULL,
   `publish` varchar(10) NOT NULL DEFAULT '0',
@@ -174,22 +183,22 @@ CREATE TABLE IF NOT EXISTS `cdrr_item` (
   `unique_id` varchar(150) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_id` (`unique_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=37 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
 
 --
 -- Dumping data for table `cdrr_item`
 --
 
-INSERT INTO `cdrr_item` (`id`, `balance`, `received`, `dispensed_units`, `dispensed_packs`, `losses`, `adjustments`, `count`, `resupply`, `aggr_consumed`, `aggr_on_hand`, `publish`, `cdrr_id`, `drug_id`, `unique_id`) VALUES
-(1, '90', '', '80', '', '', '', '10', '230', '', '', '0', '572b32bde8dcd42e5964d23e7a69e138', 'ABACAVIR (ABC)300MG TABS', '572b32bde8dcd42e5964d23e7a69e138'),
-(2, '70', '', '80', '', '', '', '-10', '250', '', '', '0', '572b32bde8dcd42e5964d23e7a69e138', 'ACYCLOVIR 200MG TABS', 'f0c1d0aa67a4f68ddd258f8c7db11570'),
-(3, '60', '', '70', '', '', '', '-10', '220', '', '', '0', '46ae68428a9a69fddacff52ef49a2595', 'ABACAVIR 20MG SYRUP', '38b5c42288c708cd6bbb0f35bcb3d470'),
-(4, '90', '', '80', '', '', '', '10', '230', '', '', '0', '46ae68428a9a69fddacff52ef49a2595', 'ABACAVIR 60/LAMIVUDINE 30MG TABS', '7fe2193d1ab70ddd135c70bf778589ed'),
-(5, '2', '0', '2', '', '0', '0', '1', '4', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ABACAVIR (ABC)300MG TABS', 'd4a1c8e31469a1881c9e8714ba6af712'),
-(6, '1', '0', '1', '', '0', '0', '-0', '1', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ABACAVIR 20MG SYRUP', '3922a5e049025651b692ab5de3ec0694'),
-(7, '2', '0', '2', '', '0', '0', '1', '4', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ABACAVIR 60/LAMIVUDINE 30MG TABS', '2a1caa0c0535f601735022aa4d4390ed'),
-(8, '3', '0', '3', '', '0', '0', '-0', '9', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ACYCLOVIR 200MG TABS', '20e8040dcd1a1af4c09f187166fc6820'),
-(9, '100', '50', '100', '', '', '40', '100', '100', '', '', '0', '9e4f3db3c00fd2d41b0853ec9e6e731d', 'ACYCLOVIR 200MG TABS', '9e4f3db3c00fd2d41b0853ec9e6e731d');
+INSERT INTO `cdrr_item` (`id`, `balance`, `received`, `dispensed_units`, `dispensed_packs`, `losses`, `adjustments`, `count`, `resupply`, `newresupply`, `aggr_consumed`, `aggr_on_hand`, `publish`, `cdrr_id`, `drug_id`, `unique_id`) VALUES
+(1, '90', '', '80', '', '', '', '10', '230', '', '', '', '0', '572b32bde8dcd42e5964d23e7a69e138', 'ABACAVIR (ABC)300MG TABS', '572b32bde8dcd42e5964d23e7a69e138'),
+(2, '70', '', '80', '', '', '', '-10', '250', '', '', '', '0', '572b32bde8dcd42e5964d23e7a69e138', 'ACYCLOVIR 200MG TABS', 'f0c1d0aa67a4f68ddd258f8c7db11570'),
+(3, '60', '', '70', '', '', '', '-10', '220', '', '', '', '0', '46ae68428a9a69fddacff52ef49a2595', 'ABACAVIR 20MG SYRUP', '38b5c42288c708cd6bbb0f35bcb3d470'),
+(4, '90', '', '80', '', '', '', '10', '230', '', '', '', '0', '46ae68428a9a69fddacff52ef49a2595', 'ABACAVIR 60/LAMIVUDINE 30MG TABS', '7fe2193d1ab70ddd135c70bf778589ed'),
+(5, '2', '0', '2', '', NULL, '0', '1', '4', '4', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ABACAVIR (ABC)300MG TABS', 'd4a1c8e31469a1881c9e8714ba6af712'),
+(6, '1', '0', '1', '', NULL, '0', '-0', '2', '1', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ABACAVIR 20MG SYRUP', '3922a5e049025651b692ab5de3ec0694'),
+(7, '2', '0', '2', '', NULL, '0', '1', '4', '4', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ABACAVIR 60/LAMIVUDINE 30MG TABS', '2a1caa0c0535f601735022aa4d4390ed'),
+(8, '3', '0', '3', '', NULL, '0', '-0', '9', '9', '', '', '0', '38b5c42288c708cd6bbb0f35bcb3d470', 'ACYCLOVIR 200MG TABS', '20e8040dcd1a1af4c09f187166fc6820'),
+(9, '100', '50', '100', '', '', '40', '100', '150', '', '', '', '0', '9e4f3db3c00fd2d41b0853ec9e6e731d', 'ACYCLOVIR 200MG TABS', '9e4f3db3c00fd2d41b0853ec9e6e731d');
 
 -- --------------------------------------------------------
 
@@ -7603,7 +7612,7 @@ CREATE TABLE IF NOT EXISTS `facility_order` (
   `unique_id` varchar(150) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_id` (`unique_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `facility_order`
@@ -7612,7 +7621,7 @@ CREATE TABLE IF NOT EXISTS `facility_order` (
 INSERT INTO `facility_order` (`id`, `status`, `created`, `updated`, `code`, `period_begin`, `period_end`, `comments`, `reports_expected`, `reports_actual`, `services`, `sponsors`, `delivery_note`, `order_id`, `facility_id`, `picking_list_id`, `central_facility`, `unique_id`) VALUES
 (1, '0', '1376487745', '1376487745', '2', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '16662', '', '13050', '572b32bde8dcd42e5964d23e7a69e138'),
 (2, '0', '1376487975', '1376487975', '0', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '13050', '', '13050', '46ae68428a9a69fddacff52ef49a2595'),
-(3, '0', '1376489840', '1376489840', '1', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '13050', '', '13050', '38b5c42288c708cd6bbb0f35bcb3d470'),
+(3, '1', '1376489840', '1376561649', '1', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '13050', '1', '13050', '38b5c42288c708cd6bbb0f35bcb3d470'),
 (4, '0', '2013-08-14', '1376491767', '2', '2013-05-01', '2013-05-31', 'Nigga Please', '', '', '', '', '', '', '16662', '', '13050', '9e4f3db3c00fd2d41b0853ec9e6e731d');
 
 -- --------------------------------------------------------
@@ -7786,22 +7795,23 @@ CREATE TABLE IF NOT EXISTS `order_comment` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `order_number` varchar(150) NOT NULL,
   `timestamp` varchar(32) NOT NULL,
-  `user` varchar(10) NOT NULL,
+  `user` varchar(150) NOT NULL,
   `comment` text NOT NULL,
   `unique_id` varchar(150) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_id` (`unique_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
 --
 -- Dumping data for table `order_comment`
 --
 
 INSERT INTO `order_comment` (`id`, `order_number`, `timestamp`, `user`, `comment`, `unique_id`) VALUES
-(1, '572b32bde8dcd42e5964d23e7a69e138', '1376487746', '2', 'Marete good', '572b32bde8dcd42e5964d23e7a69e138'),
-(2, '46ae68428a9a69fddacff52ef49a2595', '1376487976', '2', 'LVCT Main', '46ae68428a9a69fddacff52ef49a2595'),
-(3, '38b5c42288c708cd6bbb0f35bcb3d470', '1376489841', '2', 'Marete Aggregate', '38b5c42288c708cd6bbb0f35bcb3d470'),
-(4, '9e4f3db3c00fd2d41b0853ec9e6e731d', '1376491768', '2', 'Nigga Please Good Work', '9e4f3db3c00fd2d41b0853ec9e6e731d');
+(1, '572b32bde8dcd42e5964d23e7a69e138', '1376487746', 'Rufus Mbugua', 'Marete good', '572b32bde8dcd42e5964d23e7a69e138'),
+(2, '46ae68428a9a69fddacff52ef49a2595', '1376487976', 'Rufus Mbugua', 'LVCT Main', '46ae68428a9a69fddacff52ef49a2595'),
+(3, '38b5c42288c708cd6bbb0f35bcb3d470', '1376489841', 'Rufus Mbugua', 'Marete Aggregate', '38b5c42288c708cd6bbb0f35bcb3d470'),
+(4, '9e4f3db3c00fd2d41b0853ec9e6e731d', '1376491768', 'Rufus Mbugua', 'Nigga Please Good Work', '9e4f3db3c00fd2d41b0853ec9e6e731d'),
+(5, '38b5c42288c708cd6bbb0f35bcb3d470', '1376561650', 'Dr. Madawa', 'All things are in order', '885296de849c994ad6679c249db58351');
 
 -- --------------------------------------------------------
 
@@ -7870,7 +7880,14 @@ CREATE TABLE IF NOT EXISTS `picking_list_details` (
   `created_by` varchar(10) NOT NULL,
   `status` varchar(5) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `picking_list_details`
+--
+
+INSERT INTO `picking_list_details` (`id`, `name`, `timestamp`, `created_by`, `status`) VALUES
+(1, 'July 2013 KP', '1376562117', '2', '0');
 
 -- --------------------------------------------------------
 
@@ -8052,30 +8069,10 @@ CREATE TABLE IF NOT EXISTS `user_sessions` (
 --
 
 INSERT INTO `user_sessions` (`session_id`, `ip_address`, `user_agent`, `last_activity`, `user_data`) VALUES
-('10bc8b5c45a892da4aafa1e9e5690b37', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491389, ''),
-('13942cfeafa0775c79f40289fe17680b', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491174, ''),
-('237ae0fda322d7731a7b3366a6307cfd', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko', 1376485954, ''),
-('26e1e76e420e9d47663cb67830621a45', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko', 1376485973, ''),
-('30e9f60655b8f9b19fe850526f4cc3df', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376493326, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
-('3cf127d7944e06dbb48b7a2cc20fb5c2', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376492003, ''),
-('3dae2dc19a03d589fe82263b6fd5da09', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376485935, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
-('45a13f807c897e3c76a513bb6ca1e442', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491350, ''),
-('4970506c7f398c1ff7b84a2124eb523a', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376492990, ''),
-('58f812e80ef217a4a41e640882ff6504', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376492950, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
-('7cc7dda4a77c9dd48e76f0b8b62b5680', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376493366, ''),
-('8abc227215223c83feaa0cdb3a0aaf22', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko', 1376485961, ''),
-('8d86af120b014c9e44e922aace5c5289', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376492997, ''),
-('91f8208bc44f4ea6812f2c415b55fce3', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491292, ''),
-('95eca89d26bd0d6a08e502b7dd98173f', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko', 1376485997, ''),
-('a584cf75e7030b8a12db8e7493895e99', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376493888, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
-('b34078f251e8afad88bdf1b730deff7e', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491383, ''),
-('bd8c1f3dae9bd07b5b4006e45ef0c5d7', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491298, ''),
-('c019124e0d590524770b0d65072ba3c5', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376493373, ''),
-('d98aa893446f60de18c66a38331a4a57', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491344, ''),
-('e084f157aad8a62728c8f025560298f9', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko', 1376485991, ''),
-('e6ac81846eccf411ab64d259b2873cb9', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491997, ''),
-('eb4fad79e88fc7633be95f9a1c85348f', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376491168, ''),
-('fc20eb14cb2f436534952288614e0bd3', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:22.0) Gecko', 1376485980, '');
+('34e3a3d5bd3ed8d781454f2670feaf73', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376560732, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
+('522d5bf8b7c00840f0d2486f12aaef45', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376562621, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
+('688b3be702d39e34beb9f6481c873fe4', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376560809, ''),
+('6f070cfdde9b2060db32b66e23391304', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376560803, '');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
