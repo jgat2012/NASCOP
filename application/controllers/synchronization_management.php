@@ -134,14 +134,42 @@ class Synchronization_Management extends MY_Controller {
 	}
 
 	public function synchronize() {
+		//Variables
+		$sql = '';
+		$order_number = '';
+		$unique_column = 'unique_id';
 		$data_array = $this -> download_to_adt("13050");
 		$table_array = json_decode($data_array, TRUE);
+		$insert_array = array();
+		$update_array = array();
+
 		foreach ($table_array as $table => $table_contents) {
-			//echo $table."\n";
 			foreach ($table_contents as $contents) {
-                     echo $contents['unique_id']."\n";
+				$order_number = $contents['unique_id'];
+				if ($table == "facility_order") {
+					$sql = "select is_downloaded as download from facility_order where unique_id='$order_number'";
+					$query = $this -> db -> query($sql);
+					$results = $query -> result_array();
+					if ($results) {
+						if ($results[0]['download'] == 0) {
+							//Record has not been downloaded(Hence Update)
+							$update_array[] = $order_number;
+						}
+					} else {
+						//No record Hence Insert
+						$insert_array[] = $order_number;
+					}
+				} else {
+					//If not facility_order table
+					unset($contents['id']);
+					if (in_array($order_number, $update_array)) {					
+						$this -> db -> where($unique_column, $order_number);
+						$this -> db -> update($table, $contents);
+					} else if (in_array($order_number, $insert_array)) {
+						$this -> db -> insert($table, $contents);
+					}
+				}
 			}
-			die();
 		}
 	}
 
