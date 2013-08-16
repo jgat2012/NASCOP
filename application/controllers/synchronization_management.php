@@ -12,7 +12,7 @@ class Synchronization_Management extends MY_Controller {
 		$id_str = "";
 		$temp_str = "";
 		$sql = "";
-		$table_lists = array("facility_order", "cdrr_item", "maps_item", "order_comment");		
+		$table_lists = array("facility_order", "cdrr_item", "maps_item", "order_comment");
 		$id_array = array();
 		foreach ($table_lists as $table_list) {
 			$strSQl = "";
@@ -54,7 +54,7 @@ class Synchronization_Management extends MY_Controller {
 								foreach ($id_array as $temp_id) {
 									$id_str .= ",\"" . $temp_id . "\"";
 								}
-								 $id_str = substr($id_str, 1);
+								$id_str = substr($id_str, 1);
 							}
 						}
 						$fields = substr($fields, 1);
@@ -89,6 +89,59 @@ class Synchronization_Management extends MY_Controller {
 			echo $sql = base64_encode($sql);
 		} else {
 			echo $sql = "";
+		}
+	}
+
+	public function download_to_adt($facility) {
+		//Variables
+		$main_array = array();
+		$temp_array = array();
+		$table_array = array("cdrr_item", "maps_item", "order_comment");
+		$sql = "";
+		$unique_column = "";
+		$order_number = "";
+
+		foreach ($table_array as $table) {
+			$sql = "select * from facility_order where is_downloaded='0' and code >='1' and central_facility='$facility'";
+			$query = $this -> db -> query($sql);
+			$order_array = $query -> result_array();
+			if ($order_array) {
+				$main_array["facility_order"] = $order_array;
+				foreach ($table_array as $table) {
+					if ($table == "cdrr_item") {
+						$unique_column = "cdrr_id";
+					} else if ($table == "maps_item") {
+						$unique_column = "maps_id";
+					} else if ($table == "order_comment") {
+						$unique_column = "order_number";
+					}
+					foreach ($order_array as $order) {
+						$order_number = $order['unique_id'];
+						$sql = "select * from $table where $unique_column='$order_number'";
+						$query = $this -> db -> query($sql);
+						$temp_array = $query -> result_array();
+						//$sql = "update facility_order set is_downloaded='1' where unique_id='$order_number' ";
+						//$this -> db -> query($sql);
+					}
+					$main_array[$table] = $temp_array;
+					unset($temp_array);
+				}
+			}
+		}
+		header('Content-type: application/json');
+		return json_encode($main_array);
+
+	}
+
+	public function synchronize() {
+		$data_array = $this -> download_to_adt("13050");
+		$table_array = json_decode($data_array, TRUE);
+		foreach ($table_array as $table => $table_contents) {
+			//echo $table."\n";
+			foreach ($table_contents as $contents) {
+                     echo $contents['unique_id']."\n";
+			}
+			die();
 		}
 	}
 

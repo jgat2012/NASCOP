@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 15, 2013 at 12:32 PM
+-- Generation Time: Aug 16, 2013 at 05:46 PM
 -- Server version: 5.5.27
 -- PHP Version: 5.4.7
 
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS `access_log` (
   `facility_code` varchar(150) NOT NULL,
   `access_type` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=57 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=58 ;
 
 --
 -- Dumping data for table `access_log`
@@ -120,7 +120,8 @@ INSERT INTO `access_log` (`id`, `machine_code`, `user_id`, `access_level`, `star
 (53, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 10:40:42', '2013-08-15 11:10:57', 'NASCOP', 'Logout'),
 (54, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 11:13:54', '2013-08-15 11:26:33', 'NASCOP', 'Logout'),
 (55, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 12:57:10', '2013-08-15 12:58:52', 'NASCOP', 'Logout'),
-(56, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 13:01:16', '2013-08-15 13:30:21', 'NASCOP', 'Logout');
+(56, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-15 13:01:16', '2013-08-15 13:30:21', 'NASCOP', 'Logout'),
+(57, '2,nascop_pharmacist,,2,nascop_pharm,Dr. Madawa,naspharm@nascop.org,0725304567,NASCOP,,', '2', 2, '2013-08-16 09:56:07', '2013-08-16 10:39:43', 'NASCOP', 'Logout');
 
 -- --------------------------------------------------------
 
@@ -183,7 +184,7 @@ CREATE TABLE IF NOT EXISTS `cdrr_item` (
   `unique_id` varchar(150) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_id` (`unique_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 --
 -- Dumping data for table `cdrr_item`
@@ -7610,6 +7611,8 @@ CREATE TABLE IF NOT EXISTS `facility_order` (
   `picking_list_id` varchar(10) NOT NULL,
   `central_facility` varchar(10) NOT NULL,
   `unique_id` varchar(150) NOT NULL,
+  `is_uploaded` int(5) NOT NULL,
+  `is_downloaded` int(5) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_id` (`unique_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
@@ -7618,11 +7621,11 @@ CREATE TABLE IF NOT EXISTS `facility_order` (
 -- Dumping data for table `facility_order`
 --
 
-INSERT INTO `facility_order` (`id`, `status`, `created`, `updated`, `code`, `period_begin`, `period_end`, `comments`, `reports_expected`, `reports_actual`, `services`, `sponsors`, `delivery_note`, `order_id`, `facility_id`, `picking_list_id`, `central_facility`, `unique_id`) VALUES
-(1, '0', '1376487745', '1376487745', '2', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '16662', '', '13050', '572b32bde8dcd42e5964d23e7a69e138'),
-(2, '0', '1376487975', '1376487975', '0', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '13050', '', '13050', '46ae68428a9a69fddacff52ef49a2595'),
-(3, '1', '1376489840', '1376561649', '1', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '13050', '1', '13050', '38b5c42288c708cd6bbb0f35bcb3d470'),
-(4, '0', '2013-08-14', '1376491767', '2', '2013-05-01', '2013-05-31', 'Nigga Please', '', '', '', '', '', '', '16662', '', '13050', '9e4f3db3c00fd2d41b0853ec9e6e731d');
+INSERT INTO `facility_order` (`id`, `status`, `created`, `updated`, `code`, `period_begin`, `period_end`, `comments`, `reports_expected`, `reports_actual`, `services`, `sponsors`, `delivery_note`, `order_id`, `facility_id`, `picking_list_id`, `central_facility`, `unique_id`, `is_uploaded`, `is_downloaded`) VALUES
+(1, '0', '1376487745', '1376487745', '2', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '16662', '', '13050', '572b32bde8dcd42e5964d23e7a69e138', 0, 0),
+(2, '0', '1376487975', '1376487975', '0', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '13050', '', '13050', '46ae68428a9a69fddacff52ef49a2595', 0, 0),
+(3, '3', '1376489840', '1376561649', '1', '2013-07-01', '2013-07-31', '', '', '', '', '', '', '', '13050', '1', '13050', '38b5c42288c708cd6bbb0f35bcb3d470', 0, 0),
+(4, '0', '2013-08-14', '1376491767', '2', '2013-05-01', '2013-05-31', 'Nigga Please', '', '', '', '', '', '', '16662', '', '13050', '9e4f3db3c00fd2d41b0853ec9e6e731d', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -7879,6 +7882,7 @@ CREATE TABLE IF NOT EXISTS `picking_list_details` (
   `timestamp` varchar(32) NOT NULL,
   `created_by` varchar(10) NOT NULL,
   `status` varchar(5) NOT NULL,
+  `pipeline` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
@@ -7886,8 +7890,8 @@ CREATE TABLE IF NOT EXISTS `picking_list_details` (
 -- Dumping data for table `picking_list_details`
 --
 
-INSERT INTO `picking_list_details` (`id`, `name`, `timestamp`, `created_by`, `status`) VALUES
-(1, 'July 2013 KP', '1376562117', '2', '0');
+INSERT INTO `picking_list_details` (`id`, `name`, `timestamp`, `created_by`, `status`, `pipeline`) VALUES
+(1, 'July 2013 KP', '1376562117', '2', '1', 'Kenya Pharma');
 
 -- --------------------------------------------------------
 
@@ -8069,10 +8073,7 @@ CREATE TABLE IF NOT EXISTS `user_sessions` (
 --
 
 INSERT INTO `user_sessions` (`session_id`, `ip_address`, `user_agent`, `last_activity`, `user_data`) VALUES
-('34e3a3d5bd3ed8d781454f2670feaf73', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376560732, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
-('522d5bf8b7c00840f0d2486f12aaef45', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376562621, 'a:3:{s:7:"link_id";s:5:"index";s:7:"linkSub";s:15:"user_management";s:9:"linkTitle";s:16:"Users Management";}'),
-('688b3be702d39e34beb9f6481c873fe4', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376560809, ''),
-('6f070cfdde9b2060db32b66e23391304', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376560803, '');
+('351a8f256aa7b1c3e109637ce75f9fe1', '0.0.0.0', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/53', 1376659449, '');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

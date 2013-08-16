@@ -3,6 +3,7 @@ class Picking_List_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
+		date_default_timezone_set('Africa/Nairobi');
 	}
 
 	public function index() {
@@ -165,7 +166,7 @@ $commodities = $order->Commodity_Objects;
 //Loop through the commodities to display their particulars
 foreach($commodities as $commodity){
 	$data .= '<tr>
-		<td>'.$commodity -> Drugcode_Object->Drug.'</td>
+		<td>'.$commodity ->Drug_Id.'</td>
 		<td>'.$commodity ->Resupply.'</td>
 		<td>';
 		if($commodity -> Drugcode_Object->Drug_Unit->Name == "Bottle"){$data .= 'Bottle';} else{$data .= 'Packs';}

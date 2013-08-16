@@ -6,6 +6,7 @@ class Picking_List_Details extends Doctrine_Record {
 		$this -> hasColumn('Created_By', 'varchar', 10);
 		$this -> hasColumn('Timestamp', 'varchar', 32);
 		$this -> hasColumn('Status', 'varchar', 5);
+		$this -> hasColumn('Pipeline', 'varchar',20);
 	}//end setTableDefinition
 
 	public function setUp() {
