@@ -134,7 +134,10 @@ class Synchronization_Management extends MY_Controller {
 			}
 		}
 		header('Content-type: application/json');
-		return json_encode($main_array);
+		echo "<pre>";
+
+		echo "</pre>";
+		echo json_encode($main_array);
 
 	}
 
@@ -144,7 +147,10 @@ class Synchronization_Management extends MY_Controller {
 		$order_number = '';
 		$unique_column = 'unique_id';
 		$data_array = $_POST;
-		$table_array = json_decode($data_array, TRUE);
+		//$table_array = json_decode($data_array, TRUE);
+		//$table_array = $this -> objectToArray($table_array);
+		$table_array=$data_array;
+		print_r($table_array);die();
 		$insert_array = array();
 		$update_array = array();
 		foreach ($table_array as $table => $table_contents) {
@@ -181,6 +187,16 @@ class Synchronization_Management extends MY_Controller {
 				}
 			}
 		}
+	}
+
+	public function objectToArray($object) {
+		if (!is_object($object) && !is_array($object)) {
+			return $object;
+		}
+		if (is_object($object)) {
+			$object = (array)$object;
+		}
+		return array_map('objectToArray', $object);
 	}
 
 	public function base_params($data) {
