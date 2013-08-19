@@ -1,4 +1,4 @@
-<div class="center-content">
+
 	<div>
     <div>
 		<ul class="breadcrumb">
@@ -58,7 +58,7 @@
 			</div>
   </div>
   </div>		
-</div>
+
 <script type="text/javascript">
 	$(document).ready(function(){
 		var base_url="<?php echo base_url();?>";

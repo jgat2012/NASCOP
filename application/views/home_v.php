@@ -195,14 +195,20 @@ var chartLink;
     </script>
 
 <div class="main-content">
+<div class="center-content">
 	<?php
 	if($user_is_pharmacist){
 		$this->load->view('dashboard/pharmacist');
-	?>
-	<div class="center-content">
-
-</div>
-	<?php }if($user_is_administrator){ $this->load->view("sysadmin_home_v");}?>
+	 }
+	 
+	elseif($user_is_administrator){
+	 	 $this->load->view("dashboard/system_admin");
+	 }
+	else{
+		$this->load->view("dashboard/index");
+	}
+	 ?>
+	</div>
 </div>
 
 <script type="text/javascript">
