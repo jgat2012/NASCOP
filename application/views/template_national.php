@@ -32,6 +32,12 @@ $this -> load -> view('sections/head');
 				<div class="banner_text"><?php echo $banner_text; ?></div>	
 				
  <div id="top_menu"> 
+ <div class="welcome_msg">
+	<span>Welcome <b style="font-weight: bolder;font-size: 20px;">National User</b>. <a id="logout_btn" href="<?php echo base_url().'user_management/login' ?>"><i class="icon-off"></i>Login</a></span>
+	<br>
+	<span class="date"><?php echo date('l, jS \of F Y') ?></span>
+	<input type="hidden" id="facility_hidden" />
+</div>
 </div>
 
 </div>

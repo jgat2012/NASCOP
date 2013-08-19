@@ -42,6 +42,6 @@ class System_management extends MY_Controller {
 		$assets = $this -> carabiner -> display_string();
 		$this -> session -> set_userdata('assets', $assets);
 		
-		redirect('User_Management/login');
+		redirect('dashboard_management');
 	}
 }
