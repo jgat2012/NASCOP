@@ -2,13 +2,17 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 class Dashboard_Management extends MY_Controller {
-function __construct() {
+	function __construct() {
 		parent::__construct();
 		$data = array();
 		ini_set("max_execution_time", "10000");
 	}
-	public function index() {
 
+	public function index() {
+		$data['content_view'] = "home_v";
+		$data['banner_text'] = "National Dashboard";
+		$data['title'] = "webADT | National Dashboard";
+		$this->base_params($data);
 	}
 
 	public function notification($id, $notification, $count, $icon, $link) {
@@ -48,6 +52,10 @@ function __construct() {
 		}
 		$dyn_table .= "</tbody></table>";
 		echo $dyn_table;
+	}
+
+	public function base_params($data) {
+		$this -> load -> view("template_national", $data);
 	}
 
 }
