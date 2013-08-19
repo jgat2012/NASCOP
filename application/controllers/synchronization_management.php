@@ -146,11 +146,11 @@ class Synchronization_Management extends MY_Controller {
 		$sql = '';
 		$order_number = '';
 		$unique_column = 'unique_id';
-		$data_array = $_POST;
-		//$table_array = json_decode($data_array, TRUE);
-		//$table_array = $this -> objectToArray($table_array);
-		$table_array=$data_array;
-		print_r($table_array);die();
+		$data_array = file_get_contents('php://input');
+		$table_array = json_decode($data_array, TRUE);
+		$table_array = $this -> objectToArray($table_array);
+		print_r($data_array);
+		die();
 		$insert_array = array();
 		$update_array = array();
 		foreach ($table_array as $table => $table_contents) {
