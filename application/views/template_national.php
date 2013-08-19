@@ -61,18 +61,12 @@ $this -> load -> view('sections/head');
 
 		<h3>Quick Links</h3>
 		<ul class="nav nav-list well">
-			 			
-				
-				<li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			
-			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			
-                <li class="divider"></li>
-			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>				
-			
+		    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>				
 		</ul>
 		<h3>Notifications</h3>
 		<ul id="notification1" class="nav nav-list well">
-			<li><a id='online' class='admin_link'><i class='icon-signal'></i>Online Users <div id="span2" class='badge badge-important'></div></a></li>
-			<li><a id='inactive' class='admin_link'><i class='icon-th'></i>Deactivated Users <div id="span1" class='badge badge-important'></div></a></li>
+		<li><a id='online' class='admin_link'><i class='icon-signal'></i>Online Facilities <div id="span2" class='badge badge-important'></div></a></li>
+		<li><a id='inactive' class='admin_link'><i class='icon-th'></i>Deactivated Users <div id="span1" class='badge badge-important'></div></a></li>
 		</ul>	
 	</div>
 	<?php

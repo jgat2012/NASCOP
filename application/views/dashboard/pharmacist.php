@@ -11,7 +11,7 @@
 	<input type="text"  class="input-medium" id="reporting_period_1"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_1"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_1"/>
-	<button class="generate btn" id="expiry_btn">
+	<button class="generate btn btn-warning" id="expiry_btn">
 		Get
 	</button>
 	<br/>
@@ -34,7 +34,7 @@
 	<input type="text"  class="input-medium" id="reporting_period_2"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_2"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_2"/>
-	<button class="btn generate" id="enrollment_btn">
+	<button class="btn generate btn-warning" id="enrollment_btn">
 		Get
 	</button> </br/>
 	<button class="btn btn-success more" id="enrollment-more">
@@ -53,7 +53,7 @@
 	<input type="text"  class="input-medium" id="reporting_period_3"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_3"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_3"/>
-	<button class="generate btn" id="appointment_btn">
+	<button class="generate btn btn-warning" id="appointment_btn">
 		Get
 	</button>
 	<br/>
@@ -74,7 +74,7 @@
 	<input type="hidden"  class="input-medium" id="period_start_date_4"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_4"/>
 	<input type="hidden"  class="input-medium"/>
-	<button class="generate btn" id="stockout_btn">
+	<button class="generate btn btn-warning" id="stockout_btn">
 		Get
 	</button>
 	<br/>
