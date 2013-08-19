@@ -3,10 +3,13 @@
 	$(document).ready(function() {
 		
 		//Set all input to be readonly
-		//$("#generate_order").find("input").attr("readonly","readonly");
+		$("#generate_order").find("input").attr("readonly","readonly");
+		$(".research").find("input").attr("readonly","readonly");
+		$(".resupply").removeAttr("readonly");
 		//$(".research").find("input").attr("readonly","readonly");
 		//$("#facility_info").find("input").attr("readonly","readonly");
 		
+		/*
 		$(".accordion").accordion();
 
 		var $research = $('.research');
@@ -17,6 +20,7 @@
 			$research.find('.accordion').not(this).siblings().fadeOut(500);
 			$(this).siblings().fadeToggle(500);
 		}).eq(0).trigger('click');
+		*/
 
 		$('#accordion_collapse').click(function() {
 			if($(this).val() == "+") {
@@ -144,35 +148,50 @@
 	}
 </script>
 <div class="full-content" style='background:#9CF'>
+		<div >
+		<ul class="breadcrumb">
+			<li>
+				<a href="<?php echo site_url().'order_rationalization' ?>">Orders</a><span class="divider">/</span>
+			</li>
+			<li class="active" id="actual_page">
+				Details for Order No: <?php echo $order_no;?>
+			</li>
+		</ul>
+	</div>	
 <form method="post" id="fmEditOrder" action="<?php echo site_url('order_rationalization/save')?>">
 	<input type="hidden" id="transaction_type" name="transaction_type" >
 	<input type="hidden" name="order_number" value="<?php echo $order_details->id;?>" />
 	<div class="facility_info" class="header section">
-		<table class="table table-bordered" >
+		 <table class="table dataTable" >
 			<tbody>
 				<tr>
 					<th>Order No</th>
-					<td><span class="_green"><?php echo $order_no ?></span></td>
-				</tr>
-				<tr>
+					<td><span class="_green">
+					<?php 
+					$order_types = array(0=>"Central Order",1=>"Aggregated Order",2=>"Satellite Order"); 
+					echo $order_no."(".@$order_types[$order_details->Code].")";?></span></td>
 					<th width="160px">Facility code:</th>
 					<td><span class="_green"><?php echo $order_details -> Facility_Object -> facilitycode;?></span></td>
+					</tr>
+				<tr>
 					<th width="140px">Facility Name:</th>
 					<td><span class="_green"><?php echo $order_details -> Facility_Object -> name;?></span></td>
 					
-				</tr>
-				<tr>
+				
 					<th>Facility Type:</th>
 					<td><span class="_green"><?php echo $order_details -> Facility_Object -> Type -> Name;?></span></td>
+					</tr>
+				<tr>
 					<th>District / County:</th>
 					<td><span class="_green"><?php echo $order_details -> Facility_Object -> Parent_District -> Name;?> / <?php echo $order_details -> Facility_Object -> County -> county;?></span></td>
-				</tr>
-				<tr>
 					<th>Reporting Period : </th>
-					<td colspan="3"><input class="_green" name="reporting_period" id="reporting_period" type="text" value="<?php echo date('F-Y',strtotime($order_details->Period_Begin)); ?>"></td>
-					<input name="start_date" id="period_start_date" type="hidden" value="<?php echo date('d',strtotime($order_details->Period_Begin));?>">
-					<input name="end_date" id="period_end_date" type="hidden" value="<?php echo date('d',strtotime($order_details->Period_End));?>"></td>
+					<td colspan="3"><input name="reporting_period" id="reporting_period" type="text" placeholder="Click here to select period" value="<?php echo date('F-Y',strtotime($order_details->Period_Begin)); ?>" disabled="disabled"/></td>
+					<input name="start_date" id="period_start_date" type="hidden" value="<?php echo $order_details->Period_Begin;?>">
+					<input name="end_date" id="period_end_date" type="hidden" value="<?php echo $order_details->Period_End;?>">
+					<input name="unique_id" id="unique_id" type="hidden" value="<?php echo $order_details->Unique_Id;?>">
+					</td>
 				</tr>
+				
 			</tbody>
 		</table>
 	</div>
@@ -181,7 +200,6 @@
 <tr>
 <!-- label row -->
 <th class="col_drug" rowspan="2">Drug Name</th>
-<th class="number" rowspan="2">Pack Size</th> <!-- pack size -->
 
 <th class="number">Beginning Balance</th>
 <th class="number">Quantity Received in this period</th>
@@ -215,7 +233,6 @@
 <tr>
 <!-- letter row -->
 <th></th> <!-- drug name -->
-<th></th> <!-- packs size -->
 <th>A</th> <!-- balance -->
 <th>B</th> <!-- received -->
 <th>C</th> <!-- dispensed_units/packs -->
@@ -229,7 +246,7 @@
 </thead>';
 	?>
 <div id="commodity-table">
-	<table class="table table-bordered table_order_details" id="generate_order">
+	<table class="table table-bordered table_order_details dataTables" id="generate_order">
 		<?php echo $header_text;?>
 		<tbody>
 			<?php
@@ -242,10 +259,7 @@
 			}
 			?>
 			<tr class="ordered_drugs" drug_id="<?php echo $commodity -> Drugcode_Object->id;?>">
-				<td class="col_drug"><?php echo $commodity -> Drugcode_Object->Drug;?></td>
-				<td class="number">
-				<input id="pack_size" type="text" value="<?php echo $commodity -> Drugcode_Object -> Pack_Size;?>" class="pack_size">
-				</td>
+				<td class="col_drug"><?php echo $commodity ->Drug_Id;?></td>
 				<td class="number calc_count">
 				<input name="opening_balance[]" id="opening_balance_<?php echo $commodity -> id;?>" type="text" class="opening_balance" value="<?php echo $commodity -> Balance;?>">
 				</td>
@@ -264,7 +278,8 @@
 				</td>
 				<!-- aggregate -->
 				<td class="number col_resupply">
-				<input tabindex="-1" name="resupply[]" id="CdrrItem_10_resupply" type="text" class="resupply" value="<?php echo $commodity -> Resupply;?>">
+				<input tabindex="-1" name="newresupply[]" id="CdrrItem_10_newresupply" type="text" class="resupply" value="<?php echo $commodity -> Resupply;?>">
+				<input tabindex="-1" name="resupply[]" id="CdrrItem_10_resupply" type="hidden" class="resupply" value="<?php echo $commodity -> Resupply;?>">
 				</td>
 				<input type="hidden" name="commodity[]" value="<?php echo $commodity -> id;?>"/>
 			</tr>
@@ -274,21 +289,21 @@
 	<br />
 	<hr size="1">
 	
-	<div>
+	<div class='comments'>
 	<?php 
 	$has_comment=0;
 	foreach($comments as $comment){
 		$has_comment=1;
 		?>
-	
-		<span class="label" style="vertical-align: bottom">Comment </span>
-		<textarea style="width:98%" rows="3" name="comments"><?php echo $comment->Comment ?></textarea>
+	    
+		<span class="label" style="vertical-align: bottom;background:#999;">Comment </span>
+		<textarea style="width:98%" rows="3" name="o_comments" disabled="disbled"><?php echo $comment->Comment ?></textarea>
 		<table class="table table-bordered">
 			<thead>
-				<tr><th>Date</th><th>Made By</th><th>Access Level</th></tr>
+				<tr><th>Last Update</th><th>Accessed By</th><th>Access Level</th></tr>
 			</thead>
 			<tbody>
-				<tr><td><span class="_green"><?php echo date('Y-m-d H:i:s', $comment -> Timestamp);?></span></td><td><span class="_green"><?php echo $comment -> User_Object -> Name;?></span></td><td><span class="_green"><?php echo $comment -> User_Object -> Access -> Level_Name;?></span></td></tr>
+				<tr><td><span class="green"><?php echo date('l d-M-Y h:i:s a', $comment -> Timestamp);?></span></td><td><span class="green"><?php if($comment -> User_Object -> Name){echo $comment -> User_Object -> Name;}else{echo $comment->User;}?></span></td><td><span class="green"><?php  if($comment -> User_Object -> Access -> Level_Name){echo $comment -> User_Object -> Access -> Level_Name;}else{ echo "Facility Administrator";}?></span></td></tr>
 			</tbody>
 		</table>
 		
@@ -297,18 +312,30 @@
 	?>
 		<span class="label" style="vertical-align: bottom"> Add Comment </span>
 		<textarea style="width:98%" rows="3" name="comments"></textarea>
+		<textarea style="display:none;" rows="3" name="o_comments"></textarea>
 	<?php	
-	}
+	}else{
 	?>
-	<input type="button" class="save_changes btn btn-success btn-small" id="approve_order" value="Approve Order" name="approve_order" />
-	<input type="button" class="save_changes btn btn-danger btn-small" id="decline_order" value="Decline Order" name="decline_order"/>
+	  <span class="label" style="vertical-align: bottom;background:#999;">Comment </span>
+		<textarea style="width:98%" rows="3" name="comments" ></textarea>
+		<table class="table table-bordered">
+			<thead>
+				<tr><th>Last Update</th><th>Accessed By</th><th>Access Level</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><span class="green"><?php echo date('l d-M-Y h:i:s a');?></span></td><td><span class="green"><?php echo $this->session->userdata("full_name");?></td><td><span class="green"><?php echo "Nascop Pharmacist";  ?></td></tr>
+			</tbody>
+		</table>
+	<?php }?>
+	<input type="button" class="save_changes btn green" id="approve_order" value="Approve Order" name="approve_order" />
+	<input type="button" class="save_changes btn red" id="decline_order" value="Decline Order" name="decline_order"/>
 	</div>
 </div>
 	<table class=" table table-bordered regimen-table big-table research">
 		<thead>
 			<tr>
 				<th class="col_drug" colspan="2"> Regimen </th>
-				<th><input type="button" id="accordion_collapse" value="+"/></span>Patients<span></th>
+				<th><input type="button" id="accordion_collapse" value="-"/></span>Patients<span></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -318,9 +345,11 @@
 
 				?>
 				<tr>
-				<td colspan="2" regimen_id="<?php echo $regimen -> id;?>" class="regimen_desc col_drug"><?php echo $regimen -> Regimen_Object->Regimen_Desc;?></td>
-				<td regimen_id="<?php echo $regimen -> id;?>" class="regimen_numbers"><input name="patient_numbers[]" id="patient_numbers_<?php echo $regimen -> Regimen_Object-> id;?>" type="text" value="<?php echo $regimen ->  Total;?>"><input name="patient_regimens[]" value="<?php echo $regimen -> id;?>" type="hidden"></td>
-				 
+				<td colspan="2" regimen_id="<?php echo $regimen -> id;?>" class="regimen_desc col_drug"><?php echo $regimen ->Regimen_Id;?></td>
+				<td regimen_id="<?php echo $regimen -> id;?>" class="regimen_numbers">
+					<input name="patient_numbers[]" id="patient_numbers_<?php echo $regimen ->id;?>" type="text" value="<?php echo $regimen ->Total;?>">
+					<input name="patient_regimens[]" value="<?php echo $regimen -> id;?>" type="hidden">
+				</td>	 
 			</tr>
 			<?php
 			}

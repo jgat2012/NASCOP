@@ -10,6 +10,7 @@ class Cdrr_Item extends Doctrine_Record {
 		$this -> hasColumn('Adjustments', 'varchar', 10);
 		$this -> hasColumn('Count', 'varchar', 10);
 		$this -> hasColumn('Resupply', 'varchar', 10);
+		$this -> hasColumn('Newresupply', 'varchar', 10);
 		$this -> hasColumn('Aggr_Consumed', 'varchar', 10);
 		$this -> hasColumn('Aggr_On_Hand', 'varchar', 10);
 		$this -> hasColumn('Publish', 'varchar', 10);

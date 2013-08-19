@@ -3,6 +3,7 @@ class Picking_List_Management extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('pagination');
+		date_default_timezone_set('Africa/Nairobi');
 	}
 
 	public function index() {
@@ -100,7 +101,13 @@ class Picking_List_Management extends MY_Controller {
 
 	public function assign_orders() {
 		$data = array();
-		$data['orders'] = $this -> input -> post("order");
+		
+		if($this -> input -> post("order")==''){
+			$data['orders'] = $this -> input -> post("order");
+		}else{
+			$data['orders']='';
+		}
+		
 		$data['page_title']='Assign Picking List';
 		$data['banner_text'] = "Assign Picking List";
 		$data['picking_lists'] = Picking_List_Details::getAllOpen();
@@ -159,7 +166,7 @@ $commodities = $order->Commodity_Objects;
 //Loop through the commodities to display their particulars
 foreach($commodities as $commodity){
 	$data .= '<tr>
-		<td>'.$commodity -> Drugcode_Object->Drug.'</td>
+		<td>'.$commodity ->Drug_Id.'</td>
 		<td>'.$commodity ->Resupply.'</td>
 		<td>';
 		if($commodity -> Drugcode_Object->Drug_Unit->Name == "Bottle"){$data .= 'Bottle';} else{$data .= 'Packs';}
