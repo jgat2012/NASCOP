@@ -32,7 +32,6 @@ class Facility_Order extends Doctrine_Record {
 		$this -> hasColumn('Central_Facility', 'varchar', 10);
 		$this -> hasColumn('Unique_Id', 'varchar','150');
 		$this -> hasColumn('Is_Uploaded', 'int','5');
-		$this -> hasColumn('Is_Downloaded', 'int','5');
 	}//end setTableDefinition
 
 	public function setUp() {

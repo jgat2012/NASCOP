@@ -116,6 +116,7 @@ class Order_Rationalization extends MY_Controller {
 
 			$order_object -> Status = $status;
 			$order_object -> Updated = $updated_on;
+			$order_object -> Is_Uploaded = 1;
 			//code = 0 i.e. fcdrr
 			$order_object -> Code = 1;
 			//Only for dcdrrs
@@ -124,26 +125,28 @@ class Order_Rationalization extends MY_Controller {
 			$order_object -> save();
 			//$order_id = $order_object -> id;
 			//Now save the comment that has been made
-			$facility="nascop";
-
-			if ($o_comments == $comments){
-				$old_comments = Order_Comment::getOrderComments($unique_id);
-				foreach ($old_comments as $old_comment) {
-					$old_comment -> delete();
+			$facility = "nascop";
+			if ($comments != null) {
+				if ($o_comments == $comments) {
+					$old_comments = Order_Comment::getOrderComments($unique_id);
+					foreach ($old_comments as $old_comment) {
+						$old_comment -> delete();
+					}
+					$sql = "select max(id)as last from order_comment";
+					$query = $this -> db -> query($sql);
+					$results = $query -> result_array();
+					$last_id = $results[0]['last'];
+					$last_id++;
 				}
-				$sql = "select max(id)as last from order_comment";
-				$query = $this -> db -> query($sql);
-				$results = $query -> result_array();
-				$last_id = $results[0]['last'];
-				$last_id++;
+
+				$order_comment = new Order_Comment();
+				$order_comment -> Order_Number = $unique_id;
+				$order_comment -> Timestamp = date('U');
+				$order_comment -> User = $user_id;
+				$order_comment -> Comment = $comments;
+				$order_comment -> Unique_Id = md5($last_id . $facility);
+				$order_comment -> save();
 			}
-			$order_comment = new Order_Comment();
-			$order_comment -> Order_Number = $unique_id;
-			$order_comment -> Timestamp = date('U');
-			$order_comment -> User = $user_id;
-			$order_comment -> Comment = $comments;
-			$order_comment -> Unique_Id = md5($last_id . $facility);
-			$order_comment -> save();
 			//Now save the cdrr items
 			$commodity_counter = 0;
 			if ($commodities != null) {
@@ -166,7 +169,6 @@ class Order_Rationalization extends MY_Controller {
 					 $cdrr_item->Publish = $opening_balances[$commodity_counter];*/
 					$cdrr_item -> Cdrr_Id = $unique_id;
 					$cdrr_item -> save();
-					echo $cdrr_item -> id . "<br>";
 					$commodity_counter++;
 				}
 			}
@@ -180,7 +182,6 @@ class Order_Rationalization extends MY_Controller {
 						$maps_item -> Total = $patient_numbers[$regimen_counter];
 						$maps_item -> Maps_Id = $unique_id;
 						$maps_item -> save();
-						echo $maps_item -> id . "<br>";
 					}
 					$regimen_counter++;
 				}
