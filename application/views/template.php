@@ -30,19 +30,28 @@ if ($this -> uri -> segment(6) != "") {
 if ($this -> uri -> segment(7) != "") {
 	$actual_page .= "/" . $this -> uri -> segment(7);
 }
-$this -> input -> set_cookie("actual_page", $actual_page, 3600);
 
-//
-if ($this -> session -> userdata("prev_page")) {
-	if ($this -> input -> cookie("actual_page") and $this -> input -> cookie("actual_page") != "") {
-		$actual_page = $this -> uri -> segment(1);
-		$this -> session -> unset_userdata("prev_page");
+/*
+ * Manage Actual Page When auto logged out
+ * Check prev page session is set
+ * if(present)check if actual page cookie exist and unset prev_page session
+ * if cookie exists redirect to cookie
+ * if cookie does not exists set cookie to current url
+ * if(not present)go to current url
+ * 
+*/
+
+if ($this -> session -> userdata("prev_page") !='') {
+	$this -> session -> set_userdata("prev_page","");
+	if ($this -> input -> cookie("actual_page") !='') {
+		$actual_page=$this -> input -> cookie("actual_page");
 		redirect($actual_page);
-		die();
+	}else{
+		$this -> input -> set_cookie("actual_page", $actual_page, 3600);
 	}
+}else{
+	$this -> input -> set_cookie("actual_page", $actual_page, 3600);
 }
-
-//setcookie("actual_page",$actual_page,3600);
 
 $access_level = $this -> session -> userdata('user_indicator');
 $user_is_administrator = false;

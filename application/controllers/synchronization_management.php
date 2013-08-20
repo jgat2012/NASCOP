@@ -7,94 +7,6 @@ class Synchronization_Management extends MY_Controller {
 		parent::__construct();
 	}
 
-	/*
-	 public function synchronize_orders($facility) {
-	 $mainstrSQl = "";
-	 $id_str = "";
-	 $temp_str = "";
-	 $sql = "";
-	 $table_lists = array("facility_order", "cdrr_item", "maps_item", "order_comment");
-	 $id_array = array();
-	 foreach ($table_lists as $table_list) {
-	 $strSQl = "";
-	 $table_name = $table_list;
-	 if ($table_list == "facility_order") {
-	 $sql = "select * from $table_name where code >='1' and central_facility='$facility'";
-	 } else if ($table_list == "cdrr_item") {
-	 if ($id_str) {
-	 $sql = "select * from  $table_name where cdrr_id IN($id_str)";
-	 }
-	 $temp_str = $id_str;
-	 } else if ($table_list == "maps_item") {
-	 if ($temp_str) {
-	 $sql = "select * from  $table_name where maps_id IN($temp_str)";
-	 }
-	 } else if ($table_list == "order_comment") {
-	 if ($temp_str) {
-	 $sql = "select * from  $table_name where order_number IN($temp_str)";
-	 }
-	 }
-	 if ($sql) {
-	 $query = $this -> db -> query($sql);
-	 $results = $query -> result_array();
-	 if ($results) {
-	 foreach ($results as $val => $value_array) {
-	 $fields = "";
-	 $values = "";
-	 $temp_val = "";
-	 $id_str = "";
-	 $strSQl .= "<br/>INSERT INTO $table_list (";
-	 foreach ($value_array as $col => $value) {
-	 if ($col != 'id') {
-	 $temp_val .= "," . $col . "=" . "\"" . trim($value) . "\"";
-	 $fields .= "," . $col;
-	 $values .= ",\"" . trim($value) . "\"";
-	 }
-	 if ($col == "unique_id" && $table_list == "facility_order") {
-	 $id_array[] = $value;
-	 foreach ($id_array as $temp_id) {
-	 $id_str .= ",\"" . $temp_id . "\"";
-	 }
-	 $id_str = substr($id_str, 1);
-	 }
-	 }
-	 $fields = substr($fields, 1);
-	 $values = substr($values, 1);
-	 $temp_val = substr($temp_val, 1);
-	 $strSQl .= $fields . ")VALUES(" . $values . ") ON DUPLICATE KEY UPDATE $temp_val ;";
-	 }
-	 }
-	 }
-	 $mainstrSQl .= $strSQl;
-	 }
-	 echo $mainstrSQl;
-
-	 }
-
-	 public function getSQL($facility) {
-	 $sql = "";
-	 if ($this -> input -> post("sql")) {
-	 $sql = $this -> input -> post("sql");
-	 if ($sql != '') {
-	 $sql = base64_decode($sql);
-	 $queries = explode(";", $sql);
-	 foreach ($queries as $query) {
-	 if (strlen($query) > 0) {
-	 $this -> db -> query($query);
-	 }
-	 }
-	 }
-	 }
-	 $sql = $this -> synchronize_orders($facility);
-	 if ($sql != '') {
-	 echo $sql = base64_encode($sql);
-	 } else {
-	 echo $sql = "";
-	 }
-	 }
-
-	 *
-	 */
 	public function download_to_adt($facility) {
 		//Variables
 		$main_array = array();
@@ -106,7 +18,7 @@ class Synchronization_Management extends MY_Controller {
 		$order_number = "";
 
 		foreach ($table_array as $table) {
-			$sql = "select * from facility_order where is_downloaded='0' and code >='1' and central_facility='$facility'";
+			$sql = "select * from facility_order where is_uploaded='1' and code >='1' and central_facility='$facility'";
 			$query = $this -> db -> query($sql);
 			$order_array = $query -> result_array();
 			if ($order_array) {
@@ -125,20 +37,15 @@ class Synchronization_Management extends MY_Controller {
 						$query = $this -> db -> query($sql);
 						$temp_array = $query -> result_array();
 						$middle_array[] = $temp_array;
-						//$sql = "update facility_order set is_downloaded='1' where unique_id='$order_number' ";
-						//$this -> db -> query($sql);
+						$sql = "update facility_order set is_uploaded='0' where unique_id='$order_number' ";
+						$this -> db -> query($sql);
 					}
 					$main_array[$table] = $middle_array;
 					unset($middle_array);
 				}
 			}
 		}
-		header('Content-type: application/json');
-		echo "<pre>";
-
-		echo "</pre>";
 		echo json_encode($main_array);
-
 	}
 
 	public function synchronize() {
@@ -146,57 +53,47 @@ class Synchronization_Management extends MY_Controller {
 		$sql = '';
 		$order_number = '';
 		$unique_column = 'unique_id';
-		$data_array = file_get_contents('php://input');
-		$table_array = json_decode($data_array, TRUE);
-		$table_array = $this -> objectToArray($table_array);
-		print_r($data_array);
-		die();
-		$insert_array = array();
-		$update_array = array();
+		$table_array = array();
+		$data_array = array();
+		$data_array = $_POST;
+		$table_array = $data_array['data'];
+		$table_array = json_decode($table_array, TRUE);
 		foreach ($table_array as $table => $table_contents) {
-			foreach ($table_contents as $contents) {
-				if ($table == "facility_order") {
+			if ($table == "facility_order") {
+				foreach ($table_contents as $contents) {
 					$order_number = $contents['unique_id'];
-					$sql = "select is_downloaded as download from facility_order where unique_id='$order_number'";
+					$sql = "select is_uploaded as available from facility_order where unique_id='$order_number'";
 					$query = $this -> db -> query($sql);
 					$results = $query -> result_array();
+					unset($contents['id']);
 					if ($results) {
-						if ($results[0]['download'] == 0) {
+						if ($results[0]['available'] == 0) {
 							//Record has not been downloaded(Hence Update)
-							$update_array[] = $order_number;
+							$this -> db -> where($unique_column, $order_number);
+							$this -> db -> update($table, $contents);
 						}
 					} else {
 						//No record Hence Insert
-						$insert_array[] = $order_number;
+						$this -> db -> insert($table, $contents);
 					}
-				} else {
-					//If not facility_order table
+				}
+			} else {
+				foreach ($table_contents as $contents) {
+					$unique_id = $contents['unique_id'];
+					$sql = "select * from $table where $unique_column='$unique_id'";
+					$query = $this -> db -> query($sql);
+					$results = $query -> result_array();
 					unset($contents['id']);
-					if (in_array($order_number, $update_array)) {
-						foreach ($contents as $content) {
-							$order_number = $content['unique_id'];
-							$this -> db -> where($unique_column, $order_number);
-							$this -> db -> update($table, $content);
-						}
-
-					} else if (in_array($order_number, $insert_array)) {
-						foreach ($contents as $content) {
-							$this -> db -> insert($table, $content);
-						}
+					if ($results) {
+						$order_number = $contents['unique_id'];
+						$this -> db -> where($unique_column, $unique_id);
+						$this -> db -> update($table, $contents);
+					} else {
+						$this -> db -> insert($table, $contents);
 					}
 				}
 			}
 		}
-	}
-
-	public function objectToArray($object) {
-		if (!is_object($object) && !is_array($object)) {
-			return $object;
-		}
-		if (is_object($object)) {
-			$object = (array)$object;
-		}
-		return array_map('objectToArray', $object);
 	}
 
 	public function base_params($data) {
