@@ -153,14 +153,14 @@
 
 </script>
 
-<div class="center-content">
-	<form id="fmChangePassword" action="<?php echo base_url().'user_management/save_new_password'?>" method="post" class="well">
+<div class="full-content">
+	<form id="fmChangePassword" action="<?php echo base_url().'user_management/save_new_password/2'?>" method="post" class="well">
 	<legend>Change Password</legend>
 	<span class="message error" id="m_error_msg_change_pass"></span>
 	<div id="loadingDiv" style="display: none"><img style="width: 30px" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
 	<br>
 	<br>
-	<table>
+	<table cellpadding="5">
 	<tr>
 	<td><label >Old Password</label></td><td><input type="password" name="old_password" id="m_old_password" required=""></td>
 	</tr>

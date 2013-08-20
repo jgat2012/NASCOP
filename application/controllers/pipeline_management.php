@@ -12,6 +12,7 @@ class Pipeline_Management extends MY_Controller {
 
 	public function index() {
 		$data['content_view'] = "pipeline_upload";
+		$data['hide_side_menu'] = 1;
 		$this -> base_params($data);
 	}
 

@@ -56,6 +56,7 @@ class Picking_List_Management extends MY_Controller {
 		$orders = $list -> Order_Objects;
 		foreach ($orders as $order) {
 			$order -> Status = "3";
+			$order -> Is_Uploaded = 1;
 			$order -> save();
 		}
 		redirect("picking_list_management/submitted_lists/1");
@@ -101,8 +102,7 @@ class Picking_List_Management extends MY_Controller {
 
 	public function assign_orders() {
 		$data = array();
-		
-		if($this -> input -> post("order")==''){
+		if($this -> input -> post("order")!=''){
 			$data['orders'] = $this -> input -> post("order");
 		}else{
 			$data['orders']='';

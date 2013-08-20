@@ -158,7 +158,7 @@
 	
 
 </style>
-<div id="view_content" class="center-content">
+<div id="view_content" class="full-content">
 	    <div>
 		<ul class="breadcrumb">
 		  <li><a href="<?php echo site_url().'home_controller/home' ?>"  id='goHome'><i class="icon-home"></i><strong>Home</strong></a> 

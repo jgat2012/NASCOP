@@ -38,9 +38,7 @@ if($this->session->userdata("changed_password")){
 
 <script type="text/javascript">
 $(document).ready(function() {
-	  <?php
-	  if($user_is_pharmacist){
-	  ?>
+
       var period=30;
       var limit=5;
       
@@ -55,7 +53,7 @@ $(document).ready(function() {
       var dd = ("0" + firstDay.getDate()).slice(-2);
       var mm = ("0" + (firstDay.getMonth() + 1)).slice(-2);
       var y = firstDay.getFullYear();
-      var firstDay =y+'-'+mm+'-'+dd;
+      var firstDay =y+'-'+mm+'-'+dd; 
       
       var numberOfDaysToAdd = 5;
       var to_date=new Date(someDate.setDate(someDate.getDate() + numberOfDaysToAdd)); 
@@ -153,8 +151,7 @@ var chartLink;
 		break;
 		
 		}
- $(chartID).animate({height:'45%',width:'49%'}, 500);
-
+        $(chartID).animate({height:'45%',width:'49%'}, 500);
 	});
 	
     
@@ -191,14 +188,19 @@ var chartLink;
                  	 $('#chart_area78').load('<?php echo base_url().'admin_management/getWeeklySumary/'?>'+from_date+'/'+to_date);	
                  }
             });
-             <?php } ?>
+          
 		});
     </script>
 
 <div class="main-content">
 	<?php
-	if($user_is_pharmacist){
+	if($user_is_pharmacist){	
 	?>
+	<style type="text/css">
+	.ui-datepicker-calendar {
+		display: none;
+	}
+</style>
 	<div class="center-content">
 		<div id="expDiv>"></div>
 		<div class="tile" id="drugs-chart">
@@ -415,8 +417,3 @@ $(document).ready(function(){
 			return (new Date((new Date(Year, Month, 1)) - 1)).getDate();
 		}
 </script>
-<style type="text/css">
-	.ui-datepicker-calendar {
-		display: none;
-	}
-</style>

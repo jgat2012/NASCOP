@@ -112,7 +112,7 @@ class User_Management extends MY_Controller {
 		$data['title'] = "Change User Password";
 		$data['content_view'] = "change_password_v";
 		$data['link'] = "settings_management";
-		$data['banner_text'] = "Change Pass";
+		$data['banner_text'] = "Change Password";
 		$data['hide_side_menu'] = 1;
 		$this -> load -> view('template', $data);
 	}
@@ -133,7 +133,7 @@ class User_Management extends MY_Controller {
 		}
 	}
 
-	public function save_new_password($type = "") {
+	public function save_new_password($type = "2") {
 		$old_password = $this -> input -> post("old_password");
 		$new_password = $this -> input -> post("new_password");
 		$valid_old_password = $this -> correct_current_password($old_password);
@@ -312,6 +312,9 @@ class User_Management extends MY_Controller {
 					$facility_details = Facilities::getCurrentFacility($logged_in -> Facility_Code);
 					$session_data = array('user_id' => $logged_in -> id, 'user_indicator' => $logged_in -> Access -> Indicator, 'facility_name' => $logged_in -> Facility -> name, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'Email_Address' => $logged_in -> Email_Address, 'Phone_Number' => $logged_in -> Phone_Number, 'facility' => $logged_in -> Facility_Code, 'facility_id' => $facility_details[0]['id'], 'county' => $facility_details[0]['county']);
 					$this -> session -> set_userdata($session_data);
+					$user=$this -> session -> userdata('user_id');
+					$sql="update access_log set access_type='Logout' where user_id='$user'";
+					$this->db->query($sql);
 					$new_access_log = new Access_Log();
 					$new_access_log -> machine_code = implode(",", $session_data);
 					$new_access_log -> user_id = $this -> session -> userdata('user_id');
