@@ -31,6 +31,7 @@
 <!-- End of CSS  Section ---------------------------------------------->
 <!-- JS --------------------------------------------------------------->
 <!-- JQuery -->
+<script src="<?php echo base_url().'Scripts/jquery-1.10.2.js'?>" type="text/javascript"></script>
 <script src="<?php echo base_url().'Scripts/jquery-1.7.2.min.js'?>" type="text/javascript"></script>
 <script src="<?php echo base_url().'Scripts/jquery-migrate-1.2.1.js'?>" type="text/javascript"></script>
 <script src="<?php echo base_url().'Scripts/jquery.form.js'?>" type="text/javascript"></script>

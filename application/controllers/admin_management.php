@@ -9,10 +9,15 @@ class admin_management extends MY_Controller {
 	public function addFacility() {
 		$results = Facilities::getAllJoined();
 		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
-		$dyn_table .= "<thead><tr><th>Facility Code</th><th>Facility Name</th><th>Facility Type</th><th>County</th><th>District</th></tr></thead><tbody>";
+		$dyn_table .= "<thead><tr><th>Facility Code</th><th>Facility Name</th><th>Facility Type</th><th>County</th><th>District</th><th>Options</th></tr></thead><tbody>";
 		if ($results) {
 			foreach ($results as $result) {
-				$dyn_table .= "<tr><td>" . $result['facilitycode'] . "</td><td>" . $result['facilityname'] . "</td><td>" . $result['f_type'] . "</td><td>" . $result['county'] . "</td><td>" . $result['district'] . "</td></tr>";
+				if ($result['active'] == '1') {
+					$option = "<a href='#edit_facilities' data-toggle='modal' role='button' class='edit' table='facilities' facility_name='" . $result['facilityname'] . "' facility_code='" . $result['facilitycode'] . "' facility_type='" . $result['f_type_id'] . "' facility_district='" . $result['district_id'] . "' facility_county='" . $result['county_id'] . "' facility_id='" . $result['id'] . "'>Edit</a> | <a href='" . base_url() . "admin_management/disable/facilities/" . $result['id'] . "' class='red'>Disable</a>";
+				} else {
+					$option = "<a href='#edit_facilities' data-toggle='modal' role='button' class='edit' table='facilities' facility_district='" . $result['district_id'] . "' facility_county='" . $result['county_id'] . "' facility_id='" . $result['id'] . "'>Edit</a> | <a href='" . base_url() . "admin_management/enable/facilities/" . $result['id'] . "' class='green'>Enable</a>";
+				}
+				$dyn_table .= "<tr><td>" . $result['facilitycode'] . "</td><td>" . $result['facilityname'] . "</td><td>" . $result['f_type'] . "</td><td>" . $result['county'] . "</td><td>" . $result['district'] . "</td><td>" . $option . "</td></tr>";
 			}
 		}
 		$dyn_table .= "</tbody></table>";
@@ -297,14 +302,15 @@ class admin_management extends MY_Controller {
 			$this -> session -> set_userdata('msg_success', 'County: ' . $county_name . ' was Added');
 			$this -> session -> set_userdata('default_link', 'addCounty');
 		} else if ($table == "facilities") {
-			$satellite_code = $this -> input -> post("facility");
-			if ($satellite_code) {
-				$central_code = $this -> session -> userdata("facility");
-				$sql = "update facilities set parent='$central_code' where facilitycode='$satellite_code'";
-				$this -> db -> query($sql);
-				$this -> session -> set_userdata('msg_success', 'Facility No: ' . $satellite_code . ' was Added as a Satellite');
-			}
-			$this -> session -> set_userdata('default_link', 'addSatellite');
+			$new_facility = new Facilities();
+			$new_facility -> facilitycode = $this -> input -> post("facility_code");
+			$new_facility -> name = $this -> input -> post("facility_name");
+			$new_facility -> facilitytype = $this -> input -> post("facility_type");
+			$new_facility -> county = $this -> input -> post("facility_county");
+			$new_facility -> district = $this -> input -> post("facility_district");
+			$new_facility -> save();
+			$this -> session -> set_userdata('msg_success', 'Facility was Added');
+			$this -> session -> set_userdata('default_link', 'addFacility');
 		} else if ($table == "district") {
 			$disrict_name = $this -> input -> post("name");
 			$new_district = new District();
@@ -480,7 +486,7 @@ class admin_management extends MY_Controller {
 	public function remove($facilitycode = "") {
 		$sql = "update facilities set parent='' where facilitycode='$facilitycode'";
 		$this -> db -> query($sql);
-		$this -> session -> set_userdata('msg_error', ' Fcaility No:' . $facilitycode . ' was removed as a Satellite');
+		$this -> session -> set_userdata('msg_error', ' Facility No:' . $facilitycode . ' was removed as a Satellite');
 		$this -> session -> set_userdata('default_link', 'addSatellite');
 		redirect("home_controller/home");
 	}
@@ -517,14 +523,17 @@ class admin_management extends MY_Controller {
 			$this -> db -> update($table, array('access_level' => $access_id, 'menu' => $menu_id));
 			$this -> session -> set_userdata('msg_success', 'User Right was Updated');
 			$this -> session -> set_userdata('default_link', 'assignRights');
-		} else if ($table = "nascop") {
-			$myFile = '././assets/nascop.txt';
-			$fh = fopen($myFile, 'w') or die("can't open file");
-			$stringData = $this -> input -> post("nascop_url");
-			fwrite($fh, $stringData);
-			fclose($fh);
-			$this -> session -> set_userdata('msg_success', 'NASCOP URL was Updated');
-			$this -> session -> set_userdata('default_link', 'nascopSettings');
+		} else if ($table == "facilities") {
+			$facility_code = $this -> input -> post("edit_facility_code");
+			$facility_name = $this -> input -> post("edit_facility_name");
+			$facility_type = $this -> input -> post("edit_facility_type");
+			$facility_county = $this -> input -> post("edit_facility_county");
+			$facility_district = $this -> input -> post("edit_facility_district");
+			$facility_id = $this -> input -> post("edit_facility_id");
+			$this -> db -> where('id', $facility_id);
+			$this -> db -> update($table, array('facilitycode' => $facility_code, 'name' => $facility_name, 'facilitytype' => $facility_type, 'county' => $facility_county, 'district' => $facility_district));
+			$this -> session -> set_userdata('msg_success', 'Facility was Updated');
+			$this -> session -> set_userdata('default_link', 'addFacility');
 		}
 		redirect("home_controller/home");
 	}
@@ -540,8 +549,8 @@ class admin_management extends MY_Controller {
 			$this -> session -> set_userdata('default_link', 'addMenu');
 		} else if ($table == "user_right") {
 			$this -> session -> set_userdata('default_link', 'assignRights');
-		} else if ($table = "nascop") {
-			$this -> session -> set_userdata('default_link', 'nascopSettings');
+		} else if ($table = "facilities") {
+			$this -> session -> set_userdata('default_link', 'addFacility');
 		}
 	}
 

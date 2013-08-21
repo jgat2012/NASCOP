@@ -3,6 +3,7 @@ class District extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('Name', 'varchar', 100);
+		$this -> hasColumn('active', 'int', 5);
 	}//end setTableDefinition
 
 	public function setUp() {
@@ -20,17 +21,24 @@ class District extends Doctrine_Record {
 		$districts = $query -> execute();
 		return $districts;
 	}
+
 	public function getAll() {
 		$query = Doctrine_Query::create() -> select("*") -> from("District");
 		$districts = $query -> execute();
 		return $districts;
 	}
-	
-	public function getPOB(){
-		$query = Doctrine_Query::create() -> select("*") -> from("District")->orderby("Name asc");
+
+	public function getPOB() {
+		$query = Doctrine_Query::create() -> select("*") -> from("District") -> orderby("Name asc");
 		$districts = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $districts;
-		
+
+	}
+
+	public function getActive() {
+		$query = Doctrine_Query::create() -> select("*") -> from("District") -> where("active='1'");
+		$districts = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $districts;
 	}
 
 }//end class

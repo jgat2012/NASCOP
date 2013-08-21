@@ -15,9 +15,9 @@ class Cdrr_Item extends Doctrine_Record {
 		$this -> hasColumn('Aggr_On_Hand', 'varchar', 10);
 		$this -> hasColumn('Publish', 'varchar', 10);
 		//The cdrr id is a foreign key from the facility order table
-		$this -> hasColumn('Cdrr_Id','varchar','150');
+		$this -> hasColumn('Cdrr_Id', 'varchar', '150');
 		$this -> hasColumn('Drug_Id', 'varchar', 10);
-		$this -> hasColumn('Unique_Id', 'varchar','150');
+		$this -> hasColumn('Unique_Id', 'varchar', '150');
 	}//end setTableDefinition
 
 	public function setUp() {
@@ -36,9 +36,12 @@ class Cdrr_Item extends Doctrine_Record {
 		$items = $query -> execute();
 		return $items[0];
 	}
-    
-	
 
+	public function getTopCommodities($limit, $order_list) {
+		$query = Doctrine_Query::create() -> select("Drug_Id,Resupply") -> from("Cdrr_Item") -> where("Cdrr_Id IN($order_list)") -> orderby("Resupply desc") -> limit("$limit");
+		$items = $query -> execute();
+		return $items;
+	}
 
 }//end class
 ?>

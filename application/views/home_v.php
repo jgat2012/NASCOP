@@ -96,7 +96,7 @@ var chartLink;
 		$('#drugs-chart').show();
 		chartID='#drugs-chart';
 		graphID="#chart_area";
-		chartLink="<?php echo base_url().'facilitydashboard_management/getTopCommodities/';?>"+period+'/'+location;
+		chartLink="<?php echo base_url().'pharmacist_management/getTopCommodities/';?>"+period+'/'+location;
 	
 		break;
 		case'enrollment-more':
@@ -104,7 +104,7 @@ var chartLink;
 		$('#enrollment-chart').show();
 		chartID='#enrollment-chart';
 		graphID="#chart_area2";
-		chartLink="<?php echo base_url().'facilitydashboard_management/getFacilitiesUsing/';?>"+fromDate+'/'+endDate;
+		chartLink="<?php echo base_url().'pharmacist_management/getFacilitiesUsing/';?>"+fromDate+'/'+endDate;
 	  
 		break;
 		case'appointment-more':
@@ -112,14 +112,15 @@ var chartLink;
 		$('#appointments-chart').show();
 		chartID='#appointments-chart';
 		graphID="#chart_area3";
-		chartLink="<?php echo base_url().'facilitydashboard_management/getPickingList/';?>"+fromDate+'/'+endDate;
+		chartLink="<?php echo base_url().'pharmacist_management/getPickingList/';?>"+fromDate+'/'+endDate;
 
 		break;
 		case'stock-more':
 		$('.tile').hide();
 		$('#stocks-chart').show();
-		chartID='#stocks-chart';
-		graphID="#table1";
+		chartID='#appointments-chart';
+		graphID="#chart_area3";
+		chartLink="<?php echo base_url().'pharmacist_management/getFacilitiesDelay/';?>"+fromDate+'/'+endDate;
 		break;
 		}
 		

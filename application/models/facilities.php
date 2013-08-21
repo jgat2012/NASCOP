@@ -18,6 +18,7 @@ class Facilities extends Doctrine_Record {
 		$this -> hasColumn('service_pmtct', 'int', 2);
 		$this -> hasColumn('service_pep', 'int', 2);
 		$this -> hasColumn('supplied_by', 'int', 2);
+		$this -> hasColumn('active', 'int', 5);
 	}
 
 	public function setUp() {
@@ -115,9 +116,7 @@ class Facilities extends Doctrine_Record {
 	}
 
 	public function getAllJoined() {
-		$query = Doctrine_Query::create() -> select("f.facilitycode,f.name as facilityname,c.county as county,t.Name as f_type,pd.Name as district") -> from("Facilities f") -> orderBy("name") -> leftjoin("f.County c,f.Type t,f.Parent_District pd");
-		//echo $query->getSQL();
-		//die();
+		$query = Doctrine_Query::create() -> select("f.facilitycode,f.active,f.name as facilityname,c.id as county_id,c.county as county,t.id as f_type_id,t.Name as f_type,pd.id as district_id,pd.Name as district") -> from("Facilities f") -> orderBy("name") -> leftjoin("f.County c,f.Type t,f.Parent_District pd");
 		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $facility;
 	}
