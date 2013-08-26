@@ -34,7 +34,7 @@ class Pipeline_Management extends MY_Controller {
 		} else {
 			$this -> session -> set_userdata('upload_counter', '1');
 		}
-		redirect("pipeline_import/index");
+		redirect("pipeline_management/index");
 
 	}
 
@@ -340,6 +340,7 @@ class Pipeline_Management extends MY_Controller {
 				$facility_cell = $worksheet -> getCellByColumnAndRow(1, $row);
 				$comments_cell = $worksheet -> getCellByColumnAndRow(2, $row);
 				$facility_name = $facility_cell -> getValue();
+				$facility_name = trim(str_replace(array('\'', '"', ',', ';', '<', '>', '.'), ' ', $facility_name));
 				$comments = $comments_cell -> getValue();
 				for ($col = 4; $col < ($highestColumnIndex - 1); ++$col) {
 					$cell = $worksheet -> getCellByColumnAndRow($col, $row);
@@ -501,13 +502,13 @@ class Pipeline_Management extends MY_Controller {
 				//$this -> workbook_kp_paggregate($worksheet, $pipeline, $year, $month);
 			} else if ($worksheetTitle == "Patients by Regimen" || $CurrentWorkSheetIndex == 7) {
 				//Check if Patient By Regimen Sheet
-				$this -> workbook_kp_pbyregimen($worksheet, $pipeline, $year, $month);
+				//$this -> workbook_kp_pbyregimen($worksheet, $pipeline, $year, $month);
 			} else if ($worksheetTitle == "ART Patients Scaleup Trends" || $CurrentWorkSheetIndex == 8) {
 				//Check if Patient Scaleup Sheet
 				//$this -> workbook_kp_pscaleup($worksheet, $pipeline, $year, $month);
 			} else if ($worksheetTitle == "Current Patients By ART Site" || $CurrentWorkSheetIndex == 9) {
 				//Check if Current Patients By ART  Sheet
-				//$this -> workbook_kp_pcurrent($worksheet, $pipeline, $year, $month);
+				$this -> workbook_kp_pcurrent($worksheet, $pipeline, $year, $month);
 			} else if ($worksheetTitle == "Pipeline Commodity Consumption" || $CurrentWorkSheetIndex == 10) {
 				//Check if Pipeline Commodity Consumption Sheet
 				//$this -> workbook_kp_piconsumption($worksheet, $pipeline, $year, $month);
@@ -727,7 +728,7 @@ class Pipeline_Management extends MY_Controller {
 
 		for ($i = 0; $i < 10; $i++) {
 			$validity = Dashboard_Patientbyline::checkValid($pipeline, $month, $year, $label[$i]);
-			if (!$validity) {
+			if (!$validity && $label[$i] != '') {
 				$new_patentbyline = new Dashboard_Patientbyline();
 				$new_patentbyline -> pipeline = $pipeline;
 				$new_patentbyline -> month = $month;
@@ -793,19 +794,22 @@ class Pipeline_Management extends MY_Controller {
 			$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
 			$arr = $worksheet -> toArray(null, true, true, true);
 			for ($row = 9; $row <= ($highestRow - 1); ++$row) {
+				$facility_id_cell = $worksheet -> getCellByColumnAndRow(0,$row);
 				$facility_cell = $worksheet -> getCellByColumnAndRow(1, $row);
 				$facility_name = $facility_cell -> getValue();
+				$facility_name = trim(str_replace(array('\'', '"', ',', ';', '<', '>', '.'), ' ', $facility_name));
 				$comments_cell = $worksheet -> getCellByColumnAndRow(2, $row);
 				$comments = $comments_cell -> getValue();
 				for ($col = 4; $col < ($highestColumnIndex - 1); ++$col) {
 					$cell = $worksheet -> getCellByColumnAndRow($col, $row);
 					$regimen_desc_cell = $worksheet -> getCellByColumnAndRow($col, 1);
 					$regimen_code_cell = $worksheet -> getCellByColumnAndRow($col, 6);
-					$prev_regimen_code_cell = $worksheet -> getCellByColumnAndRow($col, 7);
+					$prev_regimen_code_cell = $worksheet -> getCellByColumnAndRow($col, 7);				
 					$val = $cell -> getValue();
 					if ($val == null) {
 						$val = 0;
 					}
+					if($regimen_desc_cell !='' && $facility_id_cell !=''){
 					$pipeline_report = new Patient_Byregimen_Numbers();
 					$pipeline_report -> facilityname = $facility_name;
 					$pipeline_report -> comments = $comments;
@@ -817,6 +821,7 @@ class Pipeline_Management extends MY_Controller {
 					$pipeline_report -> total = $val;
 					$pipeline_report -> pipeline = $pipeline;
 					$pipeline_report -> save();
+					}
 				}
 			}
 
@@ -1020,6 +1025,7 @@ class Pipeline_Management extends MY_Controller {
 					if ($row < 176) {
 						$facility_cell = $worksheet -> getCellByColumnAndRow(1, $row);
 						$facility_name = $facility_cell -> getValue();
+						$facility_name = trim(str_replace(array('\'', '"', ',', ';', '<', '>', '.'), ' ', $facility_name));
 						for ($col = 4; $col < $highestColumnIndex; ++$col) {
 							$cell = $worksheet -> getCellByColumnAndRow($col, $row);
 							$regimen_desc_cell = $worksheet -> getCellByColumnAndRow($col, 1);

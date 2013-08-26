@@ -177,7 +177,7 @@
 					<div class="errormessage"></div>
 					<div class="well" style="background:#9CF">
 						
-						<form name="frm" method="post" enctype="multipart/form-data" id="frm" action="<?php echo base_url()."pipeline_import/upload"?>">
+						<form name="frm" method="post" enctype="multipart/form-data" id="frm" action="<?php echo base_url()."pipeline_management/upload"?>">
 							<legend>
 							Pipeline Data Upload 
 							

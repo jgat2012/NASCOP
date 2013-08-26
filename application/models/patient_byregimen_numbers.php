@@ -24,11 +24,34 @@ class Patient_Byregimen_Numbers extends Doctrine_Record {
 		return $types;
 	}
 
-	public function checkValid($pipeline,$month,$year) {
-		$query = Doctrine_Query::create() -> select("*") -> from("patient_byregimen_numbers")->where("pipeline='$pipeline' and month='$month' and year='$year'");
-		$types = $query ->execute(array(), Doctrine::HYDRATE_ARRAY);
+	public function checkValid($pipeline, $month, $year) {
+		$query = Doctrine_Query::create() -> select("*") -> from("patient_byregimen_numbers") -> where("pipeline='$pipeline' and month='$month' and year='$year'");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $types;
+	}
 
+	public function getTotals($pipeline, $month, $year) {
+		$query = Doctrine_Query::create() -> select("*") -> from("patient_byregimen_numbers") -> where("pipeline='$pipeline' and month='$month' and year='$year'");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types;
+	}
+
+	public function getFacilities($pipeline, $month, $year) {
+		$query = Doctrine_Query::create() -> select("distinct(facilityname) as facilityname") -> from("patient_byregimen_numbers") -> where("pipeline='$pipeline' and month='$month' and year='$year'");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types;
+	}
+
+	public function getRegimens($pipeline, $month, $year) {
+		$query = Doctrine_Query::create() -> select("regimen_desc") -> from("patient_byregimen_numbers") -> where("pipeline='$pipeline' and month='$month' and year='$year' and facilityname ='AIC Litein Mission Hospital'");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types;
+	}
+
+	public function getSpecificTotals($pipeline, $month, $year, $facility_name) {
+		$query = Doctrine_Query::create() -> select("regimen_desc,total") -> from("patient_byregimen_numbers") -> where("pipeline='$pipeline' and month='$month' and year='$year' and facilityname like \"%$facility_name%\"");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types;
 	}
 
 }

@@ -46,6 +46,7 @@ class National_Management extends MY_Controller {
 				}
 
 			}
+			$dyn_table .= "</tbody></table>";
 			echo $dyn_table;
 		}
 	}
@@ -55,6 +56,10 @@ class National_Management extends MY_Controller {
 		 * Check if (type==0) then it is facility else pipeline consumption
 		 */
 		if ($type == 1) {
+			$results = Pipeline_Consumption::getConsumption($pipeline, $month, $year);
+			echo "<pre>";
+			print_r($results);
+			echo "</pre>";
 
 		} else {
 			$results = Facility_Consumption::getTotals($pipeline, $month, $year);
@@ -84,31 +89,57 @@ class National_Management extends MY_Controller {
 
 			}
 			$dyn_table .= "</tbody></table>";
-			//echo $dyn_table;
+			echo $dyn_table;
 		}
-$dyn_table .= "</tbody></table>";
-		$data['label'] = 'Facility';
-		$data['table'] = 'facilities';
-		$data['actual_page'] = 'View Facilities';
-		$data['dyn_table'] = $dyn_table;
-		$this -> base_params($data);
 	}
 
-	public function pa_patients_by_regimen() {
-
+	public function pa_patients_by_regimen($year, $month, $pipeline, $type = 0) {
+		$results = Dashboard_Patientbyline::getMonthlyValues($pipeline, $month, $year);
+		echo "<pre>";
+		print_r($results);
+		echo "</pre>";
 	}
 
-	public function pa_patients_by_artsite() {
+	public function pa_patients_by_artsite($year, $month, $pipeline, $type = 0) {
+		$facility_results = Patient_Byregimen_Numbers::getFacilities($pipeline, $month, $year);
+		$regimen_results = Patient_Byregimen_Numbers::getRegimens($pipeline, $month, $year);
+		$count = 1;
+		$i = 0;
+		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table .= "<thead><tr><th>Facility Name</th>";
+		foreach ($regimen_results as $regimen_result) {
+			$dyn_table .= "<th>" . $regimen_result['regimen_desc'] . "</th>";
+		}
+		$dyn_table .= "</tr></thead>";
+		$dyn_table .= "<tbody>";
+
+		/*
+		 * Outer Loop check through facility array
+		 * Check array keys for the current facility in loop
+		 * Inner Loop check through regimen array
+		 * Within inner loop check for facility and regimen in result array
+		 */
+
+		foreach ($facility_results as $facility) {
+			$facility_name = trim(str_replace(array('\'', '"', ',', ';', '<', '>', '.'), ' ', $facility['facilityname']));
+			$results = Patient_Byregimen_Numbers::getSpecificTotals($pipeline, $month, $year, $facility_name);
+			$dyn_table .= "<tr><td>" . $facility_name . "</td>";
+			if ($results) {
+				foreach ($results as $result) {
+					$dyn_table .= "<td>" . $result['total'] . "</td>";
+				}
+			}
+			$dyn_table .= "</tr>";
+		}
 		$dyn_table .= "</tbody></table>";
-		$data['label'] = 'Facility';
-		$data['table'] = 'facilities';
-		$data['actual_page'] = 'View Facilities';
-		$data['dyn_table'] = $dyn_table;
-		$this -> base_params($data);
+		echo $dyn_table;
 	}
 
-	public function pa_patients_scaleup() {
-
+	public function pa_patients_scaleup($year, $month, $pipeline, $type = 0) {
+		$results = Patient_Scaleup::getTotals($pipeline, $month, $year);
+		echo "<pre>";
+		print_r($results);
+		echo "</pre>";
 	}
 
 	public function fa_ordering_sites_list() {
@@ -152,7 +183,12 @@ $dyn_table .= "</tbody></table>";
 	}
 
 	public function ra_non_reporting_facility_rates() {
-
+		$dyn_table .= "</tbody></table>";
+		$data['label'] = 'Facility';
+		$data['table'] = 'facilities';
+		$data['actual_page'] = 'View Facilities';
+		$data['dyn_table'] = $dyn_table;
+		$this -> base_params($data);
 	}
 
 	public function base_params($data) {
