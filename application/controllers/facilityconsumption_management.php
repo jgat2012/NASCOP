@@ -21,6 +21,9 @@ class Facilityconsumption_Management extends MY_Controller {
 		$drug_results = Facility_Consumption::getDrugs($pipeline, $month, $year);
 		$count = 1;
 		$i = 0;
+		
+		$resultArray = '<p>'.'</p>';
+		/*
 		$dyn_table = "<table border='1'  cellspacing='0.75' cellpadding='1'>";
 		$dyn_table .= "<thead><tr><th>Facility Name</th>";
 		foreach ($drug_results as $drug_result) {
@@ -41,9 +44,9 @@ class Facilityconsumption_Management extends MY_Controller {
 				}
 			}
 
-		}
-		$dyn_table .= "</tbody></table>";
-		echo $dyn_table;
+		}*/
+		//$dyn_table .= "</tbody></table>";
+		//echo $dyn_table;
 	}
 
 }
