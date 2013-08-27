@@ -265,7 +265,6 @@ if(isset($reports)|| isset($report_title)){
 				if($user_is_facility_administrator){
 				?>
 				<li><a href="<?php echo base_url().'picking_list_management/assign_orders' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			
-			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			
                 <li class="divider"></li>
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
 				
@@ -273,6 +272,12 @@ if(isset($reports)|| isset($report_title)){
 				}
 				if($user_is_administrator){
 				?>  <li>
+						<a  id="addCounty" class="admin_link"><i class="icon-eye-open icon-black"></i>View Counties</a>
+					</li>
+					<li>
+						<a  id="addDistrict" class="admin_link"><i class="icon-eye-open icon-black"></i>View Districts</a>
+					</li>
+				     <li>
 						<a  id="addFacility" class="admin_link"><i class="icon-eye-open icon-black"></i>View Facilities</a>
 					</li>
 					<li>

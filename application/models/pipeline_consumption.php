@@ -48,7 +48,7 @@ class Pipeline_Consumption extends Doctrine_Record {
 			if (md5($drugname_cell) === $third_drug) {
 				$drugname_cell = "Triomune junior";
 			}
-			
+
 		}
 		$query = Doctrine_Query::create() -> select("*") -> from("pipeline_consumption") -> where("pipeline='$pipeline' and month='$month' and year='$year' and drugname like '%$drugname_cell%'");
 		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
@@ -64,6 +64,12 @@ class Pipeline_Consumption extends Doctrine_Record {
 
 	public function getDrugs($pipeline, $month, $year) {
 		$query = Doctrine_Query::create() -> select("distinct(drugname) as drugname") -> from("pipeline_consumption") -> where("pipeline='$pipeline' and month='$month' and year='$year'");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types;
+	}
+
+	public function getConsumption($pipeline, $month, $year) {
+		$query = Doctrine_Query::create() -> select("upper(drugname) as drugname, consumption") -> from("pipeline_consumption") -> where("pipeline='$pipeline' and month='$month' and year='$year'") -> groupBy("drugname, consumption") -> orderBy("drugname asc");
 		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $types;
 	}

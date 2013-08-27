@@ -23,6 +23,8 @@ $(document).ready(function() {
 		},
 		"bProcessing" : true,
 		"bServerSide" : false,
+		"sScrollX": "100%",
+        "sScrollXInner": ""
 	});
 	//syncOrders("13050");
 	/*

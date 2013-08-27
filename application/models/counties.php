@@ -3,6 +3,7 @@ class Counties extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('county', 'varchar', 100);
+		$this -> hasColumn('active', 'int', 5);
 	}//end setTableDefinition
 
 	public function setUp() {
@@ -24,6 +25,12 @@ class Counties extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Counties");
 		$districts = $query -> execute();
 		return $districts;
+	}
+	
+	public function getActive() {
+		$query = Doctrine_Query::create() -> select("*") -> from("Counties")->where("active='1'");
+		$counties = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $counties;
 	}
 
 }//end class

@@ -10,8 +10,9 @@ class Facility_Order extends Doctrine_Record {
 		 * 3 - Dispatched
 		 *
 		 * For the codes
-		 * 0 - Satellite facility order
-		 * 1 - Central facility order
+		 * 0 - Central facility order
+		 * 1 - Aggregated facility order
+		 * 2 - Satellite facility order
 		 */
 
 		$this -> hasColumn('Status', 'varchar', 10);
@@ -30,8 +31,8 @@ class Facility_Order extends Doctrine_Record {
 		$this -> hasColumn('Facility_Id', 'varchar', 10);
 		$this -> hasColumn('Picking_List_Id', 'varchar', 10);
 		$this -> hasColumn('Central_Facility', 'varchar', 10);
-		$this -> hasColumn('Unique_Id', 'varchar','150');
-		$this -> hasColumn('Is_Uploaded', 'int','5');
+		$this -> hasColumn('Unique_Id', 'varchar', '150');
+		$this -> hasColumn('Is_Uploaded', 'int', '5');
 	}//end setTableDefinition
 
 	public function setUp() {
@@ -74,6 +75,24 @@ class Facility_Order extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Facility_Order") -> where("Central_Facility = '$central_facility' and Status = '$status' and Period_Begin = '$period_start' and Period_End = '$period_end'");
 		$orders = $query -> execute();
 		return $orders;
+	}
+
+	public function getAggregateOrders($period_start, $period_end) {
+		$query = Doctrine_Query::create() -> select("Unique_Id") -> from("Facility_Order") -> where("Period_Begin='$period_start' and Period_End='$period_end' and code='1' and status !='2'");
+		$order_object = $query -> execute();
+		return $order_object;
+	}
+
+	public function getFacilitiesUsingADT($period_start, $period_end) {
+		$query = Doctrine_Query::create() -> select("fo.id,fo.Facility_Id as mflcode,f.name as FacilityName,ft.Name as FacilityType,f.id,fc.county as facility_county") -> from("Facility_Order fo") -> leftJoin("fo.Facility_Object f,f.Type ft,f.County fc") -> where("fo.Period_Begin='$period_start' and fo.Period_End='$period_end' and fo.code='1' and fo.status !='2'");
+		$order_object = $query -> execute();
+		return $order_object;
+	}
+
+	public function getFacilitiesDelayOrders($period_start, $period_end) {
+		$query = Doctrine_Query::create() -> select("fo.id,fo.Facility_Id as mflcode,f.name as FacilityName,ft.Name as FacilityType,f.id,fc.county as facility_county,fo.Created as CreatedTimestamp") -> from("Facility_Order fo") -> leftJoin("fo.Facility_Object f,f.Type ft,f.County fc") -> where("fo.Period_Begin='$period_start' and fo.Period_End='$period_end' and fo.code='1' and fo.status !='2'");
+		$order_object = $query -> execute();
+		return $order_object;
 	}
 
 }//end class

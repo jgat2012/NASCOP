@@ -60,7 +60,7 @@ if($table){
 </div>
 
 <!--Dialog for Satellites-->
-<div id="dialog_facilities" title="Add Satellite" class="modal hide fade cyan" tabindex="-1" role="dialog" aria-labelledby="AddCounty" aria-hidden="true">
+<div id="dialog_facilities" title="Add Facility" class="modal hide fade cyan" tabindex="-1" role="dialog" aria-labelledby="AddCounty" aria-hidden="true">
     <?php
 		$attributes = array('class' => 'input_form');
 		echo form_open('admin_management/save/'.$table, $attributes);
@@ -70,12 +70,30 @@ if($table){
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 			×
 		</button>
-		<h3 id="NewDrug">Add Satellite</h3>
+		<h3 id="NewDrug">Add Facility</h3>
 	</div>
 	<div class="modal-body">
 		<div class="max-row">
+				<label>Facility Code</label>
+				<input type="text" class="input-large" name="facility_code" required="required"/>
+		</div>
+		<div class="max-row">
 				<label>Facility Name</label>
-				<select name="facility" id="satellite" class="input-xlarge">
+				<input type="text" class="input-large" name="facility_name" required="required"/>
+		</div>
+		<div class="max-row">
+				<label>Facility Type</label>
+				<select name="facility_type" id="facility_type" class="input-xlarge">
+				</select>
+		</div>
+		<div class="max-row">
+				<label>County</label>
+				<select name="facility_county" id="facility_county" class="input-xlarge">
+				</select>
+		</div>
+		<div class="max-row">
+				<label>District</label>
+				<select name="facility_district" id="facility_district" class="input-xlarge">
 				</select>
 		</div>
 	</div>
@@ -87,6 +105,54 @@ if($table){
 	</div>
 	<?php echo form_close(); ?>
 </div>
+
+<div id="edit_facilities" title="Edit Facility" class="modal hide fade cyan" tabindex="-1" role="dialog" aria-labelledby="AddCounty" aria-hidden="true">
+    <?php
+		$attributes = array('class' => 'input_form');
+		echo form_open('admin_management/update/'.$table, $attributes);
+		echo validation_errors('<p class="error">', '</p>');
+	?>
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+			×
+		</button>
+		<h3 id="NewDrug">Edit Facility</h3>
+	</div>
+	<div class="modal-body">
+		<div class="max-row">
+				<label>Facility Code</label>
+				<input type="hidden" class="input-large" name="edit_facility_id" id="edit_facility_id" required="required"/>
+				<input type="text" class="input-large" name="edit_facility_code" id="edit_facility_code" required="required"/>
+		</div>
+		<div class="max-row">
+				<label>Facility Name</label>
+				<input type="text" class="input-large" name="edit_facility_name" id="edit_facility_name" required="required"/>
+		</div>
+		<div class="max-row">
+				<label>Facility Type</label>
+				<select name="edit_facility_type" id="edit_facility_type" class="input-xlarge">
+				</select>
+		</div>
+		<div class="max-row">
+				<label>County</label>
+				<select name="edit_facility_county" id="edit_facility_county" class="input-xlarge">
+				</select>
+		</div>
+		<div class="max-row">
+				<label>District</label>
+				<select name="edit_facility_district" id="edit_facility_district" class="input-xlarge">
+				</select>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn" data-dismiss="modal" aria-hidden="true">
+			Cancel
+		</button>
+		<input type="submit" value="Save" class="btn btn-primary " />
+	</div>
+	<?php echo form_close(); ?>
+</div>
+
 <!--Dialog for Districts-->
 <div id="dialog_district" title="Add District" class="modal hide fade cyan" tabindex="-1" role="dialog" aria-labelledby="AddDistrict" aria-hidden="true">
 	<?php
@@ -395,16 +461,45 @@ if($table){
 		$("#actual_page").text("<?php echo $actual_page; ?>");
 		//Adding Facilities
 		$("#facilities").live('click',function(){
-		    var link=base_url+"facility_management/getFacilityList";
-				$.ajax({
-				    url: link,
+		    var link_1=base_url+"facility_management/getFacilityTypes";
+			  $.ajax({
+				    url: link_1,
 				    type: 'POST',
 				    dataType: "json",
 				    success: function(data) {	
-				    	$("#satellite").empty();
-				    	$("#satellite").append($("<option></option>").attr("value",'').text('--Select One--'));
+				    	$("#facility_type").empty();
+				    	$("#facility_type").append($("<option></option>").attr("value",'').text('--Select One--'));
 				    	$.each(data, function(i, jsondata){
-				    		$("#satellite").append($("<option></option>").attr("value",jsondata.facilitycode).text(jsondata.name));
+				    		$("#facility_type").append($("<option></option>").attr("value",jsondata.id).text(jsondata.Name));
+				    	});
+				    }
+				});
+				
+	         var link_2=base_url+"facility_management/getCounties";
+			  $.ajax({
+				    url: link_2,
+				    type: 'POST',
+				    dataType: "json",
+				    success: function(data) {	
+				    	$("#facility_county").empty();
+				    	$("#facility_county").append($("<option></option>").attr("value",'').text('--Select One--'));
+				    	$.each(data, function(i, jsondata){
+				    		$("#facility_county").append($("<option></option>").attr("value",jsondata.id).text(jsondata.county));
+				    	});
+				    }
+				});
+				
+				
+			 var link_3=base_url+"facility_management/getDistricts";
+			  $.ajax({
+				    url: link_3,
+				    type: 'POST',
+				    dataType: "json",
+				    success: function(data) {	
+				    	$("#facility_district").empty();
+				    	$("#facility_district").append($("<option></option>").attr("value",'').text('--Select One--'));
+				    	$.each(data, function(i, jsondata){
+				    		$("#facility_district").append($("<option></option>").attr("value",jsondata.id).text(jsondata.Name));
 				    	});
 				    }
 				});
@@ -495,8 +590,69 @@ if($table){
 						});
 					}else if(table=="nascop"){
 						$("#nascop_url").val($(this).attr("nascop_url"));
+					}else if(table=="facilities"){
+						$("#edit_facility_id").val($(this).attr("facility_id"));
+						$("#edit_facility_code").val($(this).attr("facility_code"));
+						$("#edit_facility_name").val($(this).attr("facility_name"));
+						var facility_type=$(this).attr("facility_type");
+						var county_id=$(this).attr("facility_county");
+						var district_id=$(this).attr("facility_district");
+						var link_1 = base_url + "facility_management/getFacilityTypes";
+						$.ajax({
+							url : link_1,
+							type : 'POST',
+							dataType : "json",
+							success : function(data) {	
+								$("#edit_facility_type").empty();
+								$("#edit_facility_type").append($("<option></option>").attr("value", '').text('--Select One--'));
+								$.each(data, function(i, jsondata) {
+									if(facility_type == jsondata.id) {
+									$("#edit_facility_type").append($("<option selected='selected'></option>").attr("value", jsondata.id).text(jsondata.Name));
+									} else {
+									$("#edit_facility_type").append($("<option></option>").attr("value", jsondata.id).text(jsondata.Name));
+									}
+								});
+							}
+						});
+
+						var link_2 = base_url + "facility_management/getCounties";
+						$.ajax({
+							url : link_2,
+							type : 'POST',
+							dataType : "json",
+							success : function(data) {
+								$("#edit_facility_county").empty();
+								$("#edit_facility_county").append($("<option></option>").attr("value", '').text('--Select One--'));
+								$.each(data, function(i, jsondata) {
+									if(county_id == jsondata.id) {
+									$("#edit_facility_county").append($("<option selected='selected'></option>").attr("value", jsondata.id).text(jsondata.county));
+									} else {
+									$("#edit_facility_county").append($("<option></option>").attr("value", jsondata.id).text(jsondata.county));
+								   }
+								});
+							}
+						});
+
+						var link_3 = base_url + "facility_management/getDistricts";
+						$.ajax({
+							url : link_3,
+							type : 'POST',
+							dataType : "json",
+							success : function(data) {
+								$("#edit_facility_district").empty();
+								$("#edit_facility_district").append($("<option></option>").attr("value", '').text('--Select One--'));
+								$.each(data, function(i, jsondata) {
+									if(district_id == jsondata.id) {
+									$("#edit_facility_district").append($("<option selected='selected'></option>").attr("value", jsondata.id).text(jsondata.Name));
+									} else {
+									$("#edit_facility_district").append($("<option></option>").attr("value", jsondata.id).text(jsondata.Name));
+								    }
+								});
+							}
+						});
 					}
-			   });
-		  });
-</script>
+
+				  });
+			});
+    </script>
 

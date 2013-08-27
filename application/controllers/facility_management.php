@@ -46,10 +46,25 @@ class Facility_Management extends MY_Controller {
 		echo json_encode($facilities);
 	}
 
-	public function getCurrent(){
+	public function getCurrent() {
 		$source = $this -> session -> userdata('facility');
 		$facilities = Facilities::getCurrentFacility($source);
 		echo json_encode($facilities);
+	}
+
+	public function getCounties() {
+		$counties=Counties::getActive();
+		echo json_encode($counties);
+	}
+
+	public function getDistricts() {
+		$districts=District::getActive();
+		echo json_encode($districts);
+	}
+
+	public function getFacilityTypes() {
+		$f_types=Facility_Types::getActive();
+		echo json_encode($f_types);
 	}
 
 	public function update() {

@@ -159,8 +159,12 @@
 	
 
 </style>
+<<<<<<< HEAD
 
 <div id="view_content" class="center-content">
+=======
+<div id="view_content" class="full-content">
+>>>>>>> fb89df9c60c9a2af2f3c689b887cc1a73ef96ad9
 	    <div>
 		<ul class="breadcrumb">
 		  <li><a href="<?php echo site_url().'home_controller/home' ?>"  id='goHome'><i class="icon-home"></i><strong>Home</strong></a> 
@@ -180,7 +184,7 @@
 					<div class="well" style="background:#9CF">
 
 						
-						<form name="frm" method="post" enctype="multipart/form-data" id="frm" action="<?php echo base_url()."pipeline_import/upload"?>">
+						<form name="frm" method="post" enctype="multipart/form-data" id="frm" action="<?php echo base_url()."pipeline_management/upload"?>">
 							<legend>
 							Pipeline Data Upload 
 							

@@ -6,7 +6,7 @@ class Picking_List_Details extends Doctrine_Record {
 		$this -> hasColumn('Created_By', 'varchar', 10);
 		$this -> hasColumn('Timestamp', 'varchar', 32);
 		$this -> hasColumn('Status', 'varchar', 5);
-		$this -> hasColumn('Pipeline', 'varchar',20);
+		$this -> hasColumn('Pipeline', 'varchar', 20);
 	}//end setTableDefinition
 
 	public function setUp() {
@@ -35,6 +35,12 @@ class Picking_List_Details extends Doctrine_Record {
 
 	public static function getAllOpen() {
 		$query = Doctrine_Query::create() -> select("*") -> from("Picking_List_Details") -> where("Status = '0'");
+		$list_object = $query -> execute();
+		return $list_object;
+	}
+
+	public function getListGroup($period_start,$period_end) {
+		$query = Doctrine_Query::create() -> select("count(*) as total,Status,Pipeline") -> from("Picking_List_Details") -> where("Timestamp between '$period_start' and '$period_end'")->groupBy("Status, Pipeline");
 		$list_object = $query -> execute();
 		return $list_object;
 	}
