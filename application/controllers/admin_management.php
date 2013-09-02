@@ -577,7 +577,7 @@ class admin_management extends MY_Controller {
 		}
 		$total_series[] = $series;
 
-		$columns = array("System Admin", "Facility User", "Facility Admin");
+		$columns = array("Nascop Admin", "Nascop Pharmacist");
 		$resultArray = json_encode($total_series);
 		$categories = json_encode($columns);
 		$resultArraySize = 0;

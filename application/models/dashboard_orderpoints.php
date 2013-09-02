@@ -24,6 +24,12 @@ class Dashboard_Orderpoints extends Doctrine_Record {
 		$types = $query -> execute();
 		return $types;
 	}
+	
+	public function getMonthList($pipeline, $month, $year) {
+		$query = Doctrine_Query::create() -> select("*") -> from("dashboard_orderpoints")->where("pipeline='$pipeline' and month='$month' and year='$year'");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types;
+	}
 
 	public function checkValid($pipeline,$month,$year,$mfl_code) {
 		$query = Doctrine_Query::create() -> select("*") -> from("dashboard_orderpoints")->where("pipeline='$pipeline' and month='$month' and year='$year' and mfl_code='$mfl_code'");

@@ -147,20 +147,67 @@ class National_Management extends MY_Controller {
 		echo "</pre>";
 	}
 
-	public function fa_ordering_sites_list() {
+	public function fa_ordering_sites_list($year, $month, $pipeline, $type = 0) {
+		$results = Dashboard_Orderpoints::getMonthList($pipeline, $month, $year);
+		$ftype = "";
+		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table .= "<thead><tr><th>MFL Code</th><th>Facility Name</th><th>District</th><th>Province</th><th>Facility Type</th></tr></thead>";
+		$dyn_table .= "<tbody>";
+		foreach ($results as $result) {
+			if ($result['central'] == 1) {
+				$ftype = "Central Site";
+			} else if ($result['standalone'] == 1) {
+				$ftype = "Standalone Site";
+			} else if ($result['store'] == 1) {
+				$ftype = "District Store";
+			}
+			$dyn_table .= "<tr><td>" . $result['mfl_code'] . "</td><td>" . $result['facility_name'] . "</td><td>" . $result['district'] . "</td><td>" . $result['province'] . "</td><td>$ftype</td></tr>";
+		}
+		$dyn_table .= "</tbody></table>";
+		echo $dyn_table;
+	}
+
+	public function fa_ordering_sites_summary($year, $month, $pipeline, $type = 0) {
 
 	}
 
-	public function fa_ordering_sites_summary() {
-
+	public function fa_service_points_list($year, $month, $pipeline, $type = 0) {
+		$results = Dashboard_Servicepoints::getMonthList($pipeline, $month, $year);
+		$ftype = "";
+		$dispense = "";
+		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table .= "<thead><tr><th>MFL Code</th><th>Satellite Site</th><th>Central Site</th><th>District</th><th>Province</th><th>Dispensing Point</th><th>Facility Type</th></tr></thead>";
+		$dyn_table .= "<tbody>";
+		foreach ($results as $result) {
+			if ($result['dispensing'] == 1) {
+				$dispense = "Yes";
+			} else {
+				$dispense = "No";
+			}
+			if ($result['satellite'] == 0) {
+				$ftype = "Central Site";
+			} else if ($result['satellite'] == 1) {
+				$ftype = "Satellite Site";
+			} else if ($result['standalone'] == 1) {
+				$ftype = "Standalone Site";
+			}
+			$dyn_table .= "<tr><td>" . $result['mfl_code'] . "</td><td>" . $result['facility_name'] . "</td><td>" . $result['centralsite_name'] . "</td><td>" . $result['district'] . "</td><td>" . $result['province'] . "</td><td>$dispense</td><td>$ftype</td></tr>";
+		}
+		$dyn_table .= "</tbody></table>";
+		echo $dyn_table;
 	}
 
-	public function fa_service_points_list() {
-
-	}
-
-	public function fa_service_points_summary() {
-
+	public function fa_service_points_summary($year, $month, $pipeline, $type = 0) {
+		$results = Dashboard_Servicepoints::getMonthlySummary($pipeline, $month, $year);
+		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table .= "<thead><tr><th>Provinces</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
+		$dyn_table .= "<tbody>";
+		foreach($results as $result){
+			$dyn_table .= "<tr><td>" . $result['province'] . "</td><td>" . $result['Standalone'] . "</td><td>" . $result['Satellite'] . "</td><td>" . $result['Total'] . "</td></tr>";
+		}
+		$dyn_table .= "</tbody></table>";
+		echo $dyn_table;
+		
 	}
 
 	public function oa_orders_by_commodity() {
@@ -188,7 +235,6 @@ class National_Management extends MY_Controller {
 	}
 
 	public function ra_non_reporting_facility_rates() {
-		$dyn_table .= "</tbody></table>";
 		$data['label'] = 'Facility';
 		$data['table'] = 'facilities';
 		$data['actual_page'] = 'View Facilities';
