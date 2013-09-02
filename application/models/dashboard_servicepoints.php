@@ -33,9 +33,14 @@ class Dashboard_Servicepoints extends Doctrine_Record {
 	}
 
 	public function getMonthlySummary($pipeline, $month, $year) {
-		$query = Doctrine_Query::create() -> select("province, IF( standalone =1, COUNT( standalone ) ,  '-' ) AS Standalone, IF( satellite =1, COUNT( satellite ) ,  '-' ) AS Satellite, COUNT( * ) AS Total") -> from("dashboard_servicepoints") -> groupBy("province");
+		$query = Doctrine_Query::create() -> select("province,count(*) as total") -> from("dashboard_servicepoints")-> where("pipeline='$pipeline' and month='$month' and year='$year'") -> groupBy("province");
 		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $types;
+	}
+	public function getMonthlyProvinceSummary($pipeline, $month, $year,$province,$summary) {
+		$query = Doctrine_Query::create() -> select("count(*) as total") -> from("dashboard_servicepoints")-> where("pipeline='$pipeline' and month='$month' and year='$year' and province='$province' and $summary");
+		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types[0];
 	}
 
 	public function checkValid($pipeline, $month, $year, $facility_name, $mfl_code) {

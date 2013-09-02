@@ -168,7 +168,38 @@ class National_Management extends MY_Controller {
 	}
 
 	public function fa_ordering_sites_summary($year, $month, $pipeline, $type = 0) {
-
+		$results = Dashboard_Orderpoints::getMonthlySummary($pipeline, $month, $year);
+		$summary_array = array("central='1'", "standalone='1'", "central='0' and standalone='0'");
+		$central_total = 0;
+		$standalone_total = 0;
+		$satellite_total = 0;
+		$overall_total = 0;
+		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table .= "<thead><tr><th>Provinces</th><th>Central Sites</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
+		$dyn_table .= "<tbody>";
+		foreach ($results as $result) {
+			$province = $result['province'];
+			$total = $result['total'];
+			$dyn_table .= "<tr><td>" . $province . "</td>";
+			$count = 0;
+			foreach ($summary_array as $summary) {
+				$province_total = Dashboard_Orderpoints::getMonthlyProvinceSummary($pipeline, $month, $year, $province, $summary);
+				$dyn_table .= "<td>" . $province_total['total'] . "</td>";
+				if ($count == 0) {
+					$central_total += $province_total['total'];
+				} else if ($count == 1) {
+					$standalone_total += $province_total['total'];
+				} else if ($count == 2) {
+					$satellite_total += $province_total['total'];
+				}
+				$count++;
+			}
+			$overall_total += $total;
+			$dyn_table .= "<td>" . $total . "</td></tr>";
+		}
+		$dyn_table .= "</tbody><tfoot><tr><td>Totals</td><td>$central_total</td><td>$standalone_total</td><td>$satellite_total</td><td>$overall_total</td></tr>";
+		$dyn_table .= "</tfoot></table>";
+		echo $dyn_table;
 	}
 
 	public function fa_service_points_list($year, $month, $pipeline, $type = 0) {
@@ -199,15 +230,38 @@ class National_Management extends MY_Controller {
 
 	public function fa_service_points_summary($year, $month, $pipeline, $type = 0) {
 		$results = Dashboard_Servicepoints::getMonthlySummary($pipeline, $month, $year);
+		$summary_array = array("satellite='0' and standalone='0'", "standalone='1'", "satellite='1'");
+		$central_total = 0;
+		$standalone_total = 0;
+		$satellite_total = 0;
+		$overall_total = 0;
 		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
-		$dyn_table .= "<thead><tr><th>Provinces</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
+		$dyn_table .= "<thead><tr><th>Provinces</th><th>Central Sites</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
 		$dyn_table .= "<tbody>";
-		foreach($results as $result){
-			$dyn_table .= "<tr><td>" . $result['province'] . "</td><td>" . $result['Standalone'] . "</td><td>" . $result['Satellite'] . "</td><td>" . $result['Total'] . "</td></tr>";
+		foreach ($results as $result) {
+			$province = $result['province'];
+			$total = $result['total'];
+			$dyn_table .= "<tr><td>" . $province . "</td>";
+			$count = 0;
+			foreach ($summary_array as $summary) {
+				$province_total = Dashboard_Servicepoints::getMonthlyProvinceSummary($pipeline, $month, $year, $province, $summary);
+				$dyn_table .= "<td>" . $province_total['total'] . "</td>";
+				if ($count == 0) {
+					$central_total += $province_total['total'];
+				} else if ($count == 1) {
+					$standalone_total += $province_total['total'];
+				} else if ($count == 2) {
+					$satellite_total += $province_total['total'];
+				}
+				$count++;
+			}
+			$overall_total += $total;
+			$dyn_table .= "<td>" . $total . "</td></tr>";
 		}
-		$dyn_table .= "</tbody></table>";
+		$dyn_table .= "</tbody><tfoot><tr><td>Totals</td><td>$central_total</td><td>$standalone_total</td><td>$satellite_total</td><td>$overall_total</td></tr>";
+		$dyn_table .= "</tfoot></table>";
 		echo $dyn_table;
-		
+
 	}
 
 	public function oa_orders_by_commodity() {
