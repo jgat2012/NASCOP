@@ -10,9 +10,10 @@ class Dashboard_Management extends MY_Controller {
 
 	public function index() {
 		$data['content_view'] = "home_v";
+		$data['hide_side_menu'] = 1;
 		$data['banner_text'] = "National Dashboard";
 		$data['title'] = "webADT | National Dashboard";
-		$this->base_params($data);
+		$this -> base_params($data);
 	}
 
 	public function notification($id, $notification, $count, $icon, $link) {

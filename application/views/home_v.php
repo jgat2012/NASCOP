@@ -197,18 +197,37 @@ var chartLink;
     </script>
 
 <div class="main-content">
-<div class="center-content">
+
 	<?php
 
 	if($user_is_pharmacist){
+		
+		?>
+		<div class="center-content">
+		<?php
 		$this->load->view('dashboard/pharmacist');
+		?>
+		</div>
+		<?php
 	 }
 	 
 	elseif($user_is_administrator){
+		?>
+		<div class="center-content">
+		<?php
 	 	 $this->load->view("dashboard/system_admin");
+		 ?>
+		</div>
+		 <?php
 	 }
 	else{
+		?>
+		<div class="fullest-content">
+		<?php
 		$this->load->view("dashboard/index");
+		?>
+		</div>
+		<?php
 	}
 	 ?>
 	</div>

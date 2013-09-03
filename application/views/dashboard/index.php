@@ -13,7 +13,7 @@
 	<button class="generate btn btn-warning" id="expiry_btn">
 		Get
 	</button>
-	<br/>
+	
 	<button class="btn btn-success more" id="drugs-more">
 		Larger
 	</button>
@@ -35,7 +35,7 @@
 	<input type="hidden"  class="input-medium" id="period_end_date_2"/>
 	<button class="btn generate" id="enrollment_btn">
 		Get
-	</button> </br/>
+	</button> 
 	<button class="btn btn-success more" id="enrollment-more">
 		Larger
 	</button>
@@ -55,7 +55,7 @@
 	<button class="generate btn btn-warning" id="appointment_btn">
 		Get
 	</button>
-	<br/>
+	
 	<button class="btn btn-success more" id="appointment-more">
 		Larger
 	</button>
@@ -76,7 +76,7 @@
 	<button class="generate btn btn-warning" id="stockout_btn">
 		Get
 	</button>
-	<br/>
+	
 	<button class="btn btn-success more" id="stock-more">
 		Larger
 	</button>
@@ -85,6 +85,44 @@
 	</button></h3>
 
 	<div id="chart_area4">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		</div>
+	</div>
+</div>
+<div class="tile" id="enrollment-chart">
+	<h3>Facilities Ordering using webADT in
+	<input type="text"  class="input-medium" id="reporting_period_2"/>
+	<input type="hidden"  class="input-medium" id="period_start_date_2"/>
+	<input type="hidden"  class="input-medium" id="period_end_date_2"/>
+	<button class="btn generate" id="enrollment_btn">
+		Get
+	</button> 
+	<button class="btn btn-success more" id="enrollment-more">
+		Larger
+	</button>
+	<button class="btn btn-danger less" id="enrollment-less">
+		Smaller
+	</button></h3>
+	<div id="chart_area2">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		</div>
+	</div>
+</div>
+<div class="tile" id="enrollment-chart">
+	<h3>Facilities Ordering using webADT in
+	<input type="text"  class="input-medium" id="reporting_period_2"/>
+	<input type="hidden"  class="input-medium" id="period_start_date_2"/>
+	<input type="hidden"  class="input-medium" id="period_end_date_2"/>
+	<button class="btn generate" id="enrollment_btn">
+		Get
+	</button> 
+	<button class="btn btn-success more" id="enrollment-more">
+		Larger
+	</button>
+	<button class="btn btn-danger less" id="enrollment-less">
+		Smaller
+	</button></h3>
+	<div id="chart_area2">
 		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
 		</div>
 	</div>

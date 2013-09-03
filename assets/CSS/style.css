@@ -964,6 +964,14 @@ table.setting_table {
 	overflow-x: hidden;
 	overflow-y: auto;
 }
+.fullest-content {
+	width: 96%;
+	margin: auto;
+	padding: 10% 1% 5% 1%;
+}
+.fullest-content .tile{
+	width:32%;
+}
 /**
  * 	Styling for Dashboard
  */
