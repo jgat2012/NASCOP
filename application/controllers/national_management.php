@@ -264,8 +264,29 @@ class National_Management extends MY_Controller {
 
 	}
 
-	public function oa_orders_by_commodity() {
-
+	public function oa_orders_by_commodity($year, $month, $pipeline, $type = 0) {
+		/*
+		 * Convert month and year to period start to period end
+		 * Get all Approved/Dispatched Aggregated Orders(Unique Ids) in period for that pipeline
+		 * Get all commodities in the cdrr_item table for orders that have the pre-selected unique ids 
+		 */
+		
+			
+		$period_start=date('Y-m-01',strtotime($year."-".$month."-01"));
+		$period_end=date('Y-m-t',strtotime($year."-".$month."-01"));
+		$facility_orders=Facility_Order::getOrderCommoditiesByPipeline($pipeline,$period_start,$period_end);
+		$id_list=array();
+		
+		foreach($facility_orders as $facility_order){
+			$unique_id=$facility_order['Unique_Id'];
+			$id_list[]=$unique_id;
+		}
+		$orders = "'".implode("','",$id_list)."'";
+		$results=Cdrr_Item::getAllCommodities($orders);
+		echo "<pre>";
+		print_r($results);
+		echo "</pre>";
+		
 	}
 
 	public function oa_orders_reporting_rate() {

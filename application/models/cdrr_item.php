@@ -42,6 +42,12 @@ class Cdrr_Item extends Doctrine_Record {
 		$items = $query -> execute();
 		return $items;
 	}
+	
+	public function getAllCommodities($order_list) {
+		$query = Doctrine_Query::create() -> select("Drug_Id,Resupply") -> from("Cdrr_Item") -> where("Cdrr_Id IN($order_list)")->groupBy("Drug_Id") -> orderby("Drug_Id desc");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
 
 }//end class
 ?>
