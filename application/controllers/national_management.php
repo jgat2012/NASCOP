@@ -137,7 +137,11 @@ class National_Management extends MY_Controller {
 			$dyn_table .= "</tr>";
 		}
 		$dyn_table .= "</tbody></table>";
-		echo $dyn_table;
+		$data['label'] = 'Facility';
+		$data['table'] = 'facilities';
+		$data['actual_page'] = 'View Facilities';
+		$data['dyn_table'] = $dyn_table;
+		$this -> base_params($data);
 	}
 
 	public function pa_patients_scaleup($year, $month, $pipeline, $type = 0) {

@@ -41,7 +41,7 @@ fx.Base.prototype = {
 	},
 
 	custom: function(from, to) {
-		if (this.timer != null) return;
+		if (this.timer !== null) return;
 		this.from = from;
 		this.to = to;
 		this.go();
@@ -56,7 +56,7 @@ fx.Base.prototype = {
 		clearInterval(this.timer);
 		this.timer = null;
 	}
-}
+};
 
 //stretchers
 fx.Layout = Class.create();

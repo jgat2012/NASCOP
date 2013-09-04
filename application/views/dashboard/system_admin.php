@@ -1,4 +1,4 @@
-<div class="center-content">
+
 	<div>
     <div>
 		<ul class="breadcrumb">
@@ -35,7 +35,7 @@
 				   <option value="90">3 Months</option>
 				   <option value="180">6 Months</option>
 			</select>
-			<button class="generate btn" id="usage_btn">Go</button>
+			<button class="generate btn btn-warning" id="usage_btn">Get</button>
 			<button class="btn btn-success more" id="drugs-more">Larger</button>
 			<button class="btn btn-danger less" id="drugs-less">Smaller</button>
 			</h3>
@@ -49,7 +49,7 @@
 			<h3>Weekly Access Log Summary <br/>From
 				<input type="text" placeholder="Start" class="input-medium" id="enrollment_start"/> To
 				<input type="text" placeholder="End" class=" input-medium" id="enrollment_end" readonly="readonly"/>
-				<button class="btn generate" id="access_btn">Go</button>
+				<button class="btn generate btn-warning" id="access_btn">Get</button>
 				<button class="btn btn-success more" id="enrollment-more">Larger</button>
 			<button class="btn btn-danger less" id="enrollment-less">Smaller</button>
 				 </h3>
@@ -58,7 +58,7 @@
 			</div>
   </div>
   </div>		
-</div>
+
 <script type="text/javascript">
 	$(document).ready(function(){
 		var base_url="<?php echo base_url();?>";

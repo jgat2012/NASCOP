@@ -28,6 +28,7 @@
 		}
 </script>
 <div class="center-content">
+
 	<div>
 		<ul class="breadcrumb">
 		  <li><a href="<?php echo site_url().'picking_list_management' ?>">Picking Lists</a> <span class="divider">/</span></li>
@@ -99,3 +100,4 @@
 	<?php echo $pagination;?>
 </div>
 <?php endif;?>
+</div>
