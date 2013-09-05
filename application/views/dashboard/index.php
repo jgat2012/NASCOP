@@ -22,7 +22,7 @@
 	</button></h3>
 
 	<div id="chart_area">
-		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>">
 		</div>
 	</div>
 
@@ -33,7 +33,7 @@
 	<input type="text"  class="input-medium" id="reporting_period_2"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_2"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_2"/>
-	<button class="btn generate" id="enrollment_btn">
+	<button class="generate btn btn-warning" id="enrollment_btn">
 		Get
 	</button> 
 	<button class="btn btn-success more" id="enrollment-more">
@@ -43,7 +43,7 @@
 		Smaller
 	</button></h3>
 	<div id="chart_area2">
-		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>">
 		</div>
 	</div>
 </div>
@@ -52,10 +52,10 @@
 	<input type="text"  class="input-medium" id="reporting_period_3"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_3"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_3"/>
+	<br/>
 	<button class="generate btn btn-warning" id="appointment_btn">
 		Get
 	</button>
-	
 	<button class="btn btn-success more" id="appointment-more">
 		Larger
 	</button>
@@ -63,7 +63,7 @@
 		Smaller
 	</button></h3>
 	<div id="chart_area3">
-		<div class="loadingDiv" style="margin:20% 0 20% 0;"><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;"><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>">
 		</div>
 	</div>
 </div>
@@ -73,10 +73,10 @@
 	<input type="hidden"  class="input-medium" id="period_start_date_4"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_4"/>
 	<input type="hidden"  class="input-medium"/>
+	<br/>
 	<button class="generate btn btn-warning" id="stockout_btn">
 		Get
 	</button>
-	
 	<button class="btn btn-success more" id="stock-more">
 		Larger
 	</button>
@@ -85,7 +85,7 @@
 	</button></h3>
 
 	<div id="chart_area4">
-		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>">
 		</div>
 	</div>
 </div>
@@ -94,7 +94,8 @@
 	<input type="text"  class="input-medium" id="reporting_period_2"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_2"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_2"/>
-	<button class="btn generate" id="enrollment_btn">
+	<br/>
+	<button class="generate btn btn-warning" id="enrollment_btn">
 		Get
 	</button> 
 	<button class="btn btn-success more" id="enrollment-more">
@@ -104,7 +105,7 @@
 		Smaller
 	</button></h3>
 	<div id="chart_area2">
-		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>">
 		</div>
 	</div>
 </div>
@@ -113,7 +114,8 @@
 	<input type="text"  class="input-medium" id="reporting_period_2"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_2"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_2"/>
-	<button class="btn generate" id="enrollment_btn">
+	<br/>
+	<button class="generate btn btn-warning" id="enrollment_btn">
 		Get
 	</button> 
 	<button class="btn btn-success more" id="enrollment-more">
@@ -123,7 +125,7 @@
 		Smaller
 	</button></h3>
 	<div id="chart_area2">
-		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>">
+		<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>">
 		</div>
 	</div>
 </div>

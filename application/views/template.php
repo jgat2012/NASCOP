@@ -125,14 +125,14 @@ if ($user_is_pharmacist || $user_is_facility_administrator || $user_is_administr
 //Load tableTools for datatables printing and exporting
 if(isset($report_title)){
 	?>
-	<style type="text/css" title="currentStyle">
-		@import "../../media/css/demo_page.css";
-		@import "../../media/css/demo_table.css";
-		@import "<?php echo base_url().'css/datatable/TableTools.css' ?>
+    <style type="text/css" title="currentStyle">
+		@import "<?php echo base_url().'assets/CSS/datatable/demo_page.css'; ?>";
+		@import "<?php echo base_url().'assets/CSS/datatable/demo_table.css'; ?>";
+		@import "<?php echo base_url().'assets/CSS/datatable/TableTools.css' ?>
 			";
 	</style>
-	<script type="text/javascript" charset="utf-8" src="<?php echo base_url().'Scripts/datatable/ZeroClipboard.js' ?>"></script>
-	<script type="text/javascript" charset="utf-8"  src="<?php echo base_url().'Scripts/datatable/TableTools.js' ?>"></script>
+	<script type="text/javascript" charset="utf-8" src="<?php echo base_url().'assets/js/datatable/ZeroClipboard.js' ?>"></script>
+	<script type="text/javascript" charset="utf-8"  src="<?php echo base_url().'assets/js/datatable/TableTools.js' ?>"></script>
 	<?php
 	}
 ?>      
@@ -213,6 +213,8 @@ if($menus){
 	<br>
 	<span class="date"><?php echo date('l, jS \of F Y') ?></span>
 	<input type="hidden" id="facility_hidden" />
+	<br/>
+	<a href='<?php echo base_url().'home_controller/reset_user';?>' class="btn btn-success" style="color:#FFF;">Dashboard</a>
 </div>
 <?php }?>
  </div>

@@ -41,7 +41,7 @@
 			</h3>
 			
 			<div id="chart_area77">
-				<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
+				<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>"></div>
 			</div>
 			
    </div>
@@ -54,7 +54,7 @@
 			<button class="btn btn-danger less" id="enrollment-less">Smaller</button>
 				 </h3>
 			<div id="chart_area78">
-				<div class="loadingDiv" style="margin:20% 0 20% 0;"  ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
+				<div class="loadingDiv" style="margin:20% 0 20% 0;"  ><img style="width: 30px;margin-left:50%" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>"></div>
 			</div>
   </div>
   </div>		
