@@ -30,7 +30,7 @@
   	}
 	?>
 	</div>
-<form method="post" action="<?php echo site_url('picking_list_management/save_list')?>">
+<form method="post" id="fm_picking_list" action="<?php echo site_url('picking_list_management/save_list')?>">
 <?php
 	$order_list="";
 	$count=0;
@@ -47,11 +47,25 @@
 		<input type="hidden" name="orders[]" value="<?php echo $order; ?>" />
 <?php }}?>
 <div class="alert-bootstrap alert-info">Assign order(s) No <span class="_green"> <?php echo $order_list; ?></span> to a picking list.</div>
+
 <div >
-	<table class="table" style="width:60%;margin:0 auto">
+	<table class="table" style="width:70%;margin:0 auto">
 		<tbody>
 			<tr>
-				<th>New Picking List Name</th><td><input name="picking_list_name" id="picking_list_name" type="text" class="input-xlarge"></td>
+				<div class="message error" id="error_msg_pipeline" ></div>
+			</tr>
+			<tr>
+				<th>New Picking List Name</th>
+				<td><input name="picking_list_name" id="picking_list_name" type="text" class="input-xlarge"></td>
+				
+				<td>
+					<select id="pipeline_name" name="pipeline_name" class="input-xlarge">
+						<option value="0"> --Select Pipeline-- </option>
+						<?php foreach($pipelines as $pipeline){?>
+						<option value="<?php echo $pipeline['name'] ?>"><?php echo strtoupper($pipeline['name']) ?></option>
+						<?php } ?>
+					</select>
+				</td>
 			</tr>
 			<tr>
 				<th><span class="_green">or</span> Select an Open List</th>
@@ -64,10 +78,11 @@
 					</select>
 				</td> 
 			</tr>
+			
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="2"><input name="generate" id="generate" class="btn btn-success" style="padding-left: 30px;padding-right: 30px" value="Save" type="submit"></td>
+				<td colspan="4"><input name="generate" id="generate" class="btn btn-success" style="padding-left: 30px;padding-right: 30px" value="Save" type="button"></td>
 			</tr>
 		</tfoot>
 	</table>
@@ -75,3 +90,41 @@
 			
 </form>
 </div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#error_msg_pipeline").css("display","none");
+		$("#generate").live('click', function() {
+			var pick_list_new_name=$.trim($("#picking_list_name").val());
+			var selected_pipeline=$("#pipeline_name").val();
+			if(pick_list_new_name=="" && selected_pipeline==0){
+				$(".message").css("width","60%");
+				$("#error_msg_pipeline").fadeIn("slow");
+				$("#error_msg_pipeline").html("Please enter a new picking list name or select an open list");
+					setTimeout(function(){
+						$("#error_msg_pipeline").fadeOut("2000");
+					},5000);
+					
+					return;
+			}
+			//If user entered new picking list name
+			if(pick_list_new_name!=""){
+				//Check if pipeline is selected
+				if(selected_pipeline==0){
+					$("#error_msg_pipeline").fadeIn("slow");
+					$("#error_msg_pipeline").html("Please select a pipeline");
+					setTimeout(function(){
+						$("#error_msg_pipeline").fadeOut("2000");
+					},5000);
+					
+				}
+				else{
+					$("#fm_picking_list").submit();
+				}
+			}
+			else{
+				
+			}
+		})
+	});
+</script>

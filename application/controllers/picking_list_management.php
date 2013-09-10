@@ -78,7 +78,9 @@ class Picking_List_Management extends MY_Controller {
 	public function save_list() {
 		$current_user = $this -> session -> userdata('user_id');
 		$orders = $this -> input -> post("orders");
+		$pipeline_name=$this -> input -> post("pipeline_name");
 		$picking_list_name = $this -> input -> post("picking_list_name");
+		$picking_list_name=trim($picking_list_name);
 		$selected_picking_list = $this -> input -> post("selected_picking_list");
 		//First check if a name has been given to a new picking list. If so, save it first
 		if (strlen($picking_list_name) > 0) {
@@ -87,6 +89,7 @@ class Picking_List_Management extends MY_Controller {
 			$picking_list -> Timestamp = date('U');
 			$picking_list -> Created_By = $current_user;
 			$picking_list -> Status = '0';
+			$picking_list -> Pipeline = $pipeline_name;
 			$picking_list -> save();
 			$selected_picking_list = $picking_list -> id;
 		}
@@ -111,6 +114,7 @@ class Picking_List_Management extends MY_Controller {
 		$data['page_title']='Assign Picking List';
 		$data['banner_text'] = "Assign Picking List";
 		$data['picking_lists'] = Picking_List_Details::getAllOpen();
+		$data['pipelines'] = Suppliers::getAll();
 		$data['content_view'] = "assign_picking_list_v";
 		$this -> base_params($data);
 	}
