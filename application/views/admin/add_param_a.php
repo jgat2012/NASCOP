@@ -1,8 +1,9 @@
-<?php 
+
+<div style"width:50%"><?php 
 if($table){
 ?>
 <a href="#dialog_<?php echo $table;?>" role="button" id="<?php echo $table;?>" class="btn add" data-toggle="modal"><i class="icon-plus icon-black"></i>New<?php echo "  " . $label;?></a>
-<?php }echo $dyn_table;?>
+<?php }echo $dyn_table;?></div>
 <!--Dialog for Counties-->
 <div id="dialog_counties" title="Add County" class="modal hide fade cyan" tabindex="-1" role="dialog" aria-labelledby="AddCounty" aria-hidden="true">
 	   <?php

@@ -458,7 +458,7 @@ class User_Management extends MY_Controller {
 		if ($param == "2") {
 			delete_cookie("actual_page");
 		}
-		redirect("user_management/login");
+		redirect("system_management");
 	}
 
 	public function getIPLocation() {

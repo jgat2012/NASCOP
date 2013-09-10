@@ -38,8 +38,11 @@
 */
 
 $autoload['packages'] = array(APPPATH.'third_party');
+/*
+ * Autoload Sparks
+ * */
 
-
+$autoload['sparks'] = array('sk-asset/1.2.7');
 /*
 | -------------------------------------------------------------------
 |  Auto-load Libraries
@@ -64,7 +67,7 @@ $autoload['libraries'] = array('form_validation','session','table','database','e
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','form','cookie');
+$autoload['helper'] = array('url','form','cookie','asset');
 
 
 /*
@@ -80,7 +83,7 @@ $autoload['helper'] = array('url','form','cookie');
 |
 */
 
-$autoload['config'] = array();
+$autoload['config'] = array('asset');
 
 
 /*

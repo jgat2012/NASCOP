@@ -26,6 +26,12 @@ class Dashboard_Patientbyline extends Doctrine_Record {
 		return $types;
 
 	}
+	public function getMonthlyValues($pipeline,$month,$year) {
+		$query = Doctrine_Query::create() -> select("*") -> from("dashboard_patientbyline")->where("pipeline='$pipeline' and month='$month' and year='$year'");
+		$types = $query ->execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $types;
+
+	}
 
 }
 ?>

@@ -141,6 +141,7 @@
 	}
 	legend {
 		font-size: 1.4em;
+
 		height:70px;
 	}
 	h3 {
@@ -158,7 +159,12 @@
 	
 
 </style>
+<<<<<<< HEAD
+
+<div id="view_content" class="center-content">
+=======
 <div id="view_content" class="full-content">
+>>>>>>> fb89df9c60c9a2af2f3c689b887cc1a73ef96ad9
 	    <div>
 		<ul class="breadcrumb">
 		  <li><a href="<?php echo site_url().'home_controller/home' ?>"  id='goHome'><i class="icon-home"></i><strong>Home</strong></a> 
@@ -176,8 +182,9 @@
 					<div class="passmessage"></div>
 					<div class="errormessage"></div>
 					<div class="well" style="background:#9CF">
+
 						
-						<form name="frm" method="post" enctype="multipart/form-data" id="frm" action="<?php echo base_url()."pipeline_import/upload"?>">
+						<form name="frm" method="post" enctype="multipart/form-data" id="frm" action="<?php echo base_url()."pipeline_management/upload"?>">
 							<legend>
 							Pipeline Data Upload 
 							
@@ -186,6 +193,7 @@
 								<option value="1">Single Sheet</option>
 							</select>
 							<label class="show_worksheets">
+
 								<span>Select Worksheet</span>
 							<select name="test_type" id="test_type" style="width:300px;float:right;">
 								<option value="0">-Select One--</option>
@@ -208,6 +216,7 @@
 									<span style="margin-right:20px;">KEMSA</span>
 									<input type="radio" name="pipeline_name" value="2" required="required"/>
 									KENYA PHARMA </label>
+
 								<b><u><h4>Upload Period</h4></u></b>
 							<p>
 								<input type="text" name="upload_date" id="upload_date" class="input-xlarge" required="required" />

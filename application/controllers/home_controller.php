@@ -27,7 +27,7 @@ class Home_Controller extends MY_Controller {
 	}
 
 	public function home() {
-	
+
 		$rights = User_Right::getRights($this -> session -> userdata('access_level'));
 		$menu_data = array();
 		$menus = array();
@@ -50,7 +50,7 @@ class Home_Controller extends MY_Controller {
 			$timestamp = strtotime($today);
 			$data['scheduled_patients'] = Patient_Appointment::getAllScheduled($timestamp);
 		}
-		
+
 		$data['title'] = "webADT | System Home";
 		$data['content_view'] = "home_v";
 		$data['banner_text'] = "Home";
@@ -118,6 +118,30 @@ class Home_Controller extends MY_Controller {
 		}
 		echo json_encode($notice);
 
+	}
+
+	public function reset_user($type = '1') {
+		if ($type == 1) {
+			/*
+			 * Going to Dashboard
+			 * Save access_type session to another session
+			 * Kill access_type session
+			 */
+			$access_level = $this -> session -> userdata('user_indicator');
+			$this -> session -> set_userdata("other_access", $access_level);
+			$this -> session -> set_userdata("user_indicator", "");
+			redirect(base_url());
+		} else {
+			/*
+			 * Going to Home
+			 * Restore access_type session
+			 * Kill other session
+			 */
+			$access_level = $this -> session -> userdata('other_access');
+			$this -> session -> set_userdata("user_indicator", $access_level);
+			$this -> session -> set_userdata("other_access", "");
+			redirect("home_controller/home");
+		}
 	}
 
 }

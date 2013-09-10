@@ -94,6 +94,12 @@ class Facility_Order extends Doctrine_Record {
 		$order_object = $query -> execute();
 		return $order_object;
 	}
+	
+	public function getOrderCommoditiesByPipeline($pipeline,$period_start,$period_end){
+		$query = Doctrine_Query::create() -> select("Unique_Id") -> from("Facility_Order")->where("Sponsors='$pipeline' and Period_Begin='$period_start' and Period_End='$period_end' and Code='1' and Status='1' or Status='3'");
+		$order_object = $query ->execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $order_object;
+	}
 
 }//end class
 ?>
