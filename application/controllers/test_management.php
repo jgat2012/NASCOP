@@ -5,10 +5,11 @@ class test_management extends MY_Controller {
 		ini_set("max_execution_time", "100000");
 		$this -> load -> helper('fusioncharts');
 		$this -> load -> database();
+		
 	}
 
 	public function index() {
-		$this -> load -> view('test_v');
+		$this -> load -> view('test_v');	
 	}
 
 	public function enrolled_in_care($selected_period = "", $facility_code = "") {
@@ -293,8 +294,8 @@ class test_management extends MY_Controller {
 		$from = date('Y-m-01', strtotime("$selected_period"));
 		$to = date('Y-m-t', strtotime("$selected_period"));
 		$female_18 = 0;
-		$scheduled_visits= 0;
-		$unscheduled_visits=0;
+		$scheduled_visits = 0;
+		$unscheduled_visits = 0;
 
 		//Get female patients in hiv care visits
 		$sql = "select count(patient_number_ccc) as total from patient p left join patient_visit pv on pv.patient_id=p.patient_number_ccc where dispensing_date between '$from' and '$to' and gender='2' and DATEDIFF('$from',dob)>=(360*18) group by facility_code";
@@ -303,32 +304,33 @@ class test_management extends MY_Controller {
 		if ($results) {
 			$female_18 = $results[0]['total'];
 		}
-		
+
 		//Scheduled Care visits
-		$sql="select count(*) as total from (select patient,facility from  patient_appointment where appointment between '$from' and '$to' $added_sql group by patient,facility) as pa,(select patient_id,facility from patient_visit where dispensing_date between '$from' and '$to' $added_sql group by patient_id,facility) as pv where pv.patient_id=pa.patient and pv.facility=pa.facility";
+		$sql = "select count(*) as total from (select patient,facility from  patient_appointment where appointment between '$from' and '$to' $added_sql group by patient,facility) as pa,(select patient_id,facility from patient_visit where dispensing_date between '$from' and '$to' $added_sql group by patient_id,facility) as pv where pv.patient_id=pa.patient and pv.facility=pa.facility";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		if ($results) {
 			$scheduled_visits = $results[0]['total'];
 		}
-		
+
 		//Unscheduled Care visits
-		$sql="select count(*)as total from (select patient,facility from  patient_appointment where appointment between '$from' and '$to' $added_sql group by patient,facility) as pa,(select patient_id,facility from patient_visit where dispensing_date between '$from' and '$to' $added_sql group by patient_id,facility) as pv where pv.patient_id NOT IN(pa.patient)group by pv.patient_id,pv.facility";
+		$sql = "select count(*)as total from (select patient,facility from  patient_appointment where appointment between '$from' and '$to' $added_sql group by patient,facility) as pa,(select patient_id,facility from patient_visit where dispensing_date between '$from' and '$to' $added_sql group by patient_id,facility) as pv where pv.patient_id NOT IN(pa.patient)group by pv.patient_id,pv.facility";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		if ($results) {
 			$unscheduled_visits = $results[0]['total'];
 		}
-		
-		$data=array();
-		$data['female>18']=$female_18;
-		$data['scheduled_visits']=$scheduled_visits;
-        $data['unscheduled_visits']=$unscheduled_visits;
-		$data['total']=$scheduled_visits+$unscheduled_visits;
-		
+
+		$data = array();
+		$data['female>18'] = $female_18;
+		$data['scheduled_visits'] = $scheduled_visits;
+		$data['unscheduled_visits'] = $unscheduled_visits;
+		$data['total'] = $scheduled_visits + $unscheduled_visits;
+
 		return $data;
 	}
-	public function revisits_on_art($selected_period = "", $facility_code = ""){
+
+	public function revisits_on_art($selected_period = "", $facility_code = "") {
 		//Check if Facility selected or not
 		if ($facility_code) {
 			$added_sql = "where facility_code='$facility_code'";
@@ -341,15 +343,14 @@ class test_management extends MY_Controller {
 		$year = $period[1];
 		$month = date('m', strtotime($period[0]));
 		$today = date('Y-m-t', strtotime("$selected_period"));
-		
-		$from_2months="";
-		$to_1month="";
-		
+
+		$from_2months = "";
+		$to_1month = "";
+
 		$revisit_on_art_below_1 = 0;
 		$revisit_on_art_below_15 = 0;
 		$revisit_on_art_above_15 = 0;
-		
-		
+
 		//Get Patients who revisited in last 2 months
 		$sql = "select count(patient_number_ccc) as total from patient p left join patient_visit pv on pv.patient_id=p.patient_number_ccc where dispensing_date between '$from' and '$to' and gender='2' and DATEDIFF('$from',dob)>=(360*18) group by facility_code";
 		$query = $this -> db -> query($sql);
@@ -357,7 +358,7 @@ class test_management extends MY_Controller {
 		if ($results) {
 			$female_18 = $results[0]['total'];
 		}
-		
+
 	}
 
 }
