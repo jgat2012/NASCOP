@@ -13,7 +13,10 @@ class Dashboard_Management extends MY_Controller {
 		$data['hide_side_menu'] = 1;
 		$data['banner_text'] = "National Dashboard";
 		$data['title'] = "webADT | National Dashboard";
+<<<<<<< HEAD:application/controllers/dashboard_management.php
 		$data['supporter']=Supporter::getThemAll();
+=======
+>>>>>>> b7f10e3b71f611031750a3ea7c28aa07cddcb2d2:application/controllers/dashboard_management.php
 		$this -> base_params($data);
 	}
 

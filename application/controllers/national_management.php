@@ -25,13 +25,15 @@ class National_Management extends MY_Controller {
 			$drug_results = Facility_Soh::getDrugs($pipeline, $month, $year);
 			$count = 1;
 			$i = 0;
-			$dyn_table = "<table id='ca_stock_status' border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
-			$dyn_table .= "<thead><tr><th>Facility Name</th>";
+			$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5'  class='grid'>";
+			$dyn_table .= "<thead><tr><th style='width:20px;'>Facility Names</th>";
 			foreach ($drug_results as $drug_result) {
 				$dyn_table .= "<th>" . $drug_result['drugname'] . "</th>";
 			}
 			$dyn_table .= "</tr></thead>";
-			$dyn_table .= "<tbody><tr><td>" . $facility_results[$i]['facilityname'] . "</td>";
+			if ($facility_results) {
+				$dyn_table .= "<tbody><tr><td style='width:20px;'>" . $facility_results[$i]['facilityname'] . "</td>";
+			}
 			foreach ($results as $result) {
 				$dyn_table .= "<td>" . $result['total'] . "</td>";
 				$count++;
@@ -40,8 +42,7 @@ class National_Management extends MY_Controller {
 					$count = 1;
 					if ($i < sizeof($facility_results) - 1) {
 						$i++;
-						$dyn_table .= "<tr><td>" . $facility_results[$i]['facilityname'] . "</td>";
-
+						$dyn_table .= "<tr><td style='width:20px;'>" . $facility_results[$i]['facilityname'] . "</td>";
 					}
 				}
 
@@ -52,7 +53,9 @@ class National_Management extends MY_Controller {
 			$data['table'] = 'facilities';
 			$data['actual_page'] = 'View Facilities';
 			$data['dyn_table'] = $dyn_table;
-			$this -> base_params($data);
+			$data['title'] = "webADT | System Admin";
+			$data['banner_text'] = "System Admin";
+			$this -> load -> view('dashboard/new_v', $data);
 		}
 	}
 
@@ -194,7 +197,7 @@ class National_Management extends MY_Controller {
 		$data['yAxix'] = 'Period';
 		$data['resultArray'] = $resultArray;
 		$this -> load -> view('chart_v', $data);
-		
+
 	}
 
 	public function fa_ordering_sites_list($year, $month, $pipeline, $type = 0) {
@@ -318,21 +321,20 @@ class National_Management extends MY_Controller {
 		/*
 		 * Convert month and year to period start to period end
 		 * Get all Approved/Dispatched Aggregated Orders(Unique Ids) in period for that pipeline
-		 * Get all commodities in the cdrr_item table for orders that have the pre-selected unique ids 
+		 * Get all commodities in the cdrr_item table for orders that have the pre-selected unique ids
 		 */
 
+		$period_start = date('Y-m-01', strtotime($year . "-" . $month . "-01"));
+		$period_end = date('Y-m-t', strtotime($year . "-" . $month . "-01"));
+		$facility_orders = Facility_Order::getOrderCommoditiesByPipeline($pipeline, $period_start, $period_end);
+		$id_list = array();
 
-		$period_start=date('Y-m-01',strtotime($year."-".$month."-01"));
-		$period_end=date('Y-m-t',strtotime($year."-".$month."-01"));
-		$facility_orders=Facility_Order::getOrderCommoditiesByPipeline($pipeline,$period_start,$period_end);
-		$id_list=array();
-
-		foreach($facility_orders as $facility_order){
-			$unique_id=$facility_order['Unique_Id'];
-			$id_list[]=$unique_id;
+		foreach ($facility_orders as $facility_order) {
+			$unique_id = $facility_order['Unique_Id'];
+			$id_list[] = $unique_id;
 		}
-		$orders = "'".implode("','",$id_list)."'";
-		$results=Cdrr_Item::getAllCommodities($orders);
+		$orders = "'" . implode("','", $id_list) . "'";
+		$results = Cdrr_Item::getAllCommodities($orders);
 		echo "<pre>";
 		print_r($results);
 		echo "</pre>";
@@ -360,11 +362,7 @@ class National_Management extends MY_Controller {
 	}
 
 	public function ra_non_reporting_facility_rates() {
-		$data['label'] = 'Facility';
-		$data['table'] = 'facilities';
-		$data['actual_page'] = 'View Facilities';
-		$data['dyn_table'] = $dyn_table;
-		$this -> base_params($data);
+
 	}
 
 	public function base_params($data) {

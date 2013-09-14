@@ -1,3 +1,8 @@
+<style type="text/css">
+	.ui-datepicker-calendar{
+		display:none;
+	}
+</style>
 <div id="expDiv"></div>
 <div class="tile" id="drugs-chart">
 	<h3>Top

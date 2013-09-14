@@ -44,45 +44,45 @@ $(document).ready(function() {
 
 	$(".error").css("display", "none");
 	$('#new_password').keyup(function() {
-		$('#result').html(checkStrength($('#new_password').val()))
-	})
+		$('#result').html(checkStrength($('#new_password').val()));
+	});
 	function checkStrength(password) {
 
 		//initial strength
-		var strength = 0
+		var strength = 0;
 
 		//if the password length is less than 6, return message.
 		if(password.length < 6) {
-			$('#result').removeClass()
-			$('#result').addClass('short')
-			return 'Too short'
+			$('#result').removeClass();
+			$('#result').addClass('short');
+			return 'Too short';
 		}
 
 		//length is ok, lets continue.
 
 		//if length is 8 characters or more, increase strength value
 		if(password.length > 7)
-			strength += 1
+			strength += 1;
 		if(password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/))
-			strength += 1
+			strength += 1;
 		if(password.match(/([a-zA-Z])/) && password.match(/([0-9])/))
-			strength += 1
+			strength += 1;
 		if(password.match(/([!,%,&,@,#,$,^,*,?,_,~])/))
-			strength += 1
+			strength += 1;
 		if(password.match(/(.*[!,%,&,@,#,$,^,*,?,_,~].*[!,",%,&,@,#,$,^,*,?,_,~])/))
-			strength += 1
+			strength += 1;
 		if(strength < 2) {
-			$('#result').removeClass()
-			$('#result').addClass('weak')
-			return 'Weak'
+			$('#result').removeClass();
+			$('#result').addClass('weak');
+			return 'Weak';
 		} else if(strength == 2) {
-			$('#result').removeClass()
-			$('#result').addClass('good')
-			return 'Good'
+			$('#result').removeClass();
+			$('#result').addClass('good');
+			return 'Good';
 		} else {
-			$('#result').removeClass()
-			$('#result').addClass('strong')
-			return 'Strong'
+			$('#result').removeClass();
+			$('#result').addClass('strong');
+			return 'Strong';
 		}
 	}
 
@@ -262,10 +262,6 @@ function getPercentage(count, total) {
 	return (count / total) * 100;
 }
 
-function testAlert() {
-	alert("OK")
-}
-
 /*
  * Sysnchronization of Orders
  */
@@ -273,7 +269,7 @@ function syncOrders() {
 	var href = window.location.href;
 	var base_url = href.substr(href.lastIndexOf('http://'), href.lastIndexOf('/ADT'));
 	var _href = href.substr(href.lastIndexOf('/') + 1);
-	var link = base_url + "/ADT/synchronization_management/startSync"
+	var link = base_url + "/ADT/synchronization_management/startSync";
 	$.ajax({
 		url : link,
 		type : 'POST',
@@ -603,7 +599,7 @@ $(document).ready(function() {
 			}
 		}
 
-	})
+	});
 	/*
 	* Reports generation end
 	*/
@@ -614,7 +610,7 @@ $(document).ready(function() {
 		changeYear : true,
 		dateFormat : 'dd-M-yy',
 		onSelect : function(selected) {
-			$("#date_range_to").datepicker("option", "minDate", selected)
+			$("#date_range_to").datepicker("option", "minDate", selected);
 		}
 	});
 	$("#single_date_filter").datepicker({
@@ -627,7 +623,7 @@ $(document).ready(function() {
 		changeYear : true,
 		dateFormat : 'dd-M-yy',
 		onSelect : function(selected) {
-			$("#date_range_from").datepicker("option", "maxDate", selected)
+			$("#date_range_from").datepicker("option", "maxDate", selected);
 		}
 	});
 
@@ -636,7 +632,7 @@ $(document).ready(function() {
 		changeYear : true,
 		dateFormat : 'dd-M-yy',
 		onSelect : function(selected) {
-			$("#donor_date_range_to").datepicker("option", "minDate", selected)
+			$("#donor_date_range_to").datepicker("option", "minDate", selected);
 		}
 	});
 	$("#donor_date_range_to").datepicker({
@@ -644,7 +640,7 @@ $(document).ready(function() {
 		changeYear : true,
 		dateFormat : 'dd-M-yy',
 		onSelect : function(selected) {
-			$("#donor_date_range_from").datepicker("option", "maxDate", selected)
+			$("#donor_date_range_from").datepicker("option", "maxDate", selected);
 		}
 	});
 	$("#single_year_filter").datepicker({
@@ -697,7 +693,7 @@ $(document).ready(function() {
 			$(".reports_types").css("display", "none");
 			$("#drug_inventory_report_row").css("display", "block");
 		}
-	})
+	});
 	//Features to select
 	$(".select_report").change(function() {
 		var get_type = $("option:selected", this).attr("class");
@@ -750,4 +746,3 @@ $(document).ready(function() {
 /*
  *Reports JS End
  */
-

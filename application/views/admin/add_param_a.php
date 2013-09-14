@@ -1,6 +1,4 @@
-
-<div style"width:50%">
-<?php 
+<div style"width:50%"><?php 
 if($table){
 ?>
 <a href="#dialog_<?php echo $table;?>" role="button" id="<?php echo $table;?>" class="btn add" data-toggle="modal"><i class="icon-plus icon-black"></i>New<?php echo "  " . $label;?></a>
