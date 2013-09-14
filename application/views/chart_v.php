@@ -1,22 +1,22 @@
 <?php
 $chartSize=0;
 if($resultArraySize<=6){
-	$chartSize='300';
+	$chartSize='400';
 }
 if($resultArraySize>6){
 	$chartSize='600';
 }
 if($resultArraySize>10){
-	$chartSize='900';
+	$chartSize='800';
 }
 if($resultArraySize>15){
-	$chartSize='1200';
+	$chartSize='1000';
 }
 if($resultArraySize>20){
-	$chartSize='1500';
+	$chartSize='1200';
 }
 if($resultArraySize>25){
-	$chartSize='3000';
+	$chartSize='1400';
 }
 
 ?>
@@ -54,7 +54,7 @@ if($resultArraySize>25){
 	min: 0,
 	title: {
 	text: '<?php echo $yAxix; ?>',
-		align: 'high'
+		align: 'left'
 		},
 		labels: {
 		overflow: 'justify'
@@ -87,7 +87,7 @@ if($resultArraySize>25){
 		});
 </script>
 <div class="graph">
-	<div id="<?php echo $container?>"  style="width:98%"  '>
+	<div id="<?php echo $container?>"  style="width:98%;height: 100%"  '>
 </div>
 </div>
 

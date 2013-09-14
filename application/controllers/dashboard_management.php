@@ -13,6 +13,7 @@ class Dashboard_Management extends MY_Controller {
 		$data['hide_side_menu'] = 1;
 		$data['banner_text'] = "National Dashboard";
 		$data['title'] = "webADT | National Dashboard";
+		$data['supporter']=Supporter::getThemAll();
 		$this -> base_params($data);
 	}
 

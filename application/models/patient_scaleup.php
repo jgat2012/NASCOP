@@ -31,7 +31,7 @@ class Patient_Scaleup extends Doctrine_Record {
 	}
 
 	public function getTotals($pipeline, $month, $year) {
-		$query = Doctrine_Query::create() -> select("adult_art,paed_art,year,month") -> from("patient_scaleup") -> where("concat(year,month) <='$year$month' and `pipeline`='$pipeline'");
+		$query = Doctrine_Query::create() -> select("adult_art,paed_art,year,month") -> from("patient_scaleup") -> where("concat(year,month) <='$year$month' and `pipeline`='$pipeline'")->orderBy("year desc,month desc");
 		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $types;
 	}

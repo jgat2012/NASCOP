@@ -1,5 +1,6 @@
 
-<div style"width:50%"><?php 
+<div style"width:50%">
+<?php 
 if($table){
 ?>
 <a href="#dialog_<?php echo $table;?>" role="button" id="<?php echo $table;?>" class="btn add" data-toggle="modal"><i class="icon-plus icon-black"></i>New<?php echo "  " . $label;?></a>
@@ -455,7 +456,11 @@ if($table){
 	</div>
 	<?php echo form_close(); ?>
 </div>
+<script>
+$(document).ready(function(){
 
+});
+</script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		var base_url="<?php echo base_url(); ?>";

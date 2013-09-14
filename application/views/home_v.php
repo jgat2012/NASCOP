@@ -224,7 +224,7 @@ var chartLink;
 		?>
 		<div class="fullest-content">
 		<?php
-		$this->load->view("dashboard/index");
+		$this->load->view("dashboard/index1");
 		?>
 		</div>
 		<?php

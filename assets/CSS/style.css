@@ -1137,6 +1137,8 @@ html > body #main_manualcontent li a {
 .dataTables_wrapper {
 	width: 100%;
 }
+
+
 /**
  * 	Form Formatting
  */
@@ -1209,6 +1211,26 @@ input[readonly] {
 .mid-row:nth-child(even) {
 	float: right;
 }
+
+/*
+ * National Dashboard
+ */
+.nd_menus{
+	width:100%;
+}
+.nd_patient_a,.nd_order_a, .nd_report_a{
+	height:70%;	
+}
+.nd_input_small{
+	width:6%;
+	height:4%;
+	padding:0%;
+}
+.nd_input_medium{
+	width:13%;
+	height:4%;
+}
+
 /**
  * 	Users Styling
  */
