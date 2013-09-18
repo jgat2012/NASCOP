@@ -30,9 +30,9 @@ class National_Management extends MY_Controller {
 			foreach ($drug_results as $drug_result) {
 				$dyn_table .= "<th>" . $drug_result['drugname'] . "</th>";
 			}
-			$dyn_table .= "</tr></thead>";
+			$dyn_table .= "</tr></thead><tbody>";
 			if ($facility_results) {
-				$dyn_table .= "<tbody><tr><td style='width:20px;'>" . $facility_results[$i]['facilityname'] . "</td>";
+				$dyn_table .= "<tr><td style='width:20px;'>" . $facility_results[$i]['facilityname'] . "</td>";
 			}
 			foreach ($results as $result) {
 				$dyn_table .= "<td>" . $result['total'] . "</td>";
@@ -48,14 +48,11 @@ class National_Management extends MY_Controller {
 
 			}
 			$dyn_table .= "</tbody></table>";
-			//echo $dyn_table;
 			$data['label'] = 'Facility';
 			$data['table'] = 'facilities';
 			$data['actual_page'] = 'View Facilities';
 			$data['dyn_table'] = $dyn_table;
-			$data['title'] = "webADT | System Admin";
-			$data['banner_text'] = "System Admin";
-			$this -> load -> view('dashboard/new_v', $data);
+			$this -> base_params($data);
 		}
 	}
 
@@ -75,13 +72,15 @@ class National_Management extends MY_Controller {
 			$drug_results = Facility_Consumption::getDrugs($pipeline, $month, $year);
 			$count = 1;
 			$i = 0;
-			$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+			$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5'  class='grid'>";
 			$dyn_table .= "<thead><tr><th>Facility Name</th>";
 			foreach ($drug_results as $drug_result) {
 				$dyn_table .= "<th>" . $drug_result['drugname'] . "</th>";
 			}
-			$dyn_table .= "</tr></thead>";
-			$dyn_table .= "<tbody><tr><td>" . $facility_results[$i]['facilityname'] . "</td>";
+			$dyn_table .= "</tr></thead><tbody>";
+			if ($facility_results) {
+				$dyn_table .= "<tr><td style='width:20px;'>" . $facility_results[$i]['facilityname'] . "</td>";
+			}
 			foreach ($results as $result) {
 				$dyn_table .= "<td>" . $result['total'] . "</td>";
 				$count++;
@@ -96,7 +95,12 @@ class National_Management extends MY_Controller {
 
 			}
 			$dyn_table .= "</tbody></table>";
-			echo $dyn_table;
+			$dyn_table .= "</tbody></table>";
+			$data['label'] = 'Facility';
+			$data['table'] = 'facilities';
+			$data['actual_page'] = 'View Facilities';
+			$data['dyn_table'] = $dyn_table;
+			$this -> base_params($data);
 		}
 	}
 	
@@ -136,7 +140,7 @@ class National_Management extends MY_Controller {
 		$regimen_results = Patient_Byregimen_Numbers::getRegimens($pipeline, $month, $year);
 		$count = 1;
 		$i = 0;
-		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='grid'>";
 		$dyn_table .= "<thead><tr><th>Facility Name</th>";
 		foreach ($regimen_results as $regimen_result) {
 			$dyn_table .= "<th>" . $regimen_result['regimen_desc'] . "</th>";
@@ -203,7 +207,7 @@ class National_Management extends MY_Controller {
 	public function fa_ordering_sites_list($year, $month, $pipeline, $type = 0) {
 		$results = Dashboard_Orderpoints::getMonthList($pipeline, $month, $year);
 		$ftype = "";
-		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table = "<table border='1' id='facility_analysis'  cellpadding='5' class='grid'>";
 		$dyn_table .= "<thead><tr><th>MFL Code</th><th>Facility Name</th><th>District</th><th>Province</th><th>Facility Type</th></tr></thead>";
 		$dyn_table .= "<tbody>";
 		foreach ($results as $result) {
@@ -217,7 +221,11 @@ class National_Management extends MY_Controller {
 			$dyn_table .= "<tr><td>" . $result['mfl_code'] . "</td><td>" . $result['facility_name'] . "</td><td>" . $result['district'] . "</td><td>" . $result['province'] . "</td><td>$ftype</td></tr>";
 		}
 		$dyn_table .= "</tbody></table>";
-		echo $dyn_table;
+		$data['label'] = 'Facility';
+		$data['table'] = 'facilities';
+		$data['actual_page'] = 'View Facilities';
+		$data['dyn_table'] = $dyn_table;
+		$this -> base_params($data);
 	}
 
 	public function fa_ordering_sites_summary($year, $month, $pipeline, $type = 0) {
@@ -227,7 +235,7 @@ class National_Management extends MY_Controller {
 		$standalone_total = 0;
 		$satellite_total = 0;
 		$overall_total = 0;
-		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table = "<table border='1' id='facility_analysis'  cellpadding='5' class='grid'>";
 		$dyn_table .= "<thead><tr><th>Provinces</th><th>Central Sites</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
 		$dyn_table .= "<tbody>";
 		foreach ($results as $result) {
@@ -252,14 +260,18 @@ class National_Management extends MY_Controller {
 		}
 		$dyn_table .= "</tbody><tfoot><tr><td>Totals</td><td>$central_total</td><td>$standalone_total</td><td>$satellite_total</td><td>$overall_total</td></tr>";
 		$dyn_table .= "</tfoot></table>";
-		echo $dyn_table;
+		$data['label'] = 'Facility';
+		$data['table'] = 'facilities';
+		$data['actual_page'] = 'View Facilities';
+		$data['dyn_table'] = $dyn_table;
+		$this -> base_params($data);
 	}
 
 	public function fa_service_points_list($year, $month, $pipeline, $type = 0) {
 		$results = Dashboard_Servicepoints::getMonthList($pipeline, $month, $year);
 		$ftype = "";
 		$dispense = "";
-		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table = "<table border='1' id='facility_analysis'  cellpadding='5' class='grid'>";
 		$dyn_table .= "<thead><tr><th>MFL Code</th><th>Satellite Site</th><th>Central Site</th><th>District</th><th>Province</th><th>Dispensing Point</th><th>Facility Type</th></tr></thead>";
 		$dyn_table .= "<tbody>";
 		foreach ($results as $result) {
@@ -278,7 +290,11 @@ class National_Management extends MY_Controller {
 			$dyn_table .= "<tr><td>" . $result['mfl_code'] . "</td><td>" . $result['facility_name'] . "</td><td>" . $result['centralsite_name'] . "</td><td>" . $result['district'] . "</td><td>" . $result['province'] . "</td><td>$dispense</td><td>$ftype</td></tr>";
 		}
 		$dyn_table .= "</tbody></table>";
-		echo $dyn_table;
+		$data['label'] = 'Facility';
+		$data['table'] = 'facilities';
+		$data['actual_page'] = 'View Facilities';
+		$data['dyn_table'] = $dyn_table;
+		$this -> base_params($data);
 	}
 
 	public function fa_service_points_summary($year, $month, $pipeline, $type = 0) {
@@ -288,7 +304,7 @@ class National_Management extends MY_Controller {
 		$standalone_total = 0;
 		$satellite_total = 0;
 		$overall_total = 0;
-		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
+		$dyn_table = "<table border='1' id='facility_analysis'  cellpadding='5' class='grid'>";
 		$dyn_table .= "<thead><tr><th>Provinces</th><th>Central Sites</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
 		$dyn_table .= "<tbody>";
 		foreach ($results as $result) {
@@ -313,7 +329,11 @@ class National_Management extends MY_Controller {
 		}
 		$dyn_table .= "</tbody><tfoot><tr><td>Totals</td><td>$central_total</td><td>$standalone_total</td><td>$satellite_total</td><td>$overall_total</td></tr>";
 		$dyn_table .= "</tfoot></table>";
-		echo $dyn_table;
+		$data['label'] = 'Facility';
+		$data['table'] = 'facilities';
+		$data['actual_page'] = 'View Facilities';
+		$data['dyn_table'] = $dyn_table;
+		$this -> base_params($data);
 
 	}
 
@@ -369,7 +389,7 @@ class National_Management extends MY_Controller {
 		$data['content_view'] = "admin/add_param_a";
 		$data['title'] = "webADT | System Admin";
 		$data['banner_text'] = "System Admin";
-		$this -> load -> view('admin/admin_template', $data);
+		$this -> load -> view('dashboard/new_v', $data);
 	}
 
 }
