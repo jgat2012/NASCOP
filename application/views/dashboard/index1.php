@@ -6,7 +6,6 @@
 		 var active_menu=$(".commodity_analysis_menus.active").find("a").text();
 		 $("#sub_active").text(active_sub);
 		 $("#active_menu").text(active_menu);
-		
 		  //Get Today's Date and Upto Saturday
 		  var someDate = new Date();
 		  var dd = ("0" + someDate.getDate()).slice(-2);
