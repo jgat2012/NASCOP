@@ -1,5 +1,12 @@
 <script type="text/javascript">
 	$(document).ready(function(){
+		 
+		 //Update breadcrumbs
+		 var active_sub=$(".main_menu.active").find("a").text();
+		 var active_menu=$(".commodity_analysis_menus.active").find("a").text();
+		 $("#sub_active").text(active_sub);
+		 $("#active_menu").text(active_menu);
+		
 		  //Get Today's Date and Upto Saturday
 		  var someDate = new Date();
 		  var dd = ("0" + someDate.getDate()).slice(-2);
@@ -35,9 +42,16 @@
 		  }
 		  
 		  //Load previous month in months drop down
-		  $(".nd_month").val(m-1);
-		  var def_pipeline=$("#nd_pr_pipeline").val();
-		  //Load default charts
+		  
+		  var prev_m = ("0" + (someDate.getMonth() + 0)).slice(-2);
+		  $(".nd_month").val(prev_m);
+		  
+		  //Load default chart
+		  var def_month=$("#nd_ca_month").val();
+		  var def_year=$("#nd_ca_year").val();
+		  var def_pipeline=$("#nd_ca_pipeline").val();
+		  $("#chart_area_ca").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+		  stock_status(def_year,def_month,def_pipeline);
 		  
 		  /*
 		   * When year changes, if not current year, load all months
@@ -53,7 +67,6 @@
 		  */
 		 //Generate chart for commodity analysis by clicking get button
 		 $(".commodity_analysis_btn").click(function(){
-		 	$("#chart_area_ca").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		 	var id=$(this).attr("id");
 		 	var year=$("#nd_ca_year").val();
 		 	var month=$("#nd_ca_month").val();
@@ -69,7 +82,6 @@
 		 });
 		 //Generate chart for patient analysis by clicking get button
 		 $(".patient_analysis_btn").click(function(){
-		 	$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		 	var id=$(this).attr("id");
 		 	var year=$("#nd_pr_year").val();
 		 	var month=$("#nd_pr_month").val();
@@ -89,7 +101,6 @@
 		  
 		 //Generate chart for patient analysis by clicking get button
 		 $(".patient_analysis_btn").click(function(){
-		 	$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		 	var id=$(this).attr("id");
 		 	var year=$("#nd_pr_year").val();
 		 	var month=$("#nd_pr_month").val();
@@ -109,21 +120,20 @@
 		 
 		 //Generate chart for facility analysis by clicking get button
 		 $(".facility_analysis_btn").click(function(){
-		 	$("#chart_area_fa").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		 	var id=$(this).attr("id");
 		 	var year=$("#nd_fa_year").val();
 		 	var month=$("#nd_fa_month").val();
 		 	var pipeline=$("#nd_fa_pipeline").val();
 		 	//Check which button was clicked
 		 	if(id=="orderingsite_l_btn"){
-		 		ordering_site_list(year,month,pipeline);
 		 		ordering_site_summary(year,month,pipeline);
+		 		
 		 	}
 		 	else if(id=="orderingsite_s_btn"){
 		 		ordering_site_summary(year,month,pipeline);
 		 	}
 		 	else if(id=="servicepoint_l_btn"){
-		 		service_point_list(year,month,pipeline);
+		 		service_point_summary(year,month,pipeline);
 		 	}
 		 	else if(id=="servicepoint_s_btn"){
 		 		service_point_summary(year,month,pipeline);
@@ -131,13 +141,74 @@
 		 	
 		 });
 		 
+		 //Order Analysis
+		 $(".order_analysis_btn").click(function(){
+		 	var id=$(this).attr("id");
+		 	var year=$("#nd_oa_year").val();
+		 	var month=$("#nd_oa_month").val();
+		 	var pipeline=$("#nd_oa_pipeline").val();
+		 	order_analysis(year,month,pipeline);
+		 });
+		 
 		  /*
 		  * Click get button to generate charts end -----------------------------------
+		  */
+		 
+		 /*
+		  * What happens when someone clicks a menu -----------------------------------
+		  */
+		 $(".main_menu").click(function(){
+		 	//Update breadcrumbs
+		 	var selected_menu=$(this).find("a").text();
+		 	$("#sub_active").text(selected_menu);
+		 	
+		 	var id=$(this).attr("id");
+		 	var someDate = new Date();
+			var dd = ("0" + someDate.getDate()).slice(-2);
+			var prev_m = ("0" + (someDate.getMonth() + 0)).slice(-2);
+			var y = someDate.getFullYear();
+			//Commodity analysis
+			if(id=="ca_menu"){
+				//Update breadcrumbs
+				var active_menu=$(".commodity_analysis_menus.active").find("a").text();
+				$("#active_menu").text(active_menu);
+		 		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+				stock_status(y,mm,1);
+		 	}
+		 	else if(id=="pa_menu"){
+		 		//Update breadcrumbs
+				var active_menu=$(".patient_analysis_menus.active").find("a").text();
+				$("#active_menu").text(active_menu);
+		 		patient_by_regimen(y,mm,1);
+		 	}
+		 	else if(id=="fa_menu"){
+		 		//Update breadcrumbs
+				var active_menu=$(".facility_analysis_menus.active").find("a").text();
+				$("#active_menu").text(active_menu);
+		 		ordering_site_summary(y,mm,1);
+		 	}
+		 	else if(id=="oa_menu"){
+		 		//Update breadcrumbs
+				var active_menu=$(".order_analysis_menus.active").find("a").text();
+				$("#active_menu").text(active_menu);
+		 		order_analysis(y,mm,1);
+		 	}
+		 	else if(id=="ra_menu"){
+		 		
+		 	}
+		 })
+		 /*
+		  * What happens when someone clicks a menu end-----------------------------------
 		  */
 		 
 		 //-----------------------------What happens when someone clicks a submenu
 		 //Commodity analysis
 		$(".commodity_analysis_menus").click(function(){
+			
+			//Update breadcrumbs
+			var active_menu=$(this).find("a").text();
+			$("#active_menu").text(active_menu);
+			
 			//Get Today's Date and Upto Saturday
 			  var someDate = new Date();
 			  var mm = ("0" + (someDate.getMonth() + 1)).slice(-2);
@@ -146,8 +217,7 @@
 			  //Load current month in months drop down
 		  	  $("#nd_ca_month").val(mm);
 		  	  $("#nd_ca_pipeline").val(1);
-			  $("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-			
+			  
 			//Check which menu was selected
 			var id=$(this).attr("id");
 			var base_url=$("#base_url").val();
@@ -171,16 +241,19 @@
 		
 		 //Patient Analysis
 		$(".patient_analysis_menus").click(function(){
+			//Update breadcrumbs
+			var active_menu=$(this).find("a").text();
+			$("#active_menu").text(active_menu);
+			
 			//Get Today's Date and Upto Saturday
 			  var someDate = new Date();
 			  var mm = ("0" + (someDate.getMonth() + 1)).slice(-2);
 			  var y = someDate.getFullYear();
 			  var def_pipeline=$("#nd_pr_pipeline").val();
 			  //Load current month in months drop down
-		  	   $("#nd_pr_month").val(mm);
+		  	  $("#nd_pr_month").val(mm);
 		  	  $("#nd_pr_pipeline").val(1);
-			$("#chart_area_pr").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-			
+			 
 			//Check which menu was selected
 			var id=$(this).attr("id");
 			var base_url=$("#base_url").val();
@@ -211,7 +284,10 @@
 		
 		 //Facility Analysis
 		$(".facility_analysis_menus").click(function(){
-			//Get Today's Date and Upto Saturday
+			 //Update breadcrumbs
+			 var active_menu=$(this).find("a").text();
+			 $("#active_menu").text(active_menu);
+			 
 			  var someDate = new Date();
 			  var mm = ("0" + (someDate.getMonth() + 1)).slice(-2);
 			  var y = someDate.getFullYear();
@@ -219,8 +295,7 @@
 			  //Load current month in months drop down
 		  	  $("#nd_fa_month").val(mm);
 		  	  $("#nd_fa_pipeline").val(1);
-			  $("#chart_area_fa").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-			
+			  
 			//Check which menu was selected
 			var id=$(this).attr("id");
 			var base_url=$("#base_url").val();
@@ -230,7 +305,7 @@
 				$(this).addClass("active");
 				//Change id of get button
 				$(".facility_analysis_btn").attr("id","orderingsite_l_btn");
-				ordering_site_list(y,mm,def_pipeline);
+				ordering_site_summary(y,mm,def_pipeline);
 			}
 			else if(id=="ordering_site_sum_menu"){
 				$("#tab3 .active").removeClass("active");
@@ -244,7 +319,7 @@
 				$(this).addClass("active");
 				//Change id of get button
 				$(".facility_analysis_btn").attr("id","servicepoint_l_btn");
-				service_point_list(y,mm,def_pipeline);
+				service_point_summary(y,mm,def_pipeline);
 			}
 			else if(id=="service_point_sum_menu"){
 				$("#tab3 .active").removeClass("active");
@@ -256,6 +331,21 @@
 			
 		});
 		
+		//Order Analysis
+		$(".order_analysis_menus").click(function(){
+			//Update breadcrumbs
+			var active_menu=$(this).find("a").text();
+			$("#active_menu").text(active_menu);
+			
+			  var someDate = new Date();
+			  var mm = ("0" + (someDate.getMonth() + 1)).slice(-2);
+			  var y = someDate.getFullYear();
+			  var def_pipeline=$("#nd_fa_pipeline").val();
+			  //Load current month in months drop down
+		  	  $("#nd_oa_month").val(mm);
+		  	  $("#nd_oa_pipeline").val(1);
+			  order_analysis(y,mm,def_pipeline);
+		});
 		
 		//-----------------------------What happens when someone clicks a menu end -------------
 		function loadMonths(_year,current_year){
@@ -275,6 +365,9 @@
 				}
 		  	}
 		}
+		
+		//Reset css
+		$(".navbar").css("margin-bottom","0");
 	});
 	
 	/*
@@ -282,11 +375,13 @@
 	 */
 	//Stock status
 	function stock_status(year,month,pipeline){
+		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		var commodity_analysis_link="<?php echo base_url().'national_management/ca_stock_status/';?>"+year+'/'+month+'/'+pipeline;
 		$('#chart_area_ca').load(commodity_analysis_link);
 	}
 	//Consumption
 	function consumption(year,month,pipeline){
+		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		var commodity_analysis_link="<?php echo base_url().'national_management/ca_consumption/';?>"+year+'/'+month+'/'+pipeline;
 		$('#chart_area_ca').load(commodity_analysis_link);
 	}
@@ -295,17 +390,20 @@
 	 */
 	//Patient By Regimen
 	function patient_by_regimen(year,month,pipeline){
+		$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		var patient_analysis_link="<?php echo base_url().'national_management/pa_patients_by_regimen/';?>"+year+'/'+month+'/'+pipeline;
 		$('#chart_area_pr').load(patient_analysis_link);
 	}
 	//Current patient By ART Site
 	function current_patient_art(year,month,pipeline){
+		$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		var patient_analysis_link="<?php echo base_url().'national_management/pa_patients_by_artsite/';?>"+year+'/'+month+'/'+pipeline;
 		$('#chart_area_pr').load(patient_analysis_link);
 	}
 	
 	//Patient Scale Up
 	function patient_scale_up(year,month,pipeline){
+		$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		var patient_analysis_link="<?php echo base_url().'national_management/pa_patients_scaleup/';?>"+year+'/'+month+'/'+pipeline;
 		$('#chart_area_pr').load(patient_analysis_link);
 	}
@@ -318,27 +416,49 @@
 		$('#chart_area_fa').load(facility_analysis_link);
 	}
 	function ordering_site_summary(year,month,pipeline){
+		$(".os").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		var facility_analysis_link="<?php echo base_url().'national_management/fa_ordering_sites_summary/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_fa_sum').load(facility_analysis_link);
+		$('#chart_area_fa_sum').load(facility_analysis_link,function(){
+			ordering_site_list(year,month,pipeline);
+		});
 	}
 	function service_point_list(year,month,pipeline){
 		var facility_analysis_link="<?php echo base_url().'national_management/fa_service_points_list/';?>"+year+'/'+month+'/'+pipeline;
 		$('#chart_area_fa').load(facility_analysis_link);
 	}
 	function service_point_summary(year,month,pipeline){
+		$(".os").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 		var facility_analysis_link="<?php echo base_url().'national_management/fa_service_points_summary/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_fa').load(facility_analysis_link);
+		$('#chart_area_fa_sum').load(facility_analysis_link,function(){
+			service_point_list(year,month,pipeline);
+		});
+	}
+	
+	/*
+	 * Order Analysis
+	 */
+	function order_analysis(year,month,pipeline){
+		$(".oa").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+		var order_analysis_link="<?php echo base_url().'national_management/oa_orders_by_commodity/';?>"+year+'/'+month+'/'+pipeline;
+		$('#chart_area_oa').load(order_analysis_link);
 	}
 </script>
 <div class="tabbable"> <!-- Only required for left/right tabs -->
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
-    <li><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
-    <li><a href="#tab3" data-toggle="tab">Facility Analysis</a></li>
-    <li><a href="#tab4" data-toggle="tab">Order Analysis</a></li>
-    <li><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
+  <ul class="nav nav-tabs " style="width:60%; float: left">
+    <li id="ca_menu" class="active main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
+    <li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
+    <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li>
+    <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>
+   <!-- <li id="ra_menu" class="main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li> -->
   </ul>
-  <div class="tab-content">
+  <div >
+  	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
+	  <li><a href="#">National Dashboard</a><span class="divider">/</span></li>
+	  <li><a id="sub_active" href="#"></a><span class="divider">/</span></li>
+	  <li id="active_menu" class="active"></li>
+	</ol>
+  </div>
+  <div class="tab-content" style="clear:left">
   	<!-- Commodity Analysis -->
     <div class="tab-pane active" id="tab1">
       <div class="navbar" style="width:100%">
@@ -425,9 +545,9 @@
 		  <div class="navbar-inner">
 		    <ul class="nav">
 		      <li id="ordering_site_list_menu" class="active facility_analysis_menus"><a href="#">Ordering Sites List</a></li>
-		      <li id="ordering_site_sum_menu" class="facility_analysis_menus"><a  href="#">Ordering Sites Summary</a></li>
+		      <!--<li id="ordering_site_sum_menu" class="facility_analysis_menus"><a  href="#">Ordering Sites Summary</a></li>-->
 		      <li id="service_point_list_menu" class="facility_analysis_menus"><a  href="#">Service Points List</a></li>
-		      <li id="service_point_sum_menu" class="facility_analysis_menus"><a  href="#">Service Points Summary</a></li>
+		     <!-- <li id="service_point_sum_menu" class="facility_analysis_menus"><a  href="#">Service Points Summary</a></li>-->
 		    </ul>
 		  </div>
 	  </div>
@@ -454,8 +574,8 @@
 							</h3>
 				</div>
 				<div class="row-fluid">
-					<div id="chart_area_fa" class="span6"></div>
-					<div id="chart_area_fa_sum" class="span6"></div>
+					<div id="chart_area_fa" class="span6 os"></div>
+					<div id="chart_area_fa_sum" class="span6 os"></div>
 		  		</div>
 		  </div>
 		</div>
@@ -464,28 +584,29 @@
     <div class="tab-pane" id="tab4">
       <div class="row-fluid">
 		  <div class="span12">
-		    <div class="row-fluid">
-		      <div class="span6 nd_order_a">
-		       Order by commodity National Orders
-		      </div>
-		      <div class="span6 nd_order_a">
-		      	Order reporting rate
-		      </div>
-		    </div>
+		  	<div id="fa_menus" class="nd_menus">
+				<h3 class="font_responsive">
+					<select id="nd_oa_month" class="nd_month nd_input_small">
+						
+					</select>
+					<select id="nd_oa_year" class="nd_year nd_input_small">
+					</select> 
+					
+					<select id="nd_oa_pipeline" class="nd_pipeline nd_input_medium">
+						<?php //Load list of pipelines
+							foreach ($supporter as $value) {
+						?>
+						<option value="<?php echo $value['id']?>"><?php echo $value['Name']?></option>
+						<?php	
+							} 
+						?>
+					</select>
+					<button class="generate btn btn-warning nd_input_small order_analysis_btn" style="color:black" id="order_analysis_btn">Get</button>
+				</h3>
+			</div>
+			<div id="chart_area_oa" class="oa"></div>
 		  </div>
-		</div>
-		<div class="row-fluid">
-		  <div class="span12">
-		    <div class="row-fluid">
-		      <div class="span6 nd_order_a">
-		       Maps-statistics for comparison with Patient Analysis
-		      </div>
-		      <div class="span6 nd_order_a">
-		      	Pipeline delivery rates
-		      </div>
-		    </div>
-		  </div>
-		</div>
+	  </div>
     </div>
     <div class="tab-pane" id="tab5">
       <div class="row-fluid">

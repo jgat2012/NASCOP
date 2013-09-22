@@ -1,13 +1,13 @@
 <?php
 $chartSize=0;
 if($resultArraySize<=6){
-	$chartSize='400';
+	$chartSize='300';
 }
 if($resultArraySize>6){
-	$chartSize='600';
+	$chartSize='400';
 }
 if($resultArraySize>10){
-	$chartSize='800';
+	$chartSize='700';
 }
 if($resultArraySize>15){
 	$chartSize='1000';
@@ -38,7 +38,8 @@ if($resultArraySize>25){
 		],
 		chart: {
 			height:<?php echo $chartSize;?>,
-		type: '<?php echo $chartType ?>'
+			type: '<?php echo $chartType ?>',
+			marginBottom:100
 		},
 		title: {
 		text: '<?php echo $chartTitle; ?>'
@@ -73,7 +74,7 @@ if($resultArraySize>25){
 		legend: {
 		layout: 'horizontal',
 		align: 'left',
-		verticalAlign: 'top',
+		verticalAlign: 'bottom',
 		floating: true,
 		borderWidth: 1,
 		backgroundColor: '#FFFFFF',

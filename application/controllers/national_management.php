@@ -229,23 +229,26 @@ class National_Management extends MY_Controller {
 	}
 
 	public function fa_ordering_sites_summary($year, $month, $pipeline, $type = 0) {
+			
+		$centralArray = array();
+		$satelliteArray = array();
+		$standaloneArray = array();
+		$resultArraySize = 0;	
+		
 		$results = Dashboard_Orderpoints::getMonthlySummary($pipeline, $month, $year);
 		$summary_array = array("central='1'", "standalone='1'", "central='0' and standalone='0'");
 		$central_total = 0;
 		$standalone_total = 0;
 		$satellite_total = 0;
 		$overall_total = 0;
-		$dyn_table = "<table border='1' id='facility_analysis'  cellpadding='5' class='grid'>";
-		$dyn_table .= "<thead><tr><th>Provinces</th><th>Central Sites</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
-		$dyn_table .= "<tbody>";
+		
+		$nameArray = array();
 		foreach ($results as $result) {
+			$nameArray[]=$result['province'];
 			$province = $result['province'];
-			$total = $result['total'];
-			$dyn_table .= "<tr><td>" . $province . "</td>";
 			$count = 0;
 			foreach ($summary_array as $summary) {
 				$province_total = Dashboard_Orderpoints::getMonthlyProvinceSummary($pipeline, $month, $year, $province, $summary);
-				$dyn_table .= "<td>" . $province_total['total'] . "</td>";
 				if ($count == 0) {
 					$central_total += $province_total['total'];
 				} else if ($count == 1) {
@@ -255,16 +258,26 @@ class National_Management extends MY_Controller {
 				}
 				$count++;
 			}
-			$overall_total += $total;
-			$dyn_table .= "<td>" . $total . "</td></tr>";
+			
+			$centralArray[] = $central_total;
+			$satelliteArray[] = $satellite_total ;
+			$standaloneArray[] =$standalone_total;
+			$resultArraySize++;
 		}
-		$dyn_table .= "</tbody><tfoot><tr><td>Totals</td><td>$central_total</td><td>$standalone_total</td><td>$satellite_total</td><td>$overall_total</td></tr>";
-		$dyn_table .= "</tfoot></table>";
-		$data['label'] = 'Facility';
-		$data['table'] = 'facilities';
-		$data['actual_page'] = 'View Facilities';
-		$data['dyn_table'] = $dyn_table;
-		$this -> base_params($data);
+		$resultArray = array( array('name' => 'Central Sites', 'data' => $centralArray), array('name' => 'Standalone Sites', 'data' => $standaloneArray),array('name' => 'Satellite Sites', 'data' => $satelliteArray));
+		$resultArray = json_encode($resultArray);
+		$categories = $nameArray;
+		$categories = json_encode($categories);
+		//Load Data Variables
+		$data['resultArraySize'] = $resultArraySize;
+		$data['container'] = 'ordering_site';
+		$data['chartType'] = 'bar';
+		$data['title'] = 'Chart';
+		$data['chartTitle'] = 'Ordering Sites';
+		$data['categories'] = $categories;
+		$data['yAxix'] = 'Provinces';
+		$data['resultArray'] = $resultArray;
+		$this -> load -> view('chart_v', $data);
 	}
 
 	public function fa_service_points_list($year, $month, $pipeline, $type = 0) {
@@ -298,23 +311,26 @@ class National_Management extends MY_Controller {
 	}
 
 	public function fa_service_points_summary($year, $month, $pipeline, $type = 0) {
+		$centralArray = array();
+		$satelliteArray = array();
+		$standaloneArray = array();
+		$resultArraySize = 0;	
+			
+		
 		$results = Dashboard_Servicepoints::getMonthlySummary($pipeline, $month, $year);
 		$summary_array = array("satellite='0' and standalone='0'", "standalone='1'", "satellite='1'");
 		$central_total = 0;
 		$standalone_total = 0;
 		$satellite_total = 0;
 		$overall_total = 0;
-		$dyn_table = "<table border='1' id='facility_analysis'  cellpadding='5' class='grid'>";
-		$dyn_table .= "<thead><tr><th>Provinces</th><th>Central Sites</th><th>Standalone Sites</th><th>Satellite Sites</th><th>Total</th></tr></thead>";
-		$dyn_table .= "<tbody>";
+		
+		$nameArray = array();
 		foreach ($results as $result) {
+			$nameArray[]=$result['province'];
 			$province = $result['province'];
-			$total = $result['total'];
-			$dyn_table .= "<tr><td>" . $province . "</td>";
 			$count = 0;
 			foreach ($summary_array as $summary) {
 				$province_total = Dashboard_Servicepoints::getMonthlyProvinceSummary($pipeline, $month, $year, $province, $summary);
-				$dyn_table .= "<td>" . $province_total['total'] . "</td>";
 				if ($count == 0) {
 					$central_total += $province_total['total'];
 				} else if ($count == 1) {
@@ -324,16 +340,25 @@ class National_Management extends MY_Controller {
 				}
 				$count++;
 			}
-			$overall_total += $total;
-			$dyn_table .= "<td>" . $total . "</td></tr>";
+			$centralArray[] = $central_total;
+			$satelliteArray[] = $satellite_total ;
+			$standaloneArray[] =$standalone_total;
+			$resultArraySize++;
 		}
-		$dyn_table .= "</tbody><tfoot><tr><td>Totals</td><td>$central_total</td><td>$standalone_total</td><td>$satellite_total</td><td>$overall_total</td></tr>";
-		$dyn_table .= "</tfoot></table>";
-		$data['label'] = 'Facility';
-		$data['table'] = 'facilities';
-		$data['actual_page'] = 'View Facilities';
-		$data['dyn_table'] = $dyn_table;
-		$this -> base_params($data);
+		$resultArray = array( array('name' => 'Central Sites', 'data' => $centralArray), array('name' => 'Standalone Sites', 'data' => $standaloneArray),array('name' => 'Satellite Sites', 'data' => $satelliteArray));
+		$resultArray = json_encode($resultArray);
+		$categories = $nameArray;
+		$categories = json_encode($categories);
+		//Load Data Variables
+		$data['resultArraySize'] = $resultArraySize;
+		$data['container'] = 'service_point';
+		$data['chartType'] = 'bar';
+		$data['title'] = 'Chart';
+		$data['chartTitle'] = 'Service Points';
+		$data['categories'] = $categories;
+		$data['yAxix'] = 'Provinces';
+		$data['resultArray'] = $resultArray;
+		$this -> load -> view('chart_v', $data);
 
 	}
 
@@ -348,6 +373,10 @@ class National_Management extends MY_Controller {
 		$period_end = date('Y-m-t', strtotime($year . "-" . $month . "-01"));
 		$facility_orders = Facility_Order::getOrderCommoditiesByPipeline($pipeline, $period_start, $period_end);
 		$id_list = array();
+		
+		$resultArraySize=0;
+		$nameArray = array();
+		$totalArray=array();
 
 		foreach ($facility_orders as $facility_order) {
 			$unique_id = $facility_order['Unique_Id'];
@@ -355,9 +384,27 @@ class National_Management extends MY_Controller {
 		}
 		$orders = "'" . implode("','", $id_list) . "'";
 		$results = Cdrr_Item::getAllCommodities($orders);
-		echo "<pre>";
-		print_r($results);
-		echo "</pre>";
+		
+		foreach ($results as $value) {
+			$nameArray[] = $value['Drug_Id'];
+			$totalArray[] = (int)$value['Resupply'];
+			$resultArraySize++;
+		}
+		$resultArray = array( array('name' => 'Orders', 'data' => $totalArray));
+		
+		$resultArray = json_encode($resultArray);
+		$categories = $nameArray;
+		$categories = json_encode($categories);
+		//Load Data Variables
+		$data['resultArraySize'] = $resultArraySize;
+		$data['container'] = 'order_analysis_chart';
+		$data['chartType'] = 'bar';
+		$data['title'] = 'Chart';
+		$data['chartTitle'] = 'Orders By Commodity';
+		$data['categories'] = $categories;
+		$data['yAxix'] = 'Drugs';
+		$data['resultArray'] = $resultArray;
+		$this -> load -> view('chart_v', $data);
 
 	}
 
