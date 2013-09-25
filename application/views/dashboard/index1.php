@@ -1,3 +1,14 @@
+<style type="text/css">
+	.tab-content{
+		overflow:hidden;
+	}
+	.dataTables_wrapper{
+		width:98%;
+	}
+	.dataTables_filter{
+		width:100%;
+	}	
+</style>
 <script type="text/javascript">
 	$(document).ready(function(){
 		 
