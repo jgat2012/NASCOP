@@ -18,7 +18,7 @@ class Synchronization_Management extends MY_Controller {
 		$order_number = "";
 
 		foreach ($table_array as $table) {
-			$sql = "select * from facility_order where is_uploaded='1' and code >='1' and central_facility='$facility'";
+			$sql = "select * from facility_order where is_uploaded='0' and code >='1' and central_facility='$facility'";
 			$query = $this -> db -> query($sql);
 			$order_array = $query -> result_array();
 			if ($order_array) {

@@ -56,7 +56,7 @@ class Picking_List_Management extends MY_Controller {
 		$orders = $list -> Order_Objects;
 		foreach ($orders as $order) {
 			$order -> Status = "3";
-			$order -> Is_Uploaded = 1;
+			$order -> Is_Uploaded =0;
 			$order -> save();
 		}
 		redirect("picking_list_management/submitted_lists/1");

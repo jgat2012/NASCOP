@@ -116,7 +116,7 @@ class Order_Rationalization extends MY_Controller {
 
 			$order_object -> Status = $status;
 			$order_object -> Updated = $updated_on;
-			$order_object -> Is_Uploaded = 1;
+			$order_object -> Is_Uploaded =0;
 			//code = 0 i.e. fcdrr
 			$order_object -> Code = 1;
 			//Only for dcdrrs

@@ -250,13 +250,7 @@
 		<?php echo $header_text;?>
 		<tbody>
 			<?php
-			$counter = 0;
 			foreach($commodities as $commodity){
-			$counter++;
-			if($counter == 10){
-			echo $header_text;
-			$counter = 0;
-			}
 			?>
 			<tr class="ordered_drugs" drug_id="<?php echo $commodity -> Drugcode_Object->id;?>">
 				<td class="col_drug"><?php echo $commodity ->Drug_Id;?></td>
