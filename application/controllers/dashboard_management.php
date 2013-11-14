@@ -7,6 +7,10 @@ class Dashboard_Management extends MY_Controller {
 		$data = array();
 		ini_set("max_execution_time", "10000");
 	}
+	
+	public function indexS() {
+		$this->load->view('tester_v');
+	}
 
 	public function index() {
 		$data['content_view'] = "home_v";
