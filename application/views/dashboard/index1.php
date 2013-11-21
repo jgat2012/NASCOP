@@ -233,14 +233,14 @@
 			var base_url=$("#base_url").val();
 			//Patient By Regimen
 			if(id=="stock_status_menu"){
-				$("#tab1 .active").removeClass("active");
+				$("#tab2 .active").removeClass("active");
 				$(this).addClass("active");
 				//Change id of get button
 				$(".commodity_analysis_btn").attr("id","stock_status_btn");
 				stock_status(y,mm,def_pipeline);
 			}
 			else if(id=="consumption_menu"){
-				$("#tab1 .active").removeClass("active");
+				$("#tab2 .active").removeClass("active");
 				$(this).addClass("active");
 				//Change id of get button
 				$(".commodity_analysis_btn").attr("id","consumption_btn");
@@ -455,26 +455,56 @@
 </script>
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs " style="width:60%; float: left">
-    <li id="ca_menu" class="active main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
-    <li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
-    <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li>
-    <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>
+  	<li id="page_menu" class="active main_menu"><a href="#tab1" data-toggle="tab">2-Pagers</a></li>
+    <li id="ca_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Commodity Analysis</a></li>
+    <li id="pa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Patient Analysis</a></li>
+    <li id="fa_menu" class="main_menu"><a href="#tab4" data-toggle="tab">Facility Analysis</a></li>
+    <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab5" data-toggle="tab">Order Analysis</a></li>
    <!-- <li id="ra_menu" class="main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li> -->
   </ul>
-  <div >
+  <div>
   	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
 	  <li><a href="#">National Dashboard</a><span class="divider">/</span></li>
 	  <li><a id="sub_active" href="#"></a><span class="divider">/</span></li>
 	  <li id="active_menu" class="active"></li>
 	</ol>
   </div>
-  <div class="tab-content" style="clear:left">
-  	<!-- Commodity Analysis -->
+   <div class="tab-content" style="clear:left">
+  	    <!-- 2 Pager Analysis -->
     <div class="tab-pane active" id="tab1">
+    	<div class="navbar" style="width:100%">
+		  <div class="navbar-inner">
+		    <ul class="nav">
+		      <li id="downloads_menu" class="active"><a href="#">Downloads</a></li>
+		      <li id="uploads_menu"><a href="#">Uploads</a></li>
+		    </ul>
+		  </div>
+		</div>
+	  	<div class="row-fluid">
+			   <table class="dataTables">
+			   	  <thead>
+			   	  	<tr><th>Report Name</th><th>Options</th></tr>
+			   	  </thead>
+			   	  <tbody>
+			   	  	<tr>
+			   	  		<td>August_2013_National_ARV_Stock_Status_Report</td>
+			   	  		<td><a href='<?php echo base_url().'reports/August_2013_National_ARV_Stock_Status_Report.pdf';?>' target="_blank">View</a></td>
+			   	  	</tr>
+			   	  </tbody>
+			   </table>
+		</div>
+    </div>
+  	
+  	
+  	
+  	
+
+  	<!-- Commodity Analysis -->
+    <div class="tab-pane" id="tab2">
       <div class="navbar" style="width:100%">
 		  <div class="navbar-inner">
 		    <ul class="nav">
-		      <li id="stock_status_menu" class="active commodity_analysis_menus"><a href="#">Stock Status</a></li>
+		      <li id="stock_status_menu" class="commodity_analysis_menus"><a href="#">Stock Status</a></li>
 		      <li id="consumption_menu" class="commodity_analysis_menus"><a  href="#">Consumption</a></li>
 		    </ul>
 		  </div>
@@ -509,7 +539,7 @@
 		</div>
     </div>
     <!-- Patient Analysis -->
-    <div class="tab-pane" id="tab2">
+    <div class="tab-pane" id="tab3">
     	<div class="navbar" style="width:100%">
 		  <div class="navbar-inner">
 		    <ul class="nav">
@@ -550,7 +580,7 @@
     </div>
     
     <!-- Facility Analysis -->
-    <div class="tab-pane" id="tab3">
+    <div class="tab-pane" id="tab4">
       <div class="navbar" style="width:100%">
 		  <div class="navbar-inner">
 		    <ul class="nav">
@@ -591,7 +621,7 @@
 		</div>
     </div>
     <!-- Order Analysis -->
-    <div class="tab-pane" id="tab4">
+    <div class="tab-pane" id="tab5">
       <div class="row-fluid">
 		  <div class="span12">
 		  	<div id="fa_menus" class="nd_menus">
@@ -618,7 +648,7 @@
 		  </div>
 	  </div>
     </div>
-    <div class="tab-pane" id="tab5">
+    <div class="tab-pane" id="tab6">
       <div class="row-fluid">
 		  <div class="span12">
 		    <div class="row-fluid">

@@ -1190,7 +1190,7 @@ a{color:black}#signup_form a:hover{color:white}.login-form{margin:auto;width:80%
 0 1em 0}.login-form input[type="checkbox"]{width:5%}#login-other{display:block}.short_title{height:40px;padding:5px;margin:0
 0 0.2em 0;font-size:2em;color:#000}.remember{float:left}.remember-label{font-weight:normal;color:#666;padding:0
 0 0 .4em;-webkit-user-select:none;-moz-user-select:none;user-select:none;display:inline;float:left}.forgotten-password{float:right}#main_wrapper{width:auto;border:0px}.tile{display:inline-block;float:left;width:49%;height:50%;padding:0
-0.5% 0.5% 0.5%;margin-bottom:2%}.tile-half{height:50%;display:block}.graph{height:46%;overflow-x:hidden;overflow-y:auto}.fullest-content{width:96%;margin:auto;padding:10% 1% 5% 1%}.fullest-content
+0.5% 0.5% 0.5%;margin-bottom:2%}.tile-half{height:50%;display:block}.graph{overflow-x:hidden;overflow-y:auto}.fullest-content{width:96%;margin:auto;padding:10% 1% 5% 1%}.fullest-content
 .tile{width:32%}#environment_variables{width:600px;margin:0
 auto}#synchronize{text-align:left;font-size:16px;text-shadow:0 1px rgba(0, 0, 0, 0.1);letter-spacing:1px;position:absolute;right:15px;top:60px;color:#036;border:2px
 solid #DDD;width:300px;height:55px;padding:2px;overflow:hidden}#loadingDiv{width:60px;margin:0

@@ -7,11 +7,10 @@ class Pipeline_Management extends MY_Controller {
 		parent::__construct();
 		$data = array();
 		$this -> load -> library('PHPExcel');
-		ini_set("max_execution_time", "10000");
+		ini_set("max_execution_time", "100000000");
 	}
 
 	public function index() {
-
 		$data['content_view'] = "pipeline_upload";
 		$data['hide_side_menu'] = 1;
 		$this -> base_params($data);
@@ -1274,10 +1273,9 @@ class Pipeline_Management extends MY_Controller {
 
 	public function base_params($data) {
 		$data['title'] = "Pipleline Stock Data";
-
 		$data['banner_text'] = "Monthly Pipeline Upload";
 		$data['quick_link'] = "pipeline";
-		//$this -> load -> view('template', $data);
+		$this -> load -> view('template', $data);
 	}
 
 }

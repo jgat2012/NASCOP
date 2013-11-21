@@ -163,7 +163,7 @@ class Chart_Management extends MY_Controller {
 		header('Content-type: text/xml');
 		echo $strXML .= "</chart>";
 		*/
-		echo json_encode(;)
+		echo json_encode($results);
 	}
 
 	public function pipelineConsumption($year, $month, $pipeline) {

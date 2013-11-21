@@ -960,7 +960,6 @@ table.setting_table {
 	display: block;
 }
 .graph {
-	height: 46%;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
