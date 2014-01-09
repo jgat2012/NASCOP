@@ -125,7 +125,7 @@ header {
 	overflow: hidden;
 	border-bottom: 2px solid #036;
 	width: 100%;
-	height: 19%;
+	height: 16%;
 	position: fixed;
 	background: white;
 	z-index: 5;
@@ -224,7 +224,7 @@ header {
 .banner_text {
 	font-weight: 100;
 	letter-spacing: -1px;
-	margin: .2% 0 0 1%;
+	margin: .2% 0 0 0%;
 	font-size: 1.4em;
 	color: #000;
 	width: 500px;
@@ -1562,4 +1562,74 @@ td {
 .dataTables_wrapper {
 	width: auto;
 	margin: 0 auto;
+}
+
+
+/*
+ * National Dashboard Style
+ */
+.fullest-content .three_block,.fullest-content .two_block{
+	display: inline-block;
+	float: left;
+	height: 53%;
+	padding: 0 0.5% 0.5% 0.5%;
+	margin-bottom: 1%;
+}
+.fullest-content .three_block{
+	width:32%;
+	
+}
+.fullest-content .two_block{
+	width:48%;
+}
+.national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input, 
+.nat_dashboard_rep label {
+	font-size:0.9em !important;
+}
+.nat_dashboard_rep .dataTables_info{
+	width:42%;
+	font-size:0.7em;
+}
+.nat_dashboard_rep .dataTables_paginate{
+	width:55%;
+	font-size:0.7em;
+}
+
+.nat_dashboard_rep table tr td:last-child,.nat_dashboard_rep table tr th:last-child{
+	border-right:1px solid #aaa;
+}
+
+.nat_dashboard_rep select{
+	width:33%;
+}
+.nat_dashboard_rep input{
+	width:70%;
+}
+.nat_dashboard_rep select,.nat_dashboard_rep input{
+	height:2em;
+}
+.nat_dashboard_rep table td{
+	padding:1px 10px;
+}
+.nat_dashboard_rep .dataTables_filter{
+	width:70%;
+}
+.ui-widget-header {
+	background: #F7F7F7;
+	border: 1px solid #aaa;
+	color:#000000;
+}
+.nat_dashboard_rep a{
+	
+}
+.nat_dashboard_rep h3{
+	line-height: 2em;
+	-webkit-margin-before: 0.5em;
+	color: #fff;
+	font-size: 1em;
+	padding: 0 0 0 1em;
+	background:#969DA3;
+	box-shadow: 0 1.2px 3px 1px #000;
+	-webkit-box-shadow: 0 1.2px 3px 1px #000;
+
 }

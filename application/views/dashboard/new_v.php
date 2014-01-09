@@ -29,11 +29,12 @@
 				"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
 				"aButtons" : ["copy", "print", "xls", "pdf"]
 			},
+			"sScrollX" : "100%",
 			"sScrollY" : "250px",
 			"bScrollCollapse" : true,
 			"bPaginate" : false,
 			"bJQueryUI" : true,
-			"bAutoWidth" : false
+			"bAutoWidth" : true
 		},function(){
 			alert("Ok")
 		});

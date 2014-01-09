@@ -1115,13 +1115,13 @@ a{text-decoration:none}#footer_text{font-weight:300;letter-spacing:2px;margin:0
 auto;font-size:1em;color:#036;width:90%;height:30px;display:block;overflow:hidden;text-shadow:0 1px rgba(0,0,0,0.1)}#wrapper{width:100%;min-width:980px;margin:0
 auto;height:0 auto -120px auto !important}#footer{width:95%;margin:20px
 2% 0 2%;text-align:center}#inner_wrapper{width:auto;margin:0
-auto;padding:5px;overflow:visible;min-height:500px;position:relative;top:150px;min-width:980px}#sub_menu{overflow:hidden;margin-bottom:10px}.sub_menu_link{height:30px !important;line-height:30px !important;font-size:10px !important;letter-spacing:0.5px !important}#main_content{}#top-panel{overflow:hidden;border-bottom:2px solid #036;width:100%;height:19%;position:fixed;background:white;z-index:5;min-width:980px}.logo{width:100px;height:100px;position:relative;background:url("http://localhost/NASCOP/assets/css/../img/coat_of_arms-resized.png") no-repeat}#main_wrapper{border:none}#top_menu{min-width:200px;height:60px;position:absolute;top:0;right:0;margin-top: -5px}#top_menu
+auto;padding:5px;overflow:visible;min-height:500px;position:relative;top:150px;min-width:980px}#sub_menu{overflow:hidden;margin-bottom:10px}.sub_menu_link{height:30px !important;line-height:30px !important;font-size:10px !important;letter-spacing:0.5px !important}#main_content{}#top-panel{overflow:hidden;border-bottom:2px solid #036;width:100%;height:16%;position:fixed;background:white;z-index:5;min-width:980px}.logo{width:100px;height:100px;position:relative;background:url("http://localhost/NASCOP/assets/css/../img/coat_of_arms-resized.png") no-repeat}#main_wrapper{border:none}#top_menu{min-width:200px;height:60px;position:absolute;top:0;right:0;margin-top: -5px}#top_menu
 a{font-size:18px;font-weight:normal}.welcome_msg{clear:left;text-align:right;color:#2B597E;padding:20px}.welcome_msg
 a{color:rgb(24,161,214)}#my_profile_link{background-color:#00B831;width:auto;padding:0
 10px 0 10px}#my_profile_link:hover{background-color:white;cursor:pointer}.top_menu_link{float:left;min-width:115px;height:40px;line-height:40px;color:white;text-decoration:none;font-size:12px;font-weight:bold;display:block;text-align:center;background:rgb(43, 89, 126);border:1px
 solid rgba(0, 0, 0, 0.2);text-shadow:0 1px rgba(0,0,0,0.1);position:relative;z-index:2}#my_profile{width:140px !important;margin:0px
 !important;padding:0px
-!important;line-height:40px}.first_link{width:120px !important;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;margin-right: -5px;position:relative;z-index:1}.last_link{width:120px !important;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;margin-left: -5px;position:relative;z-index:1}.top_menu_active{color:#036;background:#FFF}.top_menu_link:hover{background:white;color:black;text-decoration:none}.banner_text{font-weight:100;letter-spacing: -1px;margin: .2% 0 0 1%;font-size:1.4em;color:#000;width:500px;height:30px;display:block;text-shadow:none;text-shadow:0 1px rgba(0, 0, 0, 0.1)}input[type = email]:hover, input[type = password]:hover, input[type = text]:hover, input[type = url]:hover{border:1px
+!important;line-height:40px}.first_link{width:120px !important;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;margin-right: -5px;position:relative;z-index:1}.last_link{width:120px !important;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;margin-left: -5px;position:relative;z-index:1}.top_menu_active{color:#036;background:#FFF}.top_menu_link:hover{background:white;color:black;text-decoration:none}.banner_text{font-weight:100;letter-spacing: -1px;margin: .2% 0 0 0%;font-size:1.4em;color:#000;width:500px;height:30px;display:block;text-shadow:none;text-shadow:0 1px rgba(0, 0, 0, 0.1)}input[type = email]:hover, input[type = password]:hover, input[type = text]:hover, input[type = url]:hover{border:1px
 solid #b9b9b9;border-top:1px solid #a0a0a0;-webkit-box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.1);-moz-box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.1);box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.1)}input[type = email]:focus, input[type = password]:focus, input[type = text]:focus, input[type = url]:focus{outline:none;border:1px
 solid #4d90fe;-webkit-box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.3);-moz-box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.3);box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.3)}input[type = email][disabled = disabled], input[type = password][disabled = disabled], input[type = text][disabled = disabled], input[type = url][disabled = disabled]{border:1px
 solid #e5e5e5;background:#f5f5f5}input[type = email][disabled = disabled]:hover, input[type = password][disabled = disabled]:hover, input[type = text][disabled = disabled]:hover, input[type = url][disabled = disabled]:hover{-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none}input[type =
@@ -1247,7 +1247,25 @@ auto}#commodity-table tbody
 tr{font-size:14px}.regimen-table tbody
 td{font-size:0.75em;color:#000;padding:3px}.ui-state-active{background:#e6e6e6 url(http://localhost/NASCOP/assets/css/images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x}.regimen-table thead
 .col_drug{font-size:14px}.dataTables_wrapper{width:auto;margin:0
-auto}
+auto}.fullest-content .three_block,.fullest-content
+.two_block{display:inline-block;float:left;height:53%;padding:0
+0.5% 0.5% 0.5%;margin-bottom:1%}.fullest-content
+.three_block{width:32%}.fullest-content
+.two_block{width:48%}.national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input,
+.nat_dashboard_rep
+label{font-size:0.9em !important}.nat_dashboard_rep
+.dataTables_info{width:42%;font-size:0.7em}.nat_dashboard_rep
+.dataTables_paginate{width:55%;font-size:0.7em}.nat_dashboard_rep table tr td:last-child,.nat_dashboard_rep table tr th:last-child{border-right:1px solid #aaa}.nat_dashboard_rep
+select{width:33%}.nat_dashboard_rep
+input{width:70%}.nat_dashboard_rep select,.nat_dashboard_rep
+input{height:2em}.nat_dashboard_rep table
+td{padding:1px
+10px}.nat_dashboard_rep
+.dataTables_filter{width:70%}.ui-widget-header{background:#F7F7F7;border:1px
+solid #aaa;color:#000}.nat_dashboard_rep
+a{}.nat_dashboard_rep
+h3{line-height:2em;-webkit-margin-before:0.5em;color:#fff;font-size:1em;padding:0
+0 0 1em;background:#969DA3;box-shadow:0 1.2px 3px 1px #000;-webkit-box-shadow:0 1.2px 3px 1px #000}
 .ui-multiselect{padding:2px
 0 2px 4px;text-align:left}.ui-multiselect span.ui-icon{float:right}.ui-multiselect-single .ui-multiselect-checkboxes
 input{position:absolute !important;top:auto !important;left:-9999px}.ui-multiselect-single .ui-multiselect-checkboxes
