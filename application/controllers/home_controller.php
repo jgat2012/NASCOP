@@ -57,10 +57,10 @@ class Home_Controller extends MY_Controller {
 		$data['link'] = "home";
 
 		//Get mac address
-		$get_mac = "getmac";
-		exec($get_mac, $output, $ret);
-		$value = explode('\\', $output[3]);
-		$data['mac'] = $value[0];
+		//$get_mac = "getmac";
+		//exec($get_mac, $output, $ret);
+		//$value = explode('\\', $output[3]);
+		//$data['mac'] = $value[0];
 		$data['user'] = $this -> session -> userdata['full_name'];
 		$this -> load -> view("template", $data);
 

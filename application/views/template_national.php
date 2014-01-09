@@ -27,9 +27,9 @@ $this -> load -> view('sections/head');
 					<div id="facility_name">							
 						<span><?php echo "NASCOP"; ?></span>
 					</div>
-					
+					<div class="banner_text"><?php echo $banner_text; ?></div>	
 				</div>
-				<div class="banner_text"><?php echo $banner_text; ?></div>	
+				
 				
  <div id="top_menu"> 
  <div class="welcome_msg">
