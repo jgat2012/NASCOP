@@ -8,7 +8,7 @@ class Drugcode extends Doctrine_Record {
 		$this -> hasColumn('Safety_Quantity', 'varchar', 4);
 		$this -> hasColumn('Generic_Name', 'varchar', 100);
 		$this -> hasColumn('Supported_By', 'varchar', 30);
-		$this -> hasColumn('classification', 'varchar',50);
+		$this -> hasColumn('classification', 'varchar', 50);
 		$this -> hasColumn('none_arv', 'varchar', 1);
 		$this -> hasColumn('Tb_Drug', 'varchar', 1);
 		$this -> hasColumn('Drug_In_Use', 'varchar', 1);
@@ -22,6 +22,7 @@ class Drugcode extends Doctrine_Record {
 		$this -> hasColumn('Enabled', 'varchar', 1);
 		$this -> hasColumn('Strength', 'varchar', 20);
 		$this -> hasColumn('Merged_To', 'varchar', 50);
+		$this -> hasColumn('Map', 'int', 5);
 	}
 
 	public function setUp() {
@@ -29,25 +30,25 @@ class Drugcode extends Doctrine_Record {
 		$this -> hasOne('Generic_Name as Generic', array('local' => 'Generic_Name', 'foreign' => 'id'));
 		$this -> hasOne('Drug_Unit as Drug_Unit', array('local' => 'Unit', 'foreign' => 'id'));
 		$this -> hasOne('Supporter as Supporter', array('local' => 'Supported_By', 'foreign' => 'id'));
+		$this -> hasOne('Drug_Source as Suppliers', array('local' => 'Supported_By', 'foreign' => 'id'));
 		$this -> hasMany('Brand as Brands', array('local' => 'id', 'foreign' => 'Drug_Id'));
 		$this -> hasOne('Dose as Drug_Dose', array('local' => 'Dose', 'foreign' => 'id'));
 
 	}
 
-	public function getAll($source = 0,$access_level="") {
-		if($access_level=="" || $access_level=="facility_administrator"){
-			$displayed_enabled="Source='0' or Source !='0'";
+	public function getAll($source = 0, $access_level = "") {
+		if ($access_level == "" || $access_level == "facility_administrator") {
+			$displayed_enabled = "Source='0' or Source !='0'";
+		} else {
+			$displayed_enabled = "(Source='$source' or Source='0') AND Enabled='1'";
 		}
-		else{
-			$displayed_enabled="(Source='$source' or Source='0') AND Enabled='1'";
-		}
-		
-		$query = Doctrine_Query::create() -> select("id,Drug,Pack_Size,Safety_Quantity,Quantity,Duration,Enabled,Merged_To") -> from("Drugcode") -> where($displayed_enabled) -> orderBy("id asc");
+
+		$query = Doctrine_Query::create() -> select("d.id,d.Drug,du.Name as drug_unit,d.Pack_Size,d.Dose,s.Name as supplier,d.Safety_Quantity,d.Quantity,d.Duration,d.Enabled,d.Merged_To") -> from("Drugcode d") -> leftJoin('d.Drug_Unit du, d.Suppliers s') -> where($displayed_enabled) -> orderBy("id asc");
 		$drugsandcodes = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $drugsandcodes;
 	}
-	
-	public function getAllEnabled($source = 0,$access_level="") {
+
+	public function getAllEnabled($source = 0, $access_level = "") {
 		$query = Doctrine_Query::create() -> select("id,Drug,Pack_Size,Safety_Quantity,Quantity,Duration,Enabled,Merged_To") -> from("Drugcode") -> where('enabled="1"') -> orderBy("Drug asc");
 		$drugsandcodes = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $drugsandcodes;
@@ -60,7 +61,7 @@ class Drugcode extends Doctrine_Record {
 	}
 
 	public function getAllObjects($source = 0) {
-		$query = Doctrine_Query::create() -> select("UPPER(Drug) As Drug,Pack_Size,Safety_Quantity,Quantity,Duration") -> from("Drugcode") -> where("Supplied = '1' and Enabled='1'") -> orderBy("id asc");
+		$query = Doctrine_Query::create() -> select("UPPER(d.Drug) As Drug,d.Pack_Size,d.Safety_Quantity,d.Quantity,d.Duration") -> from("Drugcode d") -> where("d.Supported_By='$source' and Enabled='1'") -> orderBy("id asc");
 		$drugsandcodes = $query -> execute(array());
 		return $drugsandcodes;
 	}
@@ -68,6 +69,12 @@ class Drugcode extends Doctrine_Record {
 	public function getBrands() {
 		$query = Doctrine_Query::create() -> select("id,Drug") -> from("Drugcode") -> where("enabled='1'");
 		$drugsandcodes = $query -> execute();
+		return $drugsandcodes;
+	}
+
+	public function getEnabledDrugs() {
+		$query = Doctrine_Query::create() -> select("id,Drug") -> from("Drugcode") -> where("Enabled='1'");
+		$drugsandcodes = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $drugsandcodes;
 	}
 
@@ -82,27 +89,30 @@ class Drugcode extends Doctrine_Record {
 		$drugs = $query -> execute();
 		return $drugs;
 	}
+
 	public static function getDrugCode($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Drugcode") -> where("id = '$id'");
 		$drugs = $query -> execute();
 		return $drugs[0];
 	}
-	
+
 	public static function getDrugCodeHydrated($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Drugcode") -> where("id = '$id'");
 		$drugs = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $drugs;
 	}
-	
-	
 
-	public function deleteBrand($id){
-		$query = Doctrine_Query::create()->delete('brand b')->where("b.id ='$id'");
-		$rows = $query->execute();
+	public function deleteBrand($id) {
+		$query = Doctrine_Query::create() -> delete('brand b') -> where("b.id ='$id'");
+		$rows = $query -> execute();
 		return $rows;
 	}
-	
-	
+
+	public function getDrugID($drugname) {
+		$query = Doctrine_Query::create() -> select("id") -> from("Drugcode") -> where("Drug like '%$drugname%'");
+		$drugs = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $drugs[0]['id'];
+	}
 
 }
 ?>

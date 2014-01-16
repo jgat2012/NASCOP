@@ -18,7 +18,6 @@ class Facilities extends Doctrine_Record {
 		$this -> hasColumn('service_pmtct', 'int', 2);
 		$this -> hasColumn('service_pep', 'int', 2);
 		$this -> hasColumn('supplied_by', 'int', 2);
-		$this -> hasColumn('active', 'int', 5);
 	}
 
 	public function setUp() {
@@ -26,6 +25,8 @@ class Facilities extends Doctrine_Record {
 		$this -> hasOne('District as Parent_District', array('local' => 'district', 'foreign' => 'id'));
 		$this -> hasOne('Counties as County', array('local' => 'county', 'foreign' => 'id'));
 		$this -> hasOne('Facility_Types as Type', array('local' => 'facilitytype', 'foreign' => 'id'));
+		$this -> hasOne('Suppliers as supplier', array('local' => 'supplied_by', 'foreign' => 'id'));
+		$this -> hasOne('Supporter as support', array('local' => 'supported_by', 'foreign' => 'id'));
 	}
 
 	public function getDistrictFacilities($district) {
@@ -109,16 +110,28 @@ class Facilities extends Doctrine_Record {
 		return $facility[0];
 	}
 
+	public static function getSupplier($id) {
+		$query = Doctrine_Query::create() -> select("supplied_by") -> from("Facilities") -> where("facilitycode = '$id'");
+		$facility = $query -> execute();
+		return $facility[0];
+	}
+
 	public static function getParent($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Facilities") -> where("facilitycode = '$id'");
 		$facility = $query -> execute();
 		return $facility[0];
 	}
 
-	public function getAllJoined() {
-		$query = Doctrine_Query::create() -> select("f.facilitycode,f.active,f.name as facilityname,c.id as county_id,c.county as county,t.id as f_type_id,t.Name as f_type,pd.id as district_id,pd.Name as district") -> from("Facilities f") -> orderBy("name") -> leftjoin("f.County c,f.Type t,f.Parent_District pd");
+	public function getMainSupplier($facility_code) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Facilities f")-> leftJoin('f.supplier s') -> where("facilitycode = '$facility_code'");
+		$facility = $query -> execute();
+		return $facility[0];
+	}
+	
+	public function getType($facility_code){
+		$query = Doctrine_Query::create() -> select("count(*) as total") -> from("Facilities")-> where("parent = '$facility_code'");
 		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
-		return $facility;
+		return $facility[0]['total'];
 	}
 
 }

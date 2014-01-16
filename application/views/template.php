@@ -43,14 +43,14 @@ if ($this -> uri -> segment(7) != "") {
 
 if ($this -> session -> userdata("prev_page") !='') {
 	$this -> session -> set_userdata("prev_page","");
-	if ($this -> input -> cookie("actual_page") !='') {
-		$actual_page=$this -> input -> cookie("actual_page");
+	if ($this -> input -> cookie("nascop_actual_page") !='') {
+		$actual_page=$this -> input -> cookie("nascop_actual_page");
 		redirect($actual_page);
 	}else{
-		$this -> input -> set_cookie("actual_page", $actual_page, 3600);
+		$this -> input -> set_cookie("nascop_actual_page", $actual_page, 3600);
 	}
 }else{
-	$this -> input -> set_cookie("actual_page", $actual_page, 3600);
+	$this -> input -> set_cookie("nascop_actual_page", $actual_page, 3600);
 }
 
 $access_level = $this -> session -> userdata('user_indicator');
@@ -160,9 +160,8 @@ if(isset($report_title)){
 					<div id="facility_name">							
 						<span><?php echo "NASCOP";?></span>
 					</div>
-					
+					<div class="banner_text"><?php echo $banner_text;?></div>	
 				</div>
-				<div class="banner_text"><?php echo $banner_text;?></div>	
 				
  <div id="top_menu"> 
 
@@ -177,7 +176,7 @@ if(isset($report_title)){
  	<a href="<?php  echo site_url('home_controller');?>" class="top_menu_link  first_link <?php
 	if ($current == "home_controller") {echo " top_menu_active ";
 	}
-?>"><i class="icon-home"></i>Home </a><?php }?>
+?>"><i class="icon-home"></i>HOME </a><?php }?>
 <?php
 if($menus){
 foreach($menus as $menu){?>
@@ -202,7 +201,7 @@ if($menus){
 	?>
 
 <div  class="btn-group" id="div_profile" >
-	<a href="#" class="top_menu_link btn dropdown-toggle" data-toggle="dropdown"  id="my_profile"><i class="icon-user icon-black"></i> Profile  <span class="caret"></span></a>
+	<a href="#" class="top_menu_link btn dropdown-toggle" data-toggle="dropdown"  id="my_profile"><i class="icon-user icon-black"></i> PROFILE  <span class="caret"></span></a>
 	<ul class="dropdown-menu" id="profile_list" role="menu">
 		<li><a href="#edit_user_profile" data-toggle="modal"><i class="icon-edit"></i> Edit Profile</a></li>
 		<li id="change_password_link"><a href="#user_change_pass" data-toggle="modal"><i class=" icon-asterisk"></i> Change Password</a></li>
@@ -256,8 +255,7 @@ if(isset($reports)|| isset($report_title)){
 			    if($user_is_pharmacist){
 				?>
 				<li><a href="<?php echo base_url().'picking_list_management/assign_orders' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			
-			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			
-                <li class="divider"></li>
+			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			 
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
 				
 				
@@ -266,8 +264,7 @@ if(isset($reports)|| isset($report_title)){
 
 				if($user_is_facility_administrator){
 				?>
-				<li><a href="<?php echo base_url().'picking_list_management/assign_orders' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			
-                <li class="divider"></li>
+				<li><a href="<?php echo base_url().'picking_list_management/assign_orders' ?>"><i class="icon-plus"></i>Add Picking List</a></li>			       
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
 				
 				<?php

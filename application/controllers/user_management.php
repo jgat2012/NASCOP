@@ -174,7 +174,7 @@ class User_Management extends MY_Controller {
 				echo json_encode($response);
 			} else {
 				$this -> session -> set_userdata("changed_password", "Your Password Has Been Changed");
-				delete_cookie("actual_page");
+				delete_cookie("nascop_actual_page");
 				redirect("user_management/login");
 			}
 		}
@@ -339,7 +339,7 @@ class User_Management extends MY_Controller {
 
 	private function _submit_validate() {
 		// validation rules
-		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|min_length[6]|max_length[30]');
+		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|min_length[4]|max_length[30]');
 
 		$this -> form_validation -> set_rules('password', 'Password', 'trim|required|min_length[6]|max_length[30]');
 
@@ -456,7 +456,7 @@ class User_Management extends MY_Controller {
 		$this -> db -> update("access_log", array('access_type' =>"Logout",'end_time'=>date("Y-m-d H:i:s")));
 		$this -> session -> sess_destroy();
 		if ($param == "2") {
-			delete_cookie("actual_page");
+			delete_cookie("nascop_actual_page");
 		}
 		redirect("system_management");
 	}
@@ -641,7 +641,7 @@ class User_Management extends MY_Controller {
 			}
 			//ob_end_flush();
 			$data['reset'] = true;
-			delete_cookie("actual_page");
+			delete_cookie("nascop_actual_page");
 			$data['title'] = "webADT | System Login";
 			$this -> load -> view("login_v", $data);
 
@@ -700,7 +700,7 @@ class User_Management extends MY_Controller {
 			$this -> session -> set_userdata("message_user_update_success", $message_success);
 
 		}
-		$previous_url = $this -> input -> cookie('actual_page', true);
+		$previous_url = $this -> input -> cookie('nascop_actual_page', true);
 		redirect($previous_url);
 
 	}
