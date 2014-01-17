@@ -1,9 +1,10 @@
 <?php
 
-class  MY_Controller  extends  CI_Controller  {
+class  MY_Controller  extends  CI_Controller {
 
-    function __construct()
-    {
-        parent::__construct(); 
-    }
-    } 
+	function __construct() {
+		parent::__construct();
+		date_default_timezone_set('Africa/Nairobi');
+	}
+
+}

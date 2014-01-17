@@ -9,8 +9,7 @@
 		  		 <li class="active" id="actual_page"><?php echo $page_title;?> </li>
 		  		<?php
 		  	}
-		  	?>
-		 
+		  	?>	 
 		</ul>
 	</div>
 	<div>
