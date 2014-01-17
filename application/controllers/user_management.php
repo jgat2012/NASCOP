@@ -95,7 +95,8 @@ class User_Management extends MY_Controller {
 			$this -> table -> add_row($user['id'], $user['Name'], $user['Username'], $user['Email_Address'], $user['Phone_Number'], $level_access, $user['Creator'], $links);
 		}
 
-		$data['users'] = $this -> table -> generate(); ;
+		$data['users'] = $this -> table -> generate();
+		;
 		$data['user_types'] = $user_types;
 		$data['facilities'] = $facilities;
 		$data['title'] = "System Users";
@@ -310,16 +311,16 @@ class User_Management extends MY_Controller {
 				//looks good. Continue!
 				else {
 					$facility_details = Facilities::getCurrentFacility($logged_in -> Facility_Code);
-					$session_data = array('user_id' => $logged_in -> id, 'user_indicator' => $logged_in -> Access -> Indicator, 'facility_name' => $logged_in -> Facility -> name, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'Email_Address' => $logged_in -> Email_Address, 'Phone_Number' => $logged_in -> Phone_Number, 'facility' => $logged_in -> Facility_Code, 'facility_id' => $facility_details[0]['id'], 'county' => $facility_details[0]['county']);
+					$session_data = array('user_id' => $logged_in -> id, 'image_link' => $logged_in -> Image_Link, 'user_indicator' => $logged_in -> Access -> Indicator, 'facility_name' => $logged_in -> Facility -> name, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'Email_Address' => $logged_in -> Email_Address, 'Phone_Number' => $logged_in -> Phone_Number, 'facility' => $logged_in -> Facility_Code, 'facility_id' => $facility_details[0]['id'], 'county' => $facility_details[0]['county']);
 					$this -> session -> set_userdata($session_data);
-					$user=$this -> session -> userdata('user_id');
-					$sql="update access_log set access_type='Logout' where user_id='$user'";
-					$this->db->query($sql);
+					$user = $this -> session -> userdata('user_id');
+					$sql = "update access_log set access_type='Logout' where user_id='$user'";
+					$this -> db -> query($sql);
 					$new_access_log = new Access_Log();
 					$new_access_log -> machine_code = implode(",", $session_data);
 					$new_access_log -> user_id = $this -> session -> userdata('user_id');
 					$new_access_log -> access_level = $this -> session -> userdata('access_level');
-					$new_access_log -> start_time =date("Y-m-d H:i:s");
+					$new_access_log -> start_time = date("Y-m-d H:i:s");
 					$new_access_log -> facility_code = $this -> session -> userdata('facility');
 					$new_access_log -> access_type = "Login";
 					$new_access_log -> save();
@@ -453,7 +454,7 @@ class User_Management extends MY_Controller {
 		$machine_code = $this -> session -> userdata("machine_code_id");
 		$last_id = Access_Log::getLastUser($this -> session -> userdata('user_id'));
 		$this -> db -> where('id', $last_id);
-		$this -> db -> update("access_log", array('access_type' =>"Logout",'end_time'=>date("Y-m-d H:i:s")));
+		$this -> db -> update("access_log", array('access_type' => "Logout", 'end_time' => date("Y-m-d H:i:s")));
 		$this -> session -> sess_destroy();
 		if ($param == "2") {
 			delete_cookie("nascop_actual_page");
@@ -652,6 +653,34 @@ class User_Management extends MY_Controller {
 		$data['title'] = 'webADT | User Profile';
 		$data['banner_text'] = 'My Profile';
 		$data['content_view'] = 'user_profile_v';
+		$this -> base_params($data);
+	}
+
+	public function save_signature() {
+		$config['upload_path'] = './assets/img';
+		$config['allowed_types'] = 'gif|jpg|png';
+		$config['max_size'] = '100';
+		$config['max_width'] = '1024';
+		$config['max_height'] = '768';
+		$this -> load -> library('upload', $config);
+		if (!$this -> upload -> do_upload()) {
+			$this -> session -> set_flashdata('sign_message', "Signature Upload Failed");
+		} else {
+			$data = array('upload_data' => $this -> upload -> data());
+			$image_link = $data['upload_data']['file_name'];
+			$user_id = $this -> session -> userdata("user_id");
+			$sql = "UPDATE users u SET image_link='$image_link' WHERE id='$user_id'";
+			$this -> db -> query($sql);
+			$this -> session -> set_flashdata('sign_message', "Signature Uploaded Successfully");
+		}
+		redirect("user_management/update_signature");
+	}
+
+	public function update_signature() {
+		$data['title'] = 'webADT | Update Signature';
+		$data['banner_text'] = 'Update Signature';
+		$data['content_view'] = 'signature_v';
+		$data['page_title'] = 'Update Signature';
 		$this -> base_params($data);
 	}
 

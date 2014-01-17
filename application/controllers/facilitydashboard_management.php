@@ -45,12 +45,12 @@ class Facilitydashboard_Management extends MY_Controller {
 		if ($access_level == "nascop_administrator") {
 			$dyn_table .= $this -> inactive_users();
 		}
-
+		$dyn_table = "<li>No Data Available</li>";
 		echo $dyn_table;
 	}
 
 	public function inactive_users() {
-		$facility_code ="NASCOP";
+		$facility_code = "NASCOP";
 		$sql = "select count(*) as total from users where Facility_Code='$facility_code' and Active='0' and access_level='2'";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
@@ -65,10 +65,5 @@ class Facilitydashboard_Management extends MY_Controller {
 		$temp = "<li class='divider'></li><li><a href='$order_link'><i class='icon-th'></i>Deactivated Users <div class='badge badge-important'>$total</div></a></li>";
 		return $temp;
 	}
-
-
-
-
-
 
 }

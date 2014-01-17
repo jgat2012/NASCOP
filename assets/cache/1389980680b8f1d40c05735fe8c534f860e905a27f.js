@@ -14597,6 +14597,15 @@ $(document).ready(function() {
 
 	}
 
+
+	$(".delete").click(function() {
+		var check = confirm("Are you sure?");
+		if(check) {
+			return true;
+		} else {
+			return false;
+		}
+	});
 	var base_url = $("#base_url").val();
 	$('.dataTables').dataTable({
 		"bJQueryUI" : true,
@@ -15325,7 +15334,6 @@ $(document).ready(function() {
 /*
  *Reports JS End
  */
-
 /* jshint forin:true, noarg:true, noempty:true, eqeqeq:true, boss:true, undef:true, curly:true, browser:true, jquery:true */
 /*
  * jQuery MultiSelect UI Widget 1.14pre

@@ -18,6 +18,15 @@ $(document).ready(function() {
 
 	}
 
+
+	$(".delete").click(function() {
+		var check = confirm("Are you sure?");
+		if(check) {
+			return true;
+		} else {
+			return false;
+		}
+	});
 	var base_url = $("#base_url").val();
 	$('.dataTables').dataTable({
 		"bJQueryUI" : true,

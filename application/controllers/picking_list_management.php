@@ -11,7 +11,7 @@ class Picking_List_Management extends MY_Controller {
 	}
 
 	public function submitted_lists($status = 0, $offset = 0) {
-		$data['page_title']="Open Picking Lists";
+		$data['page_title'] = "Open Picking Lists";
 		$items_per_page = 20;
 		$number_of_lists = Picking_List_Details::getTotalNumber($status);
 		$lists = Picking_List_Details::getPagedLists($offset, $items_per_page, $status);
@@ -28,7 +28,7 @@ class Picking_List_Management extends MY_Controller {
 		$data['quick_link'] = $status;
 		$data['content_view'] = "view_lists_v";
 		if ($status == 1) {
-			$data['page_title']="Closed Picking Lists";
+			$data['page_title'] = "Closed Picking Lists";
 			$data['content_view'] = "view_closed_lists_v";
 		}
 		$data['banner_text'] = "Picking Lists";
@@ -39,7 +39,7 @@ class Picking_List_Management extends MY_Controller {
 	public function view_orders($list) {
 		//First retrieve the order and its particulars from the database
 		$data = array();
-		$data['page_title']='Picking List Details';
+		$data['page_title'] = 'Picking List Details';
 		$data['list'] = Picking_List_Details::getList($list);
 		$data['content_view'] = "view_list_details_v";
 		$data['banner_text'] = "Picking List Details";
@@ -56,7 +56,7 @@ class Picking_List_Management extends MY_Controller {
 		$orders = $list -> Order_Objects;
 		foreach ($orders as $order) {
 			$order -> Status = "3";
-			$order -> Is_Uploaded =0;
+			$order -> Is_Uploaded = 0;
 			$order -> save();
 		}
 		redirect("picking_list_management/submitted_lists/1");
@@ -78,9 +78,9 @@ class Picking_List_Management extends MY_Controller {
 	public function save_list() {
 		$current_user = $this -> session -> userdata('user_id');
 		$orders = $this -> input -> post("orders");
-		$pipeline_name=$this -> input -> post("pipeline_name");
+		$pipeline_name = $this -> input -> post("pipeline_name");
 		$picking_list_name = $this -> input -> post("picking_list_name");
-		$picking_list_name=trim($picking_list_name);
+		$picking_list_name = trim($picking_list_name);
 		$selected_picking_list = $this -> input -> post("selected_picking_list");
 		//First check if a name has been given to a new picking list. If so, save it first
 		if (strlen($picking_list_name) > 0) {
@@ -97,7 +97,8 @@ class Picking_List_Management extends MY_Controller {
 		foreach ($orders as $order) {
 			//Retrieve the order from the database and update it's picking list details
 			$order_details = Facility_Order::getOrder($order);
-			$order_details -> Picking_List_Id = $selected_picking_list; ;
+			$order_details -> Picking_List_Id = $selected_picking_list;
+			;
 			$order_details -> save();
 		}
 		redirect("picking_list_management");
@@ -105,13 +106,13 @@ class Picking_List_Management extends MY_Controller {
 
 	public function assign_orders() {
 		$data = array();
-		if($this -> input -> post("order")!=''){
+		if ($this -> input -> post("order") != '') {
 			$data['orders'] = $this -> input -> post("order");
-		}else{
-			$data['orders']='';
+		} else {
+			$data['orders'] = '';
 		}
-		
-		$data['page_title']='Assign Picking List';
+
+		$data['page_title'] = 'Assign Picking List';
 		$data['banner_text'] = "Assign Picking List";
 		$data['picking_lists'] = Picking_List_Details::getAllOpen();
 		$data['pipelines'] = Suppliers::getAll();
@@ -120,7 +121,7 @@ class Picking_List_Management extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$data['_type']='picking';
+		$data['_type'] = 'picking';
 		$data['title'] = "Warehouse Picking Lists";
 		$data['link'] = "order_management";
 		$this -> load -> view('template', $data);
@@ -155,7 +156,7 @@ class Picking_List_Management extends MY_Controller {
 			";
 		foreach ($orders as $order) {
 			$data .= '
-			<h5 style="text-align: left">'.$order->Facility_Object->name.' number '.$order->id.'</h5>
+			<h5 style="text-align: left">' . $order -> Facility_Object -> name . ' number ' . $order -> id . '</h5>
 		<table class="data-table">	
 <thead>
 	<tr>
@@ -165,19 +166,21 @@ class Picking_List_Management extends MY_Controller {
 	</tr>
 </thead>
 <tbody>';
-//Retrieve the ordered commodities
-$commodities = $order->Commodity_Objects;
-//Loop through the commodities to display their particulars
-foreach($commodities as $commodity){
-	$data .= '<tr>
-		<td>'.$commodity ->Drug_Id.'</td>
-		<td>'.$commodity ->Resupply.'</td>
+			//Retrieve the ordered commodities
+			$commodities = $order -> Commodity_Objects;
+			//Loop through the commodities to display their particulars
+			foreach ($commodities as $commodity) {
+				$data .= '<tr>
+		<td>' . $commodity -> Drug_Id . '</td>
+		<td>' . $commodity -> Resupply . '</td>
 		<td>';
-		if($commodity -> Drugcode_Object->Drug_Unit->Name == "Bottle"){$data .= 'Bottle';} else{$data .= 'Packs';}
-		$data .= '</td>
+				if ($commodity -> Drugcode_Object -> Drug_Unit -> Name == "Bottle") {$data .= 'Bottle';
+				} else {$data .= 'Packs';
+				}
+				$data .= '</td>
 	</tr>';
-	 } 
-	$data .= '</tbody>
+			}
+			$data .= '</tbody>
 </table>
 ';
 		}
@@ -186,9 +189,9 @@ foreach($commodities as $commodity){
 
 	function generatePDF($data) {
 		$current_date = date("M d, Y");
-		$icon=site_url() .'Images/coat_of_arms-resized.png';
+		$icon = site_url() . 'Images/coat_of_arms-resized.png';
 		$html_title = "
-<div style='width:100px; height:100px; margin:0 auto;'><img src='".$icon."' style='width:96px; height:96px;'></img>
+<div style='width:100px; height:100px; margin:0 auto;'><img src='" . $icon . "' style='width:96px; height:96px;'></img>
 </div>
 ";
 		$html_title .= "<h3 style='text-align:center;'>MINISTRY OF HEALTH</h3>";
@@ -212,12 +215,12 @@ foreach($commodities as $commodity){
 		$html_title .= "<h4 style='text-align:left;'>CC: Warehouse manager, KEMSA</h4>";
 		$html_title .= "<h4 style='text-align:left;'>Date: $current_date</h4>";
 		$html_title .= "<h3 style='text-align:left; text-decoration: underline;'>RESUPPLY OF ARV'S</h3>";
-		//Create the footer 
+		//Create the footer
 		$current_user = $this -> session -> userdata('user_id');
 		$user_object = Users::getUserDetail($current_user);
 		//retrieve user so as to get their signature
-		$html_footer = "<div style='width:100%; position:fixed; bottom:0;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='Images/".$user_object->Signature."'></img></div>";
-		$html_footer .= "<h4 style='text-align:left;'>".$user_object->Name.", Pharmacist, NASCOP's ARV Logistics Management Unit at Kemsa"."</h4></div>";
+		$html_footer = "<div style='width:100%; position:fixed; bottom:0;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='Images/" . $user_object -> Signature . "'></img></div>";
+		$html_footer .= "<h4 style='text-align:left;'>" . $user_object -> Name . ", Pharmacist, NASCOP's ARV Logistics Management Unit at Kemsa" . "</h4></div>";
 		//echo $html_footer;
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');
@@ -234,9 +237,9 @@ foreach($commodities as $commodity){
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$report_name = "Warehouse Picking List.pdf";
-		$html_title."\n";
-		$data."\n";
-		$this -> mpdf -> Output($report_name,'D');
+		$html_title . "\n";
+		$data . "\n";
+		$this -> mpdf -> Output($report_name, 'D');
 	}
 
 }

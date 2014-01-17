@@ -40,7 +40,7 @@ class Pharmacist_Management extends MY_Controller {
 		$chart_title = "Top Commodity Orders";
 		$yaxis = "Packs";
 		$container="chart_expiry";
-		$this -> loadChart($columns, $total_series, $chart_title, $yaxis,$container);
+		//$this -> loadChart($columns, $total_series, $chart_title, $yaxis,$container);
 	}
 
 	public function getFacilitiesUsing($start_date = "", $end_date = "") {
@@ -63,7 +63,7 @@ class Pharmacist_Management extends MY_Controller {
 		}
 		$dyn_table .= "</tbody>";
 		$dyn_table .= "</table>";
-		echo $dyn_table;
+		//echo $dyn_table;
 	}
 
 	public function getPickingList($start_date = "", $end_date = "") {
@@ -71,7 +71,7 @@ class Pharmacist_Management extends MY_Controller {
 		 *Get all Picking Lists made in selected period
 		 *Group by Pipeline and activity status
 		 */
-		$dataArray = array();
+		/*$dataArray = array();
 		$columns = array();
 		$total_series = array();
 		$series=array();
@@ -93,8 +93,8 @@ class Pharmacist_Management extends MY_Controller {
 		$total_series[] = $series;
 		$chart_title = "Pipeline Picking Lists";
 		$yaxis = "No. of Lists";
-		$container="chart_appointments";
-		$this -> loadChart($columns, $total_series, $chart_title, $yaxis,$container);
+		$container="chart_appointments";*/
+		//$this -> loadChart($columns, $total_series, $chart_title, $yaxis,$container);
 	}
 
 	public function getFacilitiesDelay($start_date = "", $end_date = "") {
@@ -125,7 +125,7 @@ class Pharmacist_Management extends MY_Controller {
 		}
 		$dyn_table .= "</tbody>";
 		$dyn_table .= "</table>";
-		echo $dyn_table;
+		//echo $dyn_table;
 	}
 
 	public function loadChart($columns, $total_series, $chart_title, $yaxis,$container) {

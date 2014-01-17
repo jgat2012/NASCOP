@@ -13,6 +13,7 @@ class Users extends Doctrine_Record {
 		$this -> hasColumn('Email_Address', 'varchar', 50);
 		$this -> hasColumn('Active', 'varchar', 2);
 		$this -> hasColumn('Signature', 'varchar', 50);
+		$this -> hasColumn('Image_Link', 'text');
 	}
 
 	public function setUp() {
@@ -41,10 +42,10 @@ class Users extends Doctrine_Record {
 			if ($user -> Password == $user2 -> Password) {
 				return $user;
 			} else {
-				$test["attempt"]="attempt";
-				$test["user"]=$user;
+				$test["attempt"] = "attempt";
+				$test["user"] = $user;
 				return $test;
-				
+
 			}
 		} else {
 			return false;
@@ -72,58 +73,59 @@ class Users extends Doctrine_Record {
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
 	}
-	
+
 	public function getSpecific($user_id) {
-		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b')->where("u.id='$user_id'");
+		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b') -> where("u.id='$user_id'");
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
 	}
-	
+
 	public function getThem() {
-		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b')->where('a.Level_Name !="Pharmacist"');
+		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b') -> where('a.Level_Name !="Pharmacist"');
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
 	}
-	
+
 	public function getInactive($facility_code) {
-		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b')->where('a.Level_Name !="Pharmacist" and Facility_Code="'.$facility_code.'" and Active="0"');
+		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b') -> where('a.Level_Name !="Pharmacist" and Facility_Code="' . $facility_code . '" and Active="0"');
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
 	}
-	
+
 	public function getOnline($facility_code) {
-		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b')->where('a.Level_Name !="Pharmacist" and Facility_Code="'.$facility_code.'" and Active="0"');
+		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b') -> where('a.Level_Name !="Pharmacist" and Facility_Code="' . $facility_code . '" and Active="0"');
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
 	}
-	
 
 	public static function getUser($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("id = '$id'");
 		$user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $user[0];
 	}
+
 	public static function getUserAdmin($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("id = '$id'");
 		$user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $user;
 	}
-	
+
 	public static function getUserDetail($id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("id = '$id'");
 		$user = $query -> execute();
-		return $user;
+		return $user[0];
 	}
-	
+
 	public static function getUserID($username) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Users") ->where("Username = '" . $username . "' or Email_Address='" . $username . "' or Phone_Number='" . $username . "'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("Username = '" . $username . "' or Email_Address='" . $username . "' or Phone_Number='" . $username . "'");
 		$user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $user[0]['id'];
 	}
-	
-	public function getUsersFacility($q='1') {
-		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b')->where($q);
+
+	public function getUsersFacility($q = '1') {
+		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b') -> where($q);
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
 	}
+
 }

@@ -1244,6 +1244,9 @@ input[readonly] {
 a {
 	text-decoration: none;
 }
+a:hover{
+	text-decoration: none;
+}
 .enable_user {
 	color: green;
 	font-weight: bold;
