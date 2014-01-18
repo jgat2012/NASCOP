@@ -13,4 +13,14 @@ class Sync extends MY_Controller {
 		echo json_encode($user);
 	}
 
+	public function drugs() {
+		$user = Sync_Drug::getAll();
+		echo json_encode($user);
+	}
+
+	public function facilities() {
+		$user = Sync_Facility::getAll();
+		echo json_encode($user);
+	}
+
 }
