@@ -451,7 +451,7 @@ class Order extends MY_Controller {
 			$order_maps = array();
 			foreach ($main_array as $table => $main) {
 				foreach ($main as $original_id => $contents) {
-					if ($table == "cdrr") {
+					if ($table == "cdrr" || $table == "maps") {
 						$new_id = $this -> check_original($table, $original_id);
 						if ($new_id == null) {
 							$this -> db -> insert($table, $contents);
@@ -465,20 +465,41 @@ class Order extends MY_Controller {
 							$this -> db -> where('id', $new_id);
 							$this -> db -> update($table, $contents);
 						}
-					} else {
-						$contents['cdrr_id'] = $this -> check_id($contents['cdrr_id']);
-						$new_id = $this -> check_original($table, $original_id);
-						if ($new_id == null) {
-							$this -> db -> insert($table, $contents);
-							$new_id = $this -> db -> insert_id();
-							$order_maps['type'] = $table;
-							$order_maps['old_id'] = $original_id;
-							$order_maps['new_id'] = $new_id;
-							$this -> db -> insert("order_maps", $order_maps);
-						} else {
-							$this -> db -> where('id', $new_id);
-							$this -> db -> update($table, $contents);
+					} 
+					
+					else {
+						$check = substr($table,0,4);//Check if table is in relation with maps or cdrr table
+						if($check=='cdrr'){
+							$contents['cdrr_id'] = $this -> check_id($contents['cdrr_id']);
+							$new_id = $this -> check_original($table, $original_id);
+							if ($new_id == null) {
+								$this -> db -> insert($table, $contents);
+								$new_id = $this -> db -> insert_id();
+								$order_maps['type'] = $table;
+								$order_maps['old_id'] = $original_id;
+								$order_maps['new_id'] = $new_id;
+								$this -> db -> insert("order_maps", $order_maps);
+							} else {
+								$this -> db -> where('id', $new_id);
+								$this -> db -> update($table, $contents);
+							}
 						}
+						else if($check=='maps'){
+							$contents['maps_id'] = $this -> check_id($contents['maps_id'],'maps');
+							$new_id = $this -> check_original($table, $original_id);
+							if ($new_id == null) {
+								$this -> db -> insert($table, $contents);
+								$new_id = $this -> db -> insert_id();
+								$order_maps['type'] = $table;
+								$order_maps['old_id'] = $original_id;
+								$order_maps['new_id'] = $new_id;
+								$this -> db -> insert("order_maps", $order_maps);
+							} else {
+								$this -> db -> where('id', $new_id);
+								$this -> db -> update($table, $contents);
+							}
+						}
+						
 					}
 					unset($order_maps);
 				}
@@ -506,8 +527,8 @@ class Order extends MY_Controller {
 		return null;
 	}
 
-	public function check_id($new_id) {
-		$sql = "SELECT new_id FROM order_maps WHERE type='cdrr' AND old_id='$new_id' LIMIT 1";
+	public function check_id($new_id,$type='cdrr') {
+		$sql = "SELECT new_id FROM order_maps WHERE type='$type' AND old_id='$new_id' LIMIT 1";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		if ($results) {
