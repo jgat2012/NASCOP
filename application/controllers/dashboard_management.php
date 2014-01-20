@@ -7,11 +7,6 @@ class Dashboard_Management extends MY_Controller {
 		$data = array();
 		ini_set("max_execution_time", "10000");
 	}
-	
-	public function indexS() {
-		$this->load->view('tester_v');
-	}
-
 	public function index() {
 		$data['content_view'] = "home_v";
 		$data['hide_side_menu'] = 1;
@@ -27,9 +22,6 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function facilitySOH($year, $month, $pipeline) {
-		//$pipeline = "1";
-		//$month = "12";
-		//$year = "2011";
 		$results = Facility_Soh::getTotals($pipeline, $month, $year);
 		$facility_results = Facility_Soh::getFacilities($pipeline, $month, $year);
 		$drug_results = Facility_Soh::getDrugs($pipeline, $month, $year);
