@@ -9,6 +9,9 @@
  */
 $(document).ready(function() {
 
+	setTimeout(function() {
+		$(".message").fadeOut("2000");
+	}, 6000);
 	//Progress Bar
 	function progress(percent, $element) {
 		var progressBarWidth = percent * $element.width() / 100;

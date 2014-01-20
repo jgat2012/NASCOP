@@ -13,6 +13,40 @@
 	<h4><b><?php echo $order_array[0]['cdrr_label'] . " " . $order_array[0]['status_name'];?></b></h4>
 	<a href='<?php echo site_url("order/download_order/" . $cdrr_id);?>'><?php echo $order_array[0]['cdrr_label'] . " " . $order_array[0]['facility_name'] . " " . $order_array[0]['period_begin'] . " to " . $order_array[0]['period_end'] . ".xls";?></a>
     <p>&nbsp;</p>
+    <?php 
+    if($order_array[0]['status_name']!="dispatched"){
+    ?>
+    <a href="<?php echo site_url("order/move_order/review/" . $cdrr_id."/".$maps_id);?>" class="btn">Send back for Review</a>
+    <?php
+    if($order_array[0]['status_name']=="approved"){
+    ?>
+    <a href="<?php echo site_url("order/move_order/received/" . $cdrr_id."/".$maps_id);?>" class="btn">Received</a>
+    <?php
+	} else if($order_array[0]['status_name']=="received"){
+    ?>
+    <a href="<?php echo site_url("order/move_order/rationalized/" . $cdrr_id."/".$maps_id);?>" class="btn">Rationalized</a>
+     <?php
+	} else if($order_array[0]['status_name']=="rationalized"){
+    ?>
+    <a href="<?php echo site_url("order/move_order/packed/" . $cdrr_id."/".$maps_id);?>" class="delivery btn">Delivery Note Entered</a>
+     <?php
+	} else if($order_array[0]['status_name']=="packed"){
+    ?>
+    <a href="<?php echo site_url("order/move_order/dispatched/" . $cdrr_id."/".$maps_id);?>" class="btn">Dispatched</a>
+    <?php
+	}}
+    ?>
+    <p></p>
+    	<?php 
+	if($this->session->flashdata('order_delete')){
+		
+		echo '<p class="message error">'.$this->session->flashdata('order_delete').'</p>';
+	}
+	else if ($this->session->flashdata('order_message')){
+		echo '<p class="message info">'.$this->session->flashdata('order_message').'</p>';
+	}	
+	?>
+	
 		<table  cellpadding="4" border="1" width="100%" style="border:1px solid #DDD;font-size:15px;">
 			<tbody>
 				<tr>
@@ -29,7 +63,7 @@
 				<tr>
 					<td><b>Type of Service provided at the Facility: &nbsp; </b><?php echo $order_array[0]['services'];?></td>
 					<td><b>Non-ARV: &nbsp;</b>
-					<input type="checkbox" name="non_arv" />
+					<input type="checkbox" name="non_arv" id="non_arv" value="0"/>
 					</td>
 				</tr>
 				<tr>
@@ -73,14 +107,30 @@
 			?>
 		<tbody>
 			<?php 
-				$counter = 0;
+				    $counter =-1;
+					$count_one=0;
+					$count_two=0;
+					$count_three=0;
 					foreach($commodities as $commodity){
 				         if($commodity -> Drug !=NULL){
 				         	$counter++;
 			                   if($counter ==10){
 			                   echo $header_text;
 			                   $counter = 0;
-			             }
+			                   }
+							    if($commodity->Category==1 && $count_one==0){
+						  	  echo '<tr><td colspan="7" style="text-align:center;background:#999;">Adult Preparations</td></tr>';
+							  $count_one++;
+						  }	   
+						  if($commodity->Category==2 && $count_two==0){
+						  	  echo '<tr><td colspan="7" style="text-align:center;background:#999;">Pediatric Preparations</td></tr>';
+							  $count_two++;
+						  }
+                          if($commodity->Category==3 && $count_three==0){
+						  	  echo '<tr><td colspan="7" style="text-align:center;background:#999;">Drugs for OIs</td></tr>';
+							  $count_three++;
+						  }
+						 
 			?>
 			<tr class="ordered_drugs" drug_id="<?php echo $commodity -> id;?>">
 						<td class="col_drug" style="font-size:15px;"><?php echo strtoupper($commodity -> Drug);?>
@@ -139,6 +189,29 @@
 			}
 			?>
 	</table>
+	<div>
+			<table style="width:100%;" class="table ">
+		    	<tr ><td colspan="4"  maxlength="255">
+		    		<b>Delivery Note</b>
+		            <input type='text' name='delivery_note' id='delivery_note' style='width:100%;' value='<?php echo @$order_array[0]['delivery_note']; ?>'/>
+		    	</td></tr>
+		    	<?php foreach($logs as $log){?>
+				<tr>
+					<td><b>Report <?php echo $log->description;?> by:</b> </td>
+					<td><?php echo $log->user->Name; ?></td>
+					<td><b>Designation:</b></td>
+					<td><?php echo $log->user->Access->Level_Name; ?></td>
+				</tr>
+				<tr>
+					<td><b>Contact Telephone:</b></td>
+					<td><?php echo $log->user->Phone_Number; ?></td>
+					<td><b>Date:</b></td>
+					<td><?php echo $log->created; ?></td>
+				</tr>
+				<?php }?>
+			</table>
+	</div>
+	
 </div>
 <style>
 	.facility_info {
@@ -182,12 +255,25 @@
 				$research.find("tr").eq(0).show();
 				$('#accordion_collapse').val("+");
 			}
-
 	  });
+	  
+	     $(".delivery").click(function(){
+         	  var del_value=$("#delivery_note").val();
+         	  if(del_value==""){
+         	  	alert("Delivery Note is Blank");
+         	  	return false;
+         	  }
+         });
 	  
 	  <?php
 		if (!empty($order_array)) {
 		  foreach($order_array as $cdrr){
+		  	if($cdrr['non_arv']==1){
+	    ?>
+	    $("#non_arv").val("<?php echo $cdrr['non_arv']; ?>");
+	    $("#non_arv").attr("checked",true);
+	    <?php
+			}
 	    ?>
 		  $("#opening_balance_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['balance']; ?>");
 		  $("#received_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['received']; ?>");
@@ -200,6 +286,6 @@
 		}
 	   ?>
 	   $("input").attr("readonly","readonly");
-	   $(".resupply").attr("readonly",false); 	
+	   //$(".resupply").attr("readonly",false); 	
 });
 </script>

@@ -123,13 +123,13 @@ class Facilities extends Doctrine_Record {
 	}
 
 	public function getMainSupplier($facility_code) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Facilities f")-> leftJoin('f.supplier s') -> where("facilitycode = '$facility_code'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Facilities f") -> leftJoin('f.supplier s') -> where("facilitycode = '$facility_code'");
 		$facility = $query -> execute();
 		return $facility[0];
 	}
-	
-	public function getType($facility_code){
-		$query = Doctrine_Query::create() -> select("count(*) as total") -> from("Facilities")-> where("parent = '$facility_code'");
+
+	public function getType($facility_code) {
+		$query = Doctrine_Query::create() -> select("count(*) as total") -> from("Facilities") -> where("parent = '$facility_code'");
 		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $facility[0]['total'];
 	}

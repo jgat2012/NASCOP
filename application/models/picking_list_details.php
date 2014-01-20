@@ -40,7 +40,7 @@ class Picking_List_Details extends Doctrine_Record {
 	}
 
 	public function getListGroup($period_start, $period_end) {
-		$query = Doctrine_Query::create() -> select("count(*) as total,Status,Pipeline") -> from("Picking_List_Details") -> where("Timestamp between '$period_start' and '$period_end'") -> groupBy("Status, Pipeline");
+		$query = Doctrine_Query::create() -> select("count(*) as total,Status") -> from("Picking_List_Details") -> where("Timestamp between '$period_start' and '$period_end'") -> groupBy("Status");
 		$list_object = $query -> execute();
 		return $list_object;
 	}

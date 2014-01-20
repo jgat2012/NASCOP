@@ -46,6 +46,7 @@ class Picking_List extends MY_Controller {
 				WHERE p.id='$list_id'";
 		$query = $this -> db -> query($sql);
 		$this -> session -> set_flashdata('list_message', "List Closed Successfully");
+		$this -> session -> set_userdata("order_go_back", "fmaps");
 		redirect("picking_list");
 	}
 
@@ -59,12 +60,11 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function get_commodities($cdrr_id) {
-		$sql = "SELECT d.id,UPPER(d.drug) as drug,ci.resupply,du.Name as drug_unit 
-		        FROM cdrr_item ci
-		        LEFT JOIN drugcode d ON d.id=ci.drug_id
-		        LEFT JOIN drug_unit du ON du.id=d.unit
-		        WHERE ci.cdrr_id='$cdrr_id' 
-		        GROUP BY ci.drug_id";
+		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,ci.resupply
+			        FROM cdrr_item ci
+			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
+			        WHERE ci.cdrr_id='$cdrr_id'
+			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')";
 		//include resupply >0
 		$query = $this -> db -> query($sql);
 		$results = $query -> result();
@@ -92,14 +92,16 @@ class Picking_List extends MY_Controller {
 
 	public function get_orders() {
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
-		$sql = "SELECT c.id,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,s.name as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+		$sql = "SELECT c.id,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
 				FROM cdrr c
-				LEFT JOIN order_status s ON s.id=c.status
-				LEFT JOIN facilities f ON f.facilitycode=c.facility_id
+				LEFT JOIN facilities f ON f.id=c.facility_id
+				LEFT JOIN maps m ON f.id=m.facility_id
 				WHERE c.code='0'
-				AND s.name LIKE '%approved%'
+				AND m.code=c.code
+				AND m.period_begin=c.period_begin
+				AND m.period_end=c.period_end
+				AND c.status='dispatched'
 				AND c.order_id='0'";
-		//change to rationalized
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		$links = array("order/view_order" => "checkbox");
@@ -110,7 +112,7 @@ class Picking_List extends MY_Controller {
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Facility Name', 'Options');
 		$sql = "SELECT c.id,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
 				FROM cdrr c
-				LEFT JOIN facilities f ON f.facilitycode=c.facility_id
+				LEFT JOIN facilities f ON f.id=c.facility_id
 				WHERE c.order_id='$list_id'
 				GROUP BY c.id";
 		$query = $this -> db -> query($sql);
@@ -190,7 +192,7 @@ class Picking_List extends MY_Controller {
 
 		$sql = "SELECT c.id,f.name as facility_name,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id
 		        FROM cdrr c
-		        LEFT JOIN facilities f ON f.facilitycode=c.facility_id
+		        LEFT JOIN facilities f ON f.id=c.facility_id
 		        LEFT JOIN picking_list_details p ON p.id=c.order_id
 		        WHERE p.id='$list_id'";
 		$query = $this -> db -> query($sql);
@@ -291,12 +293,11 @@ class Picking_List extends MY_Controller {
 
 	public function view_commodities($cdrr_id) {
 		$columns = array('#', 'Commodity', 'Quantity for Resupply', 'Packs/Bottles/Tins');
-		$sql = "SELECT d.id,UPPER(d.drug) as drug,ci.resupply,du.Name as drug_unit 
-		        FROM cdrr_item ci
-		        LEFT JOIN drugcode d ON d.id=ci.drug_id
-		        LEFT JOIN drug_unit du ON du.id=d.unit
-		        WHERE ci.cdrr_id='$cdrr_id' 
-		        GROUP BY ci.drug_id";
+		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,ci.resupply
+			        FROM cdrr_item ci
+			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
+			        WHERE ci.cdrr_id='$cdrr_id'
+			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')";
 		//include resupply >0
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();

@@ -94,12 +94,12 @@ if ($user_is_pharmacist || $user_is_facility_administrator || $user_is_administr
    	<?php 
 	 if($user_is_nascop){
 	 ?>
-	    $('#notification1').load('<?php echo base_url() . 'facilitydashboard_management/order_notification';?>');
+	    $('#notification1').load('<?php echo base_url() . 'pharmacist_management/order_notification';?>');
 	<?php
 	 }
 	 if($user_is_facility_administrator){
 	 ?>
-		$('#notification1').load('<?php echo base_url() . 'facilitydashboard_management/order_notification';?>');
+		$('#notification1').load('<?php echo base_url() . 'pharmacist_management/order_notification';?>');
 	<?php
 	 }
 	 if($user_is_administrator){
@@ -183,7 +183,7 @@ foreach($menus as $menu){?>
 	<a href = "<?php echo site_url($menu['url']);?>" class="top_menu_link <?php
 	if ($current == $menu['url'] || $menu['url'] == $link) {echo " top_menu_active ";
 	}
-?>"><?php echo $menu['text']; if($menu['offline'] == "1"){?>
+?>"><?php echo strtoupper($menu['text']); if($menu['offline'] == "1"){?>
 	 <!-- Offline -->
 	 <span class=" red_"></span></a>
 	

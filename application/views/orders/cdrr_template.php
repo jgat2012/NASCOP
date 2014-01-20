@@ -62,7 +62,16 @@
 		 <?php
 		      }
 		  ?>
-		  <br/>	<?php echo $this->session->flashdata('order_message');?>
+		  <br/>	    	
+		  <?php 
+	if($this->session->flashdata('order_delete')){
+		
+		echo '<p class="message error">'.$this->session->flashdata('order_delete').'</p>';
+	}
+	else if ($this->session->flashdata('order_message')){
+		echo '<p class="message info">'.$this->session->flashdata('order_message').'</p>';
+	}	
+	?>
 		<?php
 			  }
 		?>	     
@@ -101,6 +110,7 @@
 						<td style="width:50%;"><b>Facility Name: &nbsp;</b><?php echo $facility_object -> name;?></td>
 						<td><b>Facility code: &nbsp;</b><?php echo $facility_object -> facilitycode;?>
 							<input type="hidden" name="facility_code" value="<?php echo $facility_object ->facilitycode; ?>"/>
+							<input type="hidden" name="facility_id" value="<?php echo $facility_object ->id; ?>"/>
 						</td>
 					</tr>
 					<tr>
@@ -127,7 +137,7 @@
 						echo implode(",", $type_of_service);
 						?><input type="hidden" name="type_of_service" value="<?php echo implode(",", $type_of_service); ?>"/></td>
 						<td><b>Non-ARV: &nbsp;</b>
-						<input type="checkbox" name="non_arv" />
+						<input type="checkbox" name="non_arv" id="non_arv" value="0"/>
 						</td>
 					</tr>
 					<tr>
@@ -243,9 +253,11 @@
 						<th>H</th>
 					</tr>
 			</thead>';}echo $header_text;?>
-				<tbody>
-					<?php 
-					$counter = 0;
+				<tbody>					<?php 
+					$counter =-1;
+					$count_one=0;
+					$count_two=0;
+					$count_three=0;
 					foreach($commodities as $commodity){
 				         if($commodity -> Drug !=NULL){
 				         	$counter++;
@@ -253,6 +265,33 @@
 			                   echo $header_text;
 			                   $counter = 0;
 			                   }
+						  if($hide_generate==2){
+						  if($commodity->Category==1 && $count_one==0){
+						  	  echo '<tr><td colspan="14" style="text-align:center;background:#999;">Adult Preparations</td></tr>';
+							  $count_one++;
+						  }	   
+						  if($commodity->Category==2 && $count_two==0){
+						  	  echo '<tr><td colspan="14" style="text-align:center;background:#999;">Pediatric Preparations</td></tr>';
+							  $count_two++;
+						  }
+                          if($commodity->Category==3 && $count_three==0){
+						  	  echo '<tr><td colspan="14" style="text-align:center;background:#999;">Drugs for OIs</td></tr>';
+							  $count_three++;
+						  }
+						  }else{
+						  if($commodity->Category==1 && $count_one==0){
+						  	  echo '<tr><td colspan="13" style="text-align:center;background:#999;">Adult Preparations</td></tr>';
+							  $count_one++;
+						  }	   
+						  if($commodity->Category==2 && $count_two==0){
+						  	  echo '<tr><td colspan="13" style="text-align:center;background:#999;">Pediatric Preparations</td></tr>';
+							  $count_two++;
+						  }
+                          if($commodity->Category==3 && $count_three==0){
+						  	  echo '<tr><td colspan="13" style="text-align:center;background:#999;">Drugs for OIs</td></tr>';
+							  $count_three++;
+						  }
+						  }
 					?>
 					<tr class="ordered_drugs" drug_id="<?php echo $commodity -> id;?>">
 						<td class="col_drug"><?php echo $commodity -> Drug;?>
@@ -286,7 +325,10 @@
 						<td> <input tabindex="-1" name="expire_qty[]" id="expire_qty_<?php echo $commodity -> id;?>" type="text" class="expire_qty"/></td>
 						<td> <input tabindex="-1" name="expire_period[]" id="expire_period_<?php echo $commodity -> id;?>" type="text" class="expire_period"/></td>	
 						<td> <input tabindex="-1" name="out_of_stock[]" id="out_of_stock_<?php echo $commodity -> id;?>" type="text" class="out_of_stock"/></td>
-						<td> <input tabindex="-1" name="resupply[]" id="resupply_<?php echo $commodity -> id;?>" type="text" class="resupply"/></td>	
+						<td> 
+							<input tabindex="-1" name="old_resupply[]" id="old_resupply_<?php echo $commodity -> id;?>" type="hidden" class="resupply"/>
+							<input tabindex="-1" name="resupply[]" id="resupply_<?php echo $commodity -> id;?>" type="text" class="resupply"/>
+						</td>	
 						<input type="hidden" name="commodity[]" value="<?php echo $commodity -> id;?>"/>					
 					</tr>					
 					<?php 
@@ -312,21 +354,27 @@
 				</tr>
 			</table>
 			<?php 
-				 }if($options=="view"){
+				 }if($options=="view" || $options=="update"){
 		    ?>
-		    <table border="0" cellpadding="5" style="padding:10px;width:100%;" class="table-bordered ">
+		    <table style="width:100%;" class="table ">
+		    	<tr ><td colspan="4"  maxlength="255">
+		    		<b>Delivery Note</b>
+		            <input type='text' name='delivery_note' id='delivery_note' style="width:100%;"/>
+		    	</td></tr>
+		    	<?php foreach($logs as $log){?>
 				<tr>
-					<td><b>Report prepared by:</b> </td>
-					<td><?php echo $cdrr_array[0]['Name']; ?></td>
+					<td><b>Report <?php echo $log->description;?> by:</b> </td>
+					<td><?php echo $log->user->Name; ?></td>
 					<td><b>Designation:</b></td>
-					<td><?php echo $cdrr_array[0]['level_name']; ?></td>
+					<td><?php echo $log->user->Access->Level_Name; ?></td>
 				</tr>
 				<tr>
 					<td><b>Contact Telephone:</b></td>
-					<td><?php echo $cdrr_array[0]['Phone_Number']; ?></td>
+					<td><?php echo $log->user->Phone_Number; ?></td>
 					<td><b>Date:</b></td>
-					<td><?php echo $cdrr_array[0]['created']; ?></td>
+					<td><?php echo $log->created; ?></td>
 				</tr>
+				<?php }?>
 			</table>
 		    <?php		 	
 				 }
@@ -343,17 +391,6 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function(){
-		
-		$(".delete").click(function() {
-			var check = confirm("Are you sure?");
-			if(check) {
-				return true;
-			} else {
-				return false;
-			}
-		});
-		
-		
 		$("#generate").click(function() {
 			$.blockUI({ message: '<h3><img width="30" height="30" src="<?php echo asset_url().'images/loading_spin.gif' ?>" /> Generating...</h3>' }); 
             var period_start = $("#period_start").attr("value");
@@ -409,9 +446,16 @@
 		?>
 		$("#central_rate").val("<?php echo $cdrr_array[0]['reports_expected']; ?>");
 		$("#actual_report").val("<?php echo $cdrr_array[0]['reports_actual']; ?>");
+		$("#delivery_note").val("<?php echo $cdrr_array[0]['delivery_note']; ?>");
 		<?php	
 		    }
-		  foreach($cdrr_array as $cdrr){
+		foreach($cdrr_array as $cdrr){
+		  	if($cdrr['non_arv']==1){
+	    ?>
+	    $("#non_arv").val("<?php echo $cdrr['non_arv']; ?>");
+	    $("#non_arv").attr("checked",true);
+	    <?php
+			}
 	    ?>
 		  $("#comments").val("<?php echo $cdrr['comments']; ?>");
 		  $("#period_start").val("<?php echo $cdrr['period_begin']; ?>");
@@ -433,6 +477,7 @@
 		  $("#expire_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['expiry_quant']; ?>");
 		  $("#expire_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['expiry_date']; ?>");
 		  $("#out_of_stock_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['out_of_stock']; ?>");
+		  $("#old_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		<?php	
 		   }

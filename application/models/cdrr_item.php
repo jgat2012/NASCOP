@@ -11,6 +11,7 @@ class Cdrr_Item extends Doctrine_Record {
 		$this -> hasColumn('count', 'int', 11);
 		$this -> hasColumn('expiry_quant', 'int', 11);
 		$this -> hasColumn('expiry_date', 'date');
+		$this -> hasColumn('resupply', 'int', 11);
 		$this -> hasColumn('out_of_stock', 'int', 11);
 		$this -> hasColumn('aggr_consumed', 'int', 11);
 		$this -> hasColumn('aggr_on_hand', 'int', 11);
@@ -25,8 +26,8 @@ class Cdrr_Item extends Doctrine_Record {
 		$this -> hasOne('Sync_Drug as S_Drug', array('local' => 'drug_id', 'foreign' => 'id'));
 	}
 
-	public static function getOrderItems($cdrr) {
-		$query = Doctrine_Query::create() -> select("*") -> from("cdrr_item") -> where("cdrr_id = '$cdrr'");
+	public static function getOrderItems($cdrr, $limit) {
+		$query = Doctrine_Query::create() -> select("drug_id,resupply") -> from("cdrr_item") -> where("cdrr_id IN($cdrr) AND resupply>0") -> orderby("resupply desc") -> limit("$limit");
 		$items = $query -> execute();
 		return $items;
 	}
