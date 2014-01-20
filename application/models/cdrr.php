@@ -21,7 +21,7 @@ class Cdrr extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('cdrr');
-		$this -> hasOne('Sync_Facility as S_Facility', array('local' => 'facility_id', 'foreign' => 'id'));
+		$this -> hasOne('Facilities as Facility', array('local' => 'facility_id', 'foreign' => 'id'));
 	}
 
 	public function getAll() {

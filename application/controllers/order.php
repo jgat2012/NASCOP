@@ -14,11 +14,14 @@ class Order extends MY_Controller {
 
 	public function get_orders() {
 		$columns = array('#', '#CDRR-ID', '#MAPS-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
-		$sql = "SELECT c.id,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,CONCAT('D-MAPS#',100) as maps_id,c.period_begin,s.name as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+		$sql = "SELECT c.id,m.id as map,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,IF(m.code='0',CONCAT('D-MAPS#',m.id),CONCAT('F-MAPS#',m.id)) as maps_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
 				FROM cdrr c
-				LEFT JOIN order_status s ON s.id=c.status
-				LEFT JOIN facilities f ON f.facilitycode=c.facility_id
-				WHERE c.code='0'";
+				LEFT JOIN facilities f ON f.id=c.facility_id
+				LEFT JOIN maps m ON f.id=m.facility_id
+				WHERE c.code='0'
+				AND m.code=c.code
+				AND m.period_begin=c.period_begin
+				AND m.period_end=c.period_end";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		$links = array("order/view_order" => "view order");
@@ -465,11 +468,10 @@ class Order extends MY_Controller {
 							$this -> db -> where('id', $new_id);
 							$this -> db -> update($table, $contents);
 						}
-					} 
-					
-					else {
-						$check = substr($table,0,4);//Check if table is in relation with maps or cdrr table
-						if($check=='cdrr'){
+					} else {
+						$check = substr($table, 0, 4);
+						//Check if table is in relation with maps or cdrr table
+						if ($check == 'cdrr') {
 							$contents['cdrr_id'] = $this -> check_id($contents['cdrr_id']);
 							$new_id = $this -> check_original($table, $original_id);
 							if ($new_id == null) {
@@ -483,9 +485,8 @@ class Order extends MY_Controller {
 								$this -> db -> where('id', $new_id);
 								$this -> db -> update($table, $contents);
 							}
-						}
-						else if($check=='maps'){
-							$contents['maps_id'] = $this -> check_id($contents['maps_id'],'maps');
+						} else if ($check == 'maps') {
+							$contents['maps_id'] = $this -> check_id($contents['maps_id'], 'maps');
 							$new_id = $this -> check_original($table, $original_id);
 							if ($new_id == null) {
 								$this -> db -> insert($table, $contents);
@@ -499,7 +500,7 @@ class Order extends MY_Controller {
 								$this -> db -> update($table, $contents);
 							}
 						}
-						
+
 					}
 					unset($order_maps);
 				}
@@ -527,7 +528,7 @@ class Order extends MY_Controller {
 		return null;
 	}
 
-	public function check_id($new_id,$type='cdrr') {
+	public function check_id($new_id, $type = 'cdrr') {
 		$sql = "SELECT new_id FROM order_maps WHERE type='$type' AND old_id='$new_id' LIMIT 1";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
@@ -546,6 +547,7 @@ class Order extends MY_Controller {
 		foreach ($data as $mydata) {
 			if ($mydata['id']) {
 				$mydata['cdrr_id'] = "<a href='" . site_url("order/view_cdrr/" . $mydata['id']) . "'>" . $mydata['cdrr_id'] . "</a>";
+				$mydata['maps_id'] = "<a href='" . site_url("order/view_maps/" . $mydata['map']) . "'>" . $mydata['maps_id'] . "</a>";
 			}
 			//Set Up links
 			foreach ($links as $i => $link) {
@@ -558,6 +560,7 @@ class Order extends MY_Controller {
 			$mydata['Options'] = rtrim($link_values, " | ");
 			$link_values = "";
 			unset($mydata['id']);
+			unset($mydata['map']);
 			$this -> table -> add_row($mydata);
 		}
 		return $this -> table -> generate();
