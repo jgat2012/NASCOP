@@ -1,5 +1,5 @@
 <?php
-class Sync_Facility extends Doctrine_Record {
+class Escm_Facility extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('name', 'varchar', 255);
@@ -22,11 +22,11 @@ class Sync_Facility extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('sync_facility');
+		$this -> setTableName('escm_facility');
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("sync_facility");
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
 		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_facility;
 	}

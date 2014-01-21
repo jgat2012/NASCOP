@@ -18,6 +18,7 @@ class Facilities extends Doctrine_Record {
 		$this -> hasColumn('service_pmtct', 'int', 2);
 		$this -> hasColumn('service_pep', 'int', 2);
 		$this -> hasColumn('supplied_by', 'int', 2);
+		$this -> hasColumn('map', 'int', 11);
 	}
 
 	public function setUp() {

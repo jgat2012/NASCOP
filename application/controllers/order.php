@@ -22,6 +22,7 @@ class Order extends MY_Controller {
 				AND m.code=c.code
 				AND m.period_begin=c.period_begin
 				AND m.period_end=c.period_end
+				AND c.id NOT IN (SELECT cdrr_id FROM escm_orders)
 				AND c.status !='prepared' 
 				AND c.status !='review'";
 		$query = $this -> db -> query($sql);

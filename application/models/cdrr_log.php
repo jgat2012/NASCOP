@@ -22,7 +22,7 @@ class Cdrr_Log extends Doctrine_Record {
 
 	public static function getLogs($cdrr) {
 		$query = Doctrine_Query::create() -> select("*") -> from("cdrr_log") -> where("cdrr_id = '$cdrr'");
-		$cdrr_log = $query -> execute();
+		$cdrr_log = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $cdrr_log;
 	}
 

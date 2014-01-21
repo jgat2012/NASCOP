@@ -26,9 +26,15 @@ class Cdrr_Item extends Doctrine_Record {
 		$this -> hasOne('Sync_Drug as S_Drug', array('local' => 'drug_id', 'foreign' => 'id'));
 	}
 
-	public static function getOrderItems($cdrr, $limit) {
+	public function getOrderItems($cdrr, $limit) {
 		$query = Doctrine_Query::create() -> select("drug_id,resupply") -> from("cdrr_item") -> where("cdrr_id IN($cdrr) AND resupply>0") -> orderby("resupply desc") -> limit("$limit");
 		$items = $query -> execute();
+		return $items;
+	}
+
+	public function getItems($cdrr) {
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr_item") -> where("cdrr_id='$cdrr'");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
 

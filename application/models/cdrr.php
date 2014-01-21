@@ -59,9 +59,9 @@ class Cdrr extends Doctrine_Record {
 	public function getNascopPeriod($id_list) {
 		$and = "";
 		if ($id_list != "") {
-			$and = "id NOT IN($id_list)";
+			$and = "and id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("$and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='1' $and") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
@@ -69,11 +69,17 @@ class Cdrr extends Doctrine_Record {
 	public function getEscmPeriod($id_list) {
 		$and = "";
 		if ($id_list != "") {
-			$and = "id IN($id_list)";
+			$and = "and id IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("$and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='1' $and") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
+	}
+
+	public function getCdrr($cdrr_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("id='$cdrr_id'");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items[0];
 	}
 
 }
