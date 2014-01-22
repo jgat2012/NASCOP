@@ -40,5 +40,11 @@ class Maps extends Doctrine_Record {
 		$this -> hasOne('Sync_Facility as S_Facility', array('local' => 'facility_id', 'foreign' => 'id'));
 	}
 
+	public function getMap($map_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("id='$map_id'");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items[0];
+	}
+
 }
 ?>

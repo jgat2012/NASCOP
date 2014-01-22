@@ -25,5 +25,11 @@ class Maps_Item extends Doctrine_Record {
 		return $items[0];
 	}
 
+	public function getItems($map_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("maps_item") -> where("maps_id='$map_id'");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
+
 }
 ?>

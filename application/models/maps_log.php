@@ -26,5 +26,11 @@ class Maps_Log extends Doctrine_Record {
 		return $map_log;
 	}
 
+	public static function getLogs($map_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("maps_log") -> where("maps_id = '$map_id'");
+		$map_log = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $map_log;
+	}
+
 }
 ?>
