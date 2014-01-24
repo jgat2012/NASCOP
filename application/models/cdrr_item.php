@@ -2,52 +2,41 @@
 class Cdrr_Item extends Doctrine_Record {
 
 	public function setTableDefinition() {
-		$this -> hasColumn('Balance', 'varchar', 10);
-		$this -> hasColumn('Received', 'varchar', 10);
-		$this -> hasColumn('Dispensed_Units', 'varchar', 10);
-		$this -> hasColumn('Dispensed_Packs', 'varchar', 10);
-		$this -> hasColumn('Losses', 'varchar', 10);
-		$this -> hasColumn('Adjustments', 'varchar', 10);
-		$this -> hasColumn('Count', 'varchar', 10);
-		$this -> hasColumn('Resupply', 'varchar', 10);
-		$this -> hasColumn('Newresupply', 'varchar', 10);
-		$this -> hasColumn('Aggr_Consumed', 'varchar', 10);
-		$this -> hasColumn('Aggr_On_Hand', 'varchar', 10);
-		$this -> hasColumn('Publish', 'varchar', 10);
-		//The cdrr id is a foreign key from the facility order table
-		$this -> hasColumn('Cdrr_Id', 'varchar', '150');
-		$this -> hasColumn('Drug_Id', 'varchar', 10);
-		$this -> hasColumn('Unique_Id', 'varchar', '150');
-	}//end setTableDefinition
+		$this -> hasColumn('balance', 'int', 11);
+		$this -> hasColumn('received', 'int', 11);
+		$this -> hasColumn('dispensed_units', 'int', 11);
+		$this -> hasColumn('dispensed_packs', 'int', 11);
+		$this -> hasColumn('losses', 'int', 11);
+		$this -> hasColumn('adjustments', 'int', 11);
+		$this -> hasColumn('count', 'int', 11);
+		$this -> hasColumn('expiry_quant', 'int', 11);
+		$this -> hasColumn('expiry_date', 'date');
+		$this -> hasColumn('resupply', 'int', 11);
+		$this -> hasColumn('out_of_stock', 'int', 11);
+		$this -> hasColumn('aggr_consumed', 'int', 11);
+		$this -> hasColumn('aggr_on_hand', 'int', 11);
+		$this -> hasColumn('publish', 'tinyint', 1);
+		$this -> hasColumn('cdrr_id', 'int', 11);
+		$this -> hasColumn('drug_id', 'int', 11);
+	}
 
 	public function setUp() {
 		$this -> setTableName('cdrr_item');
-		$this -> hasOne('Drugcode as Drugcode_Object', array('local' => 'Drug_Id', 'foreign' => 'id'));
-	}//end setUp
+		$this -> hasOne('Cdrr as Cdrr', array('local' => 'cdrr_id', 'foreign' => 'id'));
+		$this -> hasOne('Sync_Drug as S_Drug', array('local' => 'drug_id', 'foreign' => 'id'));
+	}
 
-	public static function getOrderItems($order) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Cdrr_Item") -> where("Cdrr_Id = '$order'");
+	public function getOrderItems($cdrr, $limit) {
+		$query = Doctrine_Query::create() -> select("drug_id,resupply") -> from("cdrr_item") -> where("cdrr_id IN($cdrr) AND resupply>0") -> orderby("resupply desc") -> limit("$limit");
 		$items = $query -> execute();
 		return $items;
 	}
 
-	public static function getItem($item) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Cdrr_Item") -> where("id = '$item'");
-		$items = $query -> execute();
-		return $items[0];
-	}
-
-	public function getTopCommodities($limit, $order_list) {
-		$query = Doctrine_Query::create() -> select("Drug_Id,Resupply") -> from("Cdrr_Item") -> where("Cdrr_Id IN($order_list)") -> orderby("Resupply desc") -> limit("$limit");
-		$items = $query -> execute();
-		return $items;
-	}
-	
-	public function getAllCommodities($order_list) {
-		$query = Doctrine_Query::create() -> select("Drug_Id,Resupply") -> from("Cdrr_Item") -> where("Cdrr_Id IN($order_list)")->groupBy("Drug_Id") -> orderby("Drug_Id desc");
+	public function getItems($cdrr) {
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr_item") -> where("cdrr_id='$cdrr'");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
 
-}//end class
+}
 ?>

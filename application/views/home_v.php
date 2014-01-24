@@ -72,9 +72,35 @@ $(document).ready(function() {
 	   var third_link="<?php echo base_url().'pharmacist_management/getPickingList/';?>"+firstDay+"/"+lastDay;
 	   var fourth_link="<?php echo base_url().'pharmacist_management/getFacilitiesDelay/';?>"+firstDay+"/"+lastDay;
        $('#chart_area').load(first_link);
-       $('#chart_area2').load(second_link);
+       $('#chart_area2').load(second_link, function() {
+            $("#patient_listing").dataTable({
+		 		 "bJQueryUI" : true,
+				"sPaginationType" : "full_numbers",
+				"sDom" : '<"H"Tfr>t<"F"ip>',
+				"oTableTools" : {
+					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+					"aButtons" : ["copy", "print", "xls", "pdf"]
+				},
+				"bProcessing" : true,
+				"bServerSide" : false,
+		 });
+       });
        $('#chart_area3').load(third_link);
-       $('#chart_area4').load(fourth_link);
+       $('#chart_area4').load(fourth_link, function() {
+            $("#facility_listing").dataTable({
+		 		 "bJQueryUI" : true,
+				"sPaginationType" : "full_numbers",
+				"sDom" : '<"H"Tfr>t<"F"ip>',
+				"oTableTools" : {
+					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+					"aButtons" : ["copy", "print", "xls", "pdf"]
+				},
+				"bProcessing" : true,
+				"bServerSide" : false,
+		 });
+       });
+       
+       		
        
        $("#period_start_date_1").val(firstDay);
        $("#period_end_date_1").val(lastDay);
@@ -171,7 +197,19 @@ var chartLink;
                  	 var from_date=$("#period_start_date_2").val();
                  	 var to_date=$("#period_end_date_2").val();
                  	 var enrollment_link="<?php echo base_url().'pharmacist_management/getFacilitiesUsing/';?>"+from_date+'/'+to_date;
-                 	 $('#chart_area2').load(enrollment_link);
+                 	 $('#chart_area2').load(enrollment_link, function() {
+            $("#patient_listing").dataTable({
+		 		 "bJQueryUI" : true,
+				"sPaginationType" : "full_numbers",
+				"sDom" : '<"H"Tfr>t<"F"ip>',
+				"oTableTools" : {
+					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+					"aButtons" : ["copy", "print", "xls", "pdf"]
+				},
+				"bProcessing" : true,
+				"bServerSide" : false,
+		 });
+       });
                  }else if(button_id=="appointment_btn"){
                  	 var from_date=$("#period_start_date_3").val();
                  	 var to_date=$("#period_end_date_3").val();
@@ -181,7 +219,19 @@ var chartLink;
                  	 var from_date=$("#period_start_date_4").val();
                  	 var to_date=$("#period_end_date_4").val();
                  	 var visits_link="<?php echo base_url().'pharmacist_management/getFacilitiesDelay/';?>"+from_date+'/'+to_date;
-                     $('#chart_area4').load(visits_link);
+                     $('#chart_area4').load(visits_link, function() {
+            $("#facility_listing").dataTable({
+		 		 "bJQueryUI" : true,
+				"sPaginationType" : "full_numbers",
+				"sDom" : '<"H"Tfr>t<"F"ip>',
+				"oTableTools" : {
+					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+					"aButtons" : ["copy", "print", "xls", "pdf"]
+				},
+				"bProcessing" : true,
+				"bServerSide" : false,
+		 });
+       });
                  } else if(button_id=="usage_btn"){                	
                  	 var from_date=$("#period_start_date_4").val();
                  	 var to_date=$("#period_end_date_4").val();
@@ -224,7 +274,7 @@ var chartLink;
 		?>
 		<div class="fullest-content">
 		<?php
-		$this->load->view("dashboard/index2");
+		$this->load->view("dashboard/main_v");
 		?>
 		</div>
 		<?php

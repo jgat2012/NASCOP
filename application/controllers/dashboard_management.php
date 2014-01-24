@@ -7,57 +7,69 @@ class Dashboard_Management extends MY_Controller {
 		$data = array();
 		ini_set("max_execution_time", "10000");
 	}
-	
-	public function indexS() {
-		$this->load->view('tester_v');
-	}
 
 	public function index() {
 		$data['content_view'] = "home_v";
 		$data['hide_side_menu'] = 1;
 		$data['banner_text'] = "National Dashboard";
 		$data['title'] = "webADT | National Dashboard";
-		$data['supporter']=Supporter::getThemAll();
+		$data['supporter'] = Supporter::getThemAll();
 		$this -> base_params($data);
 	}
 
-	public function notification($id, $notification, $count, $icon, $link) {
-		$note = "<li><a id='$id' href='$link'><i class='$icon'></i>$notification<div class='badge badge-important'>$count</div></a></li>";
-		echo $note;
+	public function download($type = "", $period = "") {
+
 	}
 
-	public function facilitySOH($year, $month, $pipeline) {
-		//$pipeline = "1";
-		//$month = "12";
-		//$year = "2011";
-		$results = Facility_Soh::getTotals($pipeline, $month, $year);
-		$facility_results = Facility_Soh::getFacilities($pipeline, $month, $year);
-		$drug_results = Facility_Soh::getDrugs($pipeline, $month, $year);
-		$count = 1;
-		$i = 0;
-		$dyn_table = "<table border='1'  cellspacing='0.75' cellpadding='1'>";
-		$dyn_table .= "<thead><tr><th>Facility Name</th>";
-		foreach ($drug_results as $drug_result) {
-			$dyn_table .= "<th>" . $drug_result['drugname'] . "</th>";
-		}
-		$dyn_table .= "</tr></thead>";
-		$dyn_table .= "<tbody><tr><td>" . $facility_results[$i]['facilityname'] . "</td>";
-		foreach ($results as $result) {
-			$dyn_table .= "<td>" . $result['total'] . "</td>";
-			$count++;
-			if ($count == sizeof($drug_results) + 1) {
-				$dyn_table .= "</tr>";
-				$count = 1;
-				if ($i < sizeof($facility_results) - 1) {
-					$i++;
-					$dyn_table .= "<tr><td>" . $facility_results[$i]['facilityname'] . "</td>";
+	public function getCommodity($type = "SOH") {
+		$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
+		$links = array('dashboard_management/download/' . $type => 'download');
+		//Get eSCM orders
+		$escm_orders = Escm_Orders::getAll();
+		$list = "";
+		$order_list = array();
+		$cdrr_nascop = array();
+		$cdrr_escm = array();
+		$table_name = $type;
 
-				}
+		if ($escm_orders) {
+			foreach ($escm_orders as $order_id) {
+				array_push($order_list, $order_id -> cdrr_id);
 			}
-
+			$list = "'" . implode("','", $order_list) . "'";
 		}
-		$dyn_table .= "</tbody></table>";
-		echo $dyn_table;
+		$cdrr_nascop = Cdrr::getNascopPeriod($list);
+		$counter = 0;
+		foreach ($cdrr_nascop as $nascop) {
+			$result[$counter]['period'] = date('F-Y', strtotime($nascop['period_begin']));
+			$result[$counter]['pipeline'] = "Kemsa";
+			$counter++;
+		}
+		$cdrr_escm = Cdrr::getEscmPeriod($list);
+		foreach ($cdrr_escm as $esm) {
+			$result[$counter]['period'] = date('F-Y', strtotime($esm['period_begin']));
+			$result[$counter]['pipeline'] = "Kenya Pharma";
+			$counter++;
+		}
+		echo $this -> showTable($columns, $result, $links, $table_name);
+	}
+
+	public function showTable($columns, $data = array(), $links = array(), $table_name = "") {
+		$this -> load -> library('table');
+		$tmpl = array('table_open' => '<table id=' . $table_name . '_listing class="table table-bordered table-striped tbl_nat_dashboard">');
+		$this -> table -> set_template($tmpl);
+		$this -> table -> set_heading($columns);
+		$link_values = "";
+		foreach ($data as $mydata) {
+			//Set Up links
+			foreach ($links as $i => $link) {
+				$link_values .= "<a href='" . site_url($i . '/' . $mydata['period']) . "'>$link</a> | ";
+			}
+			$mydata['Options'] = rtrim($link_values, " | ");
+			$link_values = "";
+			$this -> table -> add_row($mydata);
+		}
+		return $this -> table -> generate();
 	}
 
 	public function base_params($data) {

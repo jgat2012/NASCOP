@@ -13,7 +13,14 @@
 		<div id="open_lists" class="tab-pane active">
 			<div class="menu_container">
 				<a data-toggle='modal' href='#add_list' class='btn'><i class="icon-plus"></i> Create List</a>
-				<?php echo $this -> session -> flashdata('list_message');?>
+				<br/>
+				<?php
+				if ($this -> session -> flashdata('order_delete')) {
+					echo '<p class="message error">' . $this -> session -> flashdata('order_delete') . '</p>';
+				} else if ($this -> session -> flashdata('list_message')) {
+					echo '<p class="message info">' . $this -> session -> flashdata('list_message') . '</p>';
+				}
+				?>
 			</div>
 			<?php echo $open_table;?>
 		</div>
@@ -143,10 +150,10 @@ if($this->session->userdata("order_go_back")=="cdrr"){
 ?>
 <script type="text/javascript">
 	$(document).ready(function() {
-			$("#closed_btn").removeClass();
-			$(this).addClass("active");
-			$("#open_lists").show();
-			$("#closed_lists").hide();
+		$("#closed_btn").removeClass();
+		$(this).addClass("active");
+		$("#open_lists").show();
+		$("#closed_lists").hide();
 	});
 
 </script>
@@ -156,10 +163,10 @@ else if($this->session->userdata("order_go_back")=="fmaps"){
 ?>
 <script type="text/javascript">
 	$(document).ready(function() {
-			$("#open_btn").removeClass();
-			$("#closed_btn").addClass("active");
-			$("#closed_lists").show();
-			$("#open_lists").hide();
+		$("#open_btn").removeClass();
+		$("#closed_btn").addClass("active");
+		$("#closed_lists").show();
+		$("#open_lists").hide();
 	});
 
 </script>
@@ -171,10 +178,10 @@ else{
 ?>
 <script type="text/javascript">
 	$(document).ready(function() {
-			$("#closed_btn").removeClass();
-			$(this).addClass("active");
-			$("#open_lists").show();
-			$("#closed_lists").hide();
+		$("#closed_btn").removeClass();
+		$(this).addClass("active");
+		$("#open_lists").show();
+		$("#closed_lists").hide();
 	});
 
 </script>

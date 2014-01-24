@@ -94,12 +94,12 @@ if ($user_is_pharmacist || $user_is_facility_administrator || $user_is_administr
    	<?php 
 	 if($user_is_nascop){
 	 ?>
-	    $('#notification1').load('<?php echo base_url() . 'facilitydashboard_management/order_notification';?>');
+	    $('#notification1').load('<?php echo base_url() . 'pharmacist_management/order_notification';?>');
 	<?php
 	 }
 	 if($user_is_facility_administrator){
 	 ?>
-		$('#notification1').load('<?php echo base_url() . 'facilitydashboard_management/order_notification';?>');
+		$('#notification1').load('<?php echo base_url() . 'pharmacist_management/order_notification';?>');
 	<?php
 	 }
 	 if($user_is_administrator){
@@ -183,7 +183,7 @@ foreach($menus as $menu){?>
 	<a href = "<?php echo site_url($menu['url']);?>" class="top_menu_link <?php
 	if ($current == $menu['url'] || $menu['url'] == $link) {echo " top_menu_active ";
 	}
-?>"><?php echo $menu['text']; if($menu['offline'] == "1"){?>
+?>"><?php echo strtoupper($menu['text']); if($menu['offline'] == "1"){?>
 	 <!-- Offline -->
 	 <span class=" red_"></span></a>
 	
@@ -256,7 +256,7 @@ if(isset($reports)|| isset($report_title)){
 				?>
 				<li><a href="<?php echo base_url().'user_management/update_signature' ?>"><i class="icon-font"></i>Update Signature</a></li>			
 			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			 
-			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
+			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>User Manual</a></li>	
 				
 				
 				<?php
@@ -265,7 +265,7 @@ if(isset($reports)|| isset($report_title)){
 				if($user_is_facility_administrator){
 				?>
 				<li><a href="<?php echo base_url().'user_management/update_signature' ?>"><i class="icon-font"></i>Update Signature</a></li>			       
-			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a></li>	
+			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>User Manual</a></li>	
 				
 				<?php
 				}
@@ -296,7 +296,7 @@ if(isset($reports)|| isset($report_title)){
 						<a  id="getDeniedLogs" class="admin_link"><i class="icon-book"></i>Denied Logs</a>
 					</li>
 					 <li>
-					 	<a href="<?php echo base_url().'user_manual.pdf' ?>"><i class="icon-book"></i>User Manual</a>
+					 	<a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>User Manual</a>
 					 </li>	
 			    <?php
 				}
