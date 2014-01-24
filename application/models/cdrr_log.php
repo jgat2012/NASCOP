@@ -11,7 +11,8 @@ class Cdrr_Log extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('cdrr_log');
 		$this -> hasOne('Cdrr as Cdrr', array('local' => 'cdrr_id', 'foreign' => 'id'));
-		$this -> hasOne('Users as user', array('local' => 'user_id', 'foreign' => 'id'));
+		$this -> hasOne('Sync_User as user', array('local' => 'user_id', 'foreign' => 'id'));
+		$this -> hasOne('Users as n_user', array('local' => 'user_id', 'foreign' => 'id'));
 	}
 
 	public function getAll() {
@@ -23,6 +24,11 @@ class Cdrr_Log extends Doctrine_Record {
 	public static function getLogs($cdrr) {
 		$query = Doctrine_Query::create() -> select("*") -> from("cdrr_log") -> where("cdrr_id = '$cdrr'");
 		$cdrr_log = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $cdrr_log;
+	}
+	public static function getObjectLogs($cdrr) {
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr_log") -> where("cdrr_id = '$cdrr'");
+		$cdrr_log = $query -> execute();
 		return $cdrr_log;
 	}
 

@@ -14,6 +14,7 @@ class Users extends Doctrine_Record {
 		$this -> hasColumn('Active', 'varchar', 2);
 		$this -> hasColumn('Signature', 'varchar', 50);
 		$this -> hasColumn('Image_Link', 'text');
+		$this -> hasColumn('map', 'int', 11);
 	}
 
 	public function setUp() {

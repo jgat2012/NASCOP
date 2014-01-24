@@ -14,7 +14,7 @@
 		 });
 		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
 		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
-		 
+		/* 
 		 $("#SOH_grid").load(soh_link, function() {
             $("#SOH_listing").dataTable({
 		 		 "bJQueryUI" : true,
@@ -41,7 +41,7 @@
 				"bProcessing" : true,
 				"bServerSide" : false,
 		 });
-       });
+       });*/
 	
 		 
 		 //Update breadcrumbs

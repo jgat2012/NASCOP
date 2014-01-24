@@ -7,6 +7,8 @@
 	}
 	?>
 	<div>
+		<a data-toggle='modal' href='#select_stand-alone' class='btn check_net btn_stand_alone' id='btn_new_cdrr_stand_alone'>New Stand-Alone F-CDRR</a>
+		<a data-toggle='modal' href='#select_central' class='btn check_net btn_central' id='btn_new_cdrr_central'>New Central D-CDRR</a>
 		<?php echo $order_table;?>
 	</div>
 </div>

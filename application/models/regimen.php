@@ -23,7 +23,7 @@ class Regimen extends Doctrine_Record {
 	}
 
 	public function getAll($source = 0) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Regimen") -> where('Source = "' . $source . '" or Source ="0"') -> orderBy("Regimen_Desc asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("regimen") -> where('source = "' . $source . '" or source ="0"') -> orderBy("regimen_code asc");
 		$regimens = $query -> execute();
 		return $regimens;
 	}
@@ -41,7 +41,7 @@ class Regimen extends Doctrine_Record {
 	}
 
 	public function getAllObjects($source = 0) {
-		$query = Doctrine_Query::create() -> select("*") -> from("Regimen") -> where('Source = "' . $source . '" or Source ="0"') -> orderBy("Regimen_Code asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("regimen") -> where('source = "' . $source . '" or source ="0"') -> orderBy("regimen_code asc");
 		$regimens = $query -> execute();
 		return $regimens;
 	}
