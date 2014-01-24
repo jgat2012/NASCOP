@@ -300,7 +300,7 @@ class Picking_List extends MY_Controller {
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
-			        AND resupply >0
+			        AND resupply !='0'
 			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')";
 		//include resupply >0
 		$query = $this -> db -> query($sql);

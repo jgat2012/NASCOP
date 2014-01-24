@@ -12,6 +12,7 @@ class Cdrr_Log extends Doctrine_Record {
 		$this -> setTableName('cdrr_log');
 		$this -> hasOne('Cdrr as Cdrr', array('local' => 'cdrr_id', 'foreign' => 'id'));
 		$this -> hasOne('Sync_User as user', array('local' => 'user_id', 'foreign' => 'id'));
+		$this -> hasOne('Users as n_user', array('local' => 'user_id', 'foreign' => 'id'));
 	}
 
 	public function getAll() {

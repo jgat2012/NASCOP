@@ -118,8 +118,8 @@
 						<td><b>District: &nbsp;</b><?php echo $facility_object -> Parent_District -> Name;?></td>
 					</tr>
 					<tr>
-						<td colspan='2'><b>Programme Sponsor: &nbsp;</b><?php echo $facility_object -> support -> Name;?>
-							<input type="hidden" name="sponsor" value="<?php echo $facility_object -> support -> Name; ?>"/>
+						<td colspan='2'><b>Programme Sponsor: &nbsp;</b><?php echo $facility_object -> supplier -> name;?>
+							<input type="hidden" name="sponsor" value="<?php echo $facility_object -> supplier -> name; ?>"/>
 						</td>
 					</tr>
 					<tr>
@@ -361,7 +361,9 @@
 		    		<b>Delivery Note</b>
 		            <input type='text' name='delivery_note' id='delivery_note' style="width:100%;"/>
 		    	</td></tr>
-		    	<?php foreach($logs as $log){?>
+		    	<?php foreach($logs as $log){
+		    		if($log->description =="approved"){
+		    		?>
 				<tr>
 					<td><b>Report <?php echo $log->description;?> by:</b> </td>
 					<td><?php echo $log->user->name; ?></td>
@@ -374,7 +376,24 @@
 					<td><b>Date:</b></td>
 					<td><?php echo $log->created; ?></td>
 				</tr>
-				<?php }?>
+				<?php }else{
+				?>	
+				<tr>
+					<td><b>Report <?php echo $log->description;?> by:</b> 
+					</td>
+					<td><?php echo $log->n_user->Name; ?></td>
+					<td><b>Designation:</b></td>
+					<td><?php echo $log->n_user->Access->Level_Name; ?></td>
+				</tr>
+				<tr>
+					<td><b>Contact Telephone:</b></td>
+					<td><?php echo $log->n_user->Phone_Number; ?></td>
+					<td><b>Date:</b></td>
+					<td><?php echo $log->created; ?></td>
+				</tr>
+					
+				<?php	
+				}}?>
 			</table>
 		    <?php		 	
 				 }

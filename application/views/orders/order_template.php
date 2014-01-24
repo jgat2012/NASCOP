@@ -10,8 +10,13 @@
 		</ul>
 	</div>
 <div  class="facility_info header section" style="width:100%;">
+	<div style="float:right;">
+		<ul class="nav nav-tabs">
+         <?php echo $option_links; ?>
+        </ul>
+        </div>
 	<h4><b><?php echo $order_array[0]['cdrr_label'] . " " . $order_array[0]['status_name'];?></b></h4>
-	<a href='<?php echo site_url("order/download_order/" . $cdrr_id);?>'><?php echo $order_array[0]['cdrr_label'] . " " . $order_array[0]['facility_name'] . " " . $order_array[0]['period_begin'] . " to " . $order_array[0]['period_end'] . ".xls";?></a>
+	<a href='<?php echo site_url("order/download_cdrr/" . $cdrr_id);?>'><?php echo $order_array[0]['cdrr_label'] . " " . $order_array[0]['facility_name'] . " " . $order_array[0]['period_begin'] . " to " . $order_array[0]['period_end'] . ".xls";?></a>
     <p>&nbsp;</p>
     <?php 
     if($order_array[0]['status_name']!="dispatched"){
@@ -85,8 +90,8 @@
 						<th class="number" rowspan="3">Unit Pack Size</th>
 						<th class="number">Beginning Balance</th>
 						<th class="number">Quantity <br/>Received in this period</th>
-						<th class="number">Reported Aggregated Quantity CONSUMED in the reporting period (Satellite sites plus Central site dispensing point where relevant)</th>
-						<th class="number">Reported Aggregated Physical Stock on Hand at end of reporting period (Satellite sites plus Central site dispensing point where relevant)</th>
+						<th class="number">End of Month Physical Count</th>
+						<th class="number">Reported Aggregated <br/>Quantity CONSUMED <br/>in the reporting period<br/> (Satellite sites plus <br/>Central site dispensing point where relevant)</th>
 						<th class="number">Quantity required for RESUPPLY</th>
 					</tr>
 					<tr>
@@ -99,8 +104,8 @@
 					<tr>
 						<th>A</th>
 						<th>B</th>
+						<th>F</th>
 						<th>G</th>
-						<th>H</th>
 						<th>J</th>
 					</tr>
 			</thead>';	echo $header_text;	
@@ -139,8 +144,8 @@
 						<td class="number calc_count"><?php echo $commodity ->Pack_Size;?></td>
 						<td> <input name="opening_balance[]" id="opening_balance_<?php echo $commodity -> id;?>" type="text" class="opening_balance"/></td>
 						<td> <input name="quantity_received[]" id="received_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_received"/></td>
+						<td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
 						<td> <input tabindex="-1" name="aggregated_qty[]" id="aggregated_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_qty"/></td>
-						<td> <input tabindex="-1" name="aggregated_physical_qty[]" id="aggregated_physical_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_physical_qty"/></td>
 						<td> 
 							<input tabindex="-1" name="new_resupply[]" id="new_resupply_<?php echo $commodity -> id;?>" type="text" class="resupply"/>
 							<input tabindex="-1" name="resupply[]" id="resupply_<?php echo $commodity -> id;?>" class="resupply" type="hidden"/>
@@ -195,7 +200,9 @@
 		    		<b>Delivery Note</b>
 		            <input type='text' name='delivery_note' id='delivery_note' style='width:100%;' value='<?php echo @$order_array[0]['delivery_note']; ?>'/>
 		    	</td></tr>
-		    	<?php foreach($logs as $log){?>
+		    	<?php foreach($logs as $log){
+		    		if($log->description =="approved"){
+		    		?>
 				<tr>
 					<td><b>Report <?php echo $log->description;?> by:</b> </td>
 					<td><?php echo $log->user->name; ?></td>
@@ -208,7 +215,24 @@
 					<td><b>Date:</b></td>
 					<td><?php echo $log->created; ?></td>
 				</tr>
-				<?php }?>
+				<?php }else{
+				?>	
+				<tr>
+					<td><b>Report <?php echo $log->description;?> by:</b> 
+					</td>
+					<td><?php echo $log->n_user->Name; ?></td>
+					<td><b>Designation:</b></td>
+					<td><?php echo $log->n_user->Access->Level_Name; ?></td>
+				</tr>
+				<tr>
+					<td><b>Contact Telephone:</b></td>
+					<td><?php echo $log->n_user->Phone_Number; ?></td>
+					<td><b>Date:</b></td>
+					<td><?php echo $log->created; ?></td>
+				</tr>
+					
+				<?php	
+				}}?>
 			</table>
 	</div>
 	
@@ -277,8 +301,8 @@
 	    ?>
 		  $("#opening_balance_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['balance']; ?>");
 		  $("#received_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['received']; ?>");
+		  $("#physical_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['count']; ?>");
 		  $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");
-		  $("#aggregated_physical_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_on_hand']; ?>");
 		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		  $("#new_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		<?php	
