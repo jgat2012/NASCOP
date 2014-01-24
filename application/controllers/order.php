@@ -24,7 +24,8 @@ class Order extends MY_Controller {
 				AND m.period_begin=c.period_begin
 				AND m.period_end=c.period_end
 				AND c.status !='prepared' 
-				AND c.status !='review'";//AND c.id NOT IN (SELECT cdrr_id FROM escm_orders)
+				AND c.status !='review'";
+		//AND c.id NOT IN (SELECT cdrr_id FROM escm_orders)
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		$links = array("order/view_order" => "view order");
@@ -52,29 +53,40 @@ class Order extends MY_Controller {
 		$sql = "SELECT c.*,ci.*,f.*,co.county as county_name,d.name as district_name,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
 				FROM cdrr c
 				LEFT JOIN cdrr_item ci ON ci.cdrr_id=c.id
-				LEFT JOIN facilities f ON f.id=c.facility_id
+				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				LEFT JOIN counties co ON co.id=f.county
 				LEFT JOIN district d ON d.id=f.district
-				WHERE c.id='$cdrr_id'";
+				WHERE c.id='$cdrr_id'
+				AND ci.resupply !='0'";
 		$query = $this -> db -> query($sql);
 		$order_array = $query -> result_array();
 		$data['order_array'] = $order_array;
+		//maps
+		$sql = "SELECT mi.regimen_id,mi.total
+			 	FROM maps m
+			 	LEFT JOIN maps_item mi ON mi.maps_id=m.id
+				WHERE m.id='$maps_id'";
+		$query = $this -> db -> query($sql);
+		$fmaps_array = $query -> result_array();
+		$data['fmaps_array'] = $fmaps_array;
 		$data['page_title'] = "Central Aggregate(D-CDRR)";
 		$data['content_view'] = "orders/order_template";
 		$data['banner_text'] = "Central Aggregate(D-CDRR)";
 		$data['hide_side_menu'] = 1;
 		$data['cdrr_id'] = $cdrr_id;
-		$data['regimens'] = Regimen::getAllObjects("13050");
+		$data['regimens'] = Regimen::getAllObjects();
 		$data['regimen_categories'] = Regimen_Category::getAll();
 		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as Drug,unit as Unit_Name,packsize as Pack_Size,category_id as Category
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
+			        AND ci.resupply !='0'
 			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')
 			        $and";
 		$query = $this -> db -> query($sql);
 		$data['commodities'] = $query -> result();
-		$data['logs'] = Cdrr_Log::getLogs($cdrr_id);
+		$data['logs'] = Cdrr_Log::getObjectLogs($cdrr_id);
 		$data['maps_id'] = $maps_id;
 		$this -> base_params($data);
 	}
@@ -130,8 +142,9 @@ class Order extends MY_Controller {
 			$data['cdrr_array'] = $cdrr_array['cdrr_array'];
 			$data['status_name'] = $cdrr_array['cdrr_array'][0]['status_name'];
 			$facility_id = $cdrr_array['cdrr_array'][0]['facility_id'];
-			$facilities = Facilities::getFacility($facility_id);
-			$facility = $facilities['facilitycode'];
+			$data['facility_id']=$facility_id;
+			$facilities = Sync_Facility::getCode($facility_id, $type);
+			$facility = $facilities['code'];
 			$code = $cdrr_array['cdrr_array'][0]['code'];
 			$data['options'] = $cdrr_array['options'];
 			if ($data['options'] == "view") {
@@ -140,7 +153,7 @@ class Order extends MY_Controller {
 			$data['hide_btn'] = 1;
 			$cdrr_id = $cdrr_array['cdrr_array'][0]['cdrr_id'];
 			$data['cdrr_id'] = $cdrr_id;
-			$data['logs'] = Cdrr_Log::getLogs($cdrr_id);
+			$data['logs'] = Cdrr_Log::getObjectLogs($cdrr_id);
 			if ($data['options'] == "view") {
 				if ($data['status_name'] == "received" || $data['status_name'] == "rationalized") {
 					$data['option_links'] = "<li class='active'><a href='" . site_url("order/view_cdrr/" . $cdrr_id) . "'>view</a></li><li><a href='" . site_url("order/update_cdrr/" . $cdrr_id) . "'>update</a></li><li><a class='delete' href='" . site_url("order/delete_cdrr/" . $cdrr_id) . "'>delete</a></li>";

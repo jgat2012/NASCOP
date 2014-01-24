@@ -9,7 +9,7 @@
 			</li>
 		</ul>
 	</div>
-<div  class="facility_info header section">
+<div  class="facility_info header section" style="width:100%;">
 	<h4><b><?php echo $order_array[0]['cdrr_label'] . " " . $order_array[0]['status_name'];?></b></h4>
 	<a href='<?php echo site_url("order/download_order/" . $cdrr_id);?>'><?php echo $order_array[0]['cdrr_label'] . " " . $order_array[0]['facility_name'] . " " . $order_array[0]['period_begin'] . " to " . $order_array[0]['period_end'] . ".xls";?></a>
     <p>&nbsp;</p>
@@ -174,11 +174,11 @@
                 foreach($regimens as $regimen){
 				?>
 				<tr>
-					<td style="border-right:2px solid #DDD;padding-right:2em;"><?php echo $regimen -> Regimen_Code;?></td>
-					<td regimen_id="<?php echo $regimen -> id;?>" class="regimen_desc col_drug"><?php echo $regimen -> Regimen_Desc;?></td>
+					<td style="border-right:2px solid #DDD;padding-right:2em;"><?php echo $regimen -> regimen_code;?></td>
+					<td regimen_id="<?php echo $regimen -> id;?>" class="regimen_desc col_drug"><?php echo $regimen -> regimen_desc;?></td>
 					<td regimen_id="<?php echo $regimen -> id;?>" class="regimen_numbers">
-					<input name="patient_numbers[]" id="patient_numbers_<?php echo $regimen -> id;?>" type="text">
-					<input name="patient_regimens[]" value="<?php echo $regimen -> Regimen_Code." | ".$regimen -> Regimen_Desc;?>" type="hidden">
+					<input name="patient_numbers[]" id="patient_numbers_<?php echo $regimen -> map;?>" type="text">
+					<input name="patient_regimens[]" value="<?php echo $regimen -> regimen_code." | ".$regimen -> regimen_desc;?>" type="hidden">
 					</td>
 				</tr>
 				<?php
@@ -198,13 +198,13 @@
 		    	<?php foreach($logs as $log){?>
 				<tr>
 					<td><b>Report <?php echo $log->description;?> by:</b> </td>
-					<td><?php echo $log->user->Name; ?></td>
+					<td><?php echo $log->user->name; ?></td>
 					<td><b>Designation:</b></td>
-					<td><?php echo $log->user->Access->Level_Name; ?></td>
+					<td><?php echo $log->user->role; ?></td>
 				</tr>
 				<tr>
 					<td><b>Contact Telephone:</b></td>
-					<td><?php echo $log->user->Phone_Number; ?></td>
+					<td><?php echo $log->user->profile_id; ?></td>
 					<td><b>Date:</b></td>
 					<td><?php echo $log->created; ?></td>
 				</tr>
@@ -285,6 +285,16 @@
 		   }
 		}
 	   ?>
+	   
+	   <?php 
+	   	if (!empty($order_array)) {
+		  foreach($fmaps_array as $maps){
+	   ?>
+	   $("#patient_numbers_<?php echo $maps['regimen_id']; ?>").val("<?php echo $maps['total']; ?>");
+	   <?php
+		  }
+		}
+		?>
 	   $("input").attr("readonly","readonly");
 	   //$(".resupply").attr("readonly",false); 	
 });

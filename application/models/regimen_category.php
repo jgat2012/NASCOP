@@ -12,7 +12,7 @@ class Regimen_Category extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Regimen_Category")->where("Active","1")->orderBy("Name asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("regimen_category")->where("Active","1")->orderBy("Name asc");
 		$regimens = $query -> execute();
 		return $regimens;
 	}

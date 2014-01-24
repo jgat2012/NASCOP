@@ -110,7 +110,7 @@
 						<td style="width:50%;"><b>Facility Name: &nbsp;</b><?php echo $facility_object -> name;?></td>
 						<td><b>Facility code: &nbsp;</b><?php echo $facility_object -> facilitycode;?>
 							<input type="hidden" name="facility_code" value="<?php echo $facility_object ->facilitycode; ?>"/>
-							<input type="hidden" name="facility_id" value="<?php echo $facility_object ->id; ?>"/>
+							<input type="hidden" name="facility_id" value="<?php echo $facility_id; ?>"/>
 						</td>
 					</tr>
 					<tr>
@@ -364,13 +364,13 @@
 		    	<?php foreach($logs as $log){?>
 				<tr>
 					<td><b>Report <?php echo $log->description;?> by:</b> </td>
-					<td><?php echo $log->user->Name; ?></td>
+					<td><?php echo $log->user->name; ?></td>
 					<td><b>Designation:</b></td>
-					<td><?php echo $log->user->Access->Level_Name; ?></td>
+					<td><?php echo $log->user->role; ?></td>
 				</tr>
 				<tr>
 					<td><b>Contact Telephone:</b></td>
-					<td><?php echo $log->user->Phone_Number; ?></td>
+					<td><?php echo $log->user->profile_id; ?></td>
 					<td><b>Date:</b></td>
 					<td><?php echo $log->created; ?></td>
 				</tr>
@@ -382,7 +382,7 @@
 			<?php
                 if($hide_save==0){
 				?>
-			<input type="submit" class="btn" name="save" value="Save"/>
+			<input type="submit" class="btn btn-info" name="save" value="Save"/>
 			<?php
 				}
 			?>

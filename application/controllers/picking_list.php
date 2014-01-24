@@ -64,6 +64,7 @@ class Picking_List extends MY_Controller {
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
+			        AND ci.resupply !='0'
 			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')";
 		//include resupply >0
 		$query = $this -> db -> query($sql);
@@ -94,8 +95,9 @@ class Picking_List extends MY_Controller {
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
 		$sql = "SELECT c.id,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
 				FROM cdrr c
-				LEFT JOIN facilities f ON f.id=c.facility_id
-				LEFT JOIN maps m ON f.id=m.facility_id
+				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+				LEFT JOIN facilities f ON f.facilitycode=sf.code
+				LEFT JOIN maps m ON sf.id=m.facility_id
 				WHERE c.code='0'
 				AND m.code=c.code
 				AND m.period_begin=c.period_begin
@@ -112,7 +114,8 @@ class Picking_List extends MY_Controller {
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Facility Name', 'Options');
 		$sql = "SELECT c.id,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
 				FROM cdrr c
-				LEFT JOIN facilities f ON f.id=c.facility_id
+				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				WHERE c.order_id='$list_id'
 				GROUP BY c.id";
 		$query = $this -> db -> query($sql);
@@ -297,6 +300,7 @@ class Picking_List extends MY_Controller {
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
+			        AND resupply >0
 			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')";
 		//include resupply >0
 		$query = $this -> db -> query($sql);
