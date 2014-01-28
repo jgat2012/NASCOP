@@ -45,6 +45,26 @@ class Maps extends Doctrine_Record {
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items[0];
 	}
+	
+	public function getNascopPeriod($id_list) {
+		$and = "";
+		if ($id_list != "") {
+			$and = "and id NOT IN($id_list)";
+		}
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code !='1' $and") -> groupBy("period_begin");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
+	
+	public function getEscmPeriod($id_list) {
+		$and = "";
+		if ($id_list != "") {
+			$and = "and id IN($id_list)";
+		}
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code !='1' $and") -> groupBy("period_begin");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
 
 }
 ?>

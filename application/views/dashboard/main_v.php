@@ -14,6 +14,8 @@
 		 });
 		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
 		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
+		  var art_patient_link="<?php echo base_url().'dashboard_management/getPatients/ART_PATIENT';?>";
+		  var byregimen_patient_link="<?php echo base_url().'dashboard_management/getPatients/BYREG_PATIENT';?>";
 		/* 
 		 $("#SOH_grid").load(soh_link, function() {
             $("#SOH_listing").dataTable({
@@ -28,7 +30,7 @@
 				"bServerSide" : false,
 		 });
        });
-       
+       */
        $("#CONS_grid").load(cons_link, function() {
             $("#CONS_listing").dataTable({
 		 		 "bJQueryUI" : true,
@@ -41,7 +43,33 @@
 				"bProcessing" : true,
 				"bServerSide" : false,
 		 });
-       });*/
+       });
+       $("#ART_PATIENT_grid").load(art_patient_link, function() {
+            $("#ART_PATIENT_listing").dataTable({
+		 		 "bJQueryUI" : true,
+				"sPaginationType" : "full_numbers",
+				"sDom" : '<"H"Tfr>t<"F"ip>',
+				"oTableTools" : {
+					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+					"aButtons" : ["copy", "print", "xls", "pdf"]
+				},
+				"bProcessing" : true,
+				"bServerSide" : false,
+			});
+		});
+		$("#BYREG_PATIENT_grid").load(byregimen_patient_link, function() {
+            $("#BYREG_PATIENT_listing").dataTable({
+			 		 "bJQueryUI" : true,
+					"sPaginationType" : "full_numbers",
+					"sDom" : '<"H"Tfr>t<"F"ip>',
+					"oTableTools" : {
+						"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+						"aButtons" : ["copy", "print", "xls", "pdf"]
+					},
+					"bProcessing" : true,
+					"bServerSide" : false,
+			});
+       });
 	
 		 
 		 //Update breadcrumbs
@@ -503,43 +531,26 @@
   <div class="tab-content nat_dashboard_rep" style="clear:left">
   	<!-- Commodity Analysis -->
     <div class="tab-pane active" id="tab1">
+      <div class="two_block" id="s_consumption">
+			<h3 class="dashboard_title">Stock Consumption</h3>
+				<div id="CONS_grid"></div>
+	  </div>
+	  <!-- Stock status -->
       <div class="two_block" id="s_status">
 			<h3 class="dashboard_title">Stock Status</h3>
 			<div id="SOH_grid"></div>
-		</div>
-		<div class="two_block" id="s_consumption">
-			<h3 class="dashboard_title">Stock Consumption</h3>
-				<div id="CONS_grid"></div>
-		</div>
+	  </div>
+	  <!-- Stock status end -->
     </div>
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
     	<div class="three_block" id="patient_by_art">
     		<h3 class="dashboard_title">Current Patients By ART</h3>
-    		<table class="table table-bordered table-striped tbl_nat_dashboard">
-    			<thead>
-    				<tr><th>No</th><th>Reporting Period</th><th>Pipeline</th><th>Action</th></tr>
-    			</thead>
-    			<tbody>
-    				<tr><td>1</td><td>February - 2010</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>February - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>March - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>March - 2013</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>June - 2013</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>August - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>September - 2013</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2012</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>January - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2012</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>January - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    			</tbody>
-    		</table>
+    		<div id="ART_PATIENT_grid"></div>
     	</div>
     	<div class="three_block" id="patient_by_regimen">
     		<h3 class="dashboard_title">Patients By Regimen</h3>
-    		
+    		<div id="BYREG_PATIENT_grid"></div>
     	</div>
     	<div class="three_block" id="patient_scale_up">
     		<h3 class="dashboard_title">Patients Scale Up</h3>

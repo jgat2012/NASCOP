@@ -49,8 +49,6 @@ $(document).ready(function() {
       var firstDay = new Date(y, m, 1);
       var lastDay = new Date(y, m + 1, 0);
       
-     
-      
       //Get Today's Date and Upto Saturday
       var someDate = new Date();
       var dd = ("0" + firstDay.getDate()).slice(-2);
