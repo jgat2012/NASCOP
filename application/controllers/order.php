@@ -57,8 +57,7 @@ class Order extends MY_Controller {
 				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				LEFT JOIN counties co ON co.id=f.county
 				LEFT JOIN district d ON d.id=f.district
-				WHERE c.id='$cdrr_id'
-				AND ci.resupply !='0'";
+				WHERE c.id='$cdrr_id'";
 		$query = $this -> db -> query($sql);
 		$order_array = $query -> result_array();
 		$data['order_array'] = $order_array;
