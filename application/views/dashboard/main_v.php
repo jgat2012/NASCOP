@@ -16,6 +16,10 @@
 		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
 		  var art_patient_link="<?php echo base_url().'dashboard_management/getPatients/ART_PATIENT';?>";
 		  var byregimen_patient_link="<?php echo base_url().'dashboard_management/getPatients/BYREG_PATIENT';?>";
+		  var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/Table';?>";
+		  var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
+		  var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";
+		  var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";
 		/* 
 		 $("#SOH_grid").load(soh_link, function() {
             $("#SOH_listing").dataTable({
@@ -70,6 +74,16 @@
 					"bServerSide" : false,
 			});
        });
+       
+       $("#report_summary").load(report_analysis_table_link,function(){
+       	   $("#chart_area_report_summary").load(report_analysis_summary_link,function(){
+       			
+	       });
+       });
+       $("#chart_area_report").load(report_analysis_link);
+       $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
+       
+       
 	
 		 
 		 //Update breadcrumbs
@@ -559,12 +573,20 @@
     </div>
     <!-- Reporting Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab5">
-    	<div class="two_block" id="">
-    		<h3 class="dashboard_title">F-Maps</h3>
+    	<div class="three_block" id="">
+    		<h3 class="dashboard_title">ARV Sites</h3>
+    		<div id="report_summary">
+    			
+    		</div>
+    		<div id="chart_area_report_summary"></div>
     	</div>
-    	
-    	<div class="two_block" id="">
-    		<h3 class="dashboard_title">Cdrr</h3>
+    	<div class="three_block" id="">
+    		<h3 class="dashboard_title">Reporting Sites Analysis for <?php echo  date('F-Y');?></h3>
+    		<div id="chart_area_report_analysis"></div>
+    	</div>
+    	<div class="three_block" id="">
+    		<h3 class="dashboard_title">Reporting Site Rates</h3>
+    		<div id="chart_area_report"></div>
     	</div>
     </div>
     
