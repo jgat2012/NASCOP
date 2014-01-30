@@ -146,7 +146,7 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel->getActiveSheet()->getStyle('D7:'.$x.$p)->getAlignment()->setWrapText(true); 
 			$objPHPExcel->getActiveSheet()->getRowDimension('7')->setRowHeight(-1);
 			$objPHPExcel->getActiveSheet()->freezePane('D8');
-			$this->generateExcel($filename,$dir,$objPHPExcel);
+			$this->generateExcel($filename,$dir,$objPHPExcel); 
 			
 		}
 		//Patients BY ART Sites
