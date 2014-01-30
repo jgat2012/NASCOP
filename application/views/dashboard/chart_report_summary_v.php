@@ -6,13 +6,14 @@ $chartSize=300;
 <script>
 	$(function () {
 		    var total = 0;
-	$('#<?php echo $container;?>').highcharts({
+			$('#<?php echo $container;?>').highcharts({
 			chart:{
 				 height:'<?php echo $chartSize;?>',	
 				 type:'pie',
                   events: {
                     load: function(event) {
                         $('#<?php echo $container;?>').find('.highcharts-legend-item').last().append('<br/><br/><div style="width:220px"><hr/> <span style="float:left"> Total ARV Sites</span><span style="float:right"> ' + <?php echo $total_arv_sites;?> + '</span> </div>')
+                    	
                     }
                   }
                   

@@ -75,13 +75,10 @@
 			});
        });
        
-       $("#report_summary").load(report_analysis_table_link,function(){
-       	   $("#chart_area_report_summary").load(report_analysis_summary_link,function(){
-       			
-	       });
-       });
-       $("#chart_area_report").load(report_analysis_link);
-       $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
+       /*$("#report_summary").load(report_analysis_table_link,function(){
+       	   
+       });*/
+       
        
        
 	
@@ -278,7 +275,12 @@
 		 		order_analysis(y,mm,1);
 		 	}
 		 	else if(id=="ra_menu"){
-		 		
+		 		   if($("#chart_area_report_summary").children().length == 0){
+		 		   	   $("#chart_area_report_summary").load(report_analysis_summary_link);
+				       $("#chart_area_report").load(report_analysis_link);
+				       $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
+		 		   }
+		 		   
 		 	}
 		 })
 		 /*
@@ -549,12 +551,12 @@
 			<h3 class="dashboard_title">Stock Consumption</h3>
 				<div id="CONS_grid"></div>
 	  </div>
-	  <!-- Stock status -->
+	  <!-- Stock status 
       <div class="two_block" id="s_status">
 			<h3 class="dashboard_title">Stock Status</h3>
 			<div id="SOH_grid"></div>
 	  </div>
-	  <!-- Stock status end -->
+	   Stock status end -->
     </div>
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
@@ -568,6 +570,16 @@
     	</div>
     	<div class="three_block" id="patient_scale_up">
     		<h3 class="dashboard_title">Patients Scale Up</h3>
+    		<table class="table table-bordered table-striped tbl_nat_dashboard">
+    			<thead>
+    				
+    				<tr><th>Pipeline</th><th>Action</th></tr>
+    			</thead>
+    			<tbody>
+    				<tr><td>Kemsa</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kemsa','Download');?></td></tr>
+    				<tr><td>Kenya Pharma</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kenya_pharma','Download');?></td></tr>
+    			</tbody>
+    		</table>
     		
     	</div>
     </div>

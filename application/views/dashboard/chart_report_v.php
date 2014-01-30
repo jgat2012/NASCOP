@@ -72,7 +72,7 @@ if($resultArraySize>25){
 			},
 			legend: {
 				layout: 'horizontal',
-				align: 'left',
+				align: 'middle',
 				verticalAlign: 'bottom',
 				floating: true,
 				borderWidth: 1,
@@ -84,11 +84,11 @@ if($resultArraySize>25){
 			},
 			series:[{
                 name: 'Reporting Sites(By 10th)',
-                data: [49, 71, 106, 129, 144, 176, 135]
+                data: [49, 71, 106, 129, 144, 176]
     
             }, {
                 name: 'Total Reporting Sites Sites',
-                data: [69, 101, 106, 139, 154, 186, 145]
+                data: [69, 101, 106, 139, 154, 186]
     
             }]
 		});

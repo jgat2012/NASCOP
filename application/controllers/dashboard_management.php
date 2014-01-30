@@ -7,7 +7,7 @@ class Dashboard_Management extends MY_Controller {
 		$data = array();
 		ini_set("max_execution_time", "100000");
 		ini_set('memory_limit', '2048M');
-		$this -> load -> library('PHPExcel');
+		$this->load->library('PHPExcel');
 	}
 
 	public function index() {
@@ -21,7 +21,27 @@ class Dashboard_Management extends MY_Controller {
 
 	public function download($type = "", $period = "",$pipeline='') {
 		if($type=="SOH"){
-			$objPHPExcel = new PHPExcel();
+			$dir = "Export";
+			$inputFileType = 'Excel5';
+			$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/template/excel.xls';
+			$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+			$objPHPExcel = $objReader -> load($inputFileName);
+			/*Delete all files in export folder*/
+			if (is_dir($dir)) {
+				$files = scandir($dir);
+				foreach ($files as $object) {
+					if ($object != "." && $object != "..") {
+						unlink($dir . "/" . $object);
+					}
+				}
+			} else {
+				mkdir($dir);
+			}
+			//$objPHPExcel = new PHPExcel();
+			//$objPHPExcel -> setActiveSheetIndex(0);
+			$objPHPExcel->getDefaultStyle()->getFont()
+		    ->setName('Book Antiqua')
+		    ->setSize(10);
 			$objPHPExcel -> setActiveSheetIndex(0);
 			$i = 1;
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B1', "ART PROGRAM");
@@ -30,8 +50,6 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B4', "Period : ".$period);
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B8', "Drug Name");
 		}
-		
-		
 		else if($type=="CONS"){// Stock consumption
 			$period = date('Y-m-01',strtotime($period));
 			$drug_table = '';
@@ -65,9 +83,20 @@ class Dashboard_Management extends MY_Controller {
 					";
 			$query = $this ->db->query($sql);
 			$results = $query ->result_array();
-			
-			$objPHPExcel = new PHPExcel();
+			$filename = "Facility Cons by ARV Medicine";
+			$dir = "Export";
+			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
 			$objPHPExcel -> setActiveSheetIndex(0);
+			foreach(range('A','C') as $columnID) {
+			    $objPHPExcel->getActiveSheet()->getColumnDimension($columnID)
+			        ->setAutoSize(true);
+			}
+			$objPHPExcel -> getActiveSheet()->mergeCells('B1:C1');
+			$objPHPExcel -> getActiveSheet()->mergeCells('B2:C2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('B3:C3');
+			$objPHPExcel -> getActiveSheet()->mergeCells('B3:C3');
+			$objPHPExcel -> getActiveSheet()->mergeCells('B4:C4');
+			$objPHPExcel -> getActiveSheet()->mergeCells('B5:C5');
 			
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B1', "ARV PROGRAM");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B2', "MONTH'S CONSUMPTION BY MEDICINE BY ARV SITE");
@@ -114,24 +143,12 @@ class Dashboard_Management extends MY_Controller {
 				$p++;
 				$y++;
 			}
-			
-			$filename = "Facility Consumption by ARV Medicine for " . $period . ".csv";
-			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-			header("Cache-Control: no-store, no-cache, must-revalidate");
-			header("Cache-Control: post-check=0, pre-check=0", false);
-			header("Pragma: no-cache");
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment;filename=' . $filename);
-	
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
-	
-			$objWriter -> save('php://output');
-	
-			$objPHPExcel -> disconnectWorksheets();
-			unset($objPHPExcel);
+			$objPHPExcel->getActiveSheet()->getStyle('D7:'.$x.$p)->getAlignment()->setWrapText(true); 
+			$objPHPExcel->getActiveSheet()->getRowDimension('7')->setRowHeight(-1);
+			$objPHPExcel->getActiveSheet()->freezePane('D8');
+			$this->generateExcel($filename,$dir,$objPHPExcel);
 			
 		}
-		
 		//Patients BY ART Sites
 		else if($type=='ART_PATIENT'){
 			$period = date('Y-m-01',strtotime($period));
@@ -169,9 +186,11 @@ class Dashboard_Management extends MY_Controller {
 			
 			//GEnerate excel start here
 			$period =date('F-Y',strtotime($period));
-			$objPHPExcel = new PHPExcel();
+			$filename = "Current Patients By ART Sites";
+			$dir = "Export";
+			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
 			$objPHPExcel -> setActiveSheetIndex(0);
-;			$objPHPExcel -> getActiveSheet() -> SetCellValue('A1', "ART PROGRAM");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A1', "ART PROGRAM");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A2', "FACILITIES: CURRENT ART PATIENTS BY REGIMEN ");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A3', "Period : ".$period);
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A4', "Pipeline : ".strtoupper($pipeline));
@@ -222,23 +241,9 @@ class Dashboard_Management extends MY_Controller {
 			}
 			
 			
-			$filename = "Current Patients By ART Sites for " . $period . ".csv";
-			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-			header("Cache-Control: no-store, no-cache, must-revalidate");
-			header("Cache-Control: post-check=0, pre-check=0", false);
-			header("Pragma: no-cache");
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment;filename=' . $filename);
-	
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
-	
-			$objWriter -> save('php://output');
-	
-			$objPHPExcel -> disconnectWorksheets();
-			unset($objPHPExcel);
+			$this->generateExcel($filename,$dir,$objPHPExcel);
 						
 		}
-
 		elseif ($type=='BYREG_PATIENT') {
 			$period = date('Y-m-01',strtotime($period));
 			$facility_table = '';
@@ -274,13 +279,18 @@ class Dashboard_Management extends MY_Controller {
 			$results = $query ->result_array();
 			
 			$period =date('F-Y',strtotime($period));
-			$objPHPExcel = new PHPExcel();
+			$filename = "Patients By Regimen";
+			$dir = "Export";
+			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
+			foreach(range('B','C') as $columnID) {
+			    $objPHPExcel->getActiveSheet()->getColumnDimension($columnID)
+			        ->setAutoSize(true);
+			}
 			$objPHPExcel -> setActiveSheetIndex(0);
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C1', "ART PROGRAM");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C2', "Pipeline : ".strtoupper($pipeline));
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C3', "PATIENTS BY REGIMEN ");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C4', "Period : ".$period);
-			
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C5', "As at : ".date('jS F Y'));
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B7', "Regimen Code ");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C7', "Regimen Details ");
@@ -297,7 +307,6 @@ class Dashboard_Management extends MY_Controller {
 				$code = $value['regimen_code'];
 				$regimen_desc = $value['regimen_desc'];
 				$total = $value['tot'];
-				
 				
 				if($a==0){
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('B'.$x,$cat_name);//Regimen Category
@@ -321,29 +330,204 @@ class Dashboard_Management extends MY_Controller {
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('D'.$x,$total );
 					}
 				}
-				
-				
-				
-				
 				$x++;
 				$a++;
 			}
-			$filename = "Patients By Regimen for  " . $period . ".csv";
-			header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-			header("Cache-Control: no-store, no-cache, must-revalidate");
-			header("Cache-Control: post-check=0, pre-check=0", false);
-			header("Pragma: no-cache");
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment;filename=' . $filename);
-	
-			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'CSV');
-	
-			$objWriter -> save('php://output');
-	
-			$objPHPExcel -> disconnectWorksheets();
-			unset($objPHPExcel);
+			$this->generateExcel($filename,$dir,$objPHPExcel);
 		}
 
+		elseif($type=="PATIENT_SCALE"){
+			$period = date('Y-m-01',strtotime($period));
+			$facility_table = '';
+			$regimen_table = '';
+			$category_id='';
+			if($pipeline == 'kemsa'){
+				$regimen_table ='regimen';
+				$facility_table ='sync_facility';
+				$category_id ='category';
+			}
+			else if($pipeline == 'kenya_pharma'){
+				$regimen_table ='escm_regimen';
+				$facility_table ='escm_facility';
+				$category_id ='category_id';
+			}
+			$sql="SELECT rc.id,rc.name as r_category,m.period_begin,IF(SUM(mi.total) IS NULL,0,SUM(mi.total)) as total,rs.name,
+						IF(rc.name LIKE '%adult%' AND rs.name='art','Adult ART Patients',
+						IF(rc.name LIKE '%Paediatric%' AND rs.name='art','Paediatric ART Patients',
+						IF(rc.name LIKE '%adult%' AND rs.name='pep','PEP Adults',
+						IF(rc.name LIKE '%children%' AND rs.name='pep','PEP Children',
+						IF(rc.name LIKE '%mother%' AND rs.name='pmtct','PMTCT Mothers',
+						IF(rc.name LIKE '%child%' AND rs.name='pmtct','PMTCT Infants',
+						'')))))) as Patient_Category
+					FROM regimen_category rc
+					LEFT JOIN $regimen_table r ON r.$category_id=rc.id
+					LEFT JOIN maps_item mi ON mi.regimen_id=r.id
+					LEFT JOIN maps m ON m.id=mi.maps_id
+					LEFT JOIN regimen_service_type rs ON rs.id=r.type_of_service
+					LEFT JOIN $facility_table f ON f.id = m.facility_id
+					WHERE m.period_begin IS NOT NULL AND f.category!='satellite'
+					GROUP BY rc.name,m.period_begin,Patient_Category ORDER BY period_begin, rs.name,Patient_Category
+					 
+					";
+					//die($sql);
+			$query = $this ->db->query($sql);
+			$results = $query ->result_array();
+			$count = count($results);
+			if($count>0){
+				$first_period = $results[0]['period_begin'];
+				$first_period = date('M Y',strtotime($first_period));
+				$last_period = $results[$count-1]['period_begin'];
+				$last_period = date('M Y',strtotime($last_period));
+				if($first_period==$last_period){
+					$period_date = $first_period;
+				}
+				else{
+					$period_date = $first_period.' - '.$last_period;
+				}
+				
+			}			
+			
+			//Generate excel sheet
+			$period =date('F-Y',strtotime($period));
+			$filename = "ART Patients Scale Up Trends";
+			$dir = "Export";
+			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A1', "ART PROGRAM");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A2', "Pipeline : ".strtoupper($pipeline));
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A3', "ART Patients Scale-up by Month and Category ");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A4', "Period : ".@$period_date);
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('I5', "As at : ".date('d F Y'));
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('B6', "Patients on ART");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('E6', "Others");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A7', "Month");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('B7', "Adult ART Patients");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('C7', "Paediatric ART Patients");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('D7', "Total ART Patients");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('E7', "PEP Children");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('F7', "PEP Adults");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('G7', "PMTCT Infants");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('H7', "PMTCT Mothers");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('I7', "Grand Total");
+			$x=0;
+			$y=8;
+			$tot_art_adult=0;
+			$tot_art_child=0;
+			$tot_pep_child=0;
+			$tot_pep_adult=0;
+			$tot_pmtct_mother=0;
+			$tot_pmtct_infant=0;
+			$total = 0;
+			foreach ($results as $value) {
+				$period =date('M-Y',strtotime( $value['period_begin']));
+				$patient_category = strtolower($value['Patient_Category']);
+				$total = $value['total'];
+				if($x==0){
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('A'.$y,$period);
+					if($patient_category=='adult art patients'){$tot_art_adult+=$total;}
+					else if($patient_category=='paediatric art patients'){$tot_art_child+=$total;}
+					else if($patient_category=='pep adults'){$tot_pep_adult+=$total;}
+					else if($patient_category=='pep children'){$tot_pep_child+=$total;}
+					else if($patient_category=='pmtct infants'){$tot_pmtct_infant+=$total;}
+					else if($patient_category=='pmtct mothers'){$tot_pmtct_mother+=$total;}
+				}
+				else if($x>0){
+					if($results[$x]['period_begin']!=$results[$x-1]['period_begin']){//Period change
+						$y++;
+						$z=$y-1;
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('A'.$y,$period);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('B'.$z,$tot_art_adult);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('C'.$z,$tot_art_child);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('D'.$z,($tot_art_child+$tot_art_adult));
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('E'.$z,$tot_pep_child);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('F'.$z,$tot_pep_adult);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('G'.$z,$tot_pmtct_infant);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('H'.$z,$tot_pmtct_mother);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue('I'.$z,($tot_pmtct_mother+$tot_pmtct_infant+$tot_pep_adult+$tot_pep_child+$tot_art_child+$tot_art_adult));
+						//Initialize all totals
+						$tot_art_adult=0;
+						$tot_art_child=0;
+						$tot_pep_child=0;
+						$tot_pep_adult=0;
+						$tot_pmtct_mother=0;
+						$tot_pmtct_infant=0;
+						if($patient_category=='adult art patients'){$tot_art_adult+=$total;}
+						else if($patient_category=='paediatric art patients'){$tot_art_child+=$total;}
+						else if($patient_category=='pep adults'){$tot_pep_adult+=$total;}
+						else if($patient_category=='pep children'){$tot_pep_child+=$total;}
+						else if($patient_category=='pmtct infants'){$tot_pmtct_infant+=$total;}
+						else if($patient_category=='pmtct mothers'){$tot_pmtct_mother+=$total;}
+					}
+					else{
+						if($patient_category=='adult art patients'){$tot_art_adult+=$total;}
+						else if($patient_category=='paediatric art patients'){$tot_art_child+=$total;}
+						else if($patient_category=='pep adults'){$tot_pep_adult+=$total;}
+						else if($patient_category=='pep children'){$tot_pep_child+=$total;}
+						else if($patient_category=='pmtct infants'){$tot_pmtct_infant+=$total;}
+						else if($patient_category=='pmtct mothers'){$tot_pmtct_mother+=$total;}
+					}
+				}
+				$x++;
+				//If end of loop, append data
+				if($count==$x){
+					$z=$y;
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('B'.$z,$tot_art_adult);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C'.$z,$tot_art_child);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('D'.$z,($tot_art_child+$tot_art_adult));
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('E'.$z,$tot_pep_child);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('F'.$z,$tot_pep_adult);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('G'.$z,$tot_pmtct_infant);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('H'.$z,$tot_pmtct_mother);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('I'.$z,($tot_pmtct_mother+$tot_pmtct_infant+$tot_pep_adult+$tot_pep_child+$tot_art_child+$tot_art_adult));
+				};
+			}
+			$this->generateExcel($filename,$dir,$objPHPExcel);
+			
+		}
+		
+
+	}
+
+	public function generateExcelDefaultStyle($title=""){
+		$dir = "Export";
+		$inputFileType = 'Excel5';
+		$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/template/excel.xls';
+		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+		$objPHPExcel = $objReader -> load($inputFileName);
+		/*Delete all files in export folder*/
+		if (is_dir($dir)) {
+			$files = scandir($dir);
+			foreach ($files as $object) {
+				if ($object != "." && $object != "..") {
+					unlink($dir . "/" . $object);
+				}
+			}
+		} else {
+			mkdir($dir);
+		}
+		//$objPHPExcel = new PHPExcel();
+		//$objPHPExcel -> setActiveSheetIndex(0);
+		$objPHPExcel->getDefaultStyle()->getFont()
+	    ->setName('Book Antiqua')
+	    ->setSize(10);
+		$objPHPExcel->getActiveSheet()->setTitle($title);
+		return $objPHPExcel;
+	}
+	public function generateExcel($filename="",$dir="",$objPHPExcel=""){
+		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+		header("Cache-Control: no-store, no-cache, must-revalidate");
+		header("Cache-Control: post-check=0, pre-check=0", false);
+		header("Pragma: no-cache");
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename=' . $filename);
+		$filename = $dir.'/'.$filename.'.xls';
+		$objWriter = new PHPExcel_Writer_Excel5($objPHPExcel);
+		$objWriter -> save($filename);
+		$objPHPExcel -> disconnectWorksheets();
+		unset($objPHPExcel);
+		if (file_exists($filename)) {
+			$filename = str_replace("#", "%23", $filename);
+			redirect($filename);
+		}
 	}
 
 	public function getCommodity($type = "SOH") {
@@ -423,8 +607,8 @@ class Dashboard_Management extends MY_Controller {
 			$total_series = array();
 			$series = array();	
 			$categories = array();
-			$value1=array('45','48','15','0','68','58','289');
-			$value2=array('90','89','105','100','168','158','289');
+			$value1=array('45','48','15','0','68','58');
+			$value2=array('90','89','105','100','168','158');
 			$resultArray = array(
 								array(
 									'name'=>'Reporting Sites(By 10th)',
@@ -437,7 +621,7 @@ class Dashboard_Management extends MY_Controller {
 								);
 			$sixmonthback= date('F-Y',strtotime(date("F-Y", mktime()) . " - 182 day"));
 			$x=0;
-			while ($x <= 6) {
+			while ($x <= 5) {
 				$period = date("F-Y",strtotime(date("Y-m-d", strtotime($sixmonthback)) . " +".$x." month"));
 				$categories[$x]=$period;
 				$x++;
@@ -478,9 +662,10 @@ class Dashboard_Management extends MY_Controller {
 			
 			//Sites reported by 10th
 			$tenth=date('Y-m-10');
+			$first = date('Y-m-01');
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							INNER JOIN maps m ON m.period_begin=c.period_begin
-							WHERE c.created <='".$tenth."'";
+							WHERE c.created BETWEEN '".$tenth."' AND  '".$first."'";
 							
 			$query = $this ->db->query($sql_tenth);
 			$results = $query ->result_array();
@@ -507,9 +692,10 @@ class Dashboard_Management extends MY_Controller {
 			$data =array();
 			//Sites reported by 10th
 			$tenth=date('Y-m-10');
+			$first = date('Y-m-01');
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							INNER JOIN maps m ON m.period_begin=c.period_begin
-							WHERE c.created <='".$tenth."'";
+							WHERE c.created BETWEEN '".$tenth."' AND  '".$first."'";
 							
 			$query = $this ->db->query($sql_tenth);
 			$results = $query ->result_array();

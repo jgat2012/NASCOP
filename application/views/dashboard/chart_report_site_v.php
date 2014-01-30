@@ -13,6 +13,7 @@ $chartSize=300;
                   events: {
                     load: function(event) {
                         $('#<?php echo $container;?>').find('.highcharts-legend-item').last().append('<br/><br/><div style="width:220px"><hr/> <span style="float:left"> Total Reporting Sites</span><span style="float:right"> ' + <?php echo $tot_reportsites;?> + '</span> </div>')
+                    	
                     }
                   }
                   
