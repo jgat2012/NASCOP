@@ -201,7 +201,7 @@
 		            <input type='text' name='delivery_note' id='delivery_note' style='width:100%;' value='<?php echo @$order_array[0]['delivery_note']; ?>'/>
 		    	</td></tr>
 		    	<?php foreach($logs as $log){
-		    		if($log->description =="approved"){
+		    		if($log->description =="prepared" || $log->description =="approved"){
 		    		?>
 				<tr>
 					<td><b>Report <?php echo $log->description;?> by:</b> </td>

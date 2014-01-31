@@ -11,7 +11,7 @@ class Escm_Orders extends Doctrine_Record {
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_orders");
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_orders")->groupBy("cdrr_id");
 		$cdrrs = $query -> execute();
 		return $cdrrs;
 	}

@@ -340,7 +340,7 @@
 		</div>
 		<div>
 			<span style="vertical-align:bottom;font-size:1.2em;">Comments (Explain ALL Losses and Adjustments):</span>
-			<textarea style="width:100%" rows="8" name="comments" id="comments"></textarea>
+			<textarea style="width:100%;font-size:18px;" rows="8" name="comments" id="comments"></textarea>
 			<?php
 	           if($hide_generate==2){
 	        ?>
@@ -362,7 +362,7 @@
 		            <input type='text' name='delivery_note' id='delivery_note' style="width:100%;"/>
 		    	</td></tr>
 		    	<?php foreach($logs as $log){
-		    		if($log->description =="approved"){
+		    		if($log->description =="prepared" || $log->description =="approved"){
 		    		?>
 				<tr>
 					<td><b>Report <?php echo $log->description;?> by:</b> </td>
