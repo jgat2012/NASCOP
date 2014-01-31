@@ -347,7 +347,7 @@ class Order extends MY_Controller {
 						}
 						$cdrr_array[$commodity_counter]['out_of_stock'] = $out_of_stock[$commodity_counter];
 						$cdrr_array[$commodity_counter]['resupply'] = $resupply[$commodity_counter];
-						if ($code =="D-CDRR") {
+						if ($code == "D-CDRR") {
 							$cdrr_array[$commodity_counter]['aggr_consumed'] = $aggr_consumed[$commodity_counter];
 							$cdrr_array[$commodity_counter]['aggr_on_hand'] = $aggr_on_hand[$commodity_counter];
 						}
@@ -384,6 +384,191 @@ class Order extends MY_Controller {
 			}
 		}
 		redirect("order");
+	}
+
+	public function import_order() {
+		$code = $this -> input -> post("upload_type");
+
+		if ($code == "D-CDRR") {
+			$status_code = 0;
+			$resupply = "N";
+		} else if ($code == "F-CDRR_packs") {
+			$status_code = 3;
+			$resupply = "M";
+		}
+
+		$this -> load -> library('PHPExcel');
+		$objReader = new PHPExcel_Reader_Excel5();
+		if ($_FILES['file']['tmp_name']) {
+			$objPHPExcel = $objReader -> load($_FILES['file']['tmp_name']);
+		} else {
+			redirect("order");
+		}
+
+		$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
+		$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
+		$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
+
+		$first_row = 4;
+		$facility_name = trim($arr[$first_row]['C'] . $arr[$first_row]['D'] . $arr[$first_row]['E']);
+		$facility_code = trim($arr[$first_row]['G'] . $arr[$first_row]['H'] . $arr[$first_row]['I']);
+
+		$second_row = 5;
+		$province = trim($arr[$second_row]['C'] . $arr[$second_row]['D'] . $arr[$second_row]['E']);
+		$district = trim($arr[$second_row]['G'] . $arr[$second_row]['H'] . $arr[$second_row]['I']);
+
+		$third_row = 7;
+		$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
+		$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
+
+		if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
+			//redirect("order");
+		}
+
+		/*
+		 $duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_code);
+		 if ($duplicate == true) {
+		 //redirect("order");
+		 }*/
+
+		$fourth_row = 9;
+		$sponsor_gok = trim($arr[$fourth_row]['D']);
+		$sponsor_pepfar = trim($arr[$fourth_row]['F']);
+		$sponsor_msf = trim($arr[$fourth_row]['H']);
+		if ($sponsor_gok) {
+			$sponsors = "GOK";
+		}
+		if ($sponsor_pepfar) {
+			$sponsors = "PEPFAR";
+		}
+		if ($sponsor_msf) {
+			$sponsors = "MSF";
+		}
+
+		$fifth_row = 11;
+		$service = array();
+		$service_art = trim($arr[$fifth_row]['D']);
+		$service_pmtct = trim($arr[$fifth_row]['F']);
+		$service_pep = trim($arr[$fifth_row]['H']);
+		if ($service_art) {
+			$service[] = "ART";
+		}
+		if ($service_pmtct) {
+			$service[] = "PMTCT";
+		}
+		if ($service_pep) {
+			$service[] = "PEP";
+		}
+
+		$services = implode(",", $service);
+
+		$seventh_row = 95;
+
+		$comments = trim($arr[$seventh_row]['A']);
+		$comments .= trim($arr[$seventh_row]['B']);
+		$comments .= trim($arr[$seventh_row]['C']);
+		$comments .= trim($arr[$seventh_row]['D']);
+		$comments .= trim($arr[$seventh_row]['E']);
+		$comments .= trim($arr[$seventh_row]['F']);
+		$comments .= trim($arr[$seventh_row]['G']);
+		$comments .= trim($arr[$seventh_row]['H']);
+		$comments .= trim($arr[$seventh_row]['I']);
+		$comments .= trim($arr[$seventh_row]['J']);
+		$comments .= trim($arr[$seventh_row]['K']);
+		$comments .= trim($arr[$seventh_row]['L']);
+
+		$status = "approved";
+
+		$main_array = array();
+		$main_array['id'] = "";
+		$main_array['status'] = $status;
+		$main_array['created'] = date('Y-m-d H:i:s');
+		$main_array['updated'] = "";
+		$main_array['code'] = $code;
+		$main_array['period_begin'] = $period_begin;
+		$main_array['period_end'] = $period_end;
+		$main_array['comments'] = $comments;
+		$main_array['reports_expected'] = null;
+		$main_array['reports_actual'] = null;
+		$main_array['services'] = $services;
+		$main_array['sponsors'] = $sponsors;
+		$main_array['non_arv'] = 0;
+		$main_array['delivery_note'] = null;
+		$main_array['order_id'] = 0;
+		$facilities = Sync_Facility::getId($facility_code, $status_code);
+		$main_array['facility_id'] = $facilities['id'];
+
+		$sixth_row = 18;
+		$cdrr_array = array();
+		$commodity_counter = 0;
+
+		for ($i = $sixth_row; $sixth_row, $i <= 89; $i++) {
+			if ($i != 34 || $i != 57) {
+				if (trim($arr[$i][$resupply]) != 0) {
+					$drug_name = trim($arr[$i]['A']);
+					$pack_size = trim($arr[$i]['B']);
+					$commodity = $this -> getMappedDrug($drug_name, $pack_size);
+					if ($commodity != null) {
+						$cdrr_array[$commodity_counter]['id'] = "";
+						if ($code == "D-CDRR") {
+							$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
+							$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
+							$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@trim($arr[$i]['E']) * @$pack_size);
+							$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['E']);
+							$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['F']);
+							$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['G']);
+							$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['H']);
+							$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['K']);
+							$expiry_date = trim($arr[$i]['L']);
+							if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+								$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+							} else {
+								$cdrr_array[$commodity_counter]['expiry_date'] = "";
+							}
+							$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['M']);
+							$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['N']);
+							$cdrr_array[$commodity_counter]['aggr_consumed'] = trim($arr[$i]['I']);
+							$cdrr_array[$commodity_counter]['aggr_on_hand'] = trim($arr[$i]['J']);
+						} else if ($code == "F-CDRR_packs") {
+							$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
+							$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
+							$cdrr_array[$commodity_counter]['dispensed_units'] = trim($arr[$i]['E']);
+							$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['F']);
+							$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['G']);
+							$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['H']);
+							$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['I']);
+							$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['J']);
+							$expiry_date = trim($arr[$i]['K']);
+							if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+								$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+							} else {
+								$cdrr_array[$commodity_counter]['expiry_date'] = "";
+							}
+							$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['L']);
+							$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['M']);
+							$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
+							$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
+						}
+						$cdrr_array[$commodity_counter]['publish'] = 0;
+						$cdrr_array[$commodity_counter]['cdrr_id'] = "";
+						$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
+						$commodity_counter++;
+					}
+				}
+			}
+		}
+		$main_array['ownCdrr_item'] = $cdrr_array;
+
+		$log_array['id'] = "";
+		$log_array['description'] = "";
+		$log_array['created'] = "";
+		$log_array['user_id'] = "";
+		$log_array['maps_id'] = "";
+
+		echo "<pre>";
+		print_r($main_array);
+		echo "</pre>";
+
 	}
 
 	public function download_cdrr($cdrr_id) {
@@ -713,6 +898,13 @@ class Order extends MY_Controller {
 		return null;
 	}
 
+	public function clean_date($base_date) {
+		$clean_date = "";
+		$date_array = explode("/", @$base_date);
+		$clean_date = @$date_array[2] . "-" . @$date_array[1] . "-" . @$date_array[0];
+		return $clean_date;
+	}
+
 	public function getMappedDrug($drug_name = "", $packsize = "") {
 		if ($drug_name != "") {
 			$drugs = explode(" ", trim($drug_name));
@@ -735,7 +927,12 @@ class Order extends MY_Controller {
 					}
 				}
 			}
-			return $key = array_search(max(array_count_values($drug_list)), array_count_values($drug_list));
+			$list_array = array_count_values($drug_list);
+			if (is_array($list_array)) {
+				if (!empty($list_array)) {
+					return $key = array_search(max(array_count_values($drug_list)), array_count_values($drug_list));
+				}
+			}
 		}
 		return null;
 	}
