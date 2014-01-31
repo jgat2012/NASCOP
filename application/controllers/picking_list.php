@@ -98,8 +98,8 @@ class Picking_List extends MY_Controller {
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
 				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				LEFT JOIN maps m ON sf.id=m.facility_id
-				WHERE c.code='0'
-				AND m.code=c.code
+				WHERE c.code='D-CDRR'
+				AND m.facility_id=c.facility_id
 				AND m.period_begin=c.period_begin
 				AND m.period_end=c.period_end
 				AND c.status='dispatched'
@@ -112,7 +112,7 @@ class Picking_List extends MY_Controller {
 
 	public function get_orders_list($list_id, $status) {
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Facility Name', 'Options');
-		$sql = "SELECT c.id,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+		$sql = "SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,sf.name as facility_name
 				FROM cdrr c
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
 				LEFT JOIN facilities f ON f.facilitycode=sf.code

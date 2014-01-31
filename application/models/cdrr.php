@@ -21,7 +21,7 @@ class Cdrr extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('cdrr');
-		$this -> hasOne('Facilities as Facility', array('local' => 'facility_id', 'foreign' => 'id'));
+		$this -> hasOne('Sync_Facility as Facility', array('local' => 'facility_id', 'foreign' => 'id'));
 	}
 
 	public function getAll() {
@@ -31,7 +31,7 @@ class Cdrr extends Doctrine_Record {
 	}
 
 	public function getOrders($start, $end) {
-		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='0'");
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='D-CDRR'");
 		$cdrrs = $query -> execute();
 		return $cdrrs;
 	}
@@ -39,9 +39,9 @@ class Cdrr extends Doctrine_Record {
 	public function getFacilities($start, $end, $id_list) {
 		$and = "";
 		if ($id_list != "") {
-			$and = "and id NOT IN($id_list)";
+			//$and = "and id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code !=1 $and") -> groupBy("facility_id");
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='D-CDRR' $and") -> groupBy("facility_id");
 		$items = $query -> execute();
 		return $items;
 	}
@@ -51,7 +51,7 @@ class Cdrr extends Doctrine_Record {
 		if ($id_list != "") {
 			$and = "and id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("status,count(status) as total") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code=0 $and") -> groupBy("status");
+		$query = Doctrine_Query::create() -> select("status,count(status) as total") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='D-CDRR' $and") -> groupBy("status");
 		$items = $query -> execute();
 		return $items;
 	}

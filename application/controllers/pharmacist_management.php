@@ -66,10 +66,10 @@ class Pharmacist_Management extends MY_Controller {
 		$dyn_table .= "<tbody>";
 		if ($cdrrs) {
 			foreach ($cdrrs as $cdrr) {
-				$dyn_table .= "<tr><td>" . $cdrr -> Facility -> facilitycode . "</td>";
+				$dyn_table .= "<tr><td>" . $cdrr -> Facility -> code . "</td>";
 				$dyn_table .= "<td>" . $cdrr -> Facility -> name . "</td>";
-				$dyn_table .= "<td>" . $cdrr -> Facility -> Type -> Name . "</td>";
-				$dyn_table .= "<td>" . $cdrr -> Facility -> County -> county . "</td></tr>";
+				$dyn_table .= "<td>Central Site</td>";
+				$dyn_table .= "<td>Nairobi</td></tr>";
 			}
 		}
 		$dyn_table .= "</tbody>";
@@ -143,7 +143,7 @@ class Pharmacist_Management extends MY_Controller {
 					$date1 = new DateTime($deadline_date);
 					$date2 = new DateTime($order_date);
 					$interval = $date1 -> diff($date2);
-					$dyn_table .= "<tr><td>" . $cdrr -> Facility -> facilitycode . "</td>";
+					$dyn_table .= "<tr><td>" . $cdrr -> Facility -> code . "</td>";
 					$dyn_table .= "<td>" . $cdrr -> Facility -> name . "</td>";
 					$dyn_table .= "<td>" . date('d-M-Y', strtotime($cdrr -> created)) . "</td>";
 					$dyn_table .= "<td>" . $interval -> d . " Day(s)</td></tr>";

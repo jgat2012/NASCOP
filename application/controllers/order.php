@@ -14,15 +14,15 @@ class Order extends MY_Controller {
 
 	public function get_orders() {
 		$columns = array('#', '#CDRR-ID', '#MAPS-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
-		$sql = "SELECT c.id,m.id as map,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,IF(m.code='0',CONCAT('D-MAPS#',m.id),CONCAT('F-MAPS#',m.id)) as maps_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+		$sql = "SELECT c.id,m.id as map,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,IF(m.code='D-MAPS',CONCAT('D-MAPS#',m.id),CONCAT('F-MAPS#',m.id)) as maps_id,c.period_begin,c.status as status_name,sf.name as facility_name
 				FROM cdrr c
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
 				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				LEFT JOIN maps m ON sf.id=m.facility_id
-				WHERE c.code='0'
-				AND m.code=c.code
+				WHERE c.code='D-CDRR'
 				AND m.period_begin=c.period_begin
 				AND m.period_end=c.period_end
+				AND m.facility_id=c.facility_id
 				AND c.status !='prepared' 
 				AND c.status !='review'";
 		//AND c.id NOT IN (SELECT cdrr_id FROM escm_orders)
@@ -40,7 +40,16 @@ class Order extends MY_Controller {
 		$log -> cdrr_id = $cdrr_id;
 		$log -> save();
 
+		$mylog = new Maps_Log();
+		$mylog -> description = $status;
+		$mylog -> created = date('Y-m-d H:i:s');
+		$mylog -> user_id = $this -> session -> userdata("user_id");
+		$mylog -> maps_id = $cdrr_id;
+		$mylog -> save();
+
 		$sql = "UPDATE cdrr SET status='$status' WHERE id='$cdrr_id'";
+		$this -> db -> query($sql);
+		$sql = "UPDATE maps SET status='$status' WHERE id='$maps_id'";
 		$this -> db -> query($sql);
 
 		$this -> session -> set_flashdata('order_message', "Order " . $status . " Successfully");
@@ -50,7 +59,7 @@ class Order extends MY_Controller {
 	public function view_order($cdrr_id, $maps_id) {
 		$order_array = array();
 		$and = "";
-		$sql = "SELECT c.*,ci.*,f.*,co.county as county_name,d.name as district_name,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+		$sql = "SELECT c.*,ci.*,f.*,co.county as county_name,d.name as district_name,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,sf.name as facility_name
 				FROM cdrr c
 				LEFT JOIN cdrr_item ci ON ci.cdrr_id=c.id
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
@@ -99,7 +108,7 @@ class Order extends MY_Controller {
 
 	public function view_cdrr($cdrr_id) {
 		$cdrr_array = array();
-		$sql = "SELECT c.*,ci.*,f.*,co.county as county_name,d.name as district_name,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+		$sql = "SELECT c.*,ci.*,f.*,co.county as county_name,d.name as district_name,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,sf.name as facility_name
 				FROM cdrr c
 				LEFT JOIN cdrr_item ci ON ci.cdrr_id=c.id
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
@@ -111,7 +120,19 @@ class Order extends MY_Controller {
 		$cdrr_array = $query -> result_array();
 		$data['cdrr_array'] = $cdrr_array;
 		$data['options'] = "view";
-		$this -> set_cdrr($cdrr_array[0]['code'], $data);
+		if ($cdrr_array[0]['code'] == "D-CDRR") {
+			$code = 0;
+		} else if ($cdrr_array[0]['code'] == "F-CDRR_units") {
+			$facility_code = $this -> session -> userdata("facility");
+			if ($cdrr_array[0]['facility_code'] == $facility_code) {
+				$code = 1;
+			} else {
+				$code = 2;
+			}
+		} else if ($cdrr_array[0]['code'] == "F-CDRR_packs") {
+			$code = 3;
+		}
+		$this -> set_cdrr($code, $data);
 	}
 
 	public function set_cdrr($type, $cdrr_array = array()) {
@@ -136,7 +157,11 @@ class Order extends MY_Controller {
 			} else {
 				$data['hide_generate'] = 1;
 			}
-
+		} else if ($type == 3) {
+			$data['page_title'] = "Stand-alone(F-CDRR)";
+			$data['banner_text'] = "Stand-alone(F-CDRR)";
+			$facility = $this -> session -> userdata("facility");
+			$data['stand_alone'] = 1;
 		} else {
 			$data['page_title'] = "Central Aggregate(D-CDRR)";
 			$data['content_view'] = "orders/cdrr_template";
@@ -222,7 +247,19 @@ class Order extends MY_Controller {
 		$cdrr_array = $query -> result_array();
 		$data['cdrr_array'] = $cdrr_array;
 		$data['options'] = "update";
-		$this -> set_cdrr($cdrr_array[0]['code'], $data);
+		if ($cdrr_array[0]['code'] == "D-CDRR") {
+			$code = 0;
+		} else if ($cdrr_array[0]['code'] == "F-CDRR_units") {
+			$facility_code = $this -> session -> userdata("facility");
+			if ($cdrr_array[0]['facility_code'] == $facility_code) {
+				$code = 1;
+			} else {
+				$code = 2;
+			}
+		} else if ($cdrr_array[0]['code'] == "F-CDRR_packs") {
+			$code = 3;
+		}
+		$this -> set_cdrr($code, $data);
 	}
 
 	public function update($type = "cdrr", $cdrr_id) {
@@ -254,7 +291,7 @@ class Order extends MY_Controller {
 				$resupply = $this -> input -> post('resupply');
 				$old_resupply = $this -> input -> post('old_resupply');
 				$comments = $this -> input -> post('comments');
-				if ($code == 0) {
+				if ($code == "D-CDRR") {
 					$aggr_consumed = $this -> input -> post('aggregated_qty');
 					$aggr_on_hand = $this -> input -> post('aggregated_physical_qty');
 				}
@@ -262,11 +299,10 @@ class Order extends MY_Controller {
 				//insert cdrr
 				$main_array = array();
 				$main_array['updated'] = date('Y-m-d H:i:s');
-				$main_array['code'] = $code;
 				$main_array['period_begin'] = $period_begin;
 				$main_array['period_end'] = $period_end;
 				$main_array['comments'] = $comments;
-				if ($code == 0) {//Aggregated
+				if ($code == "D-CDRR") {//Aggregated
 					$reports_expected = $this -> input -> post('central_rate');
 					$reports_actual = $this -> input -> post('actual_report');
 					$main_array['reports_expected'] = $reports_expected;
@@ -311,7 +347,7 @@ class Order extends MY_Controller {
 						}
 						$cdrr_array[$commodity_counter]['out_of_stock'] = $out_of_stock[$commodity_counter];
 						$cdrr_array[$commodity_counter]['resupply'] = $resupply[$commodity_counter];
-						if ($code == 0) {
+						if ($code =="D-CDRR") {
 							$cdrr_array[$commodity_counter]['aggr_consumed'] = $aggr_consumed[$commodity_counter];
 							$cdrr_array[$commodity_counter]['aggr_on_hand'] = $aggr_on_hand[$commodity_counter];
 						}
@@ -676,6 +712,7 @@ class Order extends MY_Controller {
 		}
 		return null;
 	}
+
 	public function getMappedDrug($drug_name = "", $packsize = "") {
 		if ($drug_name != "") {
 			$drugs = explode(" ", trim($drug_name));
