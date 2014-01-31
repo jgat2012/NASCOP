@@ -134,5 +134,7 @@ class Facilities extends Doctrine_Record {
 		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $facility[0]['total'];
 	}
+	
+	
 
 }

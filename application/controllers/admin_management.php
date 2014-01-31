@@ -7,17 +7,35 @@ class admin_management extends MY_Controller {
 	}
 
 	public function addFacility() {
-		$results = Facilities::getAllJoined();
+		//1 == Kemsa, 2 == Kenya Pharma
+		$sql = "SELECT f.id,f.category,c.county as county_name,d.name as district,f.code,f.name,IF(a.facility_id is null,'NO','YES') as adt_installed,'Kenya Pharma' as pipeline,f.active,f.district_id,f.county_id
+					FROM escm_facility f
+					LEFT JOIN adt_sites a ON a.facility_id=f.id
+					LEFT JOIN district d ON d.id = f.district_id
+					LEFT JOIN counties c ON c.id = f.county_id
+					WHERE a.pipeline ='1' OR a.facility_id IS NULL";
+		$sql_kemsa = "SELECT f.id,f.category,c.county as county_name,d.name as district,f.code,f.name,IF(a.facility_id is null,'NO','YES') as adt_installed,'Kemsa' as pipeline,f.active,f.district_id,f.county_id
+					FROM sync_facility f
+					LEFT JOIN adt_sites a ON a.facility_id=f.id
+					LEFT JOIN district d ON d.id = f.district_id
+					LEFT JOIN counties c ON c.id = f.county_id
+					WHERE a.pipeline ='1' OR a.facility_id IS NULL";
+		$kenyapharma = $this -> db -> query($sql);	
+		$kenyapharma =$kenyapharma -> result_array();
+		$kemsa = $this -> db -> query($sql_kemsa);	
+		$kemsa =$kemsa -> result_array();
+		$results = array_merge($kenyapharma,$kemsa);
+		
 		$dyn_table = "<table border='1' id='patient_listing'  cellpadding='5' class='dataTables'>";
-		$dyn_table .= "<thead><tr><th>Facility Code</th><th>Facility Name</th><th>Facility Type</th><th>County</th><th>District</th><th>Options</th></tr></thead><tbody>";
+		$dyn_table .= "<thead><tr><th>Facility Code</th><th>Facility Name</th><th>Facility Type</th><th>County</th><th>District</th><th>ADT Installed</th><th>Pipeline</th><th>Options</th></tr></thead><tbody>";
 		if ($results) {
 			foreach ($results as $result) {
 				if ($result['active'] == '1') {
-					$option = "<a href='#edit_facilities' data-toggle='modal' role='button' class='edit' table='facilities' facility_name='" . $result['facilityname'] . "' facility_code='" . $result['facilitycode'] . "' facility_type='" . $result['f_type_id'] . "' facility_district='" . $result['district_id'] . "' facility_county='" . $result['county_id'] . "' facility_id='" . $result['id'] . "'>Edit</a> | <a href='" . base_url() . "admin_management/disable/facilities/" . $result['id'] . "' class='red'>Disable</a>";
+					$option = "<a href='#edit_facilities' data-toggle='modal' role='button' class='edit' table='facilities' facility_name='" . $result['name'] . "' facility_code='" . $result['code'] . "' facility_type='" . $result['category'] . "' facility_district='" . $result['district_id'] . "' facility_county='" . $result['county_id'] . "' facility_id='" . $result['id'] . "'>Edit</a> | <a href='" . base_url() . "admin_management/disable/facilities/" . $result['id'] . "' class='red'>Disable</a>";
 				} else {
 					$option = "<a href='#edit_facilities' data-toggle='modal' role='button' class='edit' table='facilities' facility_district='" . $result['district_id'] . "' facility_county='" . $result['county_id'] . "' facility_id='" . $result['id'] . "'>Edit</a> | <a href='" . base_url() . "admin_management/enable/facilities/" . $result['id'] . "' class='green'>Enable</a>";
 				}
-				$dyn_table .= "<tr><td>" . $result['facilitycode'] . "</td><td>" . $result['facilityname'] . "</td><td>" . $result['f_type'] . "</td><td>" . $result['county'] . "</td><td>" . $result['district'] . "</td><td>" . $option . "</td></tr>";
+				$dyn_table .= "<tr><td>" . $result['code'] . "</td><td>" . $result['name'] . "</td><td>" . $result['category'] . "</td><td>" . $result['county_name'] . "</td><td>" . $result['district'] . "</td><td>" . $result['adt_installed'] . "</td><td>" . $result['pipeline'] . "</td><td>" . $option . "</td></tr>";
 			}
 		}
 		$dyn_table .= "</tbody></table>";
