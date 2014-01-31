@@ -1575,7 +1575,7 @@ td {
 /*
  * National Dashboard Style
  */
-.fullest-content .three_block,.fullest-content .two_block{
+.fullest-content .three_block,.fullest-content .two_block,.fullest-content .onehalf_block{
 	display: inline-block;
 	float: left;
 	height: 53%;
@@ -1588,6 +1588,12 @@ td {
 }
 .fullest-content .two_block{
 	width:48%;
+}
+.fullest-content .onehalf_block{
+	width:65%;
+}
+.fullest-content .higher {
+	
 }
 .national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input, 
 .nat_dashboard_rep label {

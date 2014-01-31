@@ -18,16 +18,26 @@ class Escm_Facility extends Doctrine_Record {
 		$this -> hasColumn('hcsm_id', 'int', 11);
 		$this -> hasColumn('location', 'varchar', 255);
 		$this -> hasColumn('affiliate_organization_id', 'int', 11);
+		$this -> hasColumn('active', 'int', 1);
 
 	}
 
 	public function setUp() {
 		$this -> setTableName('escm_facility');
+		$this -> hasOne('District as Parent_District', array('local' => 'district_id', 'foreign' => 'id'));
+		$this -> hasOne('Counties as County', array('local' => 'county_id', 'foreign' => 'id'));
+		$this -> hasMany('Adt_Sites as adt', array('local' => 'id', 'foreign' => 'facility_id'));
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
+		$query = Doctrine_Query::create() -> select("f.*,d.name as district,c.county as county_name,IF(sites.facility_id is null,'NO','YES') as adt_installed") -> from("escm_facility f") -> leftJoin('f.Parent_District d, f.County c,f.adt sites');
 		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $sync_facility;
+	}
+
+	public function getAllNotHydrated() {
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
+		$sync_facility = $query -> execute();
 		return $sync_facility;
 	}
 

@@ -1,5 +1,6 @@
 <?php
 if (!defined('BASEPATH'))
+
 	exit('No direct script access allowed');
 
 class Sync extends MY_Controller {
@@ -9,6 +10,7 @@ class Sync extends MY_Controller {
 
 	public function user($email) {
 		$email = urldecode($email);
+		//$email ='kevomarete@gmail.com';
 		$user = Sync_User::getUser($email);
 		echo json_encode($user);
 	}
