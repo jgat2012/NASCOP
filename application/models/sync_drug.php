@@ -24,6 +24,16 @@ class Sync_Drug extends Doctrine_Record {
 		return $sync_drug;
 	}
 
+	public function getAllSettings($jtStartIndex, $jtPageSize, $jtSorting, $search_value) {
+		if ($search_value != "") {
+			$query = Doctrine_Query::create() -> select("id,name,abbreviation,strength,packsize,formulation,unit,weight") -> from("sync_drug") -> where("name LIKE '%$search_value%'") -> orderBy($jtSorting) -> offset($jtStartIndex) -> limit($jtPageSize);
+		} else {
+			$query = Doctrine_Query::create() -> select("id,name,abbreviation,strength,packsize,formulation,unit,weight") -> from("sync_drug") -> orderBy($jtSorting) -> offset($jtStartIndex) -> limit($jtPageSize);
+		}
+		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $sync_drug;
+	}
+
 	public function getActive() {
 		$drug_name = "CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as name";
 		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("sync_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("category_id asc");
