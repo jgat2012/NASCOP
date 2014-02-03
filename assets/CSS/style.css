@@ -1633,9 +1633,10 @@ td {
 	border: 1px solid #aaa;
 	color:#000000;
 }
-.nat_dashboard_rep a{
-	
+.nav-list>.active>a, .nav-list>.active>a:hover, .nav-list>.active>a:focus{
+	background-color:#2B597E; 
 }
+
 .nat_dashboard_rep h3{
 	line-height: 2em;
 	-webkit-margin-before: 0.5em;

@@ -1264,8 +1264,7 @@ input{height:2em}.nat_dashboard_rep table
 td{padding:1px
 10px}.nat_dashboard_rep
 .dataTables_filter{width:70%}.ui-widget-header{background:#2B597E;border:1px
-solid #aaa;color:#000}.nat_dashboard_rep
-a{}.nat_dashboard_rep
+solid #aaa;color:#000}.nav-list>.active>a,.nav-list>.active>a:hover,.nav-list>.active>a:focus{background-color:#2B597E}.nat_dashboard_rep
 h3{line-height:2em;-webkit-margin-before:0.5em;color:#fff;font-size:1em;padding:0
 0 0 1em;background:#2B597E;box-shadow:0 1.2px 3px 1px #000;-webkit-box-shadow:0 1.2px 3px 1px #000}
 .ui-multiselect{padding:2px

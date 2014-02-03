@@ -7,7 +7,7 @@
 					NASCOP SETTINGS
 				</li>
 				<li class="active">
-					<a href="#" class="setting_link" id="nascop_drugs">DRUGS</a>
+					<a href="#" class="setting_link" id="sync_drug">DRUGS</a>
 				</li>
 				<li>
 					<a href="#">FACILITIES</a>
@@ -22,7 +22,7 @@
 				<li class="nav-header">
 					eSCM SETTINGS
 				</li>
-				<li class="active">
+				<li>
 					<a href="#">DRUGS</a>
 				</li>
 				<li>
@@ -43,18 +43,10 @@
 					<a href="#">SETTINGS</a>
 				</li>
 			</ul>
-			<!--Filter-->
-			<div class="filtering">
-				<form>
-					Name:
-					<input type="text" name="name" id="name" />
-					<button type="submit" id="LoadRecordsButton">
-						Load records
-					</button>
-				</form>
-			</div>
 			<!--Tables-->
-			<div id="setting_grid" class="table-responsive"></div>
+			<div id="table_grid" class="table-responsive">
+				
+			</div>
 		</div>
 	</div>
 </div>
@@ -63,62 +55,29 @@
 		var base_url = "http://localhost/NASCOP/";
 		$(".setting_link").click(function() {
 			var link_name = $(this).attr("id");
-			$('#setting_grid').jtable({
-				title : 'NASCOP DRUGS',
-				paging : true, //Enable paging
-				pageSize : 10, //Set page size (default: 10)
-				sorting : true, //Enable sorting
-				defaultSorting : 'id ASC', //Set default sorting
-				actions : {
-					listAction : base_url + 'settings/get/' + link_name,
-					createAction : base_url + 'settings/create' + link_name,
-					updateAction : base_url + 'settings/update' + link_name,
-					deleteAction : base_url + 'settings/delete/' + link_name
-				},
-				fields : {
-					id : {
-						key : true,
-						list : false
-					},
-					name : {
-						title : 'Drug Name',
-						width : '40%'
-					},
-					abbreviation : {
-						title : 'Abbreviation',
-						width : '20%'
-					},
-					strength : {
-						title : 'Strength',
-						width : '20%'
-					},
-					packsize : {
-						title : 'Packsize',
-						width : '20%'
-					},
-					formulation : {
-						title : 'Formulation',
-						width : '20%'
-					},
-					unit : {
-						title : 'Unit',
-						width : '20%'
-					},
-					weight : {
-						title : 'Weight',
-						width : '30%',
-					}
-				}
+			var url = base_url + "settings/get/" + link_name;
+			if(link_name == "sync_drug") {
+				var columns = new Array("name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight","options");
+			}
+			//Generate Columns
+			var thead = "<table id='setting_grid'><thead><tr>";
+			$.each(columns, function(i, v) {
+				thead += "<th>" + v + "</th>";
 			});
-			$('#setting_grid').jtable('load');
+			thead += "</tr></thead></table>";
+			$("#table_grid").empty();
+			$("#table_grid").append(thead);
+
+			$('#setting_grid').dataTable({
+				"bProcessing" : true,
+				"bServerSide" : true,
+				"sAjaxSource" : url,
+				"bJQueryUI" : true,
+				"sPaginationType" : "full_numbers"
+			});
+
 		});
 		//End of function
-		//Re-load records when user click 'load records' button.
-		$('#LoadRecordsButton').click(function(e) {
-			e.preventDefault();
-			$('#setting_grid').jtable('load', {
-				name : $('#name').val(),
-			});
-		});
 	});
+
 </script>
