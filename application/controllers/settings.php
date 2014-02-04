@@ -89,7 +89,11 @@ class settings extends MY_Controller {
 			}
 			echo json_encode($output);
 		} else if ($type == "sync_regimen") {
-
+			$rows = Sync_Regimen::getAllSettings();
+			foreach ($rows as $index => $row) {
+                 unset($rows[$index]['id']);
+			}
+			echo json_encode($rows);
 		}
 	}
 

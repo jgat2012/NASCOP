@@ -54,6 +54,7 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		var base_url = "http://localhost/NASCOP/";
 
 		// Data
 		var populationData = [{
@@ -91,8 +92,15 @@
 		// Grid
 		$("#grid").igGrid({
 			width : "100%",
-			dataSource : populationData,
+			dataSource : base_url + "settings/get/sync_regimen",
 			autoGenerateColumns : true,
+			autoAdjustHeight : false,
+			alternateRowStyles : true,
+			autofitLastColumn : true,
+			fixedHeaders : true,
+			height : "300px",
+			width : "100%",
+			enableHoverStyles : true,
 			features : [{
 				name : "Sorting",
 				type : "local",
@@ -100,7 +108,13 @@
 			}, {
 				name : "Filtering",
 				type : "local",
-				mode : "advanced"
+				mode : "advanced",
+				advancedModeEditorsVisible : true,
+				nullTexts : {
+					contains : "",
+					equals : ""
+				}
+
 			}, {
 				name : "Hiding"
 			}, {
@@ -109,10 +123,27 @@
 				name : 'Paging',
 				type : "local",
 				pageSize : 10
+			}, {
+				name : "Updating",
+				enableAddRow : true,
+				editMode : "row",
+				enableDeleteRow : true,
+				columnSettings : [{
+					columnKey : "name",
+					editorOptions : {
+						type : "text",
+						disabled : false
+					}
+				}]
+			}, {
+				name : "RowSelectors",
+				enableCheckBoxes : true,
+				enableRowNumbering : false,
+			}, {
+				name : "Selection"
 			}]
 		});
 
-		var base_url = "http://localhost/NASCOP/";
 		$(".setting_link").click(function() {
 			var link_name = $(this).attr("id");
 			var url = base_url + "settings/get/" + link_name;
