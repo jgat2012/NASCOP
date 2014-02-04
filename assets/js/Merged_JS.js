@@ -8,7 +8,6 @@
  *Change password validation
  */
 $(document).ready(function() {
-
 	setTimeout(function() {
 		$(".message").fadeOut("2000");
 	}, 6000);

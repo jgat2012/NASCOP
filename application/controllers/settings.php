@@ -98,10 +98,10 @@ class settings extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$data['content_view'] = "settings/settings_param";
-		$data['title'] = "webADT | System Admin";
-		$data['banner_text'] = "System Admin";
-		$this -> load -> view('settings/settings_template', $data);
+		$data['content_view'] = "settings/settings_v";
+		$data['title'] = "webADT | API Settings";
+		$data['banner_text'] = "API Settings";
+		$this -> load -> view('template', $data);
 	}
 
 }

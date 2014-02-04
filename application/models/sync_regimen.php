@@ -20,7 +20,7 @@ class Sync_Regimen extends Doctrine_Record {
 	}
 	
 	public function getAllSettings() {
-		$query = Doctrine_Query::create() -> select("name,code,old_code,description") -> from("sync_regimen");
+		$query = Doctrine_Query::create() -> select("code,name,description,old_code") -> from("sync_regimen");
 		$sync_regimen = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_regimen;
 	}
