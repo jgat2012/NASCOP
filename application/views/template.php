@@ -146,11 +146,13 @@ if(isset($report_title)){
 <body onload="set_interval()" onmousemove="set_interval()" onclick="set_interval" onkeypress="set_interval()" onscroll="set_interval()">
 
 
-	<div id="top-panel" style="margin:0px;">
-
+	<div id="top-panel" style="margin:0px;" >
+		<div class="container-fluid">
+<div class="row-fluid">
+	<div class="span4">
 		<div class="logo">
 			<a class="logo" href="<?php echo base_url();?>" ></a> 
-</div>
+        </div>
 
 
 				<div id="system_title">
@@ -162,9 +164,9 @@ if(isset($report_title)){
 					</div>
 					<div class="banner_text"><?php echo $banner_text;?></div>	
 				</div>
-				
+	</div>	
+	<div class="span8">		
  <div id="top_menu"> 
-
  	<?php
 	//Code to loop through all the menus available to this user!
 	//Fet the current domain
@@ -192,8 +194,6 @@ foreach($menus as $menu){?>
 	 <span class=" green_"></span></a>
 <?php }?>
 
-
-
 <?php
 $counter++;
 }}
@@ -207,6 +207,7 @@ if($menus){
 		<li id="change_password_link"><a href="#user_change_pass" data-toggle="modal"><i class=" icon-asterisk"></i> Change Password</a></li>
 	</ul>
 </div>
+
 <div class="welcome_msg">
 	<span>Welcome <b style="font-weight: bolder;font-size: 20px;"><?php echo $this -> session -> userdata('full_name');?></b>. <a id="logout_btn" href="<?php echo base_url().'user_management/logout/2' ?>"><i class="icon-off"></i>Logout</a></span>
 	<br>
@@ -216,8 +217,10 @@ if($menus){
 	<a href='<?php echo base_url().'home_controller/reset_user';?>' class="btn btn-success" style="color:#FFF;">Dashboard</a>
 </div>
 <?php }?>
+</div>
  </div>
-
+</div>
+</div>
 </div>
 
 

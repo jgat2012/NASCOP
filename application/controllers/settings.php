@@ -15,86 +15,89 @@ class settings extends MY_Controller {
 	}
 
 	public function get($type = "sync_drug") {
+		//Column definitions
 		if ($type == "sync_drug") {
-			$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
-			$iDisplayLength = $this -> input -> get_post('iDisplayLength', true);
-			$iSortCol_0 = $this -> input -> get_post('iSortCol_0', false);
-			$iSortingCols = $this -> input -> get_post('iSortingCols', true);
-			$sSearch = $this -> input -> get_post('sSearch', true);
-			$sEcho = $this -> input -> get_post('sEcho', true);
-			$aColumns = array('name');
 			$columns = array("id", "name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight");
-			$columns = implode(",", $columns);
-
-			// Paging
-			if (isset($iDisplayStart) && $iDisplayLength != '-1') {
-				$this -> db -> limit($this -> db -> escape_str($iDisplayLength), $this -> db -> escape_str($iDisplayStart));
-			}
-			// Ordering
-			if (isset($iSortCol_0)) {
-				for ($i = 0; $i < intval($iSortingCols); $i++) {
-					$iSortCol = $this -> input -> get_post('iSortCol_' . $i, true);
-					$bSortable = $this -> input -> get_post('bSortable_' . intval($iSortCol), true);
-					$sSortDir = $this -> input -> get_post('sSortDir_' . $i, true);
-
-					if ($bSortable == 'true') {
-						$this -> db -> order_by($aColumns[intval($this -> db -> escape_str($iSortCol))], $this -> db -> escape_str($sSortDir));
-					}
-				}
-			}
-			/*
-			 * Filtering
-			 */
-			if (isset($sSearch) && !empty($sSearch)) {
-				for ($i = 0; $i < count($aColumns); $i++) {
-					$bSearchable = $this -> input -> get_post('bSearchable_' . $i, true);
-					// Individual column filtering
-					if (isset($bSearchable) && $bSearchable == 'true') {
-						$this -> db -> or_like($aColumns[$i], $this -> db -> escape_like_str($sSearch));
-					}
-				}
-			}
-
-			// Select Data
-			$this -> db -> select('SQL_CALC_FOUND_ROWS ' . str_replace(' , ', ' ', implode(', ', $aColumns)), false);
-			$this -> db -> select("$columns");
-			$this -> db -> from("$type s");
-			$rResult = $this -> db -> get();
-
-			// Data set length after filtering
-			$this -> db -> select('FOUND_ROWS() AS found_rows');
-			$iFilteredTotal = $this -> db -> get() -> row() -> found_rows;
-
-			// Total data set length
-			$this -> db -> select("id");
-			$this -> db -> from("$type");
-			$tot_drugs = $this -> db -> get();
-			$iTotal = count($tot_drugs -> result_array());
-
-			$output = array('sEcho' => intval($sEcho), 'iTotalRecords' => $iTotal, 'iTotalDisplayRecords' => (int)$iFilteredTotal, 'aaData' => array());
-			foreach ($rResult->result_array() as $row) {
-				$myrow = array();
-				foreach ($row as $i => $v) {
-					if ($i != "id") {
-						$myrow[] = $v;
-					} else {
-						$id = $v;
-					}
-				}
-				$links = anchor("settings/edit/" . $id, "<i class='icon-pencil'></i>");
-				$links .= "  ";
-				$links .= anchor("settings/delete/" . $id, "<i class='icon-trash'></i>");
-				$myrow[] = $links;
-				$output['aaData'][] = $myrow;
-			}
-			echo json_encode($output);
+		} else if ($type == "sync_facility") {
+			$columns = array("id", "code", "name", "category", "services");
 		} else if ($type == "sync_regimen") {
-			$rows = Sync_Regimen::getAllSettings();
-			foreach ($rows as $index => $row) {
-                 unset($rows[$index]['id']);
-			}
-			echo json_encode($rows);
+			$columns = array("id", "code", "name", "description");
+		} else if ($type == "sync_user") {
+			$columns = array("id", "name", "email", "role", "profile_id");
 		}
+
+		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
+		$iDisplayLength = $this -> input -> get_post('iDisplayLength', true);
+		$iSortCol_0 = $this -> input -> get_post('iSortCol_0', false);
+		$iSortingCols = $this -> input -> get_post('iSortingCols', true);
+		$sSearch = $this -> input -> get_post('sSearch', true);
+		$sEcho = $this -> input -> get_post('sEcho', true);
+		$aColumns = $columns;
+		$columns = implode(",", $columns);
+
+		// Paging
+		if (isset($iDisplayStart) && $iDisplayLength != '-1') {
+			$this -> db -> limit($this -> db -> escape_str($iDisplayLength), $this -> db -> escape_str($iDisplayStart));
+		}
+		// Ordering
+		if (isset($iSortCol_0)) {
+			for ($i = 0; $i < intval($iSortingCols); $i++) {
+				$iSortCol = $this -> input -> get_post('iSortCol_' . $i, true);
+				$bSortable = $this -> input -> get_post('bSortable_' . intval($iSortCol), true);
+				$sSortDir = $this -> input -> get_post('sSortDir_' . $i, true);
+
+				if ($bSortable == 'true') {
+					$this -> db -> order_by($aColumns[intval($this -> db -> escape_str($iSortCol))], $this -> db -> escape_str($sSortDir));
+				}
+			}
+		}
+		/*
+		 * Filtering
+		 */
+		if (isset($sSearch) && !empty($sSearch)) {
+			for ($i = 0; $i < count($aColumns); $i++) {
+				$bSearchable = $this -> input -> get_post('bSearchable_' . $i, true);
+				// Individual column filtering
+				if (isset($bSearchable) && $bSearchable == 'true') {
+					$this -> db -> or_like($aColumns[$i], $this -> db -> escape_like_str($sSearch));
+				}
+			}
+		}
+
+		// Select Data
+		$this -> db -> select('SQL_CALC_FOUND_ROWS ' . str_replace(' , ', ' ', implode(', ', $aColumns)), false);
+		$this -> db -> select("$columns");
+		$this -> db -> from("$type s");
+		$rResult = $this -> db -> get();
+
+		// Data set length after filtering
+		$this -> db -> select('FOUND_ROWS() AS found_rows');
+		$iFilteredTotal = $this -> db -> get() -> row() -> found_rows;
+
+		// Total data set length
+		$this -> db -> select("id");
+		$this -> db -> from("$type");
+		$tot_drugs = $this -> db -> get();
+		$iTotal = count($tot_drugs -> result_array());
+
+		$output = array('sEcho' => intval($sEcho), 'iTotalRecords' => $iTotal, 'iTotalDisplayRecords' => (int)$iFilteredTotal, 'aaData' => array());
+		foreach ($rResult->result_array() as $row) {
+			$myrow = array();
+			foreach ($row as $i => $v) {
+				if ($i != "id") {
+					$myrow[] = $v;
+				} else {
+					$id = $v;
+				}
+			}
+			$links = anchor("settings/edit/" . $id, "<i class='icon-pencil'></i>");
+			$links .= "  ";
+			$links .= anchor("settings/delete/" . $id, "<i class='icon-trash'></i>");
+			$myrow[] = $links;
+			$output['aaData'][] = $myrow;
+		}
+		echo json_encode($output);
+
 	}
 
 	public function base_params($data) {

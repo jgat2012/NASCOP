@@ -83,8 +83,9 @@ header {
 	width: 90%;
 	height: 30px;
 	display: block;
-	overflow: hidden;
+	overflow: visible;
 	text-shadow: 0 1px rgba(0, 0, 0, 0.1);
+	position:fixed;
 }
 #wrapper {
 	width: 100%;
@@ -126,10 +127,10 @@ header {
 	border-bottom: 2px solid #036;
 	width: 100%;
 	height: 140px;
-	position: fixed;
 	background: white;
 	z-index: 5;
 	min-width: 980px;
+	position:fixed;
 }
 .logo {
 	width: 100px;
@@ -633,7 +634,7 @@ tr th {
 	height: 100%;
 }
 .left-content {
-	padding: 10.5% 0.5% 0.5% 1%;
+	padding: 150px 0.5% 0.5% 1%;
 	width: 15.3%;
 	float: left;
 	margin-bottom: 2%;
@@ -646,7 +647,7 @@ tr th {
 }
 .center-content {
 	float: right;
-	padding: 11% 1% 1% 1%;
+	padding: 150px 1% 1% 1%;
 	width: 80%;
 	margin: 0 0 0 1%;
 	padding-bottom: 5%;
@@ -655,7 +656,7 @@ tr th {
 .full-content {
 	width: 90%;
 	margin: auto;
-	padding: 10% 1% 5% 1%;
+	padding: 150px 1% 5% 1%;
 	zoom:0.8;
 }
 .full-content form {
@@ -1420,36 +1421,48 @@ table#history_table td {
 /**
  * 	Media Screens
  */
-@media (min-width: 360px) and (max-width: 600px) {
+@media (min-width: 400px) and (max-width: 1023px) {
 	#footer_text {
-		font-size: 0.3em;
+		font-size: 1em;
 	}
 	.sidebar-nav-fixed {
 		width: auto;
+	}
+	body{
+	font-size: 1.4vmin;
 	}
 }
-@media (min-width: 601px) and (max-width: 800px) {
+@media (min-width: 1024px) and (max-width: 1279px) {
 	#footer_text {
-		font-size: 0.4em;
+		font-size: 1em;
 	}
 	.sidebar-nav-fixed {
 		width: auto;
+	}
+	body{
+	font-size: 1.7vmin;
 	}
 }
-@media (min-width: 801px) and (max-width: 900px) {
+@media (min-width: 1280px) and (max-width: 1365px) {
 	#footer_text {
-		font-size: 0.5em;
+		font-size: 1em;
 	}
 	.sidebar-nav-fixed {
 		width: auto;
+	}
+	body{
+	font-size: 2.0vmin;
 	}
 }
-@media (min-width: 901px) and (max-width: 1100px) {
+@media (min-width: 1366px) and (max-width: 1920px) {
 	#footer_text {
-		font-size: 0.6em;
+		font-size: 1em;
 	}
 	.sidebar-nav-fixed {
 		width: auto;
+	}
+	body{
+	font-size: 2.0vmin;
 	}
 }
 #fmChangePassword {

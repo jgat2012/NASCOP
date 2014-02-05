@@ -1,26 +1,14 @@
 <style type="text/css">
-	.ui-iggrid .ui-iggrid-footer, .ui-iggrid .ui-iggrid-toolbar {
-		background-color: #2B597E;
-	}
-	.ui-state-default, .ui-widget-header .ui-state-default {
-		background: #666;
-	}
 	.full-content {
 		width: 95%;
 		zoom: 100%;
-	}
-	.ui-iggrid-scrolldiv tbody {
-		font-size: 12px;
-	}
-	.ui-iggrid-pagedropdowncontainer{
-		display:none;
 	}
 </style>
 <div class="container-fluid full-content">
 	<!--Grid-->
 	<div class="row-fluid">
 		<div class="span3">
-			<ul class="nav nav-list">
+			<ul id="settings_list" class="nav nav-list">
 				<li class="nav-header">
 					NASCOP SETTINGS
 				</li>
@@ -28,26 +16,20 @@
 					<a href="#" class="setting_link" id="sync_drug">DRUGS</a>
 				</li>
 				<li>
-					<a href="#">FACILITIES</a>
+					<a href="#" class="setting_link" id="sync_facility">FACILITIES</a>
 				</li>
 				<li>
 					<a href="#" class="setting_link" id="sync_regimen">REGIMENS</a>
 				</li>
 				<li>
-					<a href="#">USERS</a>
+					<a href="#" class="setting_link" id="sync_user">USERS</a>
 				</li>
 				<li class="divider"></li>
 				<li class="nav-header">
 					eSCM SETTINGS
 				</li>
 				<li>
-					<a href="#">DRUGS</a>
-				</li>
-				<li>
-					<a href="#">FACILITIES</a>
-				</li>
-				<li>
-					<a href="#">REGIMENS</a>
+					<a href="#" class="api_sync">eSCM SYNC</a>
 				</li>
 			</ul>
 		</div>
@@ -55,162 +37,95 @@
 			<!--BreadCrumb-->
 			<ul class="breadcrumb">
 				<li>
-					<a href="#">HOME</a><span class="divider">/</span>
+					<a href="<?php echo site_url("home_controller/home");?>">HOME</a><span class="divider">/</span>
+				</li>
+				<li>
+					<a href="<?php echo site_url("settings");?>">SETTINGS</a><span class="divider">/</span>
 				</li>
 				<li class="active">
-					<a href="#">SETTINGS</a>
+					<span id="current_setting"></span></a>
 				</li>
 			</ul>
 			<!--Tables-->
+			<a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">new <span id="create_setting">drug</span></a>
 			<div id="table_grid" class="table-responsive"></div>
-			<div id="gridChartContainer" class="table-responsive">
-				<table id="grid"></table>
-				<div id="chart"></div>
-				<script id="rowEditDialogRowTemplate1" type="text/x-jquery-tmpl">
-					<tr>
-					<td class="labelBackGround">${headerText}
-					{{if ${dataKey} == 'BirthDate'}}<span style="color: red;">*</span>{{/if}}
-					</td>
-					<td data-key='${dataKey}'>
-					<input />
-					</td>
-					</tr>
-				</script>
-			</div>
 		</div>
 	</div>
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
 		var base_url = "http://localhost/NASCOP/";
+		//default link
+		var type = "sync_drug";
+		var url = base_url + "settings/get/" + type;
+		var div_id = "#table_grid";
 
-		// Grid
-		$("#grid").igGrid({
-			primaryKey : "name",
-			width : "100%",
-			dataSource : base_url + "settings/get/sync_regimen",
-			//updateUrl : base_url + "settings/update/sync_regimen",
-			autoGenerateColumns : true,
-			autoAdjustHeight : false,
-			alternateRowStyles : true,
-			autofitLastColumn : true,
-			fixedHeaders : true,
-			height : "300px",
-			width : "100%",
-			enableHoverStyles : true,
-			features : [{
-				name : "Sorting",
-				type : "local",
-				mode : "multi"
-			}, {
-				name : "Filtering",
-				type : "local",
-				mode : "advanced",
-				advancedModeEditorsVisible : true,
-				nullTexts : {
-					contains : "",
-					equals : ""
-				}
+		getTable(type, url, div_id);
 
-			}, {
-				name : "Hiding"
-			}, {
-				name : "ColumnMoving"
-			}, {
-				name : 'Paging',
-				type : "local",
-				pageSize : 10,
-				defaultDropDownWidth : 70
-			}, {
-				name : "Updating",
-				enableAddRow : true,
-				editMode : "rowedittemplate",
-				rowEditDialogWidth : 600,
-				rowEditDialogHeight : '400',
-				rowEditDialogContentHeight : 300,
-				rowEditDialogFieldWidth : 350,
-				rowEditDialogContainment : "window",
-				rowEditDialogRowTemplateID : "rowEditDialogRowTemplate1",
-				enableDeleteRow : false,
-				showReadonlyEditors : false,
-				showDoneCancelButtons : true,
-				enableDataDirtyException : false,
-				columnSettings : [{
-					columnKey : "name",
-					editorOptions : {
-						type : "text",
-						disabled : false
-					}
-				}]
-			}, {
-				name : "Selection",
-				mode : "row"
-			}]
-		});
+		//Set Current setting breadcrumb
+		$("#current_setting").text(type);
 
+		//function onclick to select grid to display
 		$(".setting_link").click(function() {
-			var link_name = $(this).attr("id");
-			var url = base_url + "settings/get/" + link_name;
-			if(link_name == "sync_drug") {
-				var columns = new Array("name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight", "options");
-			}
-			//Generate Columns
-			var thead = "<table id='setting_grid'><thead><tr>";
-			$.each(columns, function(i, v) {
-				thead += "<th>" + v + "</th>";
-			});
-			thead += "</tr></thead></table>";
-			$("#table_grid").empty();
-			$("#table_grid").append(thead);
+			//Change active
+			$("#settings_list>li").removeClass("active");
+			$(this).closest('li').addClass('active');
 
-			$('#setting_grid').dataTable({
-				"bProcessing" : true,
-				"bServerSide" : true,
-				"sAjaxSource" : url,
-				"bJQueryUI" : true,
-				"sPaginationType" : "full_numbers"
-			});
+			var type = $(this).attr("id");
+			var url = base_url + "settings/get/" + type;
 
-		});
-		//End of function
-		$(".setting_link1").click(function() {
-			/*
-			 var link_name = $(this).attr("id");
-			 var url = base_url + "settings/get/" + link_name;
+			getTable(type, url, div_id);
 
-			 $('#table_grid').jtable({
-			 title : 'Table of people',
-			 actions : {
-			 listAction : '/settings/get/' + link_name,
-			 createAction : '/GettingStarted/CreatePerson',
-			 updateAction : '/GettingStarted/UpdatePerson',
-			 deleteAction : '/GettingStarted/DeletePerson'
-			 },
-			 fields : {
-			 PersonId : {
-			 key : true,
-			 list : false
-			 },
-			 Name : {
-			 title : 'Author Name',
-			 width : '40%'
-			 },
-			 Age : {
-			 title : 'Age',
-			 width : '20%'
-			 },
-			 RecordDate : {
-			 title : 'Record date',
-			 width : '30%',
-			 type : 'date',
-			 create : false,
-			 edit : false
-			 }
-			 }
-			 });
-			 */
+			//Set Current setting breadcrumb
+			$("#current_setting").text(type);
 		});
 		//End of function
 	});
+	function getTable(type, url, div_id) {
+		if(type == "sync_drug") {
+			var columns = new Array("name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight", "options");
+		} else if(type == "sync_facility") {
+			var columns = new Array("mfl code", "name", "category", "services", "options");
+		} else if(type == "sync_regimen") {
+			var columns = new Array("code", "name", "description", "options");
+		} else if(type == "sync_user") {
+			var columns = new Array("name", "email", "role", "phone", "options");
+		}
+		//Generate Columns
+		var thead = "<table id='setting_grid' class='table table-bordered table-hover table-condensed'><thead><tr>";
+		$.each(columns, function(i, v) {
+			thead += "<th>" + v + "</th>";
+		});
+		thead += "</tr></thead></table>";
+		$(div_id).empty();
+		$(div_id).append(thead);
 
+		$('#setting_grid').dataTable({
+			"bProcessing" : true,
+			"bServerSide" : true,
+			"sAjaxSource" : url,
+			"bJQueryUI" : true,
+			"sPaginationType" : "full_numbers",
+			"bAutoWidth" : false,
+			"bDeferRender" : true,
+			"bInfo" : true,
+			"bProcessing" : true,
+			"bSort" : true,
+			"bSortClasses" : true,
+			"bStateSave" : true,
+			"sScrollX" : "100%",
+			"bScrollCollapse" : true,
+			"sScrollY" : "200px",
+			"bDestroy" : true,
+			"iCookieDuration" : 60 * 30,
+			"oSearch" : {
+				"bRegex" : true
+			},
+			"sCookiePrefix" : type + "_",
+			"aoColumnDefs" : [{
+				"iDataSort" : 0,
+				"aTargets" : [0]
+			}]
+		});
+	}
 </script>
