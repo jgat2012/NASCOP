@@ -47,8 +47,35 @@
 				</li>
 			</ul>
 			<!--Tables-->
-			<a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">new <span id="create_setting">drug</span></a>
+			<div class="row-fluid">
+				<div class="span2">
+					<a  href="<?php echo site_url("settings/modal/sync_drug");?>" data-target="#modal_template" role="button" id="add_btn" class="btn btn-primary modal_btn" data-toggle="modal"><i class="icon-plus-sign"></i> add <span id="create_setting">drug</span></a>
+				</div>
+				<div class="span10">
+					<?php  echo $this -> session -> flashdata("alert_message");?>
+				</div>
+			</div>
 			<div id="table_grid" class="table-responsive"></div>
+			<!-- Modal -->
+			<div id="modal_template" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<form class="form-horizontal" action="<?php echo base_url() . 'settings/save/sync_drug';?>" id="modal_action" method="post">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							×
+						</button>
+						<h3 id="myModalLabel"><span id="modal_header">Add Drug</span></h3>
+					</div>
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button class="btn" data-dismiss="modal" aria-hidden="true">
+							Close
+						</button>
+						<button class="btn btn-primary">
+							Save changes
+						</button>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>
@@ -62,11 +89,15 @@
 
 		getTable(type, url, div_id);
 
+		//load default modal
+		var link = base_url + "settings/modal/" + type
+		$(".modal-body").load(link);
+
 		//Set Current setting breadcrumb
 		$("#current_setting").text(type);
 
 		//function onclick to select grid to display
-		$(".setting_link").click(function() {
+		$(".setting_link").live("click", function() {
 			//Change active
 			$("#settings_list>li").removeClass("active");
 			$(this).closest('li').addClass('active');
@@ -78,8 +109,51 @@
 
 			//Set Current setting breadcrumb
 			$("#current_setting").text(type);
+
+			//add button label
+			if(type == "sync_drug") {
+				$("#create_setting").text("drug");
+				$("#modal_header").text("Add Drug");
+			} else if(type == "sync_facility") {
+				$("#create_setting").text("facility");
+				$("#modal_header").text("Add Facility");
+			} else if(type == "sync_regimen") {
+				$("#create_setting").text("regimen");
+				$("#modal_header").text("Add Regimen");
+			} else if(type == "sync_user") {
+				$("#create_setting").text("user");
+				$("#modal_header").text("Add User");
+			}
+			var link = base_url + "settings/modal/" + type
+			$(".modal_btn").attr("href", link);
+			$(".modal-body").load(link);
+			var action_link = base_url + "settings/save/" + type
+			$("#modal_action").attr("action", action_link);
+
 		});
 		//End of function
+
+		$(".edit_item").live("click", function() {
+			var my_array = $(this).data("mydata");
+			var current = $("#current_setting").text();
+
+			$.each(my_array, function(i, v) {
+				$("#" + current + "_" + i).val(v);
+				if(i == "id") {
+					var action_link = base_url + "settings/save/" + current + "/" + v
+					$("#modal_action").attr("action", action_link);
+				}
+			});
+			$("#modal_template").modal('show');
+		});
+
+		$("#add_btn").live("click", function() {
+			var current = $("#current_setting").text();
+			var action_link = base_url + "settings/save/" + current
+
+			$("#modal_template :input").val("");
+			$("#modal_action").attr("action", action_link);
+		});
 	});
 	function getTable(type, url, div_id) {
 		if(type == "sync_drug") {

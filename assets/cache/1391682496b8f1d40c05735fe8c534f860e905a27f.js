@@ -14588,7 +14588,7 @@ $.extend( $.fn.dataTableExt.oPagination, {
  */
 $(document).ready(function() {
 	setTimeout(function() {
-		$(".message").fadeOut("2000");
+		$(".message,.alert").fadeOut("2000");
 	}, 6000);
 	//Progress Bar
 	function progress(percent, $element) {

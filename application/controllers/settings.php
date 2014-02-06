@@ -90,13 +90,87 @@ class settings extends MY_Controller {
 					$id = $v;
 				}
 			}
-			$links = anchor("settings/edit/" . $id, "<i class='icon-pencil'></i>");
+			$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
 			$links .= "  ";
 			$links .= anchor("settings/delete/" . $id, "<i class='icon-trash'></i>");
 			$myrow[] = $links;
 			$output['aaData'][] = $myrow;
 		}
 		echo json_encode($output);
+
+	}
+
+	public function modal($type = "sync_drug") {
+		$content = "";
+		$group_div = "<div class='control-group'>";
+		$control_div = "<div class='controls'>";
+		$close_div = "</div>";
+		if ($type == "sync_drug") {
+			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight");
+		} else if ($type == "sync_facility") {
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "services" => "services");
+		} else if ($type == "sync_regimen") {
+			$inputs = array("code" => "code", "name" => "name", "description" => "description");
+		} else if ($type == "sync_user") {
+			$inputs = array("name" => "name", "email" => "email", "role" => "role", "phone" => "profile_id");
+		}
+		foreach ($inputs as $text => $input) {
+			$content .= $group_div;
+			$label = "<label class='control-label'>" . $text . "</label>";
+			$content .= $label;
+			$content .= $control_div;
+			$textfield = "<input type='text' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
+			if ($input == "profile_id") {
+				$textfield = "<input type='text' id='" . $type . "_" . $input . "' name='" . $text . "'/>";
+			}
+			$content .= $textfield;
+			$content .= $close_div;
+			$content .= $close_div;
+		}
+
+		echo $content;
+	}
+
+	public function save($type = "sync_drug", $id = null) {
+		$save_data = array();
+		$success_class = "<div class='alert alert-success'>";
+		$error_class = "<div class='alert alert-error'>";
+		$info_class = "<div class='alert alert-info'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		$message = "";
+		$close_div = "</div>";
+
+		if ($type == "sync_drug") {
+			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight");
+		} else if ($type == "sync_facility") {
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "services" => "services");
+		} else if ($type == "sync_regimen") {
+			$inputs = array("code" => "code", "name" => "name", "description" => "description");
+		} else if ($type == "sync_user") {
+			$inputs = array("name" => "name", "email" => "email", "role" => "role", "profile_id" => "phone");
+		}
+		foreach ($inputs as $index => $input) {
+			$save_data[$index] = $this -> input -> post($input);
+		}
+
+		//insert or update
+		if ($id == null) {
+			$this -> db -> insert($type, $save_data);
+			$message = "<b>Saved " . $type . "!</b>  You successfully saved.";
+			$content = $success_class;
+		} else {
+			$this -> db -> where('id', $id);
+			$this -> db -> update($type, $save_data);
+			$message = "<b>Updated " . $type . "!</b> You successfully updated.";
+			$content = $info_class;
+		}
+
+		$content .= $close_btn_div;
+		$content .= $message;
+		$content .= $close_div;
+		$this -> session -> set_flashdata("alert_message", $content);
+		$this -> session -> set_userdata("current_nav", $type);
+		redirect("settings");
 
 	}
 
