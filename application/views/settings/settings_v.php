@@ -81,16 +81,43 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var base_url = "http://localhost/NASCOP/";
+		var my_url = "<?php echo base_url(); ?>";
 		//default link
-		var type = "sync_drug";
-		var url = base_url + "settings/get/" + type;
+		var type = "<?php if($this -> session -> userdata("nav_link") !=""){echo $this -> session -> userdata("nav_link");}else{echo "sync_drug";} ?>";
+		var url = my_url + "settings/get/" + type;
 		var div_id = "#table_grid";
 
 		getTable(type, url, div_id);
 
+		//set default active in nav list
+		$("#settings_list>li").removeClass("active");
+		$('#settings_list li').each(function(n, v) {
+			var active_nav = $(this).find("a[id=" + type + "]");
+			active_nav.closest('li').addClass('active');
+		});
+		//add button label
+		if(type == "sync_drug") {
+			$("#create_setting").text("drug");
+			$("#modal_header").text("Add Drug");
+		} else if(type == "sync_facility") {
+			$("#create_setting").text("facility");
+			$("#modal_header").text("Add Facility");
+		} else if(type == "sync_regimen") {
+			$("#create_setting").text("regimen");
+			$("#modal_header").text("Add Regimen");
+		} else if(type == "sync_user") {
+			$("#create_setting").text("user");
+			$("#modal_header").text("Add User");
+		}
+
+		var link = my_url + "settings/modal/" + type
+		$(".modal_btn").attr("href", link);
+		$(".modal-body").load(link);
+		var action_link = my_url + "settings/save/" + type
+		$("#modal_action").attr("action", action_link);
+
 		//load default modal
-		var link = base_url + "settings/modal/" + type
+		var link = my_url + "settings/modal/" + type
 		$(".modal-body").load(link);
 
 		//Set Current setting breadcrumb
@@ -103,7 +130,7 @@
 			$(this).closest('li').addClass('active');
 
 			var type = $(this).attr("id");
-			var url = base_url + "settings/get/" + type;
+			var url = my_url + "settings/get/" + type;
 
 			getTable(type, url, div_id);
 
@@ -124,10 +151,10 @@
 				$("#create_setting").text("user");
 				$("#modal_header").text("Add User");
 			}
-			var link = base_url + "settings/modal/" + type
+			var link = my_url + "settings/modal/" + type
 			$(".modal_btn").attr("href", link);
 			$(".modal-body").load(link);
-			var action_link = base_url + "settings/save/" + type
+			var action_link = my_url + "settings/save/" + type
 			$("#modal_action").attr("action", action_link);
 
 		});
@@ -140,7 +167,7 @@
 			$.each(my_array, function(i, v) {
 				$("#" + current + "_" + i).val(v);
 				if(i == "id") {
-					var action_link = base_url + "settings/save/" + current + "/" + v
+					var action_link = my_url + "settings/save/" + current + "/" + v
 					$("#modal_action").attr("action", action_link);
 				}
 			});
@@ -149,7 +176,7 @@
 
 		$("#add_btn").live("click", function() {
 			var current = $("#current_setting").text();
-			var action_link = base_url + "settings/save/" + current
+			var action_link = my_url + "settings/save/" + current
 
 			$("#modal_template :input").val("");
 			$("#modal_action").attr("action", action_link);

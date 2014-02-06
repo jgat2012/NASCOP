@@ -14,6 +14,31 @@ class settings extends MY_Controller {
 		$this -> base_params($data);
 	}
 
+	public function delete($type = "sync_drug", $id = null) {
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+
+		if ($id != null) {
+			$sql = "DELETE FROM $type where id='$id'";
+			//$this -> db -> query($sql);
+			$message = "<b>Deleted " . $type . "!</b> You successfully deleted.";
+			$content = $error_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		} else {
+			$message = "<b>Failed " . $type . "!</b> You failed to delete.";
+			$content = $info_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		}
+		$this -> session -> set_flashdata("alert_message", $content);
+		$this -> session -> set_userdata("nav_link", $type);
+		redirect("settings");
+	}
+
 	public function get($type = "sync_drug") {
 		//Column definitions
 		if ($type == "sync_drug") {
@@ -92,7 +117,7 @@ class settings extends MY_Controller {
 			}
 			$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
 			$links .= "  ";
-			$links .= anchor("settings/delete/" . $id, "<i class='icon-trash'></i>");
+			$links .= anchor("settings/delete/" . $type . "/" . $id, "<i class='icon-trash'></i>", array("class" => "delete"));
 			$myrow[] = $links;
 			$output['aaData'][] = $myrow;
 		}
@@ -127,7 +152,7 @@ class settings extends MY_Controller {
 			$content .= $close_div;
 			$content .= $close_div;
 		}
-
+		$this -> session -> set_userdata("nav_link", $type);
 		echo $content;
 	}
 
@@ -169,7 +194,7 @@ class settings extends MY_Controller {
 		$content .= $message;
 		$content .= $close_div;
 		$this -> session -> set_flashdata("alert_message", $content);
-		$this -> session -> set_userdata("current_nav", $type);
+		$this -> session -> set_userdata("nav_link", $type);
 		redirect("settings");
 
 	}

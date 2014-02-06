@@ -21,7 +21,7 @@ $(document).ready(function() {
 	}
 
 
-	$(".delete").click(function() {
+	$(".delete").live("click", function() {
 		var check = confirm("Are you sure?");
 		if(check) {
 			return true;
