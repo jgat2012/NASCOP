@@ -89,7 +89,6 @@ $chartSize=300;
 	});
 </script>
 <div class="graph">
-	<div id="<?php echo $container?>"  style="width:98%;"  '>
-</div>
+	<div id="<?php echo $container?>"  style="width:98%;"  '></div>
 </div>
 

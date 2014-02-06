@@ -18,6 +18,7 @@ class Dashboard_Management extends MY_Controller {
 		$data['supporter'] = Supporter::getThemAll();
 		$this -> base_params($data);
 	}
+	
 
 	public function download($type = "", $period = "",$pipeline='') {
 		if($type=="SOH"){
@@ -565,36 +566,46 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function getPatients($type="ART_PATIENT"){
-		$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
-		$links = array('dashboard_management/download/' . $type => 'download');
-		//Get eSCM orders
-		$escm_patients = Escm_Maps::getAll();
-		$list = "";
-		$order_list = array();
-		$maps_nascop = array();
-		$maps_escm = array();
-		$table_name = $type;
-		$result =array();
-		if ($escm_patients) {
-			foreach ($escm_patients as $order_id) {
-				array_push($order_list, $order_id -> maps_id);
+		
+		if($type=="BYPIPELINE_ART"){//Pie Chart
+			$data['container'] = 'report_by_pipeline';
+			$data['title'] = 'Total Patients By Pipeline';
+			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
+			$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
+		}
+		else{
+			$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
+			$links = array('dashboard_management/download/' . $type => 'download');
+			//Get eSCM orders
+			$escm_patients = Escm_Maps::getAll();
+			$list = "";
+			$order_list = array();
+			$maps_nascop = array();
+			$maps_escm = array();
+			$table_name = $type;
+			$result =array();
+			if ($escm_patients) {
+				foreach ($escm_patients as $order_id) {
+					array_push($order_list, $order_id -> maps_id);
+				}
+				$list = "'" . implode("','", $order_list) . "'";
 			}
-			$list = "'" . implode("','", $order_list) . "'";
+			$maps_nascop = Maps::getNascopPeriod($list);
+			$counter = 0;
+			foreach ($maps_nascop as $nascop) {
+				$result[$counter]['period'] = date('F-Y', strtotime($nascop['period_begin']));
+				$result[$counter]['pipeline'] = "Kemsa";
+				$counter++;
+			}
+			$maps_escm = Maps::getEscmPeriod($list);
+			foreach ($maps_escm as $esm) {
+				$result[$counter]['period'] = date('F-Y', strtotime($esm['period_begin']));
+				$result[$counter]['pipeline'] = "Kenya Pharma";
+				$counter++;
+			}
+			echo $this -> showTable($columns, $result, $links, $table_name);
 		}
-		$maps_nascop = Maps::getNascopPeriod($list);
-		$counter = 0;
-		foreach ($maps_nascop as $nascop) {
-			$result[$counter]['period'] = date('F-Y', strtotime($nascop['period_begin']));
-			$result[$counter]['pipeline'] = "Kemsa";
-			$counter++;
-		}
-		$maps_escm = Maps::getEscmPeriod($list);
-		foreach ($maps_escm as $esm) {
-			$result[$counter]['period'] = date('F-Y', strtotime($esm['period_begin']));
-			$result[$counter]['pipeline'] = "Kenya Pharma";
-			$counter++;
-		}
-		echo $this -> showTable($columns, $result, $links, $table_name);
+		
 		
 	}
 
@@ -644,11 +655,11 @@ class Dashboard_Management extends MY_Controller {
 		
 		if($type=='table'){
 			//Total Number of ARV Sites
-			$sql_kemsa="SELECT COUNT(DISTINCT(f.code)) as total FROM sync_facility f";
+			$sql_kemsa="SELECT COUNT(f.code) as total FROM sync_facility f";
 			$query = $this ->db->query($sql_kemsa);
 			$results = $query ->result_array();
 			$total_kemsa = $results[0]['total'];
-			$sql_kenyap="SELECT COUNT(DISTINCT(f.code)) as total FROM escm_facility f";
+			$sql_kenyap="SELECT COUNT(f.code) as total FROM escm_facility f";
 			$query = $this ->db->query($sql_kenyap);
 			$results = $query ->result_array();
 			$total_kenya_pharma = $results[0]['total'];
@@ -663,9 +674,10 @@ class Dashboard_Management extends MY_Controller {
 			//Sites reported by 10th
 			$tenth=date('Y-m-10');
 			$first = date('Y-m-01');
+			$last_day = date('Y-m-t');
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							INNER JOIN maps m ON m.period_begin=c.period_begin
-							WHERE c.created BETWEEN '".$tenth."' AND  '".$first."'";
+							WHERE c.created BETWEEN '".$first."' AND  '".$tenth."'";
 							
 			$query = $this ->db->query($sql_tenth);
 			$results = $query ->result_array();
@@ -688,14 +700,17 @@ class Dashboard_Management extends MY_Controller {
 			$table_display = $this -> table -> generate();
 			echo $table_display;
 		}
+
+		
 		else if($type=='site_reporting'){
 			$data =array();
 			//Sites reported by 10th
 			$tenth=date('Y-m-10');
 			$first = date('Y-m-01');
+			$last_day = date('Y-m-t');
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							INNER JOIN maps m ON m.period_begin=c.period_begin
-							WHERE c.created BETWEEN '".$tenth."' AND  '".$first."'";
+							WHERE c.created BETWEEN '".$first."' AND  '".$tenth."'";
 							
 			$query = $this ->db->query($sql_tenth);
 			$results = $query ->result_array();
@@ -704,7 +719,8 @@ class Dashboard_Management extends MY_Controller {
 			
 			//Sites that have reported
 			$sql_report = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
-							INNER JOIN maps m ON m.period_begin=c.period_begin";
+							INNER JOIN maps m ON m.period_begin=c.period_begin
+							WHERE c.created BETWEEN '".$first."' AND  '".$last_day."'";
 			$query = $this ->db->query($sql_report);
 			$results = $query ->result_array();
 			$tot_reportsites = $results[0]['total'];
@@ -717,14 +733,16 @@ class Dashboard_Management extends MY_Controller {
 			$data['title'] = 'Reporting Analysis Summary';
 			$this -> load -> view('dashboard/chart_report_site_v', $data);
 		}
+		
+		
 		else{
 			$data =array();
 			//Total Number of ARV Sites
-			$sql_kemsa="SELECT COUNT(DISTINCT(f.code)) as total FROM sync_facility f";
+			$sql_kemsa="SELECT COUNT(f.code) as total FROM sync_facility f";
 			$query = $this ->db->query($sql_kemsa);
 			$results = $query ->result_array();
 			$total_kemsa = $results[0]['total'];
-			$sql_kenyap="SELECT COUNT(DISTINCT(f.code)) as total FROM escm_facility f";
+			$sql_kenyap="SELECT COUNT(f.code) as total FROM escm_facility f";
 			$query = $this ->db->query($sql_kenyap);
 			$results = $query ->result_array();
 			$total_kenya_pharma = $results[0]['total'];
@@ -743,6 +761,7 @@ class Dashboard_Management extends MY_Controller {
 			$data['title'] = 'Reporting Analysis Summary';
 			$this -> load -> view('dashboard/chart_report_summary_v', $data);
 		}
+
 		
 	}
 

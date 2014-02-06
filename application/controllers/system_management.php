@@ -28,4 +28,31 @@ class System_management extends MY_Controller {
 		redirect('dashboard_management');
 	}
 
+	public function updateFacility(){
+		
+		$sql ='truncate escm_facility1';
+		//$sql ="INSERT INTO escm_facility1 SELECT * FROM escm_facility WHERE name LIKE '%St Monica%'";
+		$query = $this -> db -> query($sql);
+		$sql = "SELECT DISTINCT(f.code) FROM fac f
+		INNER JOIN sync_facility ef ON ef.code=f.code
+		WHERE ef.code!=''";
+		$query = $this -> db -> query($sql);
+		$result=$query->result_array();
+		foreach ($result as $value) {
+			$name = $value['code'];
+			//$name =str_replace("'","\'", $name);
+			$name =str_replace('"','\'', $name);
+			
+			//$name =str_replace("'","\'", $name);
+			$name =addslashes($name);
+			$name_c=str_replace('Central Site',' ', $name);
+			echo $name_c."<br>";
+			$sql ="INSERT INTO escm_facility1
+					SELECT * FROM sync_facility WHERE code='".$name."'";
+					
+			$query = $this -> db -> query($sql);
+					
+		}
+	}
+
 }
