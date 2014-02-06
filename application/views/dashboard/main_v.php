@@ -1,3 +1,11 @@
+<style>
+	.row{
+		margin-left:0px;
+	}
+	#tab2 .three_block{
+		height:45%;
+	}
+</style>
 <script type="text/javascript">
 	$(document).ready(function(){
 		 
@@ -14,8 +22,6 @@
 		 });
 		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
 		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
-		  var art_patient_link="<?php echo base_url().'dashboard_management/getPatients/ART_PATIENT';?>";
-		  var byregimen_patient_link="<?php echo base_url().'dashboard_management/getPatients/BYREG_PATIENT';?>";
 		  var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/Table';?>";
 		  var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
 		  var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";
@@ -48,32 +54,10 @@
 				"bServerSide" : false,
 		 });
        });
-       $("#ART_PATIENT_grid").load(art_patient_link, function() {
-            $("#ART_PATIENT_listing").dataTable({
-		 		 "bJQueryUI" : true,
-				"sPaginationType" : "full_numbers",
-				"sDom" : '<"H"Tfr>t<"F"ip>',
-				"oTableTools" : {
-					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
-					"aButtons" : ["copy", "print", "xls", "pdf"]
-				},
-				"bProcessing" : true,
-				"bServerSide" : false,
-			});
-		});
-		$("#BYREG_PATIENT_grid").load(byregimen_patient_link, function() {
-            $("#BYREG_PATIENT_listing").dataTable({
-			 		 "bJQueryUI" : true,
-					"sPaginationType" : "full_numbers",
-					"sDom" : '<"H"Tfr>t<"F"ip>',
-					"oTableTools" : {
-						"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
-						"aButtons" : ["copy", "print", "xls", "pdf"]
-					},
-					"bProcessing" : true,
-					"bServerSide" : false,
-			});
-       });
+       
+       $("#chart_area_report_summary").load(report_analysis_summary_link);
+	   $("#chart_area_report").load(report_analysis_link);
+	   $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
        
        /*$("#report_summary").load(report_analysis_table_link,function(){
        	   
@@ -256,11 +240,12 @@
 		 		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 				stock_status(y,mm,1);
 		 	}
-		 	else if(id=="pa_menu"){
+		 	else if(id=="pa_menu"){//Patient Analysis
 		 		//Update breadcrumbs
 				var active_menu=$(".patient_analysis_menus.active").find("a").text();
 				$("#active_menu").text(active_menu);
-		 		patient_by_regimen(y,mm,1);
+		 		//patient_by_regimen(y,mm,1);
+		 		allPatientAnalysis();
 		 	}
 		 	else if(id=="fa_menu"){
 		 		//Update breadcrumbs
@@ -275,11 +260,11 @@
 		 		order_analysis(y,mm,1);
 		 	}
 		 	else if(id=="ra_menu"){
-		 		   if($("#chart_area_report_summary").children().length == 0){
+		 		  // if($("#chart_area_report_summary").children().length == 0){
 		 		   	   $("#chart_area_report_summary").load(report_analysis_summary_link);
 				       $("#chart_area_report").load(report_analysis_link);
 				       $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
-		 		   }
+		 		  // }
 		 		   
 		 	}
 		 })
@@ -474,6 +459,41 @@
 	/*
 	 * Patient Analysis functions
 	 */
+	
+	// Load patient analysis grids and graphs
+	function allPatientAnalysis(){
+		var art_patient_link="<?php echo base_url().'dashboard_management/getPatients/ART_PATIENT';?>";
+	    var byregimen_patient_link="<?php echo base_url().'dashboard_management/getPatients/BYREG_PATIENT';?>";
+	    var art_bypipeline_link="<?php echo base_url().'dashboard_management/getPatients/BYPIPELINE_ART';?>";
+		$("#ART_PATIENT_grid").load(art_patient_link, function() {
+            $("#ART_PATIENT_listing").dataTable({
+		 		 "bJQueryUI" : true,
+				"sPaginationType" : "full_numbers",
+				"sDom" : '<"H"Tfr>t<"F"ip>',
+				"oTableTools" : {
+					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+					"aButtons" : ["copy", "print", "xls", "pdf"]
+				},
+				"bProcessing" : true,
+				"bServerSide" : false,
+			});
+		});
+		$("#BYREG_PATIENT_grid").load(byregimen_patient_link, function() {
+            $("#BYREG_PATIENT_listing").dataTable({
+			 		 "bJQueryUI" : true,
+					"sPaginationType" : "full_numbers",
+					"sDom" : '<"H"Tfr>t<"F"ip>',
+					"oTableTools" : {
+						"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+						"aButtons" : ["copy", "print", "xls", "pdf"]
+					},
+					"bProcessing" : true,
+					"bServerSide" : false,
+			});
+       });
+       $("#ART_PATIENT_PIPELINE_graph").load(art_bypipeline_link);
+	}
+	
 	//Patient By Regimen
 	function patient_by_regimen(year,month,pipeline){
 		$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
@@ -531,11 +551,13 @@
 </script>
 <div class="tabbable national_dashboard_content"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs " style="width:60%; float: left">
-    <li id="ca_menu" class="active main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
-    <li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
+  	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
+  	<li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
+    <li id="ca_menu" class="main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
+    
     <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
-    <li id="ra_menu" class="main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
+    
   </ul>
   <div >
   	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
@@ -546,7 +568,7 @@
   </div>
   <div class="tab-content nat_dashboard_rep" style="clear:left">
   	<!-- Commodity Analysis -->
-    <div class="tab-pane active" id="tab1">
+    <div class="tab-pane" id="tab1">
       <div class="two_block" id="s_consumption">
 			<h3 class="dashboard_title">Stock Consumption</h3>
 				<div id="CONS_grid"></div>
@@ -560,31 +582,48 @@
     </div>
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
-    	<div class="three_block" id="patient_by_art">
-    		<h3 class="dashboard_title">Current Patients By ART</h3>
-    		<div id="ART_PATIENT_grid"></div>
-    	</div>
-    	<div class="three_block" id="patient_by_regimen">
-    		<h3 class="dashboard_title">Patients By Regimen</h3>
-    		<div id="BYREG_PATIENT_grid"></div>
-    	</div>
-    	<div class="three_block" id="patient_scale_up">
-    		<h3 class="dashboard_title">Patients Scale Up</h3>
-    		<table class="table table-bordered table-striped tbl_nat_dashboard">
-    			<thead>
-    				
-    				<tr><th>Pipeline</th><th>Action</th></tr>
-    			</thead>
-    			<tbody>
-    				<tr><td>Kemsa</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kemsa','Download');?></td></tr>
-    				<tr><td>Kenya Pharma</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kenya_pharma','Download');?></td></tr>
-    			</tbody>
-    		</table>
-    		
-    	</div>
+    	<div class="row">
+		  <div class="three_block" id="patient_by_art_by_pipeline">
+    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline</h3>
+    		<div id="ART_PATIENT_PIPELINE_graph"></div>
+    	  </div>
+    	  <div class="three_block" id="adult_patient_on_art">
+    		<h3 class="dashboard_title">Current Adult Patients on ART</h3>
+    		<div id="ART_ADULT_PATIENT_graph"></div>
+    	  </div>
+    	  <div class="three_block" id="paed_patient_on_art">
+    		<h3 class="dashboard_title">Current Paedriatic Patients on ART</h3>
+    		<div id="ART_PAED_PATIENT_graph"></div>
+    	  </div>
+		</div>
+		<div class="row">
+			<div class="three_block" id="patient_by_art">
+	    		<h3 class="dashboard_title">Current Patients By ART</h3>
+	    		<div id="ART_PATIENT_grid"></div>
+	    	</div>
+	    	<div class="three_block" id="patient_by_regimen">
+	    		<h3 class="dashboard_title">Patients By Regimen</h3>
+	    		<div id="BYREG_PATIENT_grid"></div>
+	    	</div>
+	    	<div class="three_block" id="patient_scale_up">
+	    		<h3 class="dashboard_title">Patients Scale Up</h3>
+	    		<table class="table table-bordered table-striped tbl_nat_dashboard">
+	    			<thead>
+	    				
+	    				<tr><th>Pipeline</th><th>Action</th></tr>
+	    			</thead>
+	    			<tbody>
+	    				<tr><td>Kemsa</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kemsa','Download');?></td></tr>
+	    				<tr><td>Kenya Pharma</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kenya_pharma','Download');?></td></tr>
+	    			</tbody>
+	    		</table>
+	    		
+	    	</div>
+		</div>
+    	
     </div>
     <!-- Reporting Analysis -->
-    <div class="tab-pane nat_dashboard_rep" id="tab5">
+    <div class="tab-pane nat_dashboard_rep  active" id="tab5">
     	<div class="three_block" id="">
     		<h3 class="dashboard_title">ARV Sites</h3>
     		<div id="report_summary">

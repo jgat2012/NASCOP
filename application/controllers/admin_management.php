@@ -8,13 +8,13 @@ class admin_management extends MY_Controller {
 
 	public function addFacility() {
 		//1 == Kemsa, 2 == Kenya Pharma
-		$sql = "SELECT f.id,f.category,c.county as county_name,d.name as district,f.code,f.name,IF(a.facility_id is null,'NO','YES') as adt_installed,'Kenya Pharma' as pipeline,f.active,f.district_id,f.county_id
+		$sql = "SELECT f.id,f.category,c.county as county_name,d.name as district,f.code,f.name,IF(a.facility_id is null,'NO','YES') as adt_installed,'Kenya Pharma' as pipeline,'1' as active,f.district_id,f.county_id
 					FROM escm_facility f
 					LEFT JOIN adt_sites a ON a.facility_id=f.id
 					LEFT JOIN district d ON d.id = f.district_id
 					LEFT JOIN counties c ON c.id = f.county_id
 					WHERE a.pipeline ='1' OR a.facility_id IS NULL";
-		$sql_kemsa = "SELECT f.id,f.category,c.county as county_name,d.name as district,f.code,f.name,IF(a.facility_id is null,'NO','YES') as adt_installed,'Kemsa' as pipeline,f.active,f.district_id,f.county_id
+		$sql_kemsa = "SELECT f.id,f.category,c.county as county_name,d.name as district,f.code,f.name,IF(a.facility_id is null,'NO','YES') as adt_installed,'Kemsa' as pipeline,'1' as active,f.district_id,f.county_id
 					FROM sync_facility f
 					LEFT JOIN adt_sites a ON a.facility_id=f.id
 					LEFT JOIN district d ON d.id = f.district_id
