@@ -49,7 +49,7 @@
 			<!--Tables-->
 			<div class="row-fluid">
 				<div class="span2">
-					<a  href="<?php echo site_url("settings/modal/sync_drug");?>" data-target="#modal_template" role="button" id="add_btn" class="btn btn-primary modal_btn" data-toggle="modal"><i class="icon-plus-sign"></i> add <span id="create_setting">drug</span></a>
+					<a  href="<?php echo site_url("settings/modal/sync_drug");?>" data-target="#modal_template" role="button" id="add_btn" class="btn btn-primary modal_btn" data-toggle="modal"><i class="icon-plus-sign"></i> <span id="create_setting"> add drug</span></a>
 				</div>
 				<div class="span10">
 					<?php  echo $this -> session -> flashdata("alert_message");?>
@@ -97,16 +97,16 @@
 		});
 		//add button label
 		if(type == "sync_drug") {
-			$("#create_setting").text("drug");
+			$("#create_setting").text("add drug");
 			$("#modal_header").text("Add Drug");
 		} else if(type == "sync_facility") {
-			$("#create_setting").text("facility");
+			$("#create_setting").text("add facility");
 			$("#modal_header").text("Add Facility");
 		} else if(type == "sync_regimen") {
-			$("#create_setting").text("regimen");
+			$("#create_setting").text("add regimen");
 			$("#modal_header").text("Add Regimen");
 		} else if(type == "sync_user") {
-			$("#create_setting").text("user");
+			$("#create_setting").text("add user");
 			$("#modal_header").text("Add User");
 		}
 
@@ -139,16 +139,16 @@
 
 			//add button label
 			if(type == "sync_drug") {
-				$("#create_setting").text("drug");
+				$("#create_setting").text("add drug");
 				$("#modal_header").text("Add Drug");
 			} else if(type == "sync_facility") {
-				$("#create_setting").text("facility");
+				$("#create_setting").text("add facility");
 				$("#modal_header").text("Add Facility");
 			} else if(type == "sync_regimen") {
-				$("#create_setting").text("regimen");
+				$("#create_setting").text("add regimen");
 				$("#modal_header").text("Add Regimen");
 			} else if(type == "sync_user") {
-				$("#create_setting").text("user");
+				$("#create_setting").text("add user");
 				$("#modal_header").text("Add User");
 			}
 			var link = my_url + "settings/modal/" + type
