@@ -14587,9 +14587,8 @@ $.extend( $.fn.dataTableExt.oPagination, {
  *Change password validation
  */
 $(document).ready(function() {
-
 	setTimeout(function() {
-		$(".message").fadeOut("2000");
+		$(".message,.alert").fadeOut("2000");
 	}, 6000);
 	//Progress Bar
 	function progress(percent, $element) {
@@ -14601,7 +14600,7 @@ $(document).ready(function() {
 	}
 
 
-	$(".delete").click(function() {
+	$(".delete").live("click", function() {
 		var check = confirm("Are you sure?");
 		if(check) {
 			return true;

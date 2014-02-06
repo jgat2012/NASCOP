@@ -18,6 +18,12 @@ class Sync_Regimen extends Doctrine_Record {
 		$sync_regimen = $query -> execute();
 		return $sync_regimen;
 	}
+	
+	public function getAllSettings() {
+		$query = Doctrine_Query::create() -> select("code,name,description,old_code") -> from("sync_regimen");
+		$sync_regimen = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $sync_regimen;
+	}
 
 }
 ?>

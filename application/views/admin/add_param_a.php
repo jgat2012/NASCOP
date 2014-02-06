@@ -454,11 +454,7 @@ if($table){
 	</div>
 	<?php echo form_close(); ?>
 </div>
-<script>
-$(document).ready(function(){
 
-});
-</script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		var base_url="<?php echo base_url(); ?>";
