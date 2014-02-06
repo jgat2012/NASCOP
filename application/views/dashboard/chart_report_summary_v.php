@@ -31,7 +31,9 @@ $chartSize=300;
 				'#c42525',
 				'#a6c96a'
                 ],
-            title:{text: 'ARV Sites'},
+            title:{
+            	text: 'ARV Sites'
+            	},
 			tooltip:{
 				enabled: true,
 				animation: true
@@ -60,7 +62,7 @@ $chartSize=300;
                 useHTML: true,
 				labelFormatter: function() {
                     total += this.y;
-					return '<div style="width:200px"><span style="float:left">' + this.name + ' </span><span style="float:right"> <b>' + this.y + '</b></span></div>';
+					return '<div style="width:110%"><span style="float:left">' + this.name + ' </span><span style="float:right"> <b>' + this.y + '</b></span></div>';
 				},
 				title: {
 					text: 'Description',

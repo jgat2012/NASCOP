@@ -20,24 +20,24 @@ $chartSize=320;
             categories = ['Kenya Pharma', 'Kemsa'],
             name = 'Pipelines',
             data = [{
-                    y: 55,
-                    color: colors[0],
-                    drilldown: {
-                        name: 'Kenya Pharma Categories',
-                        categories: ['Adults', 'Peads'],
-                        data: [10, 45],
-                        color: colors[0]
-                    }
-                }, {
-                    y: 45,
-                    color: colors[4],
-                    drilldown: {
-                        name: 'Kemsa Categories',
-                        categories: ['Adults', 'Peads'],
-                        data: [ 20,25],
-                        color: colors[6]
-                    }
-                }];
+	                    y: 55,
+	                    color: colors[0],
+	                    drilldown: {
+	                        name: 'Kenya Pharma Categories',
+	                        categories: ['Adults', 'Peads'],
+	                        data: [10, 45],
+	                        color: colors[0]
+	                    }
+	                }, {
+	                    y: 45,
+	                    color: colors[4],
+	                    drilldown: {
+	                        name: 'Kemsa Categories',
+	                        categories: ['Adults', 'Peads'],
+	                        data: [ 20,25],
+	                        color: colors[6]
+	                    }
+                	}];
     
     
         // Build the data arrays

@@ -465,6 +465,8 @@
 		var art_patient_link="<?php echo base_url().'dashboard_management/getPatients/ART_PATIENT';?>";
 	    var byregimen_patient_link="<?php echo base_url().'dashboard_management/getPatients/BYREG_PATIENT';?>";
 	    var art_bypipeline_link="<?php echo base_url().'dashboard_management/getPatients/BYPIPELINE_ART';?>";
+	    var art_adult_patient_link="<?php echo base_url().'dashboard_management/getPatients/ADULT_ART';?>";
+	    var art_paed_patient_link="<?php echo base_url().'dashboard_management/getPatients/PAED_ART';?>";
 		$("#ART_PATIENT_grid").load(art_patient_link, function() {
             $("#ART_PATIENT_listing").dataTable({
 		 		 "bJQueryUI" : true,
@@ -492,6 +494,8 @@
 			});
        });
        $("#ART_PATIENT_PIPELINE_graph").load(art_bypipeline_link);
+       $("#ART_ADULT_PATIENT_graph").load(art_adult_patient_link);
+       $("#ART_PAED_PATIENT_graph").load(art_paed_patient_link);
 	}
 	
 	//Patient By Regimen
