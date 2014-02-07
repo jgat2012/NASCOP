@@ -18,8 +18,6 @@ class Escm_Facility extends Doctrine_Record {
 		$this -> hasColumn('hcsm_id', 'int', 11);
 		$this -> hasColumn('location', 'varchar', 255);
 		$this -> hasColumn('affiliate_organization_id', 'int', 11);
-		$this -> hasColumn('active', 'int', 1);
-
 	}
 
 	public function setUp() {

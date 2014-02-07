@@ -29,6 +29,27 @@ $(document).ready(function() {
 			return false;
 		}
 	});
+	/*Ensure Correct Phone format is used*/
+	$(".phone").live("change", function() {
+		var phone = $(this).val();
+		var phone_length = phone.length;
+		var number_length = 10;
+		/*
+		 * 1.Check Number Length
+		 * 2.If yes,check if first characters are 07{
+		 * 3.if matches 07 alert successful
+		 * 4.if no match alert your phone number should start with 07}
+		 * 5.if no,alert incorrect phone format used
+		 */
+		if(phone_length == number_length) {
+			var first_char = phone.substr(0, 2);
+			if(first_char != 07) {
+				alert("your phone number should start with 07")
+			}
+		} else {
+			alert("incorrect phone format used");
+		}
+	});
 	var base_url = $("#base_url").val();
 	$('.dataTables').dataTable({
 		"bJQueryUI" : true,

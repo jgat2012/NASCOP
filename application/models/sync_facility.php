@@ -18,8 +18,6 @@ class Sync_Facility extends Doctrine_Record {
 		$this -> hasColumn('hcsm_id', 'int', 11);
 		$this -> hasColumn('location', 'varchar', 255);
 		$this -> hasColumn('affiliate_organization_id', 'int', 11);
-		$this -> hasColumn('active', 'int', 1);
-
 	}
 
 	public function setUp() {
@@ -39,6 +37,12 @@ class Sync_Facility extends Doctrine_Record {
 	public function getAllNotHydrated() {
 		$query = Doctrine_Query::create() -> select("*") -> from("sync_facility");
 		$sync_facility = $query -> execute();
+		return $sync_facility;
+	}
+
+	public function getAllHydrated() {
+		$query = Doctrine_Query::create() -> select("*") -> from("sync_facility");
+		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_facility;
 	}
 
