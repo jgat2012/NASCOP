@@ -573,6 +573,46 @@ class Dashboard_Management extends MY_Controller {
 			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
 			$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
 		}
+		elseif($type=="ADULT_ART"){//Pie Chart
+			$data =array();
+			$list = array();
+			$dataArray = array();
+			$columns = array();
+			$total_series = array();
+			$series = array();	
+			$categories = array();
+			$value1=array('45','48','15','0','68','58');
+			$resultArray = array(
+								array(
+									'name'=>'Reporting Sites(By 10th)',
+									'data'=>$value1
+								)
+								);
+			$sixmonthback= date('F-Y',strtotime(date("F-Y", mktime()) . " - 182 day"));
+			$x=0;
+			while ($x <= 5) {
+				$period = date("F-Y",strtotime(date("Y-m-d", strtotime($sixmonthback)) . " +".$x." month"));
+				$categories[$x]=$period;
+				$x++;
+			}
+			$resultArray = json_encode($resultArray);
+			$categories = json_encode($categories);
+			$data['resultArraySize'] = 7;
+			$data['container'] = 'report_chart';
+			$data['chartType'] = 'bar';
+			$data['title'] = 'Reporting Analysis';
+			$data['chartTitle'] = 'Reporting Sites Analysis';
+			$data['categories'] = $categories;
+			$data['yAxix'] = 'No of Facilities';
+			$data['resultArray'] = $resultArray;
+			$this -> load -> view('dashboard/chart_report_bar_v', $data);
+		}
+		elseif($type=="PAED_ART"){//Pie Chart
+			$data['container'] = 'report_paed_art';
+			$data['title'] = 'Total Patients By Pipeline';
+			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
+			$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
+		}
 		else{
 			$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
 			$links = array('dashboard_management/download/' . $type => 'download');
@@ -619,15 +659,10 @@ class Dashboard_Management extends MY_Controller {
 			$series = array();	
 			$categories = array();
 			$value1=array('45','48','15','0','68','58');
-			$value2=array('90','89','105','100','168','158');
 			$resultArray = array(
 								array(
 									'name'=>'Reporting Sites(By 10th)',
 									'data'=>$value1
-								),
-								array(
-									'name'=>'Reporting Sites',
-									'data'=>$value2
 								)
 								);
 			$sixmonthback= date('F-Y',strtotime(date("F-Y", mktime()) . " - 182 day"));
@@ -640,14 +675,14 @@ class Dashboard_Management extends MY_Controller {
 			$resultArray = json_encode($resultArray);
 			$categories = json_encode($categories);
 			$data['resultArraySize'] = 7;
-			$data['container'] = 'report_chart';
+			$data['container'] = 'report_sum_chart';
 			$data['chartType'] = 'bar';
 			$data['title'] = 'Reporting Analysis';
 			$data['chartTitle'] = 'Reporting Sites Analysis';
 			$data['categories'] = $categories;
 			$data['yAxix'] = 'No of Facilities';
 			$data['resultArray'] = $resultArray;
-			$this -> load -> view('dashboard/chart_report_v', $data);
+			$this -> load -> view('dashboard/chart_report_bar_v', $data);
 		
 		
 	}

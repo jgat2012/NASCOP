@@ -4,7 +4,7 @@ if($resultArraySize<=6){
 	$chartSize='300';
 }
 if($resultArraySize>6){
-	$chartSize='450';
+	$chartSize='400';
 }
 if($resultArraySize>10){
 	$chartSize='700';
@@ -85,10 +85,6 @@ if($resultArraySize>25){
 			series:[{
                 name: 'Reporting Sites(By 10th)',
                 data: [49, 71, 106, 129, 144, 176]
-    
-            }, {
-                name: 'Total Reporting Sites Sites',
-                data: [69, 101, 106, 139, 154, 186]
     
             }]
 		});
