@@ -8,6 +8,11 @@
 </style>
 <script type="text/javascript">
 	$(document).ready(function(){
+		  $(".order_link").click(function() {
+			var upload_type = $(this).attr("order_type");
+			$("#modal_header").text(upload_type);
+			$("#upload_type").val(upload_type);
+		  }); 
 		 
 		 $(".tbl_nat_dashboard").dataTable({
 		 		 "bJQueryUI" : true,
@@ -558,6 +563,7 @@
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
   	<li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
     <li id="ca_menu" class="main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
+    <li id="ca_menu" class="main_menu"><a href="#tab7" data-toggle="tab">Orders Upload</a></li>
     
     <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
@@ -571,6 +577,77 @@
 	</ol>
   </div>
   <div class="tab-content nat_dashboard_rep" style="clear:left">
+  	<!--Ordering-->
+  	<div class="tab-pane" id="tab7">
+  		<div class="container">
+  			<div class="row-fluid" style="height:50%;">
+  				<div class="span6">
+  	                   		<h3>CDRR Upload</h3>
+						      <div class="accordion-inner">
+						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="D-CDRR"><i class="icon-upload"></i> D-CDRR for Central Sites</a>
+						      </div>
+						      <div class="accordion-inner">
+						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="F-CDRR_packs"> <i class="icon-upload"></i> F-CDRR for Stand-alone Sites</a>
+						      </div>
+						        <h3>MAPS Upload</h3>
+						      <div class="accordion-inner">
+						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="D-MAPS"><i class="icon-upload"></i> D-MAPS for Central Sites</a>
+						      </div>
+						      <div class="accordion-inner">
+						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="F-MAPS"><i class="icon-upload"></i> F-MAPS for Stand-alone Sites</a>
+						      </div>
+						     <!-- Modal -->
+							<div id="modal_template" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+							<form id='modal_action' class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php echo base_url()."order/import_order"?>">	
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+											×
+										</button>
+										<h3 id="myModalLabel">Upload Order(<b><span id="modal_header"></span></b>)</h3>
+									</div>
+									<div class="modal-body">
+										<div class="control-group">
+										  <label class="control-label" for="inputIcon">Upload File <i class="icon-file"></i></label>
+										  <div class="controls">
+										      <input type="hidden"  name="upload_type" id="upload_type" />
+				                              <input type="file"  name="file" size="30" id="inputIcon"  required="required" accept="application/vnd.ms-excel"/>
+										  </div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button class="btn" data-dismiss="modal" aria-hidden="true">
+											Close
+										</button>
+										<button class="btn btn-primary">
+											Upload
+										</button>
+									</div>
+								</form>
+							</div>
+  				</div>
+  			    <div class="span6">
+						      <h3>CDRR Templates <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
+						      <div class="accordion-inner">
+						        <a href="<?php echo base_url().'downloads/D-CDRR for Central Sites and District Stores.xls' ;?>"><i class="icon-download-alt"></i> D-CDRR for Central Sites.xls</a>
+						      </div>
+						      <div class="accordion-inner">
+						        <a href="<?php echo base_url().'downloads/F-CDRR for Standalone Sites.xls' ;?>"> <i class="icon-download-alt"></i> F-CDRR for Stand-alone Sites.xls</a>
+						      </div>
+						        <h3>MAPS Templates <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
+						      <div class="accordion-inner">
+						        <a href="<?php echo base_url().'downloads/D-MAPS for Central Sites and District Stores.xls' ;?>"><i class="icon-download-alt"></i> D-MAPS for Central Sites.xls</a>
+						      </div>
+						      <div class="accordion-inner">
+						        <a href="<?php echo base_url().'downloads/F-MAPS for Standalone Sites.xls' ;?>"><i class="icon-download-alt"></i> F-MAPS for Stand-alone Sites.xls</a>
+						      </div>
+  			    </div><!--End of second Span-->
+  		   </div>
+  		</div>
+  		<!--
+      <div class="two_block" id="s_consumption">
+			<h3 class="dashboard_title">Order Upload</h3>
+	  </div>-->
+    </div>
   	<!-- Commodity Analysis -->
     <div class="tab-pane" id="tab1">
       <div class="two_block" id="s_consumption">

@@ -5,6 +5,10 @@ body {
 	line-height: 1;
 	font-size: 1em;
 	vertical-align: baseline;
+	min-width:480px;
+	width: auto !important;  /* Firefox will set width as auto */
+	width:400px;
+
 }
 .msginfo {
 	border: 1px solid #99c4ea;
@@ -85,7 +89,7 @@ header {
 	display: block;
 	overflow: visible;
 	text-shadow: 0 1px rgba(0, 0, 0, 0.1);
-	position:fixed;
+	position: fixed;
 }
 #wrapper {
 	width: 100%;
@@ -130,7 +134,7 @@ header {
 	background: white;
 	z-index: 5;
 	min-width: 980px;
-	position:fixed;
+	position: fixed;
 }
 .logo {
 	width: 100px;
@@ -152,7 +156,7 @@ header {
 }
 #top_menu a {
 	font-size: 14px;
-	font-weight:bold;
+	font-weight: bold;
 }
 .welcome_msg {
 	clear: left;
@@ -657,7 +661,7 @@ tr th {
 	width: 90%;
 	margin: auto;
 	padding: 150px 1% 5% 1%;
-	zoom:0.8;
+	zoom: 0.8;
 }
 .full-content form {
 	width: 100%;
@@ -970,8 +974,8 @@ table.setting_table {
 	margin: auto;
 	padding: 10% 1% 5% 1%;
 }
-.fullest-content .tile{
-	width:32%;
+.fullest-content .tile {
+	width: 32%;
 }
 /**
  * 	Styling for Dashboard
@@ -1138,8 +1142,6 @@ html > body #main_manualcontent li a {
 .dataTables_wrapper {
 	width: 100%;
 }
-
-
 /**
  * 	Form Formatting
  */
@@ -1212,26 +1214,24 @@ input[readonly] {
 .mid-row:nth-child(even) {
 	float: right;
 }
-
 /*
  * National Dashboard
  */
-.nd_menus{
-	width:100%;
+.nd_menus {
+	width: 100%;
 }
-.nd_patient_a,.nd_order_a, .nd_report_a{
-	height:70%;	
+.nd_patient_a, .nd_order_a, .nd_report_a {
+	height: 70%;
 }
-.nd_input_small{
-	width:6%;
-	height:4%;
-	padding:0%;
+.nd_input_small {
+	width: 6%;
+	height: 4%;
+	padding: 0%;
 }
-.nd_input_medium{
-	width:13%;
-	height:4%;
+.nd_input_medium {
+	width: 13%;
+	height: 4%;
 }
-
 /**
  * 	Users Styling
  */
@@ -1245,7 +1245,7 @@ input[readonly] {
 a {
 	text-decoration: none;
 }
-a:hover{
+a:hover {
 	text-decoration: none;
 }
 .enable_user {
@@ -1428,8 +1428,8 @@ table#history_table td {
 	.sidebar-nav-fixed {
 		width: auto;
 	}
-	body{
-	font-size: 1.4vmin;
+	body {
+		font-size: 1.6 vw;
 	}
 }
 @media (min-width: 1024px) and (max-width: 1279px) {
@@ -1439,8 +1439,8 @@ table#history_table td {
 	.sidebar-nav-fixed {
 		width: auto;
 	}
-	body{
-	font-size: 1.7vmin;
+	body {
+		font-size: 1.4 vw;
 	}
 }
 @media (min-width: 1280px) and (max-width: 1365px) {
@@ -1450,8 +1450,8 @@ table#history_table td {
 	.sidebar-nav-fixed {
 		width: auto;
 	}
-	body{
-	font-size: 2.0vmin;
+	body {
+		font-size: 1.2 vw;
 	}
 }
 @media (min-width: 1366px) and (max-width: 1920px) {
@@ -1461,8 +1461,9 @@ table#history_table td {
 	.sidebar-nav-fixed {
 		width: auto;
 	}
-	body{
-	font-size: 2.0vmin;
+	body {
+		font-size: 1 vw;
+		/*font-size: 2.0vmin;font-size: 1em;*/
 	}
 }
 #fmChangePassword {
@@ -1511,9 +1512,9 @@ table#history_table td {
 	width: 28%;
 	float: right;
 }
-.regimen-table,#commodity-table{
-display:inline-block;
-vertical-align:top;
+.regimen-table, #commodity-table {
+	display: inline-block;
+	vertical-align: top;
 }
 .regimen-table tbody th {
 	font-size: 14px;
@@ -1583,81 +1584,73 @@ td {
 	width: auto;
 	margin: 0 auto;
 }
-
-
 /*
  * National Dashboard Style
  */
-.fullest-content .three_block,.fullest-content .two_block,.fullest-content .onehalf_block{
+.fullest-content .three_block, .fullest-content .two_block, .fullest-content .onehalf_block {
 	display: inline-block;
 	float: left;
 	height: 50%;
 	padding: 0 0.5% 0.5% 0.5%;
 	margin-bottom: 1%;
 }
-.fullest-content .three_block{
-	width:32%;
-	
+.fullest-content .three_block {
+	width: 32%;
 }
-.fullest-content .two_block{
-	width:48%;
+.fullest-content .two_block {
+	width: 48%;
 }
-.fullest-content .onehalf_block{
-	width:65%;
+.fullest-content .onehalf_block {
+	width: 65%;
 }
 .fullest-content .higher {
-	
-}
-.national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input, 
-.nat_dashboard_rep label {
-	font-size:0.9em !important;
-}
-.nat_dashboard_rep .dataTables_info{
-	width:42%;
-	font-size:0.7em;
-}
-.nat_dashboard_rep .dataTables_paginate{
-	width:55%;
-	font-size:0.7em;
-}
 
-.nat_dashboard_rep table tr td:last-child,.nat_dashboard_rep table tr th:last-child{
-	border-right:1px solid #aaa;
 }
-
-.nat_dashboard_rep select{
-	width:33%;
+.national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select, .nat_dashboard_rep input, .nat_dashboard_rep label {
+	font-size: 0.9em !important;
 }
-.nat_dashboard_rep input{
-	width:70%;
+.nat_dashboard_rep .dataTables_info {
+	width: 42%;
+	font-size: 0.7em;
 }
-.nat_dashboard_rep select,.nat_dashboard_rep input{
-	height:2em;
+.nat_dashboard_rep .dataTables_paginate {
+	width: 55%;
+	font-size: 0.7em;
 }
-.nat_dashboard_rep table td{
-	padding:1px 10px;
+.nat_dashboard_rep table tr td:last-child, .nat_dashboard_rep table tr th:last-child {
+	border-right: 1px solid #aaa;
 }
-.nat_dashboard_rep .dataTables_filter{
-	width:70%;
+.nat_dashboard_rep select {
+	width: 33%;
+}
+.nat_dashboard_rep input {
+	width: 70%;
+}
+.nat_dashboard_rep select, .nat_dashboard_rep input {
+	height: 2em;
+}
+.nat_dashboard_rep table td {
+	padding: 1px 10px;
+}
+.nat_dashboard_rep .dataTables_filter {
+	width: 70%;
 }
 .ui-widget-header {
 	/*#F7F7F7*/
 	background: #2B597E;
 	border: 1px solid #aaa;
-	color:#000000;
+	color: #000000;
 }
-.nav-list>.active>a, .nav-list>.active>a:hover, .nav-list>.active>a:focus{
-	background-color:#2B597E; 
+.nav-list > .active > a, .nav-list > .active > a:hover, .nav-list > .active > a:focus {
+	background-color: #2B597E;
 }
-
-.nat_dashboard_rep h3{
+.nat_dashboard_rep h3 {
 	line-height: 2em;
 	-webkit-margin-before: 0.5em;
 	color: #fff;
 	font-size: 1em;
 	padding: 0 0 0 1em;
-	background:#2B597E; /*#969DA3*/
+	background: #2B597E; /*#969DA3*/
 	box-shadow: 0 1.2px 3px 1px #000;
 	-webkit-box-shadow: 0 1.2px 3px 1px #000;
-
 }

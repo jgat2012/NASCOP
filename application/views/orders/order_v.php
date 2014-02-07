@@ -6,13 +6,8 @@
 		echo '<p class="message info">' . $this -> session -> flashdata('order_message') . '</p>';
 	}
 	?>
-	<div>
-		<a data-toggle='modal' href='#select_satellite' class='btn upload' id='D-CDRR'><i class="icon-upload"></i> Upload D-CDRR(<b>Central</b>)</a>
-		<a data-toggle='modal' href='#select_satellite' class='btn upload' id='F-CDRR_packs'><i class="icon-upload"></i> Upload F-CDRR(<b>Stand-Alone</b>)</a>
-		<a data-toggle='modal' href='#select_satellite' class='btn upload' id='D-MAPS'><i class="icon-upload"></i> Upload D-MAPS(<b>Central</b>)</a>
-		<a data-toggle='modal' href='#select_satellite' class='btn upload' id='F-MAPS'><i class="icon-upload"></i> Upload F-MAPS(<b>Stand-Alone</b>)</a>
-		<?php echo $order_table;?>
-	</div>
+	<p></p>
+	<?php echo $order_table;?>
 </div>
 <div id="select_satellite" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div id="excel_upload" style="text-align:center;">
