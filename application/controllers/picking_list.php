@@ -98,8 +98,8 @@ class Picking_List extends MY_Controller {
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
 				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				LEFT JOIN maps m ON sf.id=m.facility_id
-				WHERE c.code='D-CDRR'
-				AND m.facility_id=c.facility_id
+				WHERE m.facility_id=c.facility_id
+				AND (c.code='D-CDRR' OR c.code='F-CDRR_packs')
 				AND m.period_begin=c.period_begin
 				AND m.period_end=c.period_end
 				AND c.status='dispatched'

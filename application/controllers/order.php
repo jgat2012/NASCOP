@@ -414,6 +414,14 @@ class Order extends MY_Controller {
 		$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
 		$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
 
+		$text = $arr[2]['A'];
+
+		$file_type = $this -> checkFileType($code, $text);
+		if ($file_type == false) {
+			$this -> session -> set_flashdata('order_message', "Incorrect File Selected");
+			redirect("dashboard_management");
+		}
+
 		if ($code == "D-CDRR" || $code == "F-CDRR_packs") {
 			$first_row = 4;
 			$facility_name = trim($arr[$first_row]['C'] . $arr[$first_row]['D'] . $arr[$first_row]['E']);
@@ -428,6 +436,7 @@ class Order extends MY_Controller {
 			$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
 			if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
+				$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
 				redirect("order");
 			}
 
@@ -499,9 +508,10 @@ class Order extends MY_Controller {
 			}
 			$main_array['facility_id'] = $facilities['id'];
 			$facility_id = $facilities['id'];
-			
+
 			$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 			if ($duplicate == true) {
+				$this -> session -> set_flashdata('order_message', "An cdrr report already exists for this month !");
 				redirect("dashboard_management");
 			}
 
@@ -1212,6 +1222,26 @@ class Order extends MY_Controller {
 		$date_array = explode("/", @$base_date);
 		$clean_date = @$date_array[2] . "-" . @$date_array[1] . "-" . @$date_array[0];
 		return $clean_date;
+	}
+
+	public function checkFileType($type, $text) {
+
+		if ($type == "D-CDRR") {
+			$match = trim("CENTRAL SITE  / DISTRICT STORE CONSUMPTION DATA REPORT AND REQUEST (D-CDRR) FOR ANTIRETROVIRAL AND OPPORTUNISTIC INFECTION MEDICINES");
+		} else if ($type == "D-MAPS") {
+			$match = trim("CENTRAL SITE  / DISTRICT STORE MONTHLY ARV PATIENT SUMMARY (D-MAPS) REPORT");
+		} else if ($type == "F-CDRR_packs" || $type == "F-CDRR_units") {
+			$match = trim("FACILITY CONSUMPTION DATA REPORT AND REQUEST (F-CDRR) FOR ANTIRETROVIRAL AND OPPORTUNISTIC INFECTION MEDICINES");
+		} else if ($type == "F-MAPS") {
+			$match = trim("FACILITY MONTHLY ARV PATIENT SUMMARY (F-MAPS) REPORT");
+		}
+
+		//Test
+		if (trim($text) === $match) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public function getUser($name) {
