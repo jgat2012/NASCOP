@@ -1,5 +1,5 @@
 <?php
-$chartSize=300;
+$chartSize=250;
 
 ?>
 
