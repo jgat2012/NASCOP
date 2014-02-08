@@ -396,6 +396,10 @@ class Order extends MY_Controller {
 		} else if ($code == "F-CDRR_packs") {
 			$status_code = 3;
 			$resupply = "M";
+		} else if ($code == "D-MAPS") {
+			$status_code = 0;
+		} else if ($code == "F-MAPS") {
+			$status_code = 3;
 		}
 
 		$this -> load -> library('PHPExcel');
@@ -639,7 +643,7 @@ class Order extends MY_Controller {
 			$revisit_cm = $arr[134]["E"];
 			$new_oc = $arr[134]["F"];
 			$revisit_oc = $arr[134]["G"];
-			$facilities = Sync_Facility::getId($facility_code, 2);
+			$facilities = Sync_Facility::getId($facility_code, $status_code);
 			$facility_id = $facilities['id'];
 
 			//Save Import Values
