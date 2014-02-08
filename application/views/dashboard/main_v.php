@@ -12,6 +12,7 @@
 			var upload_type = $(this).attr("order_type");
 			$("#modal_header").text(upload_type);
 			$("#upload_type").val(upload_type);
+			$("#inputIcon").val("");
 		  }); 
 		 
 		 $(".tbl_nat_dashboard").dataTable({
