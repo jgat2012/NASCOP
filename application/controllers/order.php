@@ -19,8 +19,8 @@ class Order extends MY_Controller {
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
 				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				LEFT JOIN maps m ON sf.id=m.facility_id
-				WHERE c.code='D-CDRR'
-				AND m.period_begin=c.period_begin
+				WHERE m.period_begin=c.period_begin
+				AND (c.code='D-CDRR' OR c.code='F-CDRR_packs')
 				AND m.period_end=c.period_end
 				AND m.facility_id=c.facility_id
 				AND c.status !='prepared' 
@@ -428,14 +428,8 @@ class Order extends MY_Controller {
 			$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
 			if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
-				//redirect("order");
+				redirect("order");
 			}
-
-			/*
-			 $duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_code);
-			 if ($duplicate == true) {
-			 //redirect("order");
-			 }*/
 
 			$fourth_row = 9;
 			$sponsor_gok = trim($arr[$fourth_row]['D']);
@@ -500,7 +494,16 @@ class Order extends MY_Controller {
 			$main_array['delivery_note'] = null;
 			$main_array['order_id'] = 0;
 			$facilities = Sync_Facility::getId($facility_code, $status_code);
+			if ($facilities == "") {
+				redirect("dashboard_management");
+			}
 			$main_array['facility_id'] = $facilities['id'];
+			$facility_id = $facilities['id'];
+			
+			$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
+			if ($duplicate == true) {
+				redirect("dashboard_management");
+			}
 
 			$sixth_row = 18;
 			$cdrr_array = array();
@@ -563,11 +566,30 @@ class Order extends MY_Controller {
 			}
 			$main_array['ownCdrr_item'] = $cdrr_array;
 
-			$log_array['id'] = "";
-			$log_array['description'] = "";
-			$log_array['created'] = "";
-			$log_array['user_id'] = "";
-			$log_array['maps_id'] = "";
+			$log_array[0]['id'] = "";
+			$log_array[0]['description'] = "prepared";
+			if ($code == "D-CDRR") {
+				$log_array[0]['created'] = $this -> clean_date(trim($arr[113]['G']));
+				$log_array[0]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+			} else {
+				$log_array[0]['created'] = $this -> clean_date(trim($arr[109]['G']));
+				$log_array[0]['user_id'] = $this -> getUser(trim($arr[107]['C']));
+			}
+			$log_array[0]['cdrr_id'] = "";
+
+			$log_array[1]['id'] = "";
+			$log_array[1]['description'] = "approved";
+			if ($code == "D-CDRR") {
+				$log_array[1]['created'] = $this -> clean_date(trim($arr[117]['G']));
+				$log_array[1]['user_id'] = $this -> getUser(trim($arr[115]['C']));
+			} else {
+				$log_array[1]['created'] = $this -> clean_date(trim($arr[113]['G']));
+				$log_array[1]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+			}
+			$log_array[1]['cdrr_id'] = "";
+
+			$main_array['ownCdrr_log'] = $log_array;
+			$type = "cdrr";
 
 		} else if ($code == "D-MAPS" || $code == "F-MAPS") {
 			$first_row = 4;
@@ -584,13 +606,8 @@ class Order extends MY_Controller {
 
 			if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
 				$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
-				//redirect("order");
+				redirect("dashboard_management");
 			}
-			/*$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_code, "maps");
-			 if ($duplicate == true) {
-			 $this -> session -> set_flashdata('order_message', "An fmap report already exists for this month !");
-			 //redirect("order");
-			 }*/
 
 			$fourth_row = 9;
 			$sponsors = "";
@@ -644,7 +661,16 @@ class Order extends MY_Controller {
 			$new_oc = $arr[134]["F"];
 			$revisit_oc = $arr[134]["G"];
 			$facilities = Sync_Facility::getId($facility_code, $status_code);
+			if ($facilities == "") {
+				redirect("dashboard_management");
+			}
 			$facility_id = $facilities['id'];
+
+			$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
+			if ($duplicate == true) {
+				$this -> session -> set_flashdata('order_message', "An fmap report already exists for this month !");
+				redirect("dashboard_management");
+			}
 
 			//Save Import Values
 
@@ -708,24 +734,137 @@ class Order extends MY_Controller {
 			}
 			$main_array['ownMaps_item'] = $maps_array;
 
-			$log_array = array();
-			$log_array['id'] = "";
-			$log_array['description'] = $status;
-			$log_array['created'] = $created;
-			$log_array['user_id'] = $this -> session -> userdata("api_id");
-			$log_array['maps_id'] = "";
+			$log_array[0]['id'] = "";
+			$log_array[0]['description'] = "prepared";
+			if ($code == "D-MAPS") {
+				$log_array[0]['created'] = $this -> clean_date(trim($arr[143]['E']));
+				$log_array[0]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+			} else {
+				$log_array[0]['created'] = $this -> clean_date(trim($arr[139]['E']));
+				$log_array[0]['user_id'] = $this -> getUser(trim($arr[137]['B']));
+			}
+			$log_array[0]['maps_id'] = "";
 
-			$main_array['ownMaps_log'] = array($log_array);
+			$log_array[1]['id'] = "";
+			$log_array[1]['description'] = "approved";
+			if ($code == "D-MAPS") {
+				$log_array[1]['created'] = $this -> clean_date(trim($arr[147]['E']));
+				$log_array[1]['user_id'] = $this -> getUser(trim($arr[145]['B']));
+			} else {
+				$log_array[1]['created'] = $this -> clean_date(trim($arr[143]['E']));
+				$log_array[1]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+			}
+			$log_array[1]['maps_id'] = "";
+
+			$main_array['ownMaps_log'] = $log_array;
+			$type = "maps";
 		}
 		$main_array = array($main_array);
-		//$this -> prepare_order($type, $main_array);
-		//$this -> session -> set_flashdata('order_message', "Your " . strtoupper($type) . " data was successfully saved !");
-		//redirect("order");
+		$this -> prepare_order($type, $main_array);
+		$content = "Order was successfully saved";
+		$this -> session -> set_flashdata('order_message', $content);
+		redirect("dashboard_management");
+	}
 
-		echo "<pre>";
-		print_r($main_array);
-		echo "</pre>";
+	public function prepare_order($type = "cdrr", $responses = array()) {
+		$my_array = array();
+		if ($type == "cdrr") {
+			$cdrr = array();
+			$cdrr_items = array();
+			$cdrr_log = array();
+			$temp_items = array();
+			$temp_log = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownCdrr_item") {
+						$cdrr_items[$index] = $main;
+					} else if ($index == "ownCdrr_log") {
+						$cdrr_log[$index] = $main;
+					} else {
+						$cdrr[$index] = $main;
+					}
+				}
+			}
+			//Insert the cdrr and retrieve the auto_id assigned to it,this will be the cdrr_id
+			$this -> db -> insert('cdrr', $cdrr);
+			$cdrr_id = $this -> db -> insert_id();
 
+			//Loop through cdrr_log and add cdrr_id
+			foreach ($cdrr_log as $index => $log) {
+				foreach ($log as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "cdrr_id") {
+							$temp_log[$counter]['cdrr_id'] = $cdrr_id;
+						} else {
+							$temp_log[$counter][$ind] = $item;
+						}
+
+					}
+				}
+			}
+			$this -> db -> insert_batch('cdrr_log', $temp_log);
+
+			//Loop through cdrr_item and add cdrr_id
+			foreach ($cdrr_items as $index => $cdrr_item) {
+				foreach ($cdrr_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "cdrr_id") {
+							$temp_items[$counter]['cdrr_id'] = $cdrr_id;
+						} else {
+							$temp_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('cdrr_item', $temp_items);
+		} else if ($type == "maps") {
+			$maps = array();
+			$temp_items = array();
+			$temp_log = array();
+			$maps_log = array();
+			$maps_items = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownMaps_item") {
+						$temp_items['maps_item'] = $main;
+					} else if ($index == "ownMaps_log") {
+						$temp_log['maps_log'] = $main;
+					} else {
+						$maps[$index] = $main;
+					}
+				}
+			}
+			$this -> db -> insert("maps", $maps);
+			$maps_id = $this -> db -> insert_id();
+
+			//attach maps id to maps_log
+			foreach ($temp_log as $logs) {
+				foreach ($logs as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "maps_id") {
+							$maps_log[$counter]['maps_id'] = $maps_id;
+						} else {
+							$maps_log[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('maps_log', $maps_log);
+
+			//attach maps id to maps_item
+			foreach ($temp_items as $temp_item) {
+				foreach ($temp_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "maps_id") {
+							$maps_items[$counter]['maps_id'] = $maps_id;
+						} else {
+							$maps_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('maps_item', $maps_items);
+		}
 	}
 
 	public function download_cdrr($cdrr_id) {
@@ -984,6 +1123,19 @@ class Order extends MY_Controller {
 		}
 	}
 
+	public function check_duplicate($code, $period_start, $period_end, $facility, $table = "cdrr") {
+		$response = false;
+		$sql = "select * from $table where period_begin='$period_start' and period_end='$period_end' and code='$code' and facility_id='$facility'";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			$response = true;
+			$this -> session -> set_flashdata('order_message', strtoupper($table) . ' report already exists for this month !');
+
+		}
+		return $response;
+	}
+
 	public function check_original($type, $original_id) {
 		$sql = "SELECT new_id FROM order_maps WHERE type='$type' AND old_id='$original_id' LIMIT 1";
 		$query = $this -> db -> query($sql);
@@ -1060,6 +1212,14 @@ class Order extends MY_Controller {
 		$date_array = explode("/", @$base_date);
 		$clean_date = @$date_array[2] . "-" . @$date_array[1] . "-" . @$date_array[0];
 		return $clean_date;
+	}
+
+	public function getUser($name) {
+		$user_id = Sync_User::getId($name);
+		if ($user_id) {
+			return $user_id['id'];
+		}
+		return null;
 	}
 
 	public function getMappedDrug($drug_name = "", $packsize = "") {

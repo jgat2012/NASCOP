@@ -578,6 +578,8 @@
 	</ol>
   </div>
   <div class="tab-content nat_dashboard_rep" style="clear:left">
+  	
+  	<?php echo $this->session->flashdata("order_message");?>
   	<!--Ordering-->
   	<div class="tab-pane" id="tab7">
   		<div class="container">
