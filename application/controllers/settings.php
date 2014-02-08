@@ -1,9 +1,10 @@
 <?php
 class settings extends MY_Controller {
+	var $esm_url = "https://api.kenyapharma.org/";
 	function __construct() {
 		parent::__construct();
 		$this -> load -> library('encrypt');
-		date_default_timezone_set('Africa/Nairobi');
+		$this -> load -> library('Curl');
 	}
 
 	public function index() {
@@ -14,14 +15,92 @@ class settings extends MY_Controller {
 		$this -> base_params($data);
 	}
 
+	public function api_sync() {
+		$log = "";
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		//Link array
+		$links = array();
+		$links['escm_drug'] = "drugs";
+		$links['escm_regimen'] = "regimen";
+
+		$curl = new Curl();
+		$url = $this -> esm_url;
+
+		$username = "kevinmarete";
+		$password = "poltergeist";
+		$curl -> setBasicAuthentication($username, $password);
+		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
+		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
+
+		foreach ($links as $table => $link) {
+			$target_url = $url . $link;
+			$curl -> get($target_url);
+			if ($curl -> error) {
+				$curl -> error_code;
+				$log .= "Error " . $curl -> error_code . " ! Sync Failed<br/>";
+			} else {
+				$main_array = json_decode($curl -> response, TRUE);
+				$this -> db -> query("TRUNCATE $table");
+				$this -> db -> insert_batch($table, $main_array);
+				$log .= "Sync " . $table . "! Synched Succesful<br/>";
+			}
+		}
+		$content = $info_class;
+		$content .= $close_btn_div;
+		$content .= $log;
+		$content .= $close_div;
+		$this -> session -> set_flashdata('alert_message', $content);
+	}
+
+	public function enable($type = "sync_drug", $id = null) {
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+
+		if ($id != null) {
+			if ($type == "sync_drug") {
+				$columns = array("category_id" => 0);
+			} else if ($type == "sync_regimen") {
+				$columns = array("category_id" => 0);
+			} else if ($type == "sync_user") {
+				$columns = array("status" => "A");
+			}
+			$this -> db -> where('id', $id);
+			$this -> db -> update($type, $columns);
+			$message = "<b>Enabled " . $type . "!</b> You successfully enabled.";
+			$content = $info_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		} else {
+			$message = "<b>Failed " . $type . "!</b> You failed to enable.";
+			$content = $error_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		}
+		$this -> session -> set_flashdata("alert_message", $content);
+		$this -> session -> set_userdata("nav_link", $type);
+		redirect("settings");
+	}
+
 	public function delete($type = "sync_drug", $id = null) {
 		$info_class = "<div class='alert alert-info'>";
 		$error_class = "<div class='alert alert-error'>";
 		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
 
 		if ($id != null) {
-			$sql = "DELETE FROM $type where id='$id'";
-			//$this -> db -> query($sql);
+			if ($type == "sync_drug") {
+				$columns = array("category_id" => 14);
+			} else if ($type == "sync_regimen") {
+				$columns = array("category_id" => 15);
+			} else if ($type == "sync_user") {
+				$columns = array("status" => "N");
+			}
+			$this -> db -> where('id', $id);
+			$this -> db -> update($type, $columns);
 			$message = "<b>Deleted " . $type . "!</b> You successfully deleted.";
 			$content = $error_class;
 			$content .= $close_btn_div;
@@ -42,13 +121,13 @@ class settings extends MY_Controller {
 	public function get($type = "sync_drug") {
 		//Column definitions
 		if ($type == "sync_drug") {
-			$columns = array("id", "name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight");
+			$columns = array("id", "name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight", "category_id");
 		} else if ($type == "sync_facility") {
-			$columns = array("id", "code", "name", "category", "services");
+			$columns = array("id", "code", "name", "category", "sponsors", "services", "district_id", "ordering", "service_point", "county_id");
 		} else if ($type == "sync_regimen") {
-			$columns = array("id", "code", "name", "description");
+			$columns = array("id", "code", "name", "description", "old_code", "category_id");
 		} else if ($type == "sync_user") {
-			$columns = array("id", "name", "email", "role", "profile_id");
+			$columns = array("s.id", "name", "email", "role", "username", "status", "facility");
 		}
 
 		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
@@ -93,6 +172,9 @@ class settings extends MY_Controller {
 		$this -> db -> select('SQL_CALC_FOUND_ROWS ' . str_replace(' , ', ' ', implode(', ', $aColumns)), false);
 		$this -> db -> select("$columns");
 		$this -> db -> from("$type s");
+		if ($type == "sync_user") {
+			$this -> db -> join("user_facilities uf", "uf.user_id=s.id", "left");
+		}
 		$rResult = $this -> db -> get();
 
 		// Data set length after filtering
@@ -108,21 +190,44 @@ class settings extends MY_Controller {
 		$output = array('sEcho' => intval($sEcho), 'iTotalRecords' => $iTotal, 'iTotalDisplayRecords' => (int)$iFilteredTotal, 'aaData' => array());
 		foreach ($rResult->result_array() as $row) {
 			$myrow = array();
+			$action_link = "delete";
+			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id") {
+				if ($i != "id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors") {
 					$myrow[] = $v;
 				} else {
-					$id = $v;
+					if ($i == "id") {
+						$id = $v;
+					}
+				}
+				//Delete/enable actions
+				if ($type == "sync_user" && $i == "status" && $v == "N") {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "sync_drug" && $i == "category_id" && $v == 14) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "sync_regimen" && $i == "category_id" && $v == 15) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
 				}
 			}
-			$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
-			$links .= "  ";
-			$links .= anchor("settings/delete/" . $type . "/" . $id, "<i class='icon-trash'></i>", array("class" => "delete"));
+			$links = "";
+			if ($action_link == "delete") {
+				$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
+				$links .= "  ";
+				if ($type != "sync_facility") {
+					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
+				}
+			} else {
+				if ($type != "sync_facility") {
+					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
+				}
+			}
 			$myrow[] = $links;
 			$output['aaData'][] = $myrow;
 		}
 		echo json_encode($output);
-
 	}
 
 	public function modal($type = "sync_drug") {
@@ -131,13 +236,13 @@ class settings extends MY_Controller {
 		$control_div = "<div class='controls'>";
 		$close_div = "</div>";
 		if ($type == "sync_drug") {
-			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight");
+			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight", "Category" => "category_id");
 		} else if ($type == "sync_facility") {
-			$inputs = array("code" => "code", "name" => "name", "category" => "category", "services" => "services");
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district" => "district_id", "is ordering point?" => "ordering", " is service point?" => "service_point", "county" => "county_id");
 		} else if ($type == "sync_regimen") {
-			$inputs = array("code" => "code", "name" => "name", "description" => "description");
+			$inputs = array("code" => "code", "name" => "name", "description" => "description", "old_code" => "old_code");
 		} else if ($type == "sync_user") {
-			$inputs = array("name" => "name", "email" => "email", "role" => "role", "phone" => "profile_id");
+			$inputs = array("name" => "name", "email" => "email", "role" => "role", "phone" => "username", "User Facilities" => "facilities");
 		}
 		foreach ($inputs as $text => $input) {
 			$content .= $group_div;
@@ -147,6 +252,48 @@ class settings extends MY_Controller {
 			$textfield = "<input type='text' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
 			if ($input == "profile_id") {
 				$textfield = "<input type='text' id='" . $type . "_" . $input . "' name='" . $text . "'/>";
+			} else if ($input == "category_id") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $text . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$textfield .= "<option value='1'>ART Adults</option>";
+				$textfield .= "<option value='2'>ART Paeds</option>";
+				$textfield .= "<option value='3'>OI Drugs </option>";
+				$textfield .= "</select>";
+			} else if ($input == "username") {
+				$textfield = "<input type='text' id='" . $type . "_" . $input . "' name='" . $input . "' class='phone'/>";
+			} else if ($input == "district_id") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$districts = District::getActive();
+				foreach ($districts as $district) {
+					$textfield .= "<option value='" . $district['id'] . "'>" . $district['Name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "county_id") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$counties = Counties::getActive();
+				foreach ($counties as $county) {
+					$textfield .= "<option value='" . $county['id'] . "'>" . $county['county'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "ordering") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>NO</option>";
+				$textfield .= "<option value='1'>YES</option>";
+				$textfield .= "</select>";
+			} else if ($input == "service_point") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>NO</option>";
+				$textfield .= "<option value='1'>YES</option>";
+				$textfield .= "</select>";
+			} else if ($input == "facilities") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "[]' multiple='multiple' style='width:300px;'>";
+				$facilities = Sync_Facility::getAllHydrated();
+				foreach ($facilities as $facility) {
+					$textfield .= "<option value='" . $facility['id'] . "'>" . " " . $facility['name'] . "</option>";
+				}
+				$textfield .= "</select><input type='hidden' id='" . $input . "_holder' name='" . $input . "_holder' />";
 			}
 			$content .= $textfield;
 			$content .= $close_div;
@@ -168,26 +315,47 @@ class settings extends MY_Controller {
 		if ($type == "sync_drug") {
 			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight");
 		} else if ($type == "sync_facility") {
-			$inputs = array("code" => "code", "name" => "name", "category" => "category", "services" => "services");
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district_id" => "district_id", "ordering" => "ordering", "service_point" => "service_point", "county_id" => "county_id");
 		} else if ($type == "sync_regimen") {
 			$inputs = array("code" => "code", "name" => "name", "description" => "description");
 		} else if ($type == "sync_user") {
-			$inputs = array("name" => "name", "email" => "email", "role" => "role", "profile_id" => "phone");
+			$inputs = array("name" => "name", "email" => "email", "role" => "role", "username" => "username", "facility_list" => "facilities_holder");
 		}
 		foreach ($inputs as $index => $input) {
-			$save_data[$index] = $this -> input -> post($input);
+			if ($index == "facility_list") {
+				if ($input == null) {
+					$facility_list = "";
+				} else {
+					$facility_list = json_encode($this -> input -> post($input));
+				}
+			} else {
+				$save_data[$index] = $this -> input -> post($input);
+			}
 		}
-
 		//insert or update
 		if ($id == null) {
 			$this -> db -> insert($type, $save_data);
 			$message = "<b>Saved " . $type . "!</b>  You successfully saved.";
 			$content = $success_class;
+			if ($type == "sync_user") {
+				$user_id = $this -> db -> insert_id();
+				$this -> db -> insert("user_facilities", array("user_id" => $user_id, "facility" => $facility_list));
+			}
 		} else {
 			$this -> db -> where('id', $id);
 			$this -> db -> update($type, $save_data);
 			$message = "<b>Updated " . $type . "!</b> You successfully updated.";
 			$content = $info_class;
+			if ($type == "sync_user") {
+				$user_id = $id;
+				$results = User_Facilities::getFacilityList($user_id);
+				if ($results) {
+					$this -> db -> where('user_id', $user_id);
+					$this -> db -> update("user_facilities", array("user_id" => $user_id, "facility" => $facility_list));
+				} else {
+					$this -> db -> insert("user_facilities", array("user_id" => $user_id, "facility" => $facility_list));
+				}
+			}
 		}
 
 		$content .= $close_btn_div;

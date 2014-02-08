@@ -213,6 +213,7 @@ if($menus){
 	<br>
 	<span class="date"><?php echo date('l, jS \of F Y') ?></span>
 	<input type="hidden" id="facility_hidden" />
+	<input type="hidden" id="base_url" value="<?php echo base_url();?>"/>
 	<br/>
 	<a href='<?php echo base_url().'home_controller/reset_user';?>' class="btn btn-success" style="color:#FFF;">Dashboard</a>
 </div>

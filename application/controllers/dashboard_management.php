@@ -533,7 +533,7 @@ class Dashboard_Management extends MY_Controller {
 
 	public function getCommodity($type = "SOH") {
 		$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
-		$links = array('dashboard_management/download/' . $type => 'download');
+		$links = array('dashboard_management/download/' . $type => '<i class="icon-download-alt"></i>download');
 		//Get eSCM orders
 		$escm_orders = Escm_Orders::getAll();
 		$list = "";
@@ -676,7 +676,7 @@ class Dashboard_Management extends MY_Controller {
 		}
 		else{
 			$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
-			$links = array('dashboard_management/download/' . $type => 'download');
+			$links = array('dashboard_management/download/' . $type => '<i class="icon-download-alt"></i>download');
 			//Get eSCM orders
 			$escm_patients = Escm_Maps::getAll();
 			$list = "";

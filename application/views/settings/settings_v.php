@@ -49,10 +49,10 @@
 			<!--Tables-->
 			<div class="row-fluid">
 				<div class="span2">
-					<a  href="<?php echo site_url("settings/modal/sync_drug");?>" data-target="#modal_template" role="button" id="add_btn" class="btn btn-primary modal_btn" data-toggle="modal"><i class="icon-plus-sign"></i> add <span id="create_setting">drug</span></a>
+					<a  href="<?php echo site_url("settings/modal/sync_drug");?>"  role="button" id="add_btn" class="btn btn-primary modal_btn" data-toggle="modal"><i class="icon-plus-sign"></i> <span id="create_setting"> add drug</span></a>
 				</div>
 				<div class="span10">
-					<?php  echo $this -> session -> flashdata("alert_message");?>
+					<?php echo $this -> session -> flashdata("alert_message");?>
 				</div>
 			</div>
 			<div id="table_grid" class="table-responsive"></div>
@@ -81,12 +81,11 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var my_url = "<?php echo base_url(); ?>";
+        var my_url = "<?php echo base_url(); ?>";
 		//default link
 		var type = "<?php if($this -> session -> userdata("nav_link") !=""){echo $this -> session -> userdata("nav_link");}else{echo "sync_drug";} ?>";
-		var url = my_url + "settings/get/" + type;
+		var url = my_url + "settings/get/" + type;		
 		var div_id = "#table_grid";
-
 		getTable(type, url, div_id);
 
 		//set default active in nav list
@@ -95,18 +94,19 @@
 			var active_nav = $(this).find("a[id=" + type + "]");
 			active_nav.closest('li').addClass('active');
 		});
+		$("#add_btn").show();
 		//add button label
 		if(type == "sync_drug") {
-			$("#create_setting").text("drug");
+			$("#create_setting").text("add drug");
 			$("#modal_header").text("Add Drug");
 		} else if(type == "sync_facility") {
-			$("#create_setting").text("facility");
+			$("#add_btn").hide();
 			$("#modal_header").text("Add Facility");
 		} else if(type == "sync_regimen") {
-			$("#create_setting").text("regimen");
+			$("#create_setting").text("add regimen");
 			$("#modal_header").text("Add Regimen");
 		} else if(type == "sync_user") {
-			$("#create_setting").text("user");
+			$("#create_setting").text("add user");
 			$("#modal_header").text("Add User");
 		}
 
@@ -137,18 +137,20 @@
 			//Set Current setting breadcrumb
 			$("#current_setting").text(type);
 
+			$("#add_btn").show();
+
 			//add button label
 			if(type == "sync_drug") {
-				$("#create_setting").text("drug");
+				$("#create_setting").text("add drug");
 				$("#modal_header").text("Add Drug");
 			} else if(type == "sync_facility") {
-				$("#create_setting").text("facility");
+				$("#add_btn").hide();
 				$("#modal_header").text("Add Facility");
 			} else if(type == "sync_regimen") {
-				$("#create_setting").text("regimen");
+				$("#create_setting").text("add regimen");
 				$("#modal_header").text("Add Regimen");
 			} else if(type == "sync_user") {
-				$("#create_setting").text("user");
+				$("#create_setting").text("add user");
 				$("#modal_header").text("Add User");
 			}
 			var link = my_url + "settings/modal/" + type
@@ -163,23 +165,68 @@
 		$(".edit_item").live("click", function() {
 			var my_array = $(this).data("mydata");
 			var current = $("#current_setting").text();
+			
+			//facilities multifilter
+			if(current == "sync_user") {
+				$("#sync_user_facilities").multiselect().multiselectfilter();
+				$("#sync_user_facilities").multiselect("uncheckAll");
+			}
 
 			$.each(my_array, function(i, v) {
 				$("#" + current + "_" + i).val(v);
 				if(i == "id") {
 					var action_link = my_url + "settings/save/" + current + "/" + v
 					$("#modal_action").attr("action", action_link);
+				} else if(i == "facility" && v !=null) {
+					var family_planning = $.parseJSON(v);
+					if(family_planning != null || family_planning != " ") {
+						var fplan = family_planning.split(',');
+						for(var i = 0; i < fplan.length; i++) {
+							$("select#sync_user_facilities").multiselect("widget").find(":checkbox[value='" + fplan[i] + "']").each(function() {
+								$(this).click();
+							});
+						}
+					}
 				}
 			});
 			$("#modal_template").modal('show');
 		});
 
-		$("#add_btn").live("click", function() {
+		$("#add_btn").click(function() {
 			var current = $("#current_setting").text();
 			var action_link = my_url + "settings/save/" + current
 
 			$("#modal_template :input").val("");
 			$("#modal_action").attr("action", action_link);
+			
+			if(current=="sync_user"){
+				$("#sync_user_facilities").multiselect().multiselectfilter();
+				$("#sync_user_facilities").multiselect("uncheckAll");
+				$("#modal_template").modal('show');		
+			}else{
+			    $("#modal_template").modal('show');			
+			}
+		});
+		//escm sync function
+		$(".api_sync").click(function() {
+			var url = my_url + "settings/api_sync";
+			$.ajax({
+				url : url,
+				type : 'POST',
+				success : function(data) {
+					window.location = my_url + "settings";
+				}
+			});
+		});
+		//form submit
+		$("#modal_action").submit(function() {
+			var current = $("#current_setting").text();
+			if(current == "sync_user") {
+				var facilities = $("select#sync_user_facilities").multiselect("getChecked").map(function() {
+					return this.value;
+				}).get();
+			}
+			$("#facilities_holder").val(facilities);
 		});
 	});
 	function getTable(type, url, div_id) {

@@ -20,12 +20,18 @@ class Sync_User extends Doctrine_Record {
 		$sync_user = $query -> execute();
 		return $sync_user;
 	}
+
 	public function getUser($email) {
-		$query = Doctrine_Query::create() -> select("*") -> from("sync_user")->where("email ='".$email."'" );
+		$query = Doctrine_Query::create() -> select("*") -> from("sync_user") -> where("email ='" . $email . "'");
 		$sync_user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_user[0];
 	}
 
+	public function getId($name) {
+		$query = Doctrine_Query::create() -> select("id") -> from("sync_user") -> where("name like '%$name%'");
+		$sync_user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return @$sync_user[0];
+	}
 
 }
 ?>
