@@ -33,7 +33,21 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var oTable = $('.dataTables').dataTable();
+		var oTable = $('#my_orders').dataTable({
+			"bJQueryUI" : true,
+			"sPaginationType" : "full_numbers",
+			"bAutoWidth" : false,
+			"bDeferRender" : true,
+			"bInfo" : true,
+			"bProcessing" : true,
+			"bSort" : true,
+			"bSortClasses" : true,
+			"bStateSave" : true,
+			"sScrollX" : "100%",
+			"bScrollCollapse" : true,
+			"sScrollY" : "200px",
+			"sCookiePrefix" :"nascop_orders_"
+			});
 		oTable.fnSort([[0, 'desc']]);
 		$(".upload").click(function() {
 			var upload_type = $(this).attr("id");

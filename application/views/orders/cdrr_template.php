@@ -118,8 +118,8 @@
 						<td><b>District: &nbsp;</b><?php echo $facility_object -> Parent_District -> Name;?></td>
 					</tr>
 					<tr>
-						<td colspan='2'><b>Programme Sponsor: &nbsp;</b><?php echo $facility_object -> supplier -> name;?>
-							<input type="hidden" name="sponsor" value="<?php echo $facility_object -> supplier -> name; ?>"/>
+						<td colspan='2'><b>Programme Sponsor: &nbsp;</b><?php echo $facility_object -> support -> Name;?>
+							<input type="hidden" name="sponsor" value="<?php echo $facility_object -> support -> Name; ?>"/>
 						</td>
 					</tr>
 					<tr>
@@ -213,8 +213,51 @@
 						<th>J</th>
 					</tr>
 			</thead>';
-	}
-			else{$header_text = '<thead style="text-align:left;background:#c3d9ff;">
+	}else if($stand_alone==1){
+		$header_text = '<thead style="text-align:left;background:#c3d9ff;">
+					<tr>
+						<th class="col_drug" rowspan="3">Drug Name</th>
+						<th class="number" rowspan="3">Basic Unit</th>
+						<th class="number">Beginning Balance</th>
+						<th class="number">Quantity <br/>Received in this period</th>
+						<th class="col_dispensed_units" colspan="2">Total Quantity Dispensed <br/>this period</th>
+						<th class="col_losses_units">Losses <br/>(Damages, Expiries, Missing)</th>
+						<th class="col_adjustments">Adjustments (Borrowed from <br/>or Issued out to Other Facilities)</th>
+						<th class="number">End of Month Physical Count</th>
+						<th class="number" colspan="2">Drugs with less than 6 months to expiry</th>
+						<th class="number">Days out of stock this Month</th>
+						<th class="number">Quantity required for RESUPPLY</th>
+					</tr>
+					<tr>
+						<th>In Packs</th>
+						<th>In Packs</th>
+						<th class="col_dispensed_units">In Units</th>
+						<th class="col_dispensed_units">In Packs</th>
+						<th class="col_dispensed_units">In Packs</th>
+						<th>In Packs</th>
+						<th>In Packs</th>
+						<th>Quantity</th>
+						<th>Expiry Date</th>
+						<th></th>
+						<th>In Packs</th>
+					</tr>
+					<tr>
+						<th>A</th>
+						<th>B</th>
+						<th></th>
+						<th>C</th>
+						<th>D</th>
+						<th>E</th>
+						<th>F</th>
+						<th>In Units</th>
+						<th>mm-yy</th>
+						<th>G</th>
+						<th>H</th>
+					</tr>
+			</thead>';
+		
+	}else if($stand_alone==0 && $hide_generate !=2){
+		$header_text = '<thead style="text-align:left;background:#c3d9ff;">
 					<tr>
 						<th class="col_drug" rowspan="3">Drug Name</th>
 						<th class="number" rowspan="3">Basic Unit</th>
@@ -253,7 +296,8 @@
 						<th>H</th>
 					</tr>
 			</thead>';}echo $header_text;?>
-				<tbody>					<?php 
+				<tbody>					
+					<?php 
 					$counter =-1;
 					$count_one=0;
 					$count_two=0;
@@ -304,13 +348,20 @@
 						<?php
 						}else{
 						?>
-						<td class="number calc_count"><?php if($options=="view"){echo $commodity->Unit_Name;}else{echo $commodity->Drug_Unit->Name;}?></td>
+						<td class="number calc_count"><?php if($options=="view"){echo $commodity->Unit_Name;}else{echo $commodity->Unit_Name;}?></td>
 						<?php	
 						}
 						?>
 						<td> <input name="opening_balance[]" id="opening_balance_<?php echo $commodity -> id;?>" type="text" class="opening_balance"/></td>
 						<td> <input name="quantity_received[]" id="received_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_received"/></td>
 						<td> <input name="quantity_dispensed[]" id="dispensed_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_dispensed"/></td>
+						<?php
+	                    if($stand_alone==1){
+	                    ?>
+	                    <td> <input name="quantity_dispensed_packs[]" id="dispensed_in_period_packs_<?php echo $commodity -> id;?>" type="text" class="quantity_dispensed_packs"/></td>
+	                    <?php
+						}
+	                    ?>
 						<td> <input name="losses[]" id="losses_in_period_<?php echo $commodity->id;?>" type="text" class="losses"/></td>
 						<td> <input name="adjustments[]" id="adjustments_in_period_<?php echo $commodity->id;?>" type="text" class="adjustments"/></td>
 						<td> <input tabindex="-1" name="physical_count[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_count"/></td>
@@ -372,7 +423,7 @@
 				</tr>
 				<tr>
 					<td><b>Contact Telephone:</b></td>
-					<td><?php echo $log->user->profile_id; ?></td>
+					<td><?php echo $log->user->username; ?></td>
 					<td><b>Date:</b></td>
 					<td><?php echo $log->created; ?></td>
 				</tr>
@@ -427,6 +478,12 @@
 				$(".aggregated_physical_qty").attr("readonly",true);
 				$(".resupply").attr("readonly",true);		
 				<?php
+				}else if($stand_alone==1){
+				?>	
+				getPeriodDrugBalance(count,$(this).attr("drug_id"), period_start, period_end,3);	
+				$(".physical_count").attr("readonly",true);
+				$(".resupply").attr("readonly",true);	
+				<?php
                 }else{
 				?>
 				getPeriodDrugBalance(count,$(this).attr("drug_id"), period_start, period_end,2);	
@@ -450,6 +507,9 @@
 		$(".quantity_dispensed").live('change',function() {
 			calculateResupply($(this));
 		});
+		$(".quantity_dispensed_packs").live('change',function() {
+			calculateResupply($(this));
+		});
 		$(".losses").live('change',function() {
 			calculateResupply($(this));
 		});
@@ -461,7 +521,7 @@
 		});
 		<?php
 		if (!empty($cdrr_array)) {
-			if($cdrr_array[0]['code']==0){
+			if($cdrr_array[0]['code']=="D-CDRR"){
 		?>
 		$("#central_rate").val("<?php echo $cdrr_array[0]['reports_expected']; ?>");
 		$("#actual_report").val("<?php echo $cdrr_array[0]['reports_actual']; ?>");
@@ -482,11 +542,18 @@
 		  $("#opening_balance_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['balance']; ?>");
 		  $("#received_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['received']; ?>");
 		  $("#dispensed_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_units']; ?>"); 
+		  <?php  
+			if($cdrr_array[0]['code']=="F-CDRR_packs"){
+		  ?>
+		  $("#dispensed_in_period_packs_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>"); 	
+		  <?php	
+			}
+		  ?>
 		  $("#losses_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['losses']; ?>");
 		  $("#adjustments_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['adjustments']; ?>");
 		  $("#physical_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['count']; ?>");
 		  <?php
-		  if($cdrr_array[0]['code']==0){
+		  if($cdrr_array[0]['code']=="D-CDRR"){
 		  ?>
 		  $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");
 		  $("#aggregated_physical_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_on_hand']; ?>");
@@ -515,8 +582,18 @@
 		var row_element = element.closest("tr");
 		var opening_balance = parseInt(row_element.find(".opening_balance").attr("value"));
 		var quantity_received = parseInt(row_element.find(".quantity_received").attr("value"));
+		<?php
+		if($stand_alone==1){
+		?>
+		var quantity_dispensed = parseInt(row_element.find(".quantity_dispensed_packs").attr("value"));
+		<?php
+		}else{
+		?>
 		var quantity_dispensed = parseInt(row_element.find(".quantity_dispensed").attr("value"));
-		var losses = parseInt(row_element.find(".losses").attr("value"));
+		<?php
+		}
+		?>
+        var losses = parseInt(row_element.find(".losses").attr("value"));
 		var adjustments = parseInt(row_element.find(".adjustments").attr("value"));
 		var physical_count = parseInt(row_element.find(".physical_count").attr("value"));
 		var resupply = 0;

@@ -63,6 +63,8 @@ class Sync_Facility extends Doctrine_Record {
 	public function getCode($facility_id, $status_code = 0) {
 		if ($status_code == 0) {
 			$conditions = "id='$facility_id' and ordering='1'";
+		} else if ($status_code == 3) {
+			$conditions = "id='$facility_id' and category like '%standalone%'";
 		} else {
 			$conditions = "id='$facility_id' and service_point='1'";
 		}

@@ -31,7 +31,7 @@ class Cdrr extends Doctrine_Record {
 	}
 
 	public function getOrders($start, $end) {
-		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='D-CDRR'");
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and(code='D-CDRR' or code='F-CDRR_packs')");
 		$cdrrs = $query -> execute();
 		return $cdrrs;
 	}
@@ -39,9 +39,9 @@ class Cdrr extends Doctrine_Record {
 	public function getFacilities($start, $end, $id_list) {
 		$and = "";
 		if ($id_list != "") {
-			//$and = "and id NOT IN($id_list)";
+			$and = "and id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='D-CDRR' $and") -> groupBy("facility_id");
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and(code='D-CDRR' or code='F-CDRR_packs') $and") -> groupBy("facility_id");
 		$items = $query -> execute();
 		return $items;
 	}
@@ -51,7 +51,7 @@ class Cdrr extends Doctrine_Record {
 		if ($id_list != "") {
 			$and = "and id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("status,count(status) as total") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='D-CDRR' $and") -> groupBy("status");
+		$query = Doctrine_Query::create() -> select("status,count(status) as total") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and(code='D-CDRR' or code='F-CDRR_packs') $and") -> groupBy("status");
 		$items = $query -> execute();
 		return $items;
 	}
@@ -61,7 +61,7 @@ class Cdrr extends Doctrine_Record {
 		if ($id_list != "") {
 			$and = "and id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='1' $and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='F-CDRR_units' $and") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
@@ -71,7 +71,7 @@ class Cdrr extends Doctrine_Record {
 		if ($id_list != "") {
 			$and = "and id IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='1' $and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='F-CDRR_units' $and") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
