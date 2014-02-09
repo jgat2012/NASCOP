@@ -1,10 +1,10 @@
 <?php
 $chartSize=0;
 if($resultArraySize<=6){
-	$chartSize='300';
+	$chartSize='250';
 }
 if($resultArraySize>6){
-	$chartSize='400';
+	$chartSize='350';
 }
 if($resultArraySize>10){
 	$chartSize='700';
@@ -47,7 +47,7 @@ if($resultArraySize>25){
 			{
 			categories:  <?php echo $categories; ?>,
 			title: {
-			text: 'Period'
+			text: 'Regimens'
 			}
 			},
 			yAxis: {
@@ -70,23 +70,10 @@ if($resultArraySize>25){
 					}
 				}
 			},
-			legend: {
-				layout: 'horizontal',
-				align: 'middle',
-				verticalAlign: 'bottom',
-				floating: true,
-				borderWidth: 1,
-				backgroundColor: '#FFFFFF',
-				shadow: true
-			},
 			credits: {
 			enabled: false
 			},
-			series:[{
-                name: 'Reporting Sites(By 10th)',
-                data: [49, 71, 106, 129, 144, 176]
-    
-            }]
+			series:<?php echo $resultArray?>
 		});
 	});
 </script>

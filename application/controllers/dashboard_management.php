@@ -533,7 +533,7 @@ class Dashboard_Management extends MY_Controller {
 
 	public function getCommodity($type = "SOH") {
 		$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
-		$links = array('dashboard_management/download/' . $type => 'download');
+		$links = array('dashboard_management/download/' . $type => '<i class="icon-download-alt"></i>download');
 		//Get eSCM orders
 		$escm_orders = Escm_Orders::getAll();
 		$list = "";
@@ -574,48 +574,109 @@ class Dashboard_Management extends MY_Controller {
 			$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
 		}
 		elseif($type=="ADULT_ART"){//Pie Chart
+			$sql= "SELECT  
+					IF(r.regimen_code='AF3A' OR r.regimen_code='AF3B' OR r.regimen_code='AF1A' OR r.regimen_code='AF1B' OR r.regimen_code='AF2A' OR r.regimen_code='AF2B',r.regimen_desc,
+						IF(r.regimen_code LIKE '%AS%','2nd line','Other Regimens'
+						)
+					) as regimen_cat,SUM(mi.total) as tot FROM regimen r
+					LEFT JOIN maps_item mi ON mi.regimen_id =r.id
+					GROUP BY regimen_cat";
+			$query =$this->db->query($sql);
+			$result=$query->result_array();
+			
+		
 			$data =array();
+			$list = array();
+			$regimens = array("D4T+3TC+NVP","D4T+3TC+EFV","AZT+3TC+NVP","AZT+3TC+EFV","TDF+3TC+NVP","TDF+3TC+EFV","2ND LINE","OTHER REGIMENS");
+			$dataArray = array();
+			$columns = array();
+			$total_series = array();
+			$series = array();	
+			$categories = array();
+			
+			$values=array(0,0,0,0,0,0,0,0);
+			foreach ($result as $value) {
+				$total = $value['tot'];
+				$value =strtoupper($value['regimen_cat']);
+				$key = array_search($value, $regimens); 
+				$values[$key] = @(int)$total;
+			}
+			$resultArray = array(
+								array(
+									'name'=>'Number of Patients',
+									'data'=>$values
+								)
+								);
+			foreach ($regimens as $key => $value) {
+				$categories[$key] = $value;
+			}
+			
+			$resultArray = json_encode($resultArray);
+			//var_dump($resultArray);die();
+			$categories = json_encode($categories);
+			$data['resultArraySize'] = 7;
+			$data['container'] = 'report_adult_chart';
+			$data['chartType'] = 'bar';
+			$data['chartTitle'] = 'Adult Patients on ART';
+			$data['categories'] = $categories;
+			$data['yAxix'] = 'No of Patients';
+			$data['name'] = 'Adult Patients';
+			$data['resultArray'] = $resultArray;
+			$this -> load -> view('dashboard/chart_report_bar_v', $data);
+		}
+		elseif($type=="PAED_ART"){//Pie Chart
+			$sql= "SELECT  
+					IF(r.regimen_code='CF1A' OR r.regimen_code='CF1B' OR r.regimen_code='CF2A' OR r.regimen_code='CF2B' OR r.regimen_code='CF2D' OR r.regimen_code='CF1C',r.regimen_desc,
+						IF(r.regimen_code LIKE '%CS%','2nd line','Other Regimens'
+						)
+					) as regimen_cat,SUM(mi.total) as tot FROM regimen r
+					LEFT JOIN maps_item mi ON mi.regimen_id =r.id
+					GROUP BY regimen_cat";
+					
+			$query =$this->db->query($sql);
+			$result=$query->result_array();
+			
+			$data =array();
+			$regimens = array("AZT+3TC+NVP","AZT+3TC+EFV","ABC+3TC+NVP","ABC+3TC+EFV","ABC+3TC+LPv/r","AZT+3TC+LPv/r","2ND LINE","OTHER REGIMENS");
 			$list = array();
 			$dataArray = array();
 			$columns = array();
 			$total_series = array();
 			$series = array();	
 			$categories = array();
-			$value1=array('45','48','15','0','68','58');
+			$values=array(0,0,0,0,0,0,0,0);
+			foreach ($result as $value) {
+				$total = $value['tot'];
+				$value =strtoupper($value['regimen_cat']);
+				$key = array_search($value, $regimens); 
+				$values[$key] = @(int)$total;
+			}
 			$resultArray = array(
 								array(
-									'name'=>'Reporting Sites(By 10th)',
-									'data'=>$value1
+									'name'=>'Number of Patients',
+									'data'=>$values
 								)
 								);
-			$sixmonthback= date('F-Y',strtotime(date("F-Y", mktime()) . " - 182 day"));
-			$x=0;
-			while ($x <= 5) {
-				$period = date("F-Y",strtotime(date("Y-m-d", strtotime($sixmonthback)) . " +".$x." month"));
-				$categories[$x]=$period;
-				$x++;
+								
+			foreach ($regimens as $key => $value) {
+				$categories[$key] = $value;
 			}
 			$resultArray = json_encode($resultArray);
 			$categories = json_encode($categories);
 			$data['resultArraySize'] = 7;
-			$data['container'] = 'report_chart';
+			$data['container'] = 'report_paed_chart';
 			$data['chartType'] = 'bar';
 			$data['title'] = 'Reporting Analysis';
-			$data['chartTitle'] = 'Reporting Sites Analysis';
+			$data['chartTitle'] = 'Paediatric Patients on ART';
 			$data['categories'] = $categories;
-			$data['yAxix'] = 'No of Facilities';
+			$data['yAxix'] = 'No of Patients';
+			$data['name'] = 'Paediatric Patients';
 			$data['resultArray'] = $resultArray;
 			$this -> load -> view('dashboard/chart_report_bar_v', $data);
 		}
-		elseif($type=="PAED_ART"){//Pie Chart
-			$data['container'] = 'report_paed_art';
-			$data['title'] = 'Total Patients By Pipeline';
-			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
-			$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
-		}
 		else{
 			$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
-			$links = array('dashboard_management/download/' . $type => 'download');
+			$links = array('dashboard_management/download/' . $type => '<i class="icon-download-alt"></i>download');
 			//Get eSCM orders
 			$escm_patients = Escm_Maps::getAll();
 			$list = "";
@@ -651,6 +712,8 @@ class Dashboard_Management extends MY_Controller {
 
 	public function getReport($type=''){
 		
+		
+		
 			$data =array();
 			$list = array();
 			$dataArray = array();
@@ -658,7 +721,7 @@ class Dashboard_Management extends MY_Controller {
 			$total_series = array();
 			$series = array();	
 			$categories = array();
-			$value1=array('45','48','15','0','68','58');
+			$value1=array(4,48,15,0,68,58);
 			$resultArray = array(
 								array(
 									'name'=>'Reporting Sites(By 10th)',
@@ -668,7 +731,13 @@ class Dashboard_Management extends MY_Controller {
 			$sixmonthback= date('F-Y',strtotime(date("F-Y", mktime()) . " - 182 day"));
 			$x=0;
 			while ($x <= 5) {
-				$period = date("F-Y",strtotime(date("Y-m-d", strtotime($sixmonthback)) . " +".$x." month"));
+				$period = date("F-Y",strtotime(date("Y-m-d", strtotime($sixmonthback)) . " +".($x+1)." month"));
+				$first = date('Y-m-01',strtotime($period));
+				$last_day = date('Y-m-t',strtotime($period));
+				$sql = "SELECT COUNT(DISTINCT(c.facility_id)) as total_report FROM cdrr c
+							INNER JOIN maps m ON m.period_begin=c.period_begin
+							WHERE c.created BETWEEN '".$first."' AND  '".$last_day."'";
+				
 				$categories[$x]=$period;
 				$x++;
 			}
@@ -678,11 +747,11 @@ class Dashboard_Management extends MY_Controller {
 			$data['container'] = 'report_sum_chart';
 			$data['chartType'] = 'bar';
 			$data['title'] = 'Reporting Analysis';
-			$data['chartTitle'] = 'Reporting Sites Analysis';
+			$data['chartTitle'] = 'Reporting rates for ARV Ordering points for KP and KEMSA pipelines';
 			$data['categories'] = $categories;
-			$data['yAxix'] = 'No of Facilities';
+			$data['yAxix'] = '% Reporting Rate';
 			$data['resultArray'] = $resultArray;
-			$this -> load -> view('dashboard/chart_report_bar_v', $data);
+			$this -> load -> view('dashboard/chart_report_line_v', $data);
 		
 		
 	}
@@ -717,21 +786,33 @@ class Dashboard_Management extends MY_Controller {
 			$query = $this ->db->query($sql_tenth);
 			$results = $query ->result_array();
 			$tot_tenth = $results[0]['total'];
-			$x=($tot_tenth/$tot_adtsites)*100;
+			if($tot_adtsites==0){
+				$x=0;
+			}
+			else{
+				$x=($tot_tenth/$tot_adtsites)*100;
+			}
+			
 			//Sites that have reported
 			$sql_report = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
-							INNER JOIN maps m ON m.period_begin=c.period_begin";
+							INNER JOIN maps m ON m.period_begin=c.period_begin
+							WHERE c.created BETWEEN '".$first."' AND  '".$last_day."'";
 			$query = $this ->db->query($sql);
 			$results = $query ->result_array();
 			$tot_reportsites = $results[0]['total'];
-			$y=($tot_reportsites/$tot_adtsites)*100;
+			if($tot_adtsites==0){
+				$y=0;
+			}
+			else{
+				$y=($tot_reportsites/$tot_adtsites)*100;
+			}
 			$tmpl = array('table_open' => '<table id="" class="table table-bordered table-striped">');
 			$this -> table -> set_template($tmpl);
-			$this -> table -> set_heading('Description', 'Total No', 'Rate');
-			$this -> table -> add_row('Total No of ARV Sites',$total_arv_sites ,' - ' );
-			$this -> table -> add_row('No of Sites with Web ADT Installed',$tot_adtsites , ' - ');
-			$this -> table -> add_row('No of Sites That Have Reported this month (By the 10th)',$tot_tenth ,$x.' %' );
-			$this -> table -> add_row('Total No of Sites That Have Reported this month',$tot_reportsites , $y.' %');
+			$this -> table -> set_heading('','Description', 'Total No', 'Rate');
+			$this -> table -> add_row('','Total No of ARV Sites',$total_arv_sites ,' - ' );
+			$this -> table -> add_row('','No of Sites with Web ADT Installed',$tot_adtsites , ' - ');
+			$this -> table -> add_row('','No of Sites That Have Reported this month (By the 10th)',$tot_tenth ,$x.' %' );
+			$this -> table -> add_row('','Total No of Sites That Have Reported this month',$tot_reportsites , $y.' %');
 			$table_display = $this -> table -> generate();
 			echo $table_display;
 		}

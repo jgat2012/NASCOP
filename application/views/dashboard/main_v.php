@@ -28,10 +28,10 @@
 		 });
 		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
 		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
-		  var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/Table';?>";
+		  var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/table';?>";//Table Reporting Sites Summary
 		  var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
-		  var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";
-		  var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";
+		  var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";//ARV Sites
+		  var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites
 		/* 
 		 $("#SOH_grid").load(soh_link, function() {
             $("#SOH_listing").dataTable({
@@ -65,9 +65,7 @@
 	   $("#chart_area_report").load(report_analysis_link);
 	   $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
        
-       /*$("#report_summary").load(report_analysis_table_link,function(){
-       	   
-       });*/
+       $("#report_summary_table").load(report_analysis_table_link);
        
        
        
@@ -267,6 +265,7 @@
 		 	}
 		 	else if(id=="ra_menu"){
 		 		  // if($("#chart_area_report_summary").children().length == 0){
+		 		  	   $("#report_summary_table").load(report_analysis_table_link);
 		 		   	   $("#chart_area_report_summary").load(report_analysis_summary_link);
 				       $("#chart_area_report").load(report_analysis_link);
 				       $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
@@ -655,7 +654,7 @@
     <div class="tab-pane" id="tab1">
       <div class="two_block" id="s_consumption">
 			<h3 class="dashboard_title">Stock Consumption</h3>
-				<div id="CONS_grid"></div>
+			<div id="CONS_grid"></div>
 	  </div>
 	  <!-- Stock status 
       <div class="two_block" id="s_status">
@@ -697,8 +696,8 @@
 	    				<tr><th>Pipeline</th><th>Action</th></tr>
 	    			</thead>
 	    			<tbody>
-	    				<tr><td>Kemsa</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kemsa','Download');?></td></tr>
-	    				<tr><td>Kenya Pharma</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kenya_pharma','Download');?></td></tr>
+	    				<tr><td>Kemsa</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kemsa','<i class="icon-download-alt"></i>Download');?></td></tr>
+	    				<tr><td>Kenya Pharma</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kenya_pharma','<i class="icon-download-alt"></i>Download');?></td></tr>
 	    			</tbody>
 	    		</table>
 	    		
@@ -708,24 +707,32 @@
     </div>
     <!-- Reporting Analysis -->
     <div class="tab-pane nat_dashboard_rep  active" id="tab5">
-    	<div class="three_block" id="">
-    		<h3 class="dashboard_title">ARV Sites</h3>
-    		<div id="report_summary">
-    			
-    		</div>
-    		<div id="chart_area_report_summary"></div>
+    	<div class="row">
+    		<div class="two_block" id="">
+	    		<h3 class="dashboard_title">ARV Sites</h3>
+	    		
+	    		<div id="chart_area_report_summary"></div>
+	    	</div>
+	    	<div class="two_block" id="">
+	    		<h3 class="dashboard_title">Reporting Site Rates</h3>
+	    		<div id="chart_area_report"></div>
+	    	</div>
     	</div>
-    	<div class="three_block" id="">
-    		<h3 class="dashboard_title">Reporting Sites Analysis for <?php echo  date('F-Y');?></h3>
-    		<div id="chart_area_report_analysis"></div>
+    	<div class="row">
+    		<div class="two_block" id="">
+	    		<h3 class="dashboard_title">Reporting Sites Analysis for <?php echo  date('F-Y');?></h3>
+	    		<div id="chart_area_report_analysis"></div>
+	    	</div>
+	    	<div class="two_block" id="">
+	    		<h3 class="dashboard_title">Reporting Sites Rate Summary for <?php echo  date('F-Y');?></h3>
+	    		<div id="report_summary_table"></div>
+	    	</div>
     	</div>
-    	<div class="three_block" id="">
-    		<h3 class="dashboard_title">Reporting Site Rates</h3>
-    		<div id="chart_area_report"></div>
-    	</div>
+    	
+    	
     </div>
-    
     <!-- Reporting Analysis -->
+    
     <div class="tab-pane nat_dashboard_rep" id="tab6">
     	<div class="two_block" id="">
     		<h3 class="dashboard_title">F-Maps</h3>

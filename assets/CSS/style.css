@@ -1603,11 +1603,13 @@ td {
 .fullest-content .onehalf_block {
 	width: 65%;
 }
-.fullest-content .higher {
-
+.fullest-content #tab5 .two_block {
+	height:40%;
 }
-.national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select, .nat_dashboard_rep input, .nat_dashboard_rep label {
-	font-size: 0.9em !important;
+
+.national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input, 
+.nat_dashboard_rep label {
+	font-size:0.9em !important;
 }
 .nat_dashboard_rep .dataTables_info {
 	width: 42%;
