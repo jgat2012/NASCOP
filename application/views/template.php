@@ -298,7 +298,7 @@ if(isset($reports)|| isset($report_title)){
 						<a  id="getDeniedLogs" class="admin_link"><i class="icon-book"></i>Denied Logs</a>
 					</li>
 					 <li>
-					 	<a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>User Manual</a>
+					 	<a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank" download="notsopainful"><i class="icon-book"></i>User Manual</a>
 					 </li>	
 			    <?php
 				}

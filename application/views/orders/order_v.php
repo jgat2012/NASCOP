@@ -7,6 +7,7 @@
 	}
 	?>
 	<p></p>
+	<a href="<?php echo base_url().'order/clear_all' ?>" class="btn btn-danger" style="float:right;"><i class="icon-remove"></i> Remove All</a>
 	<?php echo $order_table;?>
 </div>
 <div id="select_satellite" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

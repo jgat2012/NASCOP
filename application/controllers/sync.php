@@ -137,12 +137,15 @@ class Sync extends MY_Controller {
 				$cdrr_id = $this -> db -> insert_id();
 
 				//Loop through cdrr_log and add cdrr_id
-				foreach ($cdrr_log as $index => $log) {
-					foreach ($log as $ind => $lg) {
-						if ($ind == "cdrr_id") {
-							$lg['cdrr_id'] = $cdrr_id;
+				foreach ($cdrr_log as $index => $logs) {
+					foreach ($logs as $counter => $log) {
+						foreach ($log as $ind => $lg) {
+							if ($ind == "cdrr_id") {
+								$temp_log[$counter]['cdrr_id'] = $cdrr_id;
+							}else {
+								$temp_log[$counter][$index] = $lg;
+							}
 						}
-						$temp_log[] = $lg;
 					}
 				}
 				$this -> db -> insert_batch('cdrr_log', $temp_log);
@@ -181,7 +184,6 @@ class Sync extends MY_Controller {
 				}
 				$this -> db -> insert("maps", $maps);
 				$maps_id = $this -> db -> insert_id();
-				
 
 				//attach maps id to maps_log
 				foreach ($temp_log as $logs) {
@@ -212,7 +214,7 @@ class Sync extends MY_Controller {
 				$this -> db -> insert_batch('maps_item', $maps_items);
 				$my_array = $this -> read($type, $maps_id);
 			}
-			echo json_encode($my_array,JSON_PRETTY_PRINT);
+			echo json_encode($my_array, JSON_PRETTY_PRINT);
 		}
 
 	}

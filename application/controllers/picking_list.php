@@ -169,10 +169,25 @@ class Picking_List extends MY_Controller {
 		$this -> mpdf -> simpleTables = true;
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
-		$report_name = "Warehouse Picking List.pdf";
+		$dir = "Export/";
+		$report_name = $dir . "Warehouse Picking List.pdf";
 		$html_title . "\n";
 		$data . "\n";
-		$this -> mpdf -> Output($report_name, 'D');
+
+		/*Delete all files in export folder*/
+		if (is_dir($dir)) {
+			$files = scandir($dir);
+			foreach ($files as $object) {
+				if ($object != "." && $object != "..") {
+					unlink($dir . "/" . $object);
+				}
+			}
+		} else {
+			mkdir($dir);
+		}
+
+		$this -> mpdf -> Output($report_name, 'F');
+		redirect($report_name);
 	}
 
 	public function print_list($list_id) {
@@ -247,7 +262,7 @@ class Picking_List extends MY_Controller {
 				} else if ($link == "remove order") {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='delete link'>$link</a> | ";
 				} else if ($link == "print list") {
-					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='link'>$link</a> | ";
+					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' target='_blank' class='link'>$link</a> | ";
 				} else if ($link == "update") {
 					$link_values .= "<a data-toggle='modal' href='#edit_list' class='update' link_id='" . $mydata['id'] . "' link_name='" . $mydata['name'] . "'>$link</a> | ";
 				} else if ($link == "assign orders") {

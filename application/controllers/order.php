@@ -24,7 +24,6 @@ class Order extends MY_Controller {
 					AND (c.code =  'D-CDRR' OR c.code =  'F-CDRR_packs')
 					AND c.status !=  'prepared'
 					AND c.status !=  'review'
-					AND c.status = m.status
 					AND c.id NOT IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
 					GROUP BY c.id";
 		$query = $this -> db -> query($sql);
@@ -1384,6 +1383,20 @@ class Order extends MY_Controller {
 			}
 		}
 		return $code;
+	}
+
+	public function clear_all() {
+		$sql_array = array();
+		$sql_array[] = "TRUNCATE cdrr";
+		$sql_array[] = "TRUNCATE cdrr_item";
+		$sql_array[] = "TRUNCATE cdrr_log";
+		$sql_array[] = "TRUNCATE maps";
+		$sql_array[] = "TRUNCATE maps_item";
+		$sql_array[] = "TRUNCATE maps_log";
+		foreach ($sql_array as $sql) {
+			$query = $this -> db -> query($sql);
+		}
+		redirect("order");
 	}
 
 	public function base_params($data) {
