@@ -348,7 +348,7 @@ class settings extends MY_Controller {
 			$content = $info_class;
 			if ($type == "sync_user") {
 				$user_id = $id;
-				$results = User_Facilities::getFacilityList($user_id);
+				$results = User_Facilities::getHydratedFacilityList($user_id);
 				if ($results) {
 					$this -> db -> where('user_id', $user_id);
 					$this -> db -> update("user_facilities", array("user_id" => $user_id, "facility" => $facility_list));

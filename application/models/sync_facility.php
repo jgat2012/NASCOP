@@ -41,7 +41,7 @@ class Sync_Facility extends Doctrine_Record {
 	}
 
 	public function getAllHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("sync_facility");
+		$query = Doctrine_Query::create() -> select("*") -> from("sync_facility")->orderBy("name asc");
 		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_facility;
 	}

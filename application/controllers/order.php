@@ -15,17 +15,18 @@ class Order extends MY_Controller {
 	public function get_orders() {
 		$columns = array('#', '#CDRR-ID', '#MAPS-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
 		$sql = "SELECT c.id,m.id as map,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,IF(m.code='D-MAPS',CONCAT('D-MAPS#',m.id),CONCAT('F-MAPS#',m.id)) as maps_id,c.period_begin,c.status as status_name,sf.name as facility_name
-				FROM cdrr c
-				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
-				LEFT JOIN facilities f ON f.facilitycode=sf.code
-				LEFT JOIN maps m ON sf.id=m.facility_id
-				WHERE m.period_begin=c.period_begin
-				AND (c.code='D-CDRR' OR c.code='F-CDRR_packs')
-				AND m.period_end=c.period_end
-				AND m.facility_id=c.facility_id
-				AND c.status !='prepared' 
-				AND c.status !='review'";
-		//AND c.id NOT IN (SELECT cdrr_id FROM escm_orders)
+					FROM cdrr c
+					LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+				    LEFT JOIN facilities f ON f.facilitycode=sf.code,maps m
+					WHERE c.facility_id = m.facility_id
+					AND c.period_begin = m.period_begin
+					AND c.period_end = m.period_end
+					AND (c.code =  'D-CDRR' OR c.code =  'F-CDRR_packs')
+					AND c.status !=  'prepared'
+					AND c.status !=  'review'
+					AND c.status = m.status
+					AND c.id NOT IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
+					GROUP BY c.id";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		$links = array("order/view_order" => "view order");

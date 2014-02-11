@@ -167,19 +167,18 @@ if(isset($report_title)){
 	</div>	
 	<div class="span8">		
  <div id="top_menu"> 
+ 		<a href="<?php  echo site_url('home_controller');?>" class="top_menu_link  first_link 
+ 			<?php
+			     //Code to loop through all the menus available to this user!
+				//Fet the current domain
+				$menus = $this -> session -> userdata('menu_items');
+				$current = $this -> router -> class;
+				$counter = 0;
+ 				if ($current == "home_controller") {
+ 					echo " top_menu_active ";
+ 				}
+            ?>"><i class="icon-home"></i>HOME </a>
  	<?php
-	//Code to loop through all the menus available to this user!
-	//Fet the current domain
-	$menus = $this -> session -> userdata('menu_items');
-	$current = $this -> router -> class;
-	$counter = 0;
-	if($menus){
-?>
- 	<a href="<?php  echo site_url('home_controller');?>" class="top_menu_link  first_link <?php
-	if ($current == "home_controller") {echo " top_menu_active ";
-	}
-?>"><i class="icon-home"></i>HOME </a><?php }?>
-<?php
 if($menus){
 foreach($menus as $menu){?>
 	<a href = "<?php echo site_url($menu['url']);?>" class="top_menu_link <?php
@@ -197,18 +196,18 @@ foreach($menus as $menu){?>
 <?php
 $counter++;
 }}
-if($menus){
 	?>
 
-<div  class="btn-group" id="div_profile" >
+<div  class="btn-group" id="div_profile">
 	<a href="#" class="top_menu_link btn dropdown-toggle" data-toggle="dropdown"  id="my_profile"><i class="icon-user icon-black"></i> PROFILE  <span class="caret"></span></a>
 	<ul class="dropdown-menu" id="profile_list" role="menu">
 		<li><a href="#edit_user_profile" data-toggle="modal"><i class="icon-edit"></i> Edit Profile</a></li>
 		<li id="change_password_link"><a href="#user_change_pass" data-toggle="modal"><i class=" icon-asterisk"></i> Change Password</a></li>
 	</ul>
 </div>
-
-<div class="welcome_msg">
+ </div>
+</div>
+<div class="welcome_msg" style="clear:none;margin-top:40px;">
 	<span>Welcome <b style="font-weight: bolder;font-size: 20px;"><?php echo $this -> session -> userdata('full_name');?></b>. <a id="logout_btn" href="<?php echo base_url().'user_management/logout/2' ?>"><i class="icon-off"></i>Logout</a></span>
 	<br>
 	<span class="date"><?php echo date('l, jS \of F Y') ?></span>
@@ -217,9 +216,8 @@ if($menus){
 	<br/>
 	<a href='<?php echo base_url().'home_controller/reset_user';?>' class="btn btn-success" style="color:#FFF;">Dashboard</a>
 </div>
-<?php }?>
-</div>
- </div>
+
+
 </div>
 </div>
 </div>

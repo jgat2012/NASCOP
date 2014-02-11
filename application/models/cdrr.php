@@ -82,5 +82,11 @@ class Cdrr extends Doctrine_Record {
 		return $items[0];
 	}
 
+	public function getFacilityCdrr($facility_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("facility_id='$facility_id'");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
+
 }
 ?>

@@ -45,7 +45,13 @@ class Maps extends Doctrine_Record {
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items[0];
 	}
-	
+
+	public function getFacilityMap($facility_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("faciltiy_id='$facility_id'");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
+
 	public function getNascopPeriod($id_list) {
 		$and = "";
 		if ($id_list != "") {
@@ -55,7 +61,7 @@ class Maps extends Doctrine_Record {
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
-	
+
 	public function getEscmPeriod($id_list) {
 		$and = "";
 		if ($id_list != "") {
