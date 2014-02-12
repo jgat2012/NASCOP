@@ -24,12 +24,18 @@
 				<li>
 					<a href="#" class="setting_link" id="sync_user">USERS</a>
 				</li>
+				<li>
+					<a href="#" class="setting_link" id="sync_mail">MAILING LISTS</a>
+				</li>
 				<li class="divider"></li>
 				<li class="nav-header">
 					eSCM SETTINGS
 				</li>
 				<li>
-					<a href="#" class="api_sync">eSCM SYNC</a>
+					<a href="#" id="api_sync" class="api_sync">eSCM Settings</a>
+				</li>
+				<li>
+					<a href="#" id="order_sync" class="api_sync">eSCM Orders</a>
 				</li>
 			</ul>
 		</div>

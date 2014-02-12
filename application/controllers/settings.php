@@ -54,6 +54,59 @@ class settings extends MY_Controller {
 		$this -> session -> set_flashdata('alert_message', $content);
 	}
 
+	public function get_updates() {
+		$log = "";
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+
+		$curl = new Curl();
+		$url = $this -> esm_url;
+
+		foreach ($lists as $facility_id) {
+			$links[] = "facility/" . $facility_id . "/cdrr";
+			$links[] = "facility/" . $facility_id . "/maps";
+		}
+
+		$username = "kevinmarete";
+		$password = "poltergeist";
+		$curl -> setBasicAuthentication($username, $password);
+		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
+		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
+
+		foreach ($links as $link) {
+			$target_url = $url . $link;
+			$curl -> get($target_url);
+			if ($curl -> error) {
+				$curl -> error_code;
+				$log="Error: " . $curl -> error_code . "<br/>";
+			} else {
+				$main_array = json_decode($curl -> response, TRUE);
+				$clean_data = array();
+				foreach ($main_array as $main) {
+					if ($main['code'] == "D-CDRR" || $main['code'] == "F-CDRR_units" || $main['code'] == "F-CDRR_packs") {
+						$type = "cdrr";
+					} else {
+						$type = "maps";
+					}
+					if ($main['period_begin'] == date('Y-m-01') && $main['period_end'] == date('Y-m-t')) {
+						if (is_array($main)) {
+							if (!empty($main)) {
+								$this -> extract_order($type, array($main), $main['id']);
+							}
+						}
+					}
+				}
+				$log="Sync Complete";
+			}
+		}
+		$content = $info_class;
+		$content .= $close_btn_div;
+		$content .= $log;
+		$content .= $close_div;
+		$this -> session -> set_flashdata('alert_message', "Sync Complete");
+	}
+
 	public function enable($type = "sync_drug", $id = null) {
 		$info_class = "<div class='alert alert-info'>";
 		$error_class = "<div class='alert alert-error'>";
@@ -365,6 +418,138 @@ class settings extends MY_Controller {
 		$this -> session -> set_userdata("nav_link", $type);
 		redirect("settings");
 
+	}
+
+	public function prepare_order($type = "cdrr", $responses = array()) {
+		$my_array = array();
+		if ($type == "cdrr") {
+			$cdrr = array();
+			$cdrr_items = array();
+			$cdrr_log = array();
+			$temp_items = array();
+			$temp_log = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownCdrr_item") {
+						$cdrr_items[$index] = $main;
+					} else if ($index == "ownCdrr_log") {
+						$cdrr_log[$index] = $main;
+					} else {
+						$cdrr[$index] = $main;
+					}
+				}
+			}
+			//Insert the cdrr and retrieve the auto_id assigned to it,this will be the cdrr_id
+			$this -> db -> insert('cdrr', $cdrr);
+			$cdrr_id = $this -> db -> insert_id();
+
+			//Loop through cdrr_log and add cdrr_id
+			foreach ($cdrr_log as $index => $log) {
+				foreach ($log as $ind => $lg) {
+					if ($ind == "cdrr_id") {
+						$lg['cdrr_id'] = $cdrr_id;
+					}
+					$temp_log[] = $lg;
+				}
+			}
+			$this -> db -> insert_batch('cdrr_log', $temp_log);
+
+			//Loop through cdrr_item and add cdrr_id
+			foreach ($cdrr_items as $index => $cdrr_item) {
+				foreach ($cdrr_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "cdrr_id") {
+							$temp_items[$counter]['cdrr_id'] = $cdrr_id;
+						} else {
+							$temp_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('cdrr_item', $temp_items);
+		} else if ($type == "maps") {
+			$maps = array();
+			$temp_items = array();
+			$temp_log = array();
+			$maps_log = array();
+			$maps_items = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownMaps_item") {
+						$temp_items['maps_item'] = $main;
+					} else if ($index == "ownMaps_log") {
+						$temp_log['maps_log'] = $main;
+					} else {
+						$maps[$index] = $main;
+					}
+				}
+			}
+			$this -> db -> insert("maps", $maps);
+			$maps_id = $this -> db -> insert_id();
+
+			//attach maps id to maps_log
+			foreach ($temp_log as $logs) {
+				foreach ($logs as $index => $log) {
+					if ($index == "maps_id") {
+						$log["maps_id"] = $maps_id;
+					}
+					$maps_log[] = $log;
+				}
+			}
+			$this -> db -> insert_batch('maps_log', $maps_log);
+
+			//attach maps id to maps_item
+			foreach ($temp_items as $temp_item) {
+				foreach ($temp_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "maps_id") {
+							$maps_items[$counter]['maps_id'] = $maps_id;
+						} else {
+							$maps_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('maps_item', $maps_items);
+		}
+	}
+
+	public function delete_order($type = "cdrr", $id, $mission = 0) {
+		$sql = "SELECT status FROM $type WHERE id='$id'";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			$status = $results[0]['status'];
+			if (($status != "approved" || $mission == 1)) {
+				$sql_array = array();
+				if ($type == "cdrr") {
+					$this -> session -> set_userdata("order_go_back", "cdrr");
+					$sql_array[] = "DELETE FROM cdrr where id='$id'";
+					$sql_array[] = "DELETE FROM cdrr_item where cdrr_id='$id'";
+					$sql_array[] = "DELETE FROM cdrr_log where cdrr_id='$id'";
+				} else if ($type == "maps") {
+					$this -> session -> set_userdata("order_go_back", "maps");
+					$sql_array[] = "DELETE FROM maps where id='$id'";
+					$sql_array[] = "DELETE FROM maps_item where maps_id='$id'";
+					$sql_array[] = "DELETE FROM maps_log where maps_id='$id'";
+				}
+				foreach ($sql_array as $sql) {
+					$query = $this -> db -> query($sql);
+				}
+				if ($mission == 0) {
+					$this -> session -> set_flashdata("order_delete", $type . " was deleted successfully.");
+				}
+			} else {
+				if ($mission == 0) {
+					$this -> session -> set_flashdata("order_delete", $type . " delete failed!");
+				}
+			}
+		} else {
+			$this -> session -> set_flashdata("order_delete", $type . " not found!");
+		}
+		if ($mission == 0) {
+			redirect("order");
+		}
 	}
 
 	public function base_params($data) {

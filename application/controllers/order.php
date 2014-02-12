@@ -72,6 +72,7 @@ class Order extends MY_Controller {
 		$data['order_array'] = $order_array;
 		$data['order_code'] = $order_array[0]['code'];
 
+		$data['amc'] = $this -> getAMC($order_array[0]['facility_id'], $order_array[0]['code'], $order_array[0]['period_begin']);
 		if ($order_array[0]['status_name'] == "received" || $order_array[0]['status_name'] == "rationalized") {
 			$data['option_links'] = "<li class='active'><a href='" . site_url("order/view_cdrr/" . $cdrr_id) . "'>view</a></li><li><a href='" . site_url("order/update_cdrr/" . $cdrr_id) . "'>update</a></li><li></li>";
 		} else {
@@ -1397,6 +1398,12 @@ class Order extends MY_Controller {
 			$query = $this -> db -> query($sql);
 		}
 		redirect("order");
+	}
+
+	public function getAMC($facility_id, $code, $period_begin = "") {
+		$earlier_begin = date('Y-m-d', strtotime($period_begin . "-3 months"));
+		$total = Cdrr::getAMC($facility_id, $code, $earlier_begin, $period_begin);
+		return $total;
 	}
 
 	public function base_params($data) {

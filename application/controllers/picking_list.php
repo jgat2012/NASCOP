@@ -92,7 +92,7 @@ class Picking_List extends MY_Controller {
 		if ($type == 0) {
 			$links = array("picking_list/view_orders" => "view orders", "picking_list/assign_orders" => "assign orders", "picking_list/update_list" => "update", "picking_list/close_list" => "close", "picking_list/delete_list" => "delete");
 		} else if ($type == 1) {
-			$links = array("picking_list/view_orders" => "view orders", "picking_list/print_list" => "print list");
+			$links = array("picking_list/view_orders" => "view orders", "picking_list/print_list" => "print list","picking_list/mail_list" => "send list");
 		}
 		return $this -> showTable($columns, $results, $links);
 	}
