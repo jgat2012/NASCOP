@@ -316,11 +316,12 @@
 	  });
 	  
 	     $(".delivery").click(function(){
+	     	/*
          	  var del_value=$("#delivery_note").val();
          	  if(del_value==""){
          	  	alert("Delivery Note is Blank");
          	  	return false;
-         	  }
+         	  }*/
          });
 	  
 	  <?php
