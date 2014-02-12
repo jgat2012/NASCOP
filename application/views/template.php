@@ -146,7 +146,7 @@ if(isset($report_title)){
 <body onload="set_interval()" onmousemove="set_interval()" onclick="set_interval" onkeypress="set_interval()" onscroll="set_interval()">
 
 
-	<div id="top-panel" style="margin:0px;" >
+	<div id="top-panel" style="margin:0px;height:140px;" >
 		<div class="container-fluid">
 <div class="row-fluid">
 	<div class="span4">
