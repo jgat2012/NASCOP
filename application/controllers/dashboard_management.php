@@ -27,29 +27,75 @@ class Dashboard_Management extends MY_Controller {
 			$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/template/excel.xls';
 			$objReader = PHPExcel_IOFactory::createReader($inputFileType);
 			$objPHPExcel = $objReader -> load($inputFileName);
-			/*Delete all files in export folder*/
-			if (is_dir($dir)) {
-				$files = scandir($dir);
-				foreach ($files as $object) {
-					if ($object != "." && $object != "..") {
-						unlink($dir . "/" . $object);
-					}
-				}
-			} else {
-				mkdir($dir);
-			}
-			//$objPHPExcel = new PHPExcel();
-			//$objPHPExcel -> setActiveSheetIndex(0);
+			
+			$filename = "Stock";
+			$dir = "Export";
+			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
+			$objPHPExcel -> setActiveSheetIndex(0);
 			$objPHPExcel->getDefaultStyle()->getFont()
 		    ->setName('Book Antiqua')
 		    ->setSize(10);
-			$objPHPExcel -> setActiveSheetIndex(0);
 			$i = 1;
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('B1', "ART PROGRAM");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('B2', "Pipeline : ".strtoupper($pipeline));
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('B3', " MONTHLY COMMODITY CONSUMPTION ");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('B4', "Period : ".$period);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('B8', "Drug Name");
+			$objPHPExcel->getActiveSheet()->getColumnDimension("B")
+			        ->setAutoSize(true);
+			$objPHPExcel->getActiveSheet()->getStyle('C3:AN3')->getAlignment()->setWrapText(true);
+			$objPHPExcel->getActiveSheet()->getRowDimension('3')->setRowHeight(-1);
+			foreach(range('C','AN') as $columnID) {
+				
+				if($columnID=="F" || $columnID=="G" || $columnID=="K" || $columnID=="O" || $columnID=="S" || $columnID=="U" || $columnID=="Y" || $columnID=="Z" || $columnID=="AB" || $columnID=="AF" || $columnID=="AG" || $columnID=="AK"){
+					$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)->setWidth(5);
+				}
+				else{
+					$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)->setWidth(15);
+				}
+			    
+			}
+			$objPHPExcel -> getActiveSheet()->mergeCells('H2:J2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('L2:N2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('P2:R2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('T2:X2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('P2:R2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('AA2:AE2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('AH2:AJ2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('AL2:AN2');
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('H2', "KEMSA");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('L2', "KENYA PHARMA");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('P2', "NATIONAL");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('T2', "NATIONAL MOS - Without S.up");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AA2', "NATIONAL MOS - S.up");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AH2', "KEMSA");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AL2', "KP");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A3', "Drug Abbreviation");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('B3', "Drugs Classification");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('C3', "Current Consumption- Kemsa");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('D3', "Current Consumption- KP");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('E3', "Agg. Avg. Monthly Consumption");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('H3', "Facility SOH - KEMSA Pipeline");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('I3', "SOH KEMSA");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('J3', "KEMSA - Pending With Suppliers");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('L3', "Facility SOH - KP");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('M3', "SOH KP");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('N3', "KP - Pending With Suppliers");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('P3', "Facility SOH");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('Q3', "Stocks on hand - Central Stores");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('R3', "Pending With Suppliers");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('T3', "National MOS");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('V3', "MOS at Facilities");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('W3', "MOS at Central Stores");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('X3', "MOS - Pending With Suppliers");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AA3', "National MOS");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AC3', "MOS at Facilities");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AD3', "MOS at Central Stores");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AE3', "MOS - Pending With Suppliers");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AH3', "MOS at Facilities");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AI3', "MOS at Central Stores");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AJ3', "MOS - Pending With Suppliers");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AL3', "MOS at Facilities");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AM3', "MOS at Central Stores");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('AN3', "MOS - Pending With Suppliers");
+			$sql = "SELECT d.name,d.abbreviation,d.category_id FROM escm_drug";
+			
+			$this->generateExcel($filename,$dir,$objPHPExcel);
 		}
 		else if($type=="CONS"){// Stock consumption
 			$period = date('Y-m-01',strtotime($period));
@@ -567,34 +613,47 @@ class Dashboard_Management extends MY_Controller {
 	public function getCommodity($type = "SOH") {
 		$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
 		$links = array('dashboard_management/download/' . $type => '<i class="icon-download-alt"></i>download');
-		//Get eSCM orders
-		$escm_orders = Escm_Orders::getAll();
-		$list = "";
-		$order_list = array();
-		$cdrr_nascop = array();
-		$cdrr_escm = array();
 		$table_name = $type;
-		$result =array();
-
-		if ($escm_orders) {
-			foreach ($escm_orders as $order_id) {
-				array_push($order_list, $order_id -> cdrr_id);
+		
+		if($type=="CONS"){
+			//Get eSCM orders
+			$escm_orders = Escm_Orders::getAll();
+			$list = "";
+			$order_list = array();
+			$cdrr_nascop = array();
+			$cdrr_escm = array();
+			$result =array();
+			if ($escm_orders) {
+				foreach ($escm_orders as $order_id) {
+					array_push($order_list, $order_id -> cdrr_id);
+				}
+				$list = "'" . implode("','", $order_list) . "'";
 			}
-			$list = "'" . implode("','", $order_list) . "'";
+			$cdrr_nascop = Cdrr::getNascopPeriod($list);
+			$counter = 0;
+			foreach ($cdrr_nascop as $nascop) {
+				$result[$counter]['period'] = date('F-Y', strtotime($nascop['period_begin']));
+				$result[$counter]['pipeline'] = "Kemsa";
+				$counter++;
+			}
+			$cdrr_escm = Cdrr::getEscmPeriod($list);
+			foreach ($cdrr_escm as $esm) {
+				$result[$counter]['period'] = date('F-Y', strtotime($esm['period_begin']));
+				$result[$counter]['pipeline'] = "Kenya Pharma";
+				$counter++;
+			}
 		}
-		$cdrr_nascop = Cdrr::getNascopPeriod($list);
-		$counter = 0;
-		foreach ($cdrr_nascop as $nascop) {
-			$result[$counter]['period'] = date('F-Y', strtotime($nascop['period_begin']));
-			$result[$counter]['pipeline'] = "Kemsa";
-			$counter++;
+		elseif($type=="SOH"){
+			//Get orders from cdrr which have distinct period
+			$cdrr_data = Cdrr::getCdrrPeriod();
+			$counter = 0;
+			foreach ($cdrr_data as $cdrr) {
+				$result[$counter]['period'] = date('F-Y', strtotime($cdrr['period_begin']));
+				$result[$counter]['pipeline'] = "National Level";
+				$counter++;
+			}
 		}
-		$cdrr_escm = Cdrr::getEscmPeriod($list);
-		foreach ($cdrr_escm as $esm) {
-			$result[$counter]['period'] = date('F-Y', strtotime($esm['period_begin']));
-			$result[$counter]['pipeline'] = "Kenya Pharma";
-			$counter++;
-		}
+		
 		echo $this -> showTable($columns, $result, $links, $table_name);
 	}
 
@@ -642,6 +701,10 @@ class Dashboard_Management extends MY_Controller {
 				$total_kemsa = $tot_adult_kemsa+$tot_paed_kemsa;
 			}
 			
+			$total_adults = $tot_adult_kemsa+$tot_adult_kp;
+			$total_paeds = $tot_paed_kemsa+$tot_paed_kp;
+			$grand_total = $total_adults + $total_paeds;
+			/*
 			if($total_kemsa==0 && $total_kp==0){
 				echo "<div style='text-align:center' class=''> No data reported yet for this period </div>";die();
 			}
@@ -678,7 +741,18 @@ class Dashboard_Management extends MY_Controller {
 			
 			$data['categories'] = $categories;
 			$data['myData'] = $myData;			
-			$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
+			//$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
+			*/
+			
+			//Generate table for Number of Patients on ART
+			$tmpl = array('table_open' => '<table id="" class="table table-bordered table-striped dash_tables">');
+			$this -> table -> set_template($tmpl);
+			$this -> table -> set_heading('','Pipeline', '<center>Kemsa</center>', '<center>Kenya Pharma</center>', '<center>Line Total</center>');
+			$this -> table -> add_row('','<h5>Adults</h5>','<center>'.$tot_adult_kemsa.'</center>' ,'<center>'.$tot_adult_kp.'</center>','<center>'.$total_adults.'</center>');
+			$this -> table -> add_row('','<h5>Paeds</h5>','<center>'.$tot_paed_kemsa.'</center>' , '<center>'.$tot_paed_kp.'</center>','<center>'.$total_paeds.'</center>');
+			$this -> table -> add_row('','<h5>TOTAL</h5>','<b><center>'.$total_kemsa.'</center></b>', '<b><center>'.$total_kp.'</center></b>','<b><center>'.$grand_total.'</center></b>');
+			$table_display = $this -> table -> generate();
+			echo $table_display;
 		}
 		elseif($type=="ADULT_ART"){//Bar Chart
 			$sql= "SELECT  

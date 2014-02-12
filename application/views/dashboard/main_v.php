@@ -26,41 +26,13 @@
 				"bProcessing" : true,
 				"bServerSide" : false,
 		 });
-		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
-		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
+		 
 		  var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/table';?>";//Table Reporting Sites Summary
 		  var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
 		  var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";//ARV Sites
 		  var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites
-		/* 
-		 $("#SOH_grid").load(soh_link, function() {
-            $("#SOH_listing").dataTable({
-		 		 "bJQueryUI" : true,
-				"sPaginationType" : "full_numbers",
-				"sDom" : '<"H"Tfr>t<"F"ip>',
-				"oTableTools" : {
-					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
-					"aButtons" : ["copy", "print", "xls", "pdf"]
-				},
-				"bProcessing" : true,
-				"bServerSide" : false,
-		 });
-       });
-       */
-       $("#CONS_grid").load(cons_link, function() {
-            $("#CONS_listing").dataTable({
-		 		 "bJQueryUI" : true,
-				"sPaginationType" : "full_numbers",
-				"sDom" : '<"H"Tfr>t<"F"ip>',
-				"oTableTools" : {
-					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
-					"aButtons" : ["copy", "print", "xls", "pdf"]
-				},
-				"bProcessing" : true,
-				"bServerSide" : false,
-		 });
-       });
-       
+		
+		
        $("#chart_area_report_summary").load(report_analysis_summary_link);
 	   $("#chart_area_report").load(report_analysis_link);
 	   $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
@@ -120,7 +92,6 @@
 		  var def_year=$("#nd_ca_year").val();
 		  var def_pipeline=$("#nd_ca_pipeline").val();
 		  $("#chart_area_ca").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		  stock_status(def_year,def_month,def_pipeline);
 		  
 		  /*
 		   * When year changes, if not current year, load all months
@@ -242,7 +213,7 @@
 				var active_menu=$(".commodity_analysis_menus.active").find("a").text();
 				$("#active_menu").text(active_menu);
 		 		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-				stock_status(y,mm,1);
+				commodity_analysis();
 		 	}
 		 	else if(id=="pa_menu"){//Patient Analysis
 		 		//Update breadcrumbs
@@ -447,21 +418,6 @@
 	});
 	
 	/*
-	 * Commodity Analysis functions
-	 */
-	//Stock status
-	function stock_status(year,month,pipeline){
-		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var commodity_analysis_link="<?php echo base_url().'national_management/ca_stock_status/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_ca').load(commodity_analysis_link);
-	}
-	//Consumption
-	function consumption(year,month,pipeline){
-		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var commodity_analysis_link="<?php echo base_url().'national_management/ca_consumption/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_ca').load(commodity_analysis_link);
-	}
-	/*
 	 * Patient Analysis functions
 	 */
 	
@@ -503,25 +459,42 @@
        $("#ART_PAED_PATIENT_graph").load(art_paed_patient_link);
 	}
 	
-	//Patient By Regimen
-	function patient_by_regimen(year,month,pipeline){
-		$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var patient_analysis_link="<?php echo base_url().'national_management/pa_patients_by_regimen/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_pr').load(patient_analysis_link);
-	}
-	//Current patient By ART Site
-	function current_patient_art(year,month,pipeline){
-		$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var patient_analysis_link="<?php echo base_url().'national_management/pa_patients_by_artsite/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_pr').load(patient_analysis_link);
+	
+	/*
+	 * Commodity Analysis functions
+	 */
+	function commodity_analysis(){
+		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
+		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
+		  $("#SOH_grid").load(soh_link, function() {
+	            $("#SOH_listing").dataTable({
+			 		 "bJQueryUI" : true,
+					"sPaginationType" : "full_numbers",
+					"sDom" : '<"H"Tfr>t<"F"ip>',
+					"oTableTools" : {
+						"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+						"aButtons" : ["copy", "print", "xls", "pdf"]
+					},
+					"bProcessing" : true,
+					"bServerSide" : false,
+			 });
+	       });
+	       
+	       $("#CONS_grid").load(cons_link, function() {
+	            $("#CONS_listing").dataTable({
+			 		 "bJQueryUI" : true,
+					"sPaginationType" : "full_numbers",
+					"sDom" : '<"H"Tfr>t<"F"ip>',
+					"oTableTools" : {
+						"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+						"aButtons" : ["copy", "print", "xls", "pdf"]
+					},
+					"bProcessing" : true,
+					"bServerSide" : false,
+			 });
+	       });
 	}
 	
-	//Patient Scale Up
-	function patient_scale_up(year,month,pipeline){
-		$("#chart_area_pr").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var patient_analysis_link="<?php echo base_url().'national_management/pa_patients_scaleup/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_pr').load(patient_analysis_link);
-	}
 	
 	/*
 	 * Facility Analysis functions
@@ -682,10 +655,17 @@
     </div>
   	<!-- Commodity Analysis -->
     <div class="tab-pane" id="tab1">
-      <div class="two_block" id="s_consumption">
-			<h3 class="dashboard_title">Stock Consumption</h3>
-			<div id="CONS_grid"></div>
-	  </div>
+		<div class="row-fluid">
+			<div class="two_block span6" id="s_consumption">
+				<h3 class="dashboard_title">Stock Consumption</h3>
+				<div id="CONS_grid"></div>
+		    </div>
+		    <div class="two_block span6" id="s_consumption">
+				<h3 class="dashboard_title">Stock Status</h3>
+				<div id="SOH_grid"></div>
+		    </div>
+		</div>
+      
 	  <!-- Stock status 
       <div class="two_block" id="s_status">
 			<h3 class="dashboard_title">Stock Status</h3>
@@ -695,30 +675,30 @@
     </div>
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
-    	<div class="row">
-		  <div class="three_block" id="patient_by_art_by_pipeline">
+    	<div class="row-fluid">
+		  <div class="three_block span4" id="patient_by_art_by_pipeline">
     		<h3 class="dashboard_title">Number of Patients on ART By Pipeline for <?php echo date('F-Y');?></h3>
     		<div id="ART_PATIENT_PIPELINE_graph"></div>
     	  </div>
-    	  <div class="three_block" id="adult_patient_on_art">
+    	  <div class="three_block span4" id="adult_patient_on_art">
     		<h3 class="dashboard_title">Current Adult Patients on ART</h3>
     		<div id="ART_ADULT_PATIENT_graph"></div>
     	  </div>
-    	  <div class="three_block" id="paed_patient_on_art">
+    	  <div class="three_block span4" id="paed_patient_on_art">
     		<h3 class="dashboard_title">Current Paedriatic Patients on ART</h3>
     		<div id="ART_PAED_PATIENT_graph"></div>
     	  </div>
 		</div>
-		<div class="row">
-			<div class="three_block" id="patient_by_art">
-	    		<h3 class="dashboard_title">Current Patients By ART</h3>
+		<div class="row-fluid">
+			<div class="three_block span4" id="patient_by_art">
+	    		<h3 class="dashboard_title">Current Patients By ART Sites</h3>
 	    		<div id="ART_PATIENT_grid"></div>
 	    	</div>
-	    	<div class="three_block" id="patient_by_regimen">
+	    	<div class="three_block span4" id="patient_by_regimen">
 	    		<h3 class="dashboard_title">Patients By Regimen</h3>
 	    		<div id="BYREG_PATIENT_grid"></div>
 	    	</div>
-	    	<div class="three_block" id="patient_scale_up">
+	    	<div class="three_block span4" id="patient_scale_up">
 	    		<h3 class="dashboard_title">Patients Scale Up</h3>
 	    		<table class="table table-bordered table-striped tbl_nat_dashboard">
 	    			<thead>

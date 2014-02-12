@@ -87,6 +87,12 @@ class Cdrr extends Doctrine_Record {
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
+	
+	public function getCdrrPeriod(){
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("code='D-CDRR' or code='F-CDRR_packs'") ->groupBy("period_begin");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
 
 	public function getAMC($facility_id, $code, $earlier_begin, $period_begin) {
 		$query = Doctrine_Query::create() -> select("IF(COUNT(DISTINCT(period_begin))>3,'3',COUNT(DISTINCT(period_begin))) as total") -> from("cdrr") -> where("period_begin between '$earlier_begin' and '$period_begin' and facility_id='$facility_id' and code='$code'")->groupBy("facility_id");
