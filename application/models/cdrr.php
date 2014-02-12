@@ -87,6 +87,12 @@ class Cdrr extends Doctrine_Record {
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
+	
+	public function getCdrrPeriod(){
+		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("code='D-CDRR' or code='F-CDRR_packs'") ->groupBy("period_begin");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
 
 }
 ?>
