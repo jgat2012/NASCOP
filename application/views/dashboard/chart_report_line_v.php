@@ -14,7 +14,7 @@ $(function () {
 			'#a6c96a'
 			],
             chart: {
-            	height:350,
+            	height:330,
                 type: 'line'
             },
             title: {
@@ -29,11 +29,7 @@ $(function () {
                 }
             },
             tooltip: {
-                enabled: false,
-                formatter: function() {
-                    return '<b>'+ this.series.name +'</b><br/>'+
-                        this.x +': '+ this.y +'%';
-                }
+                valueSuffix: '%'
             },
             plotOptions: {
                 line: {
@@ -46,20 +42,7 @@ $(function () {
             credits: {
 				enabled: false
 			},
-            series: [
-            	{
-	                name: 'Kemsa/LMU - Reporting timeliness (By 10th)',
-	                data: [53, 83, 65, 68, 82, 59]
-	            }, 
-	            {
-	                name: 'Kenya Pharma - Reporting timeliness (By 10th)',
-	                data: [39, 42, 75, 85, 67, 63]
-	            }, 
-	            {
-	                name: 'National Reporting Rate',
-	                data: [84, 85, 86, 89, 96, 94]
-	            }
-	        ]
+            series: <?php echo $resultArray?>
         });
     });
     

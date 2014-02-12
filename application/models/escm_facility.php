@@ -29,14 +29,20 @@ class Escm_Facility extends Doctrine_Record {
 
 	public function getAll() {
 		$query = Doctrine_Query::create() -> select("f.*,d.name as district,c.county as county_name,IF(sites.facility_id is null,'NO','YES') as adt_installed") -> from("escm_facility f") -> leftJoin('f.Parent_District d, f.County c,f.adt sites');
-		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
-		return $sync_facility;
+		$escm_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $escm_facility;
 	}
 
 	public function getAllNotHydrated() {
 		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
-		$sync_facility = $query -> execute();
-		return $sync_facility;
+		$escm_facility = $query -> execute();
+		return $escm_facility;
+	}
+	
+	public function getFacilityCode($facility_id){
+		$query =  Doctrine_Query::create() -> select("code") -> from("escm_facility") ->where("id ='$facility_id'");
+		$escm_facility = $query -> execute();
+		return $escm_facility[0];
 	}
 
 }

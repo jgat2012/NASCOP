@@ -79,6 +79,8 @@ class Sync extends MY_Controller {
 			$this -> delete($type, $id);
 		}
 		if ($link == "escm") {
+			$pipeline = 'kenya pharma';
+			$facility_id = '';
 			if ($type == "cdrr") {
 				$cdrr = array();
 				foreach ($responses as $response) {
@@ -89,6 +91,10 @@ class Sync extends MY_Controller {
 							$this -> db -> insert_batch("cdrr_log", $main);
 						} else {
 							$cdrr[$index] = $main;
+							//Get facility id
+							if($index=='facility_id'){
+								$facility_id = $main;
+							}
 						}
 					}
 				}
@@ -105,15 +111,34 @@ class Sync extends MY_Controller {
 							$this -> db -> insert_batch("maps_log", $main);
 						} else {
 							$maps[$index] = $main;
+							//Get facility id
+							if($index=='facility_id'){
+								$facility_id = $main;
+							}
 						}
 					}
 				}
 				$this -> db -> insert("maps", $maps);
 				$maps_id = $this -> db -> insert_id();
 				$this -> db -> insert("escm_maps", array("maps_id" => $maps_id));
+				
+				
+			}
+			
+			//Check if facility already uses adt
+			$sql = "SELECT * FROM adt_sites WHERE facility_id='$facility_id' AND pipeline='$pipeline'";
+			$query = $this ->db ->query($sql);
+			$result = $query ->result_array($query);
+			$count = count($result);
+			if($count==0 && $facility_id!=''){//If facility not found
+				$data_facility = array(
+										"facility_id "=>$facility_id,
+										"pipeline"=>$pipeline);
+				$this->db->insert('adt_sites', $data_facility);
 			}
 
 		} else {
+			$pipeline = 'kemsa';
 			$my_array = array();
 			if ($type == "cdrr") {
 				$cdrr = array();
@@ -129,6 +154,10 @@ class Sync extends MY_Controller {
 							$cdrr_log[$index] = $main;
 						} else {
 							$cdrr[$index] = $main;
+							//Get facility id
+							if($index=='facility_id'){
+								$facility_id = $main;
+							}
 						}
 					}
 				}
@@ -179,6 +208,10 @@ class Sync extends MY_Controller {
 							$temp_log['maps_log'] = $main;
 						} else {
 							$maps[$index] = $main;
+							//Get facility id
+							if($index=='facility_id'){
+								$facility_id = $main;
+							}
 						}
 					}
 				}
@@ -214,9 +247,20 @@ class Sync extends MY_Controller {
 				$this -> db -> insert_batch('maps_item', $maps_items);
 				$my_array = $this -> read($type, $maps_id);
 			}
-			echo json_encode($my_array, JSON_PRETTY_PRINT);
+			//Check if facility already uses adt
+			$sql = "SELECT * FROM adt_sites WHERE facility_id='$facility_id' AND pipeline='$pipeline'";
+			$query = $this ->db ->query($sql);
+			$result = $query ->result_array($query);
+			$count = count($result);
+			if($count==0 && $facility_id!=''){//If facility not found
+				$data_facility = array(
+										"facility_id "=>$facility_id,
+										"pipeline"=>$pipeline);
+				$this->db->insert('adt_sites', $data_facility);
+			}
+			
+			echo json_encode($my_array);
 		}
-
 	}
 
 	public function read($type = "cdrr", $id) {

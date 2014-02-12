@@ -17,36 +17,18 @@ $chartSize=320;
 				'#c42525',
 				'#a6c96a'
                 ],
-            categories = ['Kenya Pharma', 'Kemsa'],
+            categories = <?php echo $categories?> ,
             name = 'Pipelines',
-            data = [{
-	                    y: 55,
-	                    color: colors[0],
-	                    drilldown: {
-	                        name: 'Kenya Pharma Categories',
-	                        categories: ['Adults', 'Peads'],
-	                        data: [10, 45],
-	                        color: colors[0]
-	                    }
-	                }, {
-	                    y: 45,
-	                    color: colors[4],
-	                    drilldown: {
-	                        name: 'Kemsa Categories',
-	                        categories: ['Adults', 'Peads'],
-	                        data: [ 20,25],
-	                        color: colors[6]
-	                    }
-                	}];
+            data = <?php echo $myData?> ;
     
     
         // Build the data arrays
-        var browserData = [];
-        var versionsData = [];
+        var pipelineData = [];
+        var categoryData = [];
         for (var i = 0; i < data.length; i++) {
     
             // add browser data
-            browserData.push({
+            pipelineData.push({
                 name: categories[i],
                 y: data[i].y,
                 color: data[i].color
@@ -55,7 +37,7 @@ $chartSize=320;
             // add version data
             for (var j = 0; j < data[i].drilldown.data.length; j++) {
                 var brightness = 0.2 - (j / data[i].drilldown.data.length) / 5 ;
-                versionsData.push({
+                categoryData.push({
                     name: data[i].drilldown.categories[j],
                     y: data[i].drilldown.data[j],
                     color: Highcharts.Color(data[i].color).brighten(brightness).get()
@@ -85,14 +67,14 @@ $chartSize=320;
                  showInLegend: true
             },
             tooltip: {
-        	    valueSuffix: '%'
+        	    //valueSuffix: '%'
             },
             credits: {
 			   enabled: false
 			},
             series: [{
                 name: 'Patients',
-                data: browserData,
+                data: pipelineData,
                 size: '60%',
                 dataLabels: {
                     formatter: function() {
@@ -103,13 +85,13 @@ $chartSize=320;
                 }
             }, {
                 name: 'Patients',
-                data: versionsData,
+                data: categoryData,
                 size: '80%',
                 innerSize: '60%',
                 dataLabels: {
                     formatter: function() {
                         // display only if larger than 1
-                        return this.y > 1 ? '<b>'+ this.point.name +':</b> '+ this.y +'%'  : null;
+                        return this.y > 1 ? '<b>'+ this.point.name +':</b> '+ this.y  : null;
                     }
                 }
             }]
