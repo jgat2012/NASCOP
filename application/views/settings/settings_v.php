@@ -215,7 +215,12 @@
 		});
 		//escm sync function
 		$(".api_sync").click(function() {
-			var url = my_url + "settings/api_sync";
+			var type=$(this).attr("id");
+			if(type=="api_sync"){
+			   var url = my_url + "settings/api_sync";		
+			}else{
+			   var url = my_url + "settings/get_updates";				
+			}
 			$.ajax({
 				url : url,
 				type : 'POST',

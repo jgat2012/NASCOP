@@ -79,7 +79,7 @@ class settings extends MY_Controller {
 			$curl -> get($target_url);
 			if ($curl -> error) {
 				$curl -> error_code;
-				$log="Error: " . $curl -> error_code . "<br/>";
+				$log = "Error: " . $curl -> error_code . "<br/>";
 			} else {
 				$main_array = json_decode($curl -> response, TRUE);
 				$clean_data = array();
@@ -97,7 +97,7 @@ class settings extends MY_Controller {
 						}
 					}
 				}
-				$log="Sync Complete";
+				$log = "Sync Complete";
 			}
 		}
 		$content = $info_class;
@@ -420,7 +420,24 @@ class settings extends MY_Controller {
 
 	}
 
-	public function prepare_order($type = "cdrr", $responses = array()) {
+	public function extract_order($type = "cdrr", $responses = array(), $id = "") {
+		/*Steps
+		 * 1.Check if escm id is mapped to nascop id return mapped id or null if none
+		 * 2.Get nascop id if exits ad delete it from cdrr/maps
+		 * 3.Clean ids of array response
+		 * 4.a)If nascop id is not null Attach nascop id to id column as well as cdrr_id and maps_id
+		 *   b)if nascop is null save order as new and user last insert id as cdrr/maps id
+		 * 5.Map the escm_id to the nascop id
+		 */
+		if ($id != "") {
+			$escm_id = $id;
+			$nascop_id = $this -> check_map($escm_id, $type);
+			if ($nascop_id != null) {
+				$this -> delete_order($type, $nascop_id, 1);
+			}
+			$responses = $this -> clean_index($type, $responses);
+			$responses = array($responses);
+		}
 		$my_array = array();
 		if ($type == "cdrr") {
 			$cdrr = array();
@@ -439,9 +456,18 @@ class settings extends MY_Controller {
 					}
 				}
 			}
-			//Insert the cdrr and retrieve the auto_id assigned to it,this will be the cdrr_id
-			$this -> db -> insert('cdrr', $cdrr);
-			$cdrr_id = $this -> db -> insert_id();
+			if ($nascop_id != null) {
+				$cdrr["id"] = $nascop_id;
+				$cdrr_id = $nascop_id;
+				//Insert the cdrr and use nascop id as cdrr id
+				$this -> db -> insert('cdrr', $cdrr);
+			} else {
+				//Insert the cdrr and retrieve the auto_id assigned to it,this will be the cdrr_id
+				$this -> db -> insert('cdrr', $cdrr);
+				$cdrr_id = $this -> db -> insert_id();
+			}
+
+			$this -> map_order($escm_id, $cdrr_id, $type);
 
 			//Loop through cdrr_log and add cdrr_id
 			foreach ($cdrr_log as $index => $log) {
@@ -484,8 +510,19 @@ class settings extends MY_Controller {
 					}
 				}
 			}
-			$this -> db -> insert("maps", $maps);
-			$maps_id = $this -> db -> insert_id();
+
+			if ($nascop_id != null) {
+				$maps["id"] = $nascop_id;
+				$maps_id = $nascop_id;
+				//Insert the maps and use nascop id as maps id
+				$this -> db -> insert('maps', $maps);
+			} else {
+				//Insert the maps and retrieve the auto_id assigned to it,this will be the cdrr_id
+				$this -> db -> insert('maps', $maps);
+				$maps_id = $this -> db -> insert_id();
+			}
+
+			$this -> map_order($escm_id, $maps_id, $type);
 
 			//attach maps id to maps_log
 			foreach ($temp_log as $logs) {
@@ -512,6 +549,131 @@ class settings extends MY_Controller {
 			}
 			$this -> db -> insert_batch('maps_item', $maps_items);
 		}
+	}
+
+	public function clean_index($type = "cdrr", $responses = array()) {
+		$my_array = array();
+		if ($type == "cdrr") {
+			$cdrr = array();
+			$cdrr_items = array();
+			$cdrr_log = array();
+			$temp_items = array();
+			$temp_log = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownCdrr_item") {
+						$cdrr_items[$index] = $main;
+					} else if ($index == "ownCdrr_log") {
+						$cdrr_log[$index] = $main;
+					} else {
+						if ($index == "id") {
+							$cdrr[$index] = "";
+						} else {
+							$cdrr[$index] = $main;
+						}
+					}
+				}
+			}
+			$my_array = $cdrr;
+
+			//Loop through cdrr_item and add cdrr_id
+			foreach ($cdrr_items as $index => $cdrr_item) {
+				foreach ($cdrr_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "id") {
+							$temp_items[$counter]['id'] = "";
+						} else if ($ind == "cdrr_id") {
+							$temp_items[$counter]['cdrr_id'] = "";
+						} else {
+							$temp_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$my_array['ownCdrr_item'] = $temp_items;
+
+			//Loop through cdrr_log and add cdrr_id
+			foreach ($cdrr_log as $index => $my_log) {
+				foreach ($my_log as $counter => $log) {
+					foreach ($log as $ind => $lg) {
+						if ($ind == "id") {
+							$temp_log[$counter]['id'] = "";
+						} else if ($ind == "cdrr_id") {
+							$temp_log[$counter]['cdrr_id'] = "";
+						} else {
+							$temp_log[$counter][$ind] = $lg;
+						}
+					}
+				}
+			}
+			$my_array['ownCdrr_log'] = $temp_log;
+
+		} else if ($type == "maps") {
+			$map = array();
+			$map_items = array();
+			$map_log = array();
+			$temp_items = array();
+			$temp_log = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownMaps_item") {
+						$map_items[$index] = $main;
+					} else if ($index == "ownMaps_log") {
+						$map_log[$index] = $main;
+					} else {
+						if ($index == "id") {
+							$map[$index] = "";
+						} else {
+							$map[$index] = $main;
+						}
+					}
+				}
+			}
+			$my_array = $map;
+
+			//Loop through cdrr_item and add cdrr_id
+			foreach ($map_items as $index => $map_item) {
+				foreach ($map_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "id") {
+							$temp_items[$counter]['id'] = "";
+						} else if ($ind == "maps_id") {
+							$temp_items[$counter]['maps_id'] = "";
+						} else {
+							$temp_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$my_array['ownMaps_item'] = $temp_items;
+
+			//Loop through cdrr_log and add cdrr_id
+			foreach ($map_log as $index => $my_log) {
+				foreach ($my_log as $counter => $log) {
+					foreach ($log as $ind => $lg) {
+						if ($ind == "id") {
+							$temp_log[$counter]['id'] = "";
+						} else if ($ind == "maps_id") {
+							$temp_log[$counter]['maps_id'] = "";
+						} else {
+							$temp_log[$counter][$ind] = $lg;
+						}
+					}
+				}
+			}
+			$my_array['ownMaps_log'] = $temp_log;
+		}
+		return $my_array;
+	}
+
+	public function check_map($escm_id, $type = "cdrr") {
+
+		return null;
+	}
+
+	public function map_order($escm_id = "", $nascop_id = "", $type = "cdrr") {
+		//escm id, nascop id
+
 	}
 
 	public function delete_order($type = "cdrr", $id, $mission = 0) {
