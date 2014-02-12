@@ -667,7 +667,7 @@
     <div class="tab-pane nat_dashboard_rep" id="tab2">
     	<div class="row">
 		  <div class="three_block" id="patient_by_art_by_pipeline">
-    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline</h3>
+    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline for <?php echo date('F-Y');?></h3>
     		<div id="ART_PATIENT_PIPELINE_graph"></div>
     	  </div>
     	  <div class="three_block" id="adult_patient_on_art">

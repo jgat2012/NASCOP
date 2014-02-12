@@ -155,19 +155,21 @@ class Dashboard_Management extends MY_Controller {
 			$period = date('Y-m-01',strtotime($period));
 			$facility_table = '';
 			$regimen_table = '';
+			$cols='';
 			if($pipeline == 'kemsa'){
 				$facility_table ='sync_facility';
 				$regimen_table ='regimen';
+				$cols = 'r.id,r.regimen_code,r.regimen_desc';
 			}
 			else if($pipeline == 'kenya_pharma'){
 				$facility_table ='escm_facility';
 				$regimen_table ='escm_regimen';
+				$cols = 'r.id,r.code,r.description';
 			}
 			//Get ART Facilities
 			$sql_facility = "
 							SELECT f.id,f.name,CAST(f.code AS UNSIGNED) as code,f.services FROM $facility_table f
-							WHERE f.services LIKE '%ART%'
-							AND f.code !='' ORDER BY code ASC
+							ORDER BY code ASC
 							";
 			$query_f = $this ->db->query($sql_facility);
 			$results_f = $query_f ->result_array();
@@ -175,11 +177,10 @@ class Dashboard_Management extends MY_Controller {
 			//Get regimen list
 			$sql_regimen = "
 							SELECT r.id,r.regimen_code,r.regimen_desc,SUM(mi.total) as tot_patient,f.code,m.facility_id  
-							FROM $regimen_table r 
+							FROM regimen r 
 							LEFT JOIN maps_item mi ON mi.regimen_id=r.id
 							LEFT JOIN maps m ON m.id=mi.maps_id
 							LEFT JOIN $facility_table f ON f.id =m.facility_id
-							WHERE enabled ='1'
 							GROUP BY r.id
 							";
 			$query = $this ->db->query($sql_regimen);
@@ -190,6 +191,15 @@ class Dashboard_Management extends MY_Controller {
 			$filename = "Current Patients By ART Sites";
 			$dir = "Export";
 			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
+			$objPHPExcel -> getActiveSheet()->mergeCells('A1:C1');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A2:C2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A3:C3');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A4:C4');
+			$objPHPExcel->getActiveSheet()->freezePane('D8');
+			foreach(range('A','D') as $columnID) {
+			    $objPHPExcel->getActiveSheet()->getColumnDimension($columnID)
+			        ->setAutoSize(true);
+			}
 			$objPHPExcel -> setActiveSheetIndex(0);
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A1', "ART PROGRAM");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A2', "FACILITIES: CURRENT ART PATIENTS BY REGIMEN ");
@@ -260,10 +270,10 @@ class Dashboard_Management extends MY_Controller {
 			
 			$sql_regimen = "
 						SELECT r.id,r.regimen_code,r.regimen_desc,rc.id as cat_id, rc.name as cat_name,IF(SUM(reg.total)IS NULL,0,SUM(reg.total)) as tot 
-						FROM $regimen_table r
+						FROM regimen r
 						LEFT JOIN(
 							SELECT r.id,r.regimen_code,r.regimen_desc,SUM(mi.total) as total 
-							FROM $regimen_table r
+							FROM regimen r
 							LEFT JOIN maps_item mi ON mi.regimen_id=r.id
 							LEFT JOIN maps m ON m.id=mi.maps_id
 							LEFT JOIN $facility_table f ON f.id=m.facility_id
@@ -283,16 +293,23 @@ class Dashboard_Management extends MY_Controller {
 			$filename = "Patients By Regimen";
 			$dir = "Export";
 			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
-			foreach(range('B','C') as $columnID) {
+			$objPHPExcel -> getActiveSheet()->mergeCells('A1:C1');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A2:C2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A3:C3');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A4:C4');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A5:C5');
+			$objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(60);
+			$objPHPExcel->getActiveSheet()->getStyle('C')->getAlignment()->setWrapText(true); 
+			foreach(range('A','B') as $columnID) {
 			    $objPHPExcel->getActiveSheet()->getColumnDimension($columnID)
 			        ->setAutoSize(true);
 			}
 			$objPHPExcel -> setActiveSheetIndex(0);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C1', "ART PROGRAM");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C2', "Pipeline : ".strtoupper($pipeline));
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C3', "PATIENTS BY REGIMEN ");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C4', "Period : ".$period);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C5', "As at : ".date('jS F Y'));
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A1', "ART PROGRAM");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A2', "Pipeline : ".strtoupper($pipeline));
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A3', "PATIENTS BY REGIMEN ");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A4', "Period : ".$period);
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A5', "As at : ".date('jS F Y'));
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B7', "Regimen Code ");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C7', "Regimen Details ");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('D7', "Total Patients ");
@@ -316,6 +333,8 @@ class Dashboard_Management extends MY_Controller {
 					$prev=$a-1;
 					if($results[$prev]['cat_id']!=$results[$a]['cat_id']){
 						$n=0;
+						$objPHPExcel->getActiveSheet()->getStyle('C'.$x)->getFont()->setBold(true);
+						$objPHPExcel->getActiveSheet()->getStyle('D'.$x)->getFont()->setBold(true);
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('C'.$x,"Category Total ");
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('D'.$x,$cat_total);
 						$cat_total=0;
@@ -331,6 +350,7 @@ class Dashboard_Management extends MY_Controller {
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('D'.$x,$total );
 					}
 				}
+				$objPHPExcel->getActiveSheet()->getRowDimension($x)->setRowHeight(-1);
 				$x++;
 				$a++;
 			}
@@ -361,7 +381,7 @@ class Dashboard_Management extends MY_Controller {
 						IF(rc.name LIKE '%child%' AND rs.name='pmtct','PMTCT Infants',
 						'')))))) as Patient_Category
 					FROM regimen_category rc
-					LEFT JOIN $regimen_table r ON r.$category_id=rc.id
+					LEFT JOIN regimen r ON r.category=rc.id
 					LEFT JOIN maps_item mi ON mi.regimen_id=r.id
 					LEFT JOIN maps m ON m.id=mi.maps_id
 					LEFT JOIN regimen_service_type rs ON rs.id=r.type_of_service
@@ -393,6 +413,19 @@ class Dashboard_Management extends MY_Controller {
 			$filename = "ART Patients Scale Up Trends";
 			$dir = "Export";
 			$objPHPExcel = $this->generateExcelDefaultStyle($filename);
+			$objPHPExcel -> getActiveSheet()->mergeCells('A1:C1');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A2:C2');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A3:C3');
+			$objPHPExcel -> getActiveSheet()->mergeCells('A4:C4');
+			$objPHPExcel -> getActiveSheet()->mergeCells('B6:D6');
+			$objPHPExcel -> getActiveSheet()->mergeCells('E6:H6');
+			foreach(range('A','I') as $columnID) {
+				$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)->setWidth(10);
+			};
+			
+			$objPHPExcel->getActiveSheet()->getStyle('B7:I7')->getAlignment()->setWrapText(true); 
+			$objPHPExcel->getActiveSheet()->getRowDimension('7')->setRowHeight(-1);
+			
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A1', "ART PROGRAM");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A2', "Pipeline : ".strtoupper($pipeline));
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('A3', "ART Patients Scale-up by Month and Category ");
@@ -566,14 +599,88 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function getPatients($type="ART_PATIENT"){
-		
-		if($type=="BYPIPELINE_ART"){//Pie Chart
+		$curren_period = date('Y-m-01');
+		$data = array();
+		if($type=="BYPIPELINE_ART"){//Number of ART Patients BY Pipeline
 			$data['container'] = 'report_by_pipeline';
 			$data['title'] = 'Total Patients By Pipeline';
 			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
+			//Get total patients for Kenya Pharma
+			$sql_kp= "
+					SELECT SUM(m.art_adult) as total_adult_kp,SUM(m.art_child) as total_paed_kp 
+					FROM maps m 
+					LEFT JOIN escm_maps em ON em.maps_id = m.id 
+					WHERE STR_TO_DATE(m.period_begin,'%Y-%m-%d')  ='".$curren_period."' 
+					AND em.maps_id IS NOT NULL
+					";
+			$query =$this->db->query($sql_kp);
+			$result=$query->result_array();
+			$tot_adult_kp = 0;
+			$tot_paed_kp = 0;
+			$total_kp = 0;
+			if(count($result)>0){
+				$tot_adult_kp =(int)$result[0]['total_adult_kp'];
+				$tot_paed_kp = (int)$result[0]['total_paed_kp'];
+				$total_kp = $tot_adult_kp+$tot_paed_kp;
+			}
+			//Get totals for Kemsa
+			$sql_kemsa= "
+					SELECT SUM(m.art_adult) as total_adult_kemsa,SUM(m.art_child) as total_paed_kemsa 
+					FROM maps m 
+					LEFT JOIN escm_maps em ON em.maps_id = m.id 
+					WHERE STR_TO_DATE(m.period_begin,'%Y-%m-%d')  ='".$curren_period."' 
+					AND em.maps_id IS NULL
+					";
+			$query =$this->db->query($sql_kemsa);
+			$result=$query->result_array();
+			$tot_adult_kemsa = 0;
+			$tot_paed_kemsa = 0;
+			$total_kemsa = 0;
+			if(count($result)>0){
+				$tot_adult_kemsa =(int)$result[0]['total_adult_kemsa'];
+				$tot_paed_kemsa = (int)$result[0]['total_paed_kemsa'];
+				$total_kemsa = $tot_adult_kemsa+$tot_paed_kemsa;
+			}
+			
+			if($total_kemsa==0 && $total_kp==0){
+				echo "<div style='text-align:center' class=''> No data reported yet for this period </div>";die();
+			}
+			$colors = array('#66aaf7','#f66c6f','#8bbc21','#910000','#1aadce','#492970','#f28f43','#77a1e5','#c42525','#a6c96a');
+			
+			$myData = array(
+							array(
+									'y'=>$total_kp,
+									'color'=>$colors[1],
+									'drilldown'=>array(
+														'name'=>'Kenya Pharma Categories',
+														'categories'=>array('Adults', 'Peads'),
+	                        							'data'=> array($tot_adult_kp,$tot_paed_kp),
+	                        							'color'=> $colors[0]
+													  )
+								  ),
+							array(
+									'y'=>$total_kemsa,
+									'color'=>$colors[4],
+									'drilldown'=>array(
+														'name'=>'Kemsa Categories',
+														'categories'=>array('Adults', 'Peads'),
+	                        							'data'=> array($tot_adult_kemsa,$tot_paed_kemsa),
+	                        							'color'=> $colors[6]
+													  )
+								  ),
+							
+							);
+			
+			$myData =json_encode($myData);
+			//echo $myData;die();
+			$categories = array('Kenya Pharma','Kemsa');
+			$categories =json_encode($categories);
+			
+			$data['categories'] = $categories;
+			$data['myData'] = $myData;			
 			$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
 		}
-		elseif($type=="ADULT_ART"){//Pie Chart
+		elseif($type=="ADULT_ART"){//Bar Chart
 			$sql= "SELECT  
 					IF(r.regimen_code='AF3A' OR r.regimen_code='AF3B' OR r.regimen_code='AF1A' OR r.regimen_code='AF1B' OR r.regimen_code='AF2A' OR r.regimen_code='AF2B',r.regimen_desc,
 						IF(r.regimen_code LIKE '%AS%','2nd line','Other Regimens'
@@ -624,7 +731,7 @@ class Dashboard_Management extends MY_Controller {
 			$data['resultArray'] = $resultArray;
 			$this -> load -> view('dashboard/chart_report_bar_v', $data);
 		}
-		elseif($type=="PAED_ART"){//Pie Chart
+		elseif($type=="PAED_ART"){//Bar Chart
 			$sql= "SELECT  
 					IF(r.regimen_code='CF1A' OR r.regimen_code='CF1B' OR r.regimen_code='CF2A' OR r.regimen_code='CF2B' OR r.regimen_code='CF2D' OR r.regimen_code='CF1C',r.regimen_desc,
 						IF(r.regimen_code LIKE '%CS%','2nd line','Other Regimens'
@@ -711,9 +818,6 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function getReport($type=''){
-		
-		
-		
 			$data =array();
 			$list = array();
 			$dataArray = array();
@@ -721,29 +825,90 @@ class Dashboard_Management extends MY_Controller {
 			$total_series = array();
 			$series = array();	
 			$categories = array();
-			$value1=array(4,48,15,0,68,58);
-			$resultArray = array(
-								array(
-									'name'=>'Reporting Sites(By 10th)',
-									'data'=>$value1
-								)
-								);
+			
 			$sixmonthback= date('F-Y',strtotime(date("F-Y", mktime()) . " - 182 day"));
 			$x=0;
+			$kemsaArray = array();
+			$kpArray = array();
+			$nationalArray = array();
 			while ($x <= 5) {
 				$period = date("F-Y",strtotime(date("Y-m-d", strtotime($sixmonthback)) . " +".($x+1)." month"));
 				$first = date('Y-m-01',strtotime($period));
+				$tenth = date('Y-m-10',strtotime($period));
 				$last_day = date('Y-m-t',strtotime($period));
-				$sql = "SELECT COUNT(DISTINCT(c.facility_id)) as total_report FROM cdrr c
+				$sql = "SELECT (
+							SELECT COUNT(DISTINCT(c.facility_id)) as kemsa FROM cdrr c
 							INNER JOIN maps m ON m.period_begin=c.period_begin
-							WHERE c.created BETWEEN '".$first."' AND  '".$last_day."'";
+							LEFT JOIN escm_orders ec ON ec.cdrr_id=c.id
+							WHERE c.created BETWEEN '".$first."' AND  '".$tenth."
+							WHERE c.id NOT IN ec.cdrr_id'
+							) as kemsa_count,
+							(SELECT COUNT(DISTINCT(c.facility_id)) as kenya_pharma FROM cdrr c
+							INNER JOIN maps m ON m.period_begin=c.period_begin
+							INNER JOIN escm_orders ec ON ec.cdrr_id=c.id
+							WHERE c.created BETWEEN '".$first."' AND  '".$tenth."') as kenya_pharma_count,
+							(
+							SELECT COUNT(DISTINCT(c.facility_id)) as national_total FROM cdrr c
+							INNER JOIN maps m ON m.period_begin=c.period_begin
+							WHERE c.created BETWEEN '".$first."' AND  '".$last_day."'
+							) as national_count,
+							(
+							SELECT COUNT(DISTINCT(id)) as total_kp FROM escm_facility
+							) as total_arv_kp,
+							(
+							SELECT COUNT(DISTINCT(id)) as total_kemsa FROM sync_facility
+							) as total_arv_kemsa
+							
+							FROM cdrr LIMIT 1
+							";
+						
+				$query = $this ->db ->query($sql);
+				$result = $query ->result_array();
+				$total_arv_kp = 0;
+				$total_arv_kemsa = 0;
+				$national_total = 0;
+				if (count($result)>0){
+					$total_arv_kp = (int)$result[0]['total_arv_kp'];
+					$total_arv_kemsa = (int)$result[0]['total_arv_kemsa'];
+					$national_total = $total_arv_kemsa+$total_arv_kp;
+				}
 				
+				
+				if($total_arv_kemsa==0){
+					$kemsa_rate = 0;
+				}
+				else{
+					$kemsa_rate = ((int) $result[0]['kemsa_count']/$total_arv_kemsa)*100;
+				}
+				if($total_arv_kp==0){
+					$kp_rate = 0;
+				}
+				else{
+					$kp_rate = ((int)$result[0]['kenya_pharma_count']/$total_arv_kp)*100;
+				}
+				if($national_total==0){
+					$national_rate = 0;
+				}
+				else{
+					$national_rate =((int)$result[0]['national_count']/$national_total)*100;
+					$national_rate = number_format($national_rate,1);
+				}
+				
+				 
+				 
+				$kemsaArray[] = $kemsa_rate;
+				$kpArray[] = $kp_rate;
+				$nationalArray[] = $national_rate;
 				$categories[$x]=$period;
 				$x++;
 			}
+			$resultArray = array( 
+								array('name' => 'Kemsa/LMU - Reporting timeliness (By 10th)', 'data' => $kemsaArray), 
+								array('name' => 'Kenya Pharma - Reporting timeliness (By 10th)', 'data' => $kpArray),
+								array('name' => 'National Reporting Rate', 'data' => $nationalArray));
+			//echo var_dump($resultArray);die();
 			$resultArray = json_encode($resultArray);
 			$categories = json_encode($categories);
-			$data['resultArraySize'] = 7;
 			$data['container'] = 'report_sum_chart';
 			$data['chartType'] = 'bar';
 			$data['title'] = 'Reporting Analysis';
@@ -757,7 +922,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 	public function reportSummary($type=""){
 		
-		if($type=='table'){
+		if($type=='table'){//Reporting site summary
 			//Total Number of ARV Sites
 			$sql_kemsa="SELECT COUNT(f.code) as total FROM sync_facility f";
 			$query = $this ->db->query($sql_kemsa);
@@ -790,21 +955,21 @@ class Dashboard_Management extends MY_Controller {
 				$x=0;
 			}
 			else{
-				$x=($tot_tenth/$tot_adtsites)*100;
+				$x=number_format(($tot_tenth/$tot_adtsites)*100,2);
 			}
 			
-			//Sites that have reported
+			//Sites that have reported this month
 			$sql_report = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							INNER JOIN maps m ON m.period_begin=c.period_begin
 							WHERE c.created BETWEEN '".$first."' AND  '".$last_day."'";
-			$query = $this ->db->query($sql);
+			$query = $this ->db->query($sql_report);
 			$results = $query ->result_array();
 			$tot_reportsites = $results[0]['total'];
 			if($tot_adtsites==0){
 				$y=0;
 			}
 			else{
-				$y=($tot_reportsites/$tot_adtsites)*100;
+				$y=number_format(($tot_reportsites/$tot_adtsites)*100,2);
 			}
 			$tmpl = array('table_open' => '<table id="" class="table table-bordered table-striped">');
 			$this -> table -> set_template($tmpl);
@@ -818,7 +983,7 @@ class Dashboard_Management extends MY_Controller {
 		}
 
 		
-		else if($type=='site_reporting'){
+		else if($type=='site_reporting'){//Reporting site Analysis
 			$data =array();
 			//Sites reported by 10th
 			$tenth=date('Y-m-10');
