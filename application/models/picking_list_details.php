@@ -12,7 +12,7 @@ class Picking_List_Details extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('picking_list_details');
 		$this -> hasOne('Users as User_Object', array('local' => 'Created_By', 'foreign' => 'id'));
-		$this -> hasMany('Facility_Order as Order_Objects', array('local' => 'id', 'foreign' => 'Picking_List_Id'));
+		$this -> hasMany('Cdrr as Cdrr', array('local' => 'id', 'foreign' => 'order_id'));
 	}//end setUp
 
 	public static function getTotalNumber($status) {
@@ -37,6 +37,12 @@ class Picking_List_Details extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("Picking_List_Details") -> where("Status = '0'");
 		$list_object = $query -> execute();
 		return $list_object;
+	}
+
+	public function getListItemCount($id) {
+		$query = Doctrine_Query::create() -> select("COUNT(c.order_id) as total") -> from("Picking_List_Details p")->leftJoin("p.Cdrr c") -> where("p.id='$id'");
+		$list_object = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $list_object[0]['total'];
 	}
 
 	public function getListGroup($period_start, $period_end) {

@@ -130,7 +130,7 @@ header {
 	overflow: hidden;
 	border-bottom: 2px solid #036;
 	width: 100%;
-	height: 140px;
+	height: auto;
 	background: white;
 	z-index: 5;
 	min-width: 980px;
@@ -1590,7 +1590,6 @@ td {
 .fullest-content .three_block, .fullest-content .two_block, .fullest-content .onehalf_block {
 	display: inline-block;
 	float: left;
-	height: 50%;
 	padding: 0 0.5% 0.5% 0.5%;
 	margin-bottom: 1%;
 }
@@ -1598,13 +1597,13 @@ td {
 	width: 32%;
 }
 .fullest-content .two_block {
-	width: 48%;
+	min-height:300px;
 }
 .fullest-content .onehalf_block {
 	width: 65%;
 }
 .fullest-content #tab5 .two_block {
-	height:40%;
+	
 }
 
 .national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input, 

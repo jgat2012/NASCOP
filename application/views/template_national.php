@@ -14,7 +14,9 @@ $this -> load -> view('sections/head');
 
 
 	<div id="top-panel" style="margin:0px;">
-
+		<div class="container-fluid">
+<div class="row-fluid">
+	<div class="span4">
 		<div class="logo">
 			<a class="logo" href="<?php echo base_url(); ?>" ></a> 
 </div>
@@ -30,7 +32,8 @@ $this -> load -> view('sections/head');
 					<div class="banner_text"><?php echo $banner_text; ?></div>	
 				</div>
 				
-				
+	</div>	
+	<div class="span8">						
  <div id="top_menu"> 
  <div class="welcome_msg">
  	<?php
@@ -55,7 +58,9 @@ $this -> load -> view('sections/head');
 	?>
 </div>
 </div>
-
+</div>
+</div>
+</div>
 </div>
 
 	<?php

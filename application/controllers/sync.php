@@ -8,11 +8,22 @@ class Sync extends MY_Controller {
 		parent::__construct();
 	}
 
-	public function user($email) {
+	public function user($email = "") {
 		$email = urldecode($email);
-		//$email ='kevomarete@gmail.com';
-		$user = Sync_User::getUser($email);
+		$email = "kevomarete@gmail.com";
+		$users = Sync_User::getUser($email);
+		$users = array($users);
+		if ($users) {
+			foreach ($users as $user) {
+				$user_id = $user['id'];
+			}
+			$facilities = User_Facilities::getHydratedFacilityList($user_id);
+			if ($facilities) {
+				$user['ownUser_facility'] = $facilities['facility'];
+			}
+		}
 		echo json_encode($user);
+
 	}
 
 	public function drugs() {
@@ -21,13 +32,42 @@ class Sync extends MY_Controller {
 	}
 
 	public function facilities() {
-		$user = Sync_Facility::getAll();
+		$user = Sync_Facility::getAllHydrated();
 		echo json_encode($user);
 	}
 
 	public function regimen() {
-		$user = Regimen::getAllRegimens();
+		$user = Sync_Regimen::getAllHydrated();
 		echo json_encode($user);
+	}
+
+	public function facility($facility_id, $type) {
+		$total_array = array();
+		if ($type == "cdrr") {
+			$cdrrs = Cdrr::getFacilityCdrr($facility_id);
+			foreach ($cdrrs as $cdrr) {
+				$id = $cdrr['id'];
+				$items = Cdrr_Item::getItems($id);
+				$logs = Cdrr_Log::getLogs($id);
+				$main_array = $cdrr;
+				$main_array["ownCdrr_item"] = $items;
+				$main_array["ownCdrr_log"] = $logs;
+				$total_array[] = $main_array;
+			}
+
+		} else if ($type == "maps") {
+			$maps = Maps::getFacilityMap($facility_id);
+			foreach ($maps as $map) {
+				$id = $map['id'];
+				$items = Maps_Item::getItems($id);
+				$logs = Maps_Log::getLogs($id);
+				$main_array["ownMaps_item"] = $items;
+				$main_array["ownMaps_log"] = $logs;
+				$total_array[] = $main_array;
+			}
+
+		}
+		echo json_encode($total_array, JSON_PRETTY_PRINT);
 	}
 
 	public function save($link = "nascop", $type = "cdrr", $id = "") {
@@ -126,12 +166,15 @@ class Sync extends MY_Controller {
 				$cdrr_id = $this -> db -> insert_id();
 
 				//Loop through cdrr_log and add cdrr_id
-				foreach ($cdrr_log as $index => $log) {
-					foreach ($log as $ind => $lg) {
-						if ($ind == "cdrr_id") {
-							$lg['cdrr_id'] = $cdrr_id;
+				foreach ($cdrr_log as $index => $logs) {
+					foreach ($logs as $counter => $log) {
+						foreach ($log as $ind => $lg) {
+							if ($ind == "cdrr_id") {
+								$temp_log[$counter]['cdrr_id'] = $cdrr_id;
+							}else {
+								$temp_log[$counter][$index] = $lg;
+							}
 						}
-						$temp_log[] = $lg;
 					}
 				}
 				$this -> db -> insert_batch('cdrr_log', $temp_log);
@@ -177,11 +220,14 @@ class Sync extends MY_Controller {
 
 				//attach maps id to maps_log
 				foreach ($temp_log as $logs) {
-					foreach ($logs as $index => $log) {
-						if ($index == "maps_id") {
-							$log["maps_id"] = $maps_id;
+					foreach ($logs as $counter => $log) {
+						foreach ($log as $index => $lg) {
+							if ($index == "maps_id") {
+								$maps_log[$counter]["maps_id"] = $maps_id;
+							} else {
+								$maps_log[$counter][$index] = $lg;
+							}
 						}
-						$maps_log[] = $log;
 					}
 				}
 				$this -> db -> insert_batch('maps_log', $maps_log);

@@ -27,7 +27,7 @@ class Cdrr_Item extends Doctrine_Record {
 	}
 
 	public function getOrderItems($cdrr, $limit) {
-		$query = Doctrine_Query::create() -> select("drug_id,resupply") -> from("cdrr_item") -> where("cdrr_id IN($cdrr) AND resupply>0") -> orderby("resupply desc") -> limit("$limit");
+		$query = Doctrine_Query::create() -> select("drug_id,MAX(resupply) as resupply") -> from("cdrr_item") -> where("cdrr_id IN($cdrr) AND resupply>0") -> groupBy("drug_id") -> orderby("resupply desc") -> limit("$limit");
 		$items = $query -> execute();
 		return $items;
 	}

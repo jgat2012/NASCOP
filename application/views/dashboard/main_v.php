@@ -706,24 +706,24 @@
     	
     </div>
     <!-- Reporting Analysis -->
-    <div class="tab-pane nat_dashboard_rep  active" id="tab5">
-    	<div class="row">
-    		<div class="two_block" id="">
+    <div class="tab-pane nat_dashboard_rep active" id="tab5">
+    	<div class="row-fluid">
+    		<div class="two_block span6" id="">
 	    		<h3 class="dashboard_title">ARV Sites</h3>
 	    		
 	    		<div id="chart_area_report_summary"></div>
 	    	</div>
-	    	<div class="two_block" id="">
+	    	<div class="two_block span6" id="">
 	    		<h3 class="dashboard_title">Reporting Site Rates</h3>
 	    		<div id="chart_area_report"></div>
 	    	</div>
     	</div>
-    	<div class="row">
-    		<div class="two_block" id="">
+    	<div class="row-fluid">
+    		<div class="two_block span6" id="">
 	    		<h3 class="dashboard_title">Reporting Sites Analysis for <?php echo  date('F-Y');?></h3>
 	    		<div id="chart_area_report_analysis"></div>
 	    	</div>
-	    	<div class="two_block" id="">
+	    	<div class="two_block span6" id="">
 	    		<h3 class="dashboard_title">Reporting Sites Rate Summary for <?php echo  date('F-Y');?></h3>
 	    		<div id="report_summary_table"></div>
 	    	</div>

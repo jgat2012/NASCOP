@@ -48,6 +48,6 @@ $(function () {
     
 </script>
 <div class="graph">
-	<div id="<?php echo $container?>"  style="width:97%;height: 100%"  '>
+	<div id="<?php echo $container?>"  style="width:97%;"  '>
 </div>
 </div>

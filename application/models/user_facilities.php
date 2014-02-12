@@ -8,12 +8,19 @@ class User_Facilities extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('user_facilities');
 		$this -> hasOne('Sync_Facility as facility', array('local' => 'user_id', 'foreign' => 'id'));
+		$this -> hasOne('Sync_User as User', array('local' => 'user_id', 'foreign' => 'id'));
 	}
 
 	public function getFacilityList($user_id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("user_facilities") -> where("user_id = '" . $user_id . "'");
 		$rights = $query -> execute();
 		return $rights[0];
+	}
+
+	public function getHydratedFacilityList($user_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("user_facilities") -> where("user_id = '" . $user_id . "'");
+		$rights = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return @$rights[0];
 	}
 
 }

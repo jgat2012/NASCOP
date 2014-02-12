@@ -15,17 +15,17 @@ class Order extends MY_Controller {
 	public function get_orders() {
 		$columns = array('#', '#CDRR-ID', '#MAPS-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
 		$sql = "SELECT c.id,m.id as map,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,IF(m.code='D-MAPS',CONCAT('D-MAPS#',m.id),CONCAT('F-MAPS#',m.id)) as maps_id,c.period_begin,c.status as status_name,sf.name as facility_name
-				FROM cdrr c
-				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
-				LEFT JOIN facilities f ON f.facilitycode=sf.code
-				LEFT JOIN maps m ON sf.id=m.facility_id
-				WHERE m.period_begin=c.period_begin
-				AND (c.code='D-CDRR' OR c.code='F-CDRR_packs')
-				AND m.period_end=c.period_end
-				AND m.facility_id=c.facility_id
-				AND c.status !='prepared' 
-				AND c.status !='review'";
-		//AND c.id NOT IN (SELECT cdrr_id FROM escm_orders)
+					FROM cdrr c
+					LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+				    LEFT JOIN facilities f ON f.facilitycode=sf.code,maps m
+					WHERE c.facility_id = m.facility_id
+					AND c.period_begin = m.period_begin
+					AND c.period_end = m.period_end
+					AND (c.code =  'D-CDRR' OR c.code =  'F-CDRR_packs')
+					AND c.status !=  'prepared'
+					AND c.status !=  'review'
+					AND c.id NOT IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
+					GROUP BY c.id";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		$links = array("order/view_order" => "view order");
@@ -70,6 +70,7 @@ class Order extends MY_Controller {
 		$query = $this -> db -> query($sql);
 		$order_array = $query -> result_array();
 		$data['order_array'] = $order_array;
+		$data['order_code'] = $order_array[0]['code'];
 
 		if ($order_array[0]['status_name'] == "received" || $order_array[0]['status_name'] == "rationalized") {
 			$data['option_links'] = "<li class='active'><a href='" . site_url("order/view_cdrr/" . $cdrr_id) . "'>view</a></li><li><a href='" . site_url("order/update_cdrr/" . $cdrr_id) . "'>update</a></li><li></li>";
@@ -142,6 +143,7 @@ class Order extends MY_Controller {
 		$data['hide_save'] = 0;
 		$data['hide_btn'] = 0;
 		$data['options'] = "none";
+		$data['stand_alone'] = 0;
 		if ($type == 1) {
 			$data['page_title'] = "Central Dispensing Point(F-CDRR)";
 			$data['content_view'] = "orders/cdrr_template";
@@ -162,6 +164,7 @@ class Order extends MY_Controller {
 			$data['banner_text'] = "Stand-alone(F-CDRR)";
 			$facility = $this -> session -> userdata("facility");
 			$data['stand_alone'] = 1;
+			$data['content_view'] = "orders/cdrr_template";
 		} else {
 			$data['page_title'] = "Central Aggregate(D-CDRR)";
 			$data['content_view'] = "orders/cdrr_template";
@@ -229,7 +232,7 @@ class Order extends MY_Controller {
 			}
 		}
 		$data['facility_object'] = Facilities::getCodeFacility($facility);
-		$data['report_type'] = $type;
+		$data['report_type'] = $this -> getActualCode($type, "cdrr");
 		$this -> base_params($data);
 	}
 
@@ -259,6 +262,12 @@ class Order extends MY_Controller {
 		} else if ($cdrr_array[0]['code'] == "F-CDRR_packs") {
 			$code = 3;
 		}
+
+		if ($cdrr_array[0]['status'] == "dispatched") {
+			$this -> session -> set_flashdata('order_message', "You cannot update order after it has been dispatched!");
+			redirect("order");
+		}
+
 		$this -> set_cdrr($code, $data);
 	}
 
@@ -282,6 +291,9 @@ class Order extends MY_Controller {
 				$opening_balances = $this -> input -> post('opening_balance');
 				$quantities_received = $this -> input -> post('quantity_received');
 				$quantities_dispensed = $this -> input -> post('quantity_dispensed');
+				if ($code == "F-CDRR_packs") {
+					$quantities_dispensed_packs = $this -> input -> post('quantity_dispensed_packs');
+				}
 				$losses = $this -> input -> post('losses');
 				$adjustments = $this -> input -> post('adjustments');
 				$physical_count = $this -> input -> post('physical_count');
@@ -335,7 +347,11 @@ class Order extends MY_Controller {
 						$cdrr_array[$commodity_counter]['balance'] = $opening_balances[$commodity_counter];
 						$cdrr_array[$commodity_counter]['received'] = $quantities_received[$commodity_counter];
 						$cdrr_array[$commodity_counter]['dispensed_units'] = $quantities_dispensed[$commodity_counter];
-						$cdrr_array[$commodity_counter]['dispensed_packs'] = ceil(@$quantities_dispensed[$commodity_counter] / @$pack_size[$commodity_counter]);
+						if ($code == "F-CDRR_packs") {
+							$cdrr_array[$commodity_counter]['dispensed_packs'] = $quantities_dispensed_packs[$commodity_counter];
+						} else {
+							$cdrr_array[$commodity_counter]['dispensed_packs'] = ceil(@$quantities_dispensed[$commodity_counter] / @$pack_size[$commodity_counter]);
+						}
 						$cdrr_array[$commodity_counter]['losses'] = $losses[$commodity_counter];
 						$cdrr_array[$commodity_counter]['adjustments'] = $adjustments[$commodity_counter];
 						$cdrr_array[$commodity_counter]['count'] = $physical_count[$commodity_counter];
@@ -354,7 +370,7 @@ class Order extends MY_Controller {
 						$cdrr_array[$commodity_counter]['cdrr_id'] = $cdrr_id;
 						$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
 
-						if ($resupply[$commodity_counter] != $old_resupply[$commodity_counter]) {
+						if (((int)$resupply[$commodity_counter] - (int)$old_resupply[$commodity_counter]) != 0) {
 							$change = new Resupply_Change();
 							$change -> cdrr_id = $cdrr_id;
 							$change -> drug_id = $commodity;
@@ -883,7 +899,7 @@ class Order extends MY_Controller {
 		$dir = "Export";
 		$drug_name = "CONCAT_WS('] ',CONCAT_WS(' [',sd.name,sd.abbreviation),CONCAT_WS(' ',sd.strength,sd.formulation)) as drug_map";
 
-		$sql = "SELECT c.*,ci.*,cl.*,f.*,co.county as county_name,d.name as district_name,u.*,al.level_name,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name,$drug_name
+		$sql = "SELECT c.*,ci.*,cl.*,f.*,co.county as county_name,d.name as district_name,u.*,al.level_name,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,sf.name as facility_name,$drug_name
 				FROM cdrr c
 				LEFT JOIN cdrr_item ci ON ci.cdrr_id=c.id
 				LEFT JOIN cdrr_log cl ON cl.cdrr_id=c.id
@@ -899,7 +915,15 @@ class Order extends MY_Controller {
 		$query = $this -> db -> query($sql);
 		$cdrr_array = $query -> result_array();
 		$report_type = $cdrr_array[0]['code'];
-		$template = "cdrr_aggregate";
+		$template = "";
+
+		if ($report_type == "D-CDRR") {
+			$template = "cdrr_aggregate";
+		} else if ($report_type == "F-CDRR_packs") {
+			$template = "cdrr_stand_alone";
+		} else if ($report_type == "F-CDRR_units") {
+			$template = "cdrr_satellite";
+		}
 
 		$inputFileType = 'Excel5';
 		$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/' . $template . '.xls';
@@ -927,24 +951,29 @@ class Order extends MY_Controller {
 		$objPHPExcel -> getActiveSheet() -> SetCellValue('D7', date('d/m/y', strtotime($cdrr_array[0]['period_begin'])));
 		$objPHPExcel -> getActiveSheet() -> SetCellValue('G7', date('d/m/y', strtotime($cdrr_array[0]['period_end'])));
 
-		if (strtoupper($cdrr_array[0]['sponsors']) == "GOK" || strtoupper($cdrr_array[0]['sponsors']) == "KEMSA") {
-			$loc = "D";
-		} else if (strtoupper($cdrr_array[0]['sponsors']) == "PEPFAR" || strtoupper($cdrr_array[0]['sponsors']) == "KENYA PHARMA") {
-			$loc = "F";
-		} else if (strtoupper($cdrr_array[0]['sponsors']) == "MSF") {
-			$loc = "H";
+		if ($cdrr_array[0]['sponsors'] != "") {
+			if (strtoupper($cdrr_array[0]['sponsors']) == "GOK" || strtoupper($cdrr_array[0]['sponsors']) == "KEMSA") {
+				$loc = "D";
+			} else if (strtoupper($cdrr_array[0]['sponsors']) == "PEPFAR" || strtoupper($cdrr_array[0]['sponsors']) == "KENYA PHARMA") {
+				$loc = "F";
+			} else if (strtoupper($cdrr_array[0]['sponsors']) == "MSF") {
+				$loc = "H";
+			}
+			$objPHPExcel -> getActiveSheet() -> SetCellValue($loc . '9', "X");
 		}
-		$objPHPExcel -> getActiveSheet() -> SetCellValue($loc . '9', "X");
 
 		$services = explode(",", $cdrr_array[0]['services']);
-		foreach ($services as $service) {
-			if (strtoupper($service) == "ART") {
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('D11', "X");
-			} else if (strtoupper($service) == "PMTCT") {
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('F11', "X");
-			} else if (strtoupper($service) == "PEP") {
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('H11', "X");
+		if ($services != "") {
+			foreach ($services as $service) {
+				if (strtoupper($service) == "ART") {
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('D11', "X");
+				} else if (strtoupper($service) == "PMTCT") {
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('F11', "X");
+				} else if (strtoupper($service) == "PEP") {
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('H11', "X");
+				}
 			}
+
 		}
 
 		$objPHPExcel -> getActiveSheet() -> SetCellValue('A95', $cdrr_array[0]['comments']);
@@ -957,24 +986,38 @@ class Order extends MY_Controller {
 				if ($key !== null) {
 					foreach ($cdrr_array as $cdrr_item) {
 						if ($key == $cdrr_item['drug_id']) {
-							$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $i, $cdrr_item['balance']);
-							$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $i, $cdrr_item['received']);
-							$objPHPExcel -> getActiveSheet() -> SetCellValue('E' . $i, $cdrr_item['dispensed_units']);
-							$objPHPExcel -> getActiveSheet() -> SetCellValue('F' . $i, $cdrr_item['losses']);
-							$objPHPExcel -> getActiveSheet() -> SetCellValue('G' . $i, $cdrr_item['adjustments']);
-							$objPHPExcel -> getActiveSheet() -> SetCellValue('H' . $i, $cdrr_item['count']);
-							if ($cdrr_array[0]['code'] == 0) {
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $i, $cdrr_item['aggr_consumed']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('J' . $i, $cdrr_item['aggr_on_hand']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('K' . $i, $cdrr_item['expiry_quant']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('L' . $i, $cdrr_item['expiry_date']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('M' . $i, $cdrr_item['out_of_stock']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('N' . $i, $cdrr_item['resupply']);
+							if ($cdrr_array[0]['code'] == "F-CDRR_packs") {
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $i, $cdrr_item['balance']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $i, $cdrr_item['received']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('E' . $i, $cdrr_item['dispensed_units']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('F' . $i, $cdrr_item['dispensed_packs']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('G' . $i, $cdrr_item['losses']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('H' . $i, $cdrr_item['adjustments']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $i, $cdrr_item['count']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('J' . $i, $cdrr_item['expiry_quant']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('K' . $i, $cdrr_item['expiry_date']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('L' . $i, $cdrr_item['out_of_stock']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('M' . $i, $cdrr_item['resupply']);
 							} else {
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $i, $cdrr_item['expiry_quant']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('J' . $i, $cdrr_item['expiry_date']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('K' . $i, $cdrr_item['out_of_stock']);
-								$objPHPExcel -> getActiveSheet() -> SetCellValue('L' . $i, $cdrr_item['resupply']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $i, $cdrr_item['balance']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $i, $cdrr_item['received']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('E' . $i, $cdrr_item['dispensed_units']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('F' . $i, $cdrr_item['losses']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('G' . $i, $cdrr_item['adjustments']);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue('H' . $i, $cdrr_item['count']);
+								if ($cdrr_array[0]['code'] == "D-CDRR") {
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $i, $cdrr_item['aggr_consumed']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('J' . $i, $cdrr_item['aggr_on_hand']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('K' . $i, $cdrr_item['expiry_quant']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('L' . $i, $cdrr_item['expiry_date']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('M' . $i, $cdrr_item['out_of_stock']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('N' . $i, $cdrr_item['resupply']);
+								} else {
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $i, $cdrr_item['expiry_quant']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('J' . $i, $cdrr_item['expiry_date']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('K' . $i, $cdrr_item['out_of_stock']);
+									$objPHPExcel -> getActiveSheet() -> SetCellValue('L' . $i, $cdrr_item['resupply']);
+								}
 							}
 						}
 					}
@@ -982,19 +1025,41 @@ class Order extends MY_Controller {
 			}
 		}
 
-		if ($cdrr_array[0]['code'] == 0) {
+		if ($cdrr_array[0]['code'] == 'D-CDRR') {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('E108', $cdrr_array[0]['reports_expected']);
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('H108', $cdrr_array[0]['reports_actual']);
 
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C111', $cdrr_array[0]['Name']);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C113', $cdrr_array[0]['Phone_Number']);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('K111', $cdrr_array[0]['level_name']);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('G113', $cdrr_array[0]['created']);
+			$logs = Cdrr_Log::getObjectLogs($cdrr_id);
+			foreach ($logs as $log) {
+				if ($log -> description == "prepared") {
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C111', $log -> user -> name);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C113', $log -> user -> username);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('K111', $log -> user -> role);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('G113', $log -> created);
+				} else if ($log -> description == "approved") {
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C115', $log -> user -> name);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C117', $log -> user -> username);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('K115', $log -> user -> role);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('G117', $log -> created);
+				}
+			}
+
 		} else {
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C107', $cdrr_array[0]['Name']);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('C109', $cdrr_array[0]['Phone_Number']);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('K107', $cdrr_array[0]['level_name']);
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('G109', $cdrr_array[0]['created']);
+			$logs = Cdrr_Log::getObjectLogs($cdrr_id);
+			foreach ($logs as $log) {
+				if ($log -> description == "prepared") {
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C107', $log -> user -> name);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C109', $log -> user -> username);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('K107', $log -> user -> role);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('G109', $log -> created);
+				} else if ($log -> description == "approved") {
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C111', $log -> user -> name);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C113', $log -> user -> username);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('K111', $log -> user -> role);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('G113', $log -> created);
+				}
+			}
+
 		}
 
 		//Generate file
@@ -1178,7 +1243,7 @@ class Order extends MY_Controller {
 
 	public function showTable($columns, $data = array(), $links = array()) {
 		$this -> load -> library('table');
-		$tmpl = array('table_open' => '<table class="dataTables">');
+		$tmpl = array('table_open' => '<table id="my_orders">');
 		$this -> table -> set_template($tmpl);
 		$this -> table -> set_heading($columns);
 		$link_values = "";
@@ -1299,6 +1364,39 @@ class Order extends MY_Controller {
 			}
 		}
 		return null;
+	}
+
+	public function getActualCode($code, $type) {
+		if ($type == "cdrr") {
+			if ($code == 0) {
+				$code = "D-CDRR";
+			} else if ($code == 3) {
+				$code = "F-CDRR_packs";
+			} else {
+				$code = "F-CDRR_units";
+			}
+		} else if ($type == "maps") {
+			if ($code == 0) {
+				$code = "D-MAPS";
+			} else {
+				$code = "F-MAPS";
+			}
+		}
+		return $code;
+	}
+
+	public function clear_all() {
+		$sql_array = array();
+		$sql_array[] = "TRUNCATE cdrr";
+		$sql_array[] = "TRUNCATE cdrr_item";
+		$sql_array[] = "TRUNCATE cdrr_log";
+		$sql_array[] = "TRUNCATE maps";
+		$sql_array[] = "TRUNCATE maps_item";
+		$sql_array[] = "TRUNCATE maps_log";
+		foreach ($sql_array as $sql) {
+			$query = $this -> db -> query($sql);
+		}
+		redirect("order");
 	}
 
 	public function base_params($data) {

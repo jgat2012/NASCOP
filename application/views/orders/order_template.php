@@ -84,7 +84,8 @@
 	<div id="commodity-table">
 		<table class="table table-bordered"  id="generate_order" style="background:#FFF;">
 		<?php
-				$header_text = '<thead style="text-align:left;background:#c3d9ff;">
+		if($order_code=="D-CDRR"){
+		  $header_text = '<thead style="text-align:left;background:#c3d9ff;">
 					<tr>
 						<th class="col_drug" style="font-size:15px;" rowspan="3">Drug Name</th>
 						<th class="number" rowspan="3">Unit Pack Size</th>
@@ -108,7 +109,36 @@
 						<th>G</th>
 						<th>J</th>
 					</tr>
-			</thead>';	echo $header_text;	
+			</thead>';	
+		}else{
+			$header_text = '<thead style="text-align:left;background:#c3d9ff;">
+					<tr>
+						<th class="col_drug" style="font-size:15px;" rowspan="3">Drug Name</th>
+						<th class="number" rowspan="3">Unit Pack Size</th>
+						<th class="number">Beginning Balance</th>
+						<th class="number">Quantity <br/>Received in this period</th>
+						<th class="number">Quantity <br/>Received in this period</th>
+						<th class="number">End of Month Physical Count</th>
+						<th class="number">Quantity required for RESUPPLY</th>
+					</tr>
+					<tr>
+						<th>In Packs</th>
+						<th>In Packs</th>
+						<th>In Packs</th>
+						<th>In Packs</th>
+						<th>In Packs</th>
+					</tr>
+					<tr>
+						<th>A</th>
+						<th>B</th>
+						<th>C</th>
+						<th>F</th>
+						<th>J</th>
+					</tr>
+			</thead>';	
+			
+		}
+					echo $header_text;	
 			?>
 		<tbody>
 			<?php 
@@ -145,7 +175,11 @@
 						<td> <input name="opening_balance[]" id="opening_balance_<?php echo $commodity -> id;?>" type="text" class="opening_balance"/></td>
 						<td> <input name="quantity_received[]" id="received_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_received"/></td>
 						<td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
+						<?php if($order_code=="D-CDRR"){?>
 						<td> <input tabindex="-1" name="aggregated_qty[]" id="aggregated_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_qty"/></td>
+						<?php }else{?>
+							<td> <input tabindex="-1" name="quantity_dispensed_packs[]" id="dispensed_in_period_packs_<?php echo $commodity->id;?>" type="text" class="quantity_dispensed_packs"/></td>	
+						<?php } ?>	
 						<td> 
 							<input tabindex="-1" name="new_resupply[]" id="new_resupply_<?php echo $commodity -> id;?>" type="text" class="resupply"/>
 							<input tabindex="-1" name="resupply[]" id="resupply_<?php echo $commodity -> id;?>" class="resupply" type="hidden"/>
@@ -211,7 +245,7 @@
 				</tr>
 				<tr>
 					<td><b>Contact Telephone:</b></td>
-					<td><?php echo $log->user->profile_id; ?></td>
+					<td><?php echo $log->user->username; ?></td>
 					<td><b>Date:</b></td>
 					<td><?php echo $log->created; ?></td>
 				</tr>
@@ -302,7 +336,11 @@
 		  $("#opening_balance_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['balance']; ?>");
 		  $("#received_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['received']; ?>");
 		  $("#physical_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['count']; ?>");
-		  $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");
+		  <?php if($cdrr['code']=="D-CDRR"){?>
+		   $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");	
+		  <?php }else{?>
+		  $("#dispensed_in_period_packs_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>");
+		  <?php }?>
 		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		  $("#new_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		<?php	

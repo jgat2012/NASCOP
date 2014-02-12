@@ -41,12 +41,18 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function close_list($list_id) {
-		$sql = "UPDATE picking_list_details p 
+		$list_orders = Picking_List_Details::getListItemCount($list_id);
+		if ($list_orders > 0) {
+			$sql = "UPDATE picking_list_details p 
 				SET p.status='1'
 				WHERE p.id='$list_id'";
-		$query = $this -> db -> query($sql);
-		$this -> session -> set_flashdata('list_message', "List Closed Successfully");
-		$this -> session -> set_userdata("order_go_back", "fmaps");
+			$query = $this -> db -> query($sql);
+			$this -> session -> set_flashdata('list_message', "List Closed Successfully");
+			$this -> session -> set_userdata("order_go_back", "fmaps");
+		} else {
+			$this -> session -> set_flashdata('list_message', "List Closing Failed");
+			$this -> session -> set_userdata("order_go_back", "cdrr");
+		}
 		redirect("picking_list");
 	}
 
@@ -163,10 +169,25 @@ class Picking_List extends MY_Controller {
 		$this -> mpdf -> simpleTables = true;
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
-		$report_name = "Warehouse Picking List.pdf";
+		$dir = "Export/";
+		$report_name = $dir . "Warehouse Picking List.pdf";
 		$html_title . "\n";
 		$data . "\n";
-		$this -> mpdf -> Output($report_name, 'D');
+
+		/*Delete all files in export folder*/
+		if (is_dir($dir)) {
+			$files = scandir($dir);
+			foreach ($files as $object) {
+				if ($object != "." && $object != "..") {
+					unlink($dir . "/" . $object);
+				}
+			}
+		} else {
+			mkdir($dir);
+		}
+
+		$this -> mpdf -> Output($report_name, 'F');
+		redirect($report_name);
 	}
 
 	public function print_list($list_id) {
@@ -193,9 +214,10 @@ class Picking_List extends MY_Controller {
 					}
 			    </style>";
 
-		$sql = "SELECT c.id,f.name as facility_name,IF(c.code='0',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id
+		$sql = "SELECT c.id,sf.name as facility_name,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id
 		        FROM cdrr c
-		        LEFT JOIN facilities f ON f.id=c.facility_id
+		        LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+		        LEFT JOIN facilities f ON f.facilitycode=sf.code
 		        LEFT JOIN picking_list_details p ON p.id=c.order_id
 		        WHERE p.id='$list_id'";
 		$query = $this -> db -> query($sql);
@@ -240,7 +262,7 @@ class Picking_List extends MY_Controller {
 				} else if ($link == "remove order") {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='delete link'>$link</a> | ";
 				} else if ($link == "print list") {
-					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='link'>$link</a> | ";
+					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' target='_blank' class='link'>$link</a> | ";
 				} else if ($link == "update") {
 					$link_values .= "<a data-toggle='modal' href='#edit_list' class='update' link_id='" . $mydata['id'] . "' link_name='" . $mydata['name'] . "'>$link</a> | ";
 				} else if ($link == "assign orders") {
@@ -273,12 +295,11 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function view_orders($list_id) {
-		$sql = "SELECT p.id,u.name as full_name,p.name,p.timestamp,count(c.order_id) as orders_total,iF(p.status=1,'Closed','Open') as status 
+		$sql = "SELECT p.id,u.name as full_name,p.name,p.timestamp,count(c.order_id) as orders_total,IF(p.status=1,'Closed','Open') as status 
 		      FROM picking_list_details p
 		      LEFT JOIN cdrr c ON c.order_id=p.id
 		      LEFT JOIN users u ON u.id=p.created_by
-		      WHERE p.id='$list_id'
-		      GROUP BY c.id";
+		      WHERE p.id='$list_id'";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result();
 		$data['list'] = $results[0];

@@ -68,8 +68,8 @@ class Pharmacist_Management extends MY_Controller {
 			foreach ($cdrrs as $cdrr) {
 				$dyn_table .= "<tr><td>" . $cdrr -> Facility -> code . "</td>";
 				$dyn_table .= "<td>" . $cdrr -> Facility -> name . "</td>";
-				$dyn_table .= "<td>Central Site</td>";
-				$dyn_table .= "<td>Nairobi</td></tr>";
+				$dyn_table .= "<td>" . $cdrr -> Facility -> category . "</td>";
+				$dyn_table .= "<td>" . $cdrr -> Facility -> County -> county . "</td></tr>";
 			}
 		}
 		$dyn_table .= "</tbody>";
@@ -86,7 +86,7 @@ class Pharmacist_Management extends MY_Controller {
 		$columns = array();
 		$total_series = array();
 		$series = array();
-		$start_date = date('U', strtotime($start_date));
+		$start_date = date('U', strtotime($start_date. "-1 day"));
 		$end_date = date('U', strtotime($end_date));
 		$open_total = 0;
 		$closed_total = 0;
