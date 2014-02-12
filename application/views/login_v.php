@@ -39,7 +39,8 @@
 				echo "<p class='message error'>" . @$login_attempt . "</p>";
 			}
 		?>
-		<div id="signup_form">
+		<div id="signup_form" class="container">
+		    <div class="row-fluid">
 			<div class="short_title" >
 				Login
 			</div>
@@ -58,7 +59,7 @@
 					<strong><a href="<?php echo base_url().'user_management/resetPassword' ?>" >Forgot Password?</a></strong>
 				</div>
 			</form>
-			
+			</div>
 		</div>
 		<footer id="bottom_ribbon2">
 			 <?php $this -> load -> view("footer_v"); ?>
