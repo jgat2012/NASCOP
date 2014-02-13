@@ -57,7 +57,7 @@ class Maps extends Doctrine_Record {
 		if ($id_list != "") {
 			$and = "and id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code !='1' $and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code !='F-MAPS' $and") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
@@ -67,10 +67,16 @@ class Maps extends Doctrine_Record {
 		if ($id_list != "") {
 			$and = "and id IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code !='1' $and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code !='F-MAPS' $and") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
+	public function getReportPeriods() {//Only get aggregated maps
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code ='D-MAPS'") -> groupBy("period_begin");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
+	
 
 }
 ?>

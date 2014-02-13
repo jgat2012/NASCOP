@@ -30,7 +30,7 @@
 		  var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/table';?>";//Table Reporting Sites Summary
 		  var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
 		  var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";//ARV Sites
-		  var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites
+		  var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites Analysis
 		
 		
        $("#chart_area_report_summary").load(report_analysis_summary_link);
@@ -51,7 +51,7 @@
 		  //Get Today's Date and Upto Saturday
 		  var someDate = new Date();
 		  var dd = ("0" + someDate.getDate()).slice(-2);
-		  var mm = ("0" + (someDate.getMonth() + 1)).slice(-2);
+		  var mm = ("0" + (someDate.getMonth() + 2)).slice(-2);//Next month
 		  var y = someDate.getFullYear();
 		  var last_10="";
 		  //Load the last 10 years in drop down
@@ -82,9 +82,8 @@
 		  	$(".nd_month").append("<option value='"+q+"'>"+month[p]+"</option>");
 		  }
 		  
-		  //Load previous month in months drop down
-		  
-		  var prev_m = ("0" + (someDate.getMonth() + 0)).slice(-2);
+		  //By default, load current month as default selected
+		  var prev_m = ("0" + (someDate.getMonth() + 1)).slice(-2);
 		  $(".nd_month").val(prev_m);
 		  
 		  //Load default chart
@@ -396,7 +395,7 @@
 		
 		//-----------------------------What happens when someone clicks a menu end -------------
 		function loadMonths(_year,current_year){
-			//If year selected is different from current year,load all months, otherload till previous month
+			//If year selected is different from current year,load all months, otherwise load till previous month
 			if(current_year!=_year){
 		  		$(".nd_month").find('option').remove();
 		  		for(var p=1;p<13;p++){
@@ -415,6 +414,41 @@
 		
 		//Reset css
 		$(".navbar").css("margin-bottom","0");
+	});
+	
+	//What happens when one clicks the generate button
+	$(".generate").live("click",function(){
+		//Check which generate button was clicked
+		var id = $(this).attr("id");
+		if(id=='rs_analysis_btn'){//If button is for reporting sites analysis
+			$(".rs_period_display").text($("#nd_ra_period").val());
+			$("#chart_area_report_analysis").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+			var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites Analysis
+			$("#chart_area_report_analysis").load(chart_area_report_analysis_link);
+		}
+		else if(id=='pa_bypipeline_btn'){//Patients on ART By Pipeline
+			var period = $("#nd_pa_bypipeline_period").val();
+			$(".pa_period_display").text(period);
+			$("#ART_PATIENT_PIPELINE_graph").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+			var art_bypipeline_link="<?php echo base_url().'dashboard_management/getPatients/BYPIPELINE_ART/';?>"+period;
+			$("#ART_PATIENT_PIPELINE_graph").load(art_bypipeline_link);
+			
+		}
+		else if(id=='adult_art_btn'){//Adult patients ON ART
+			var period = $("#nd_adult_art_period").val();
+			$(".ad_pa_period_display").text(period);
+			$("#ART_ADULT_PATIENT_graph").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+			var art_adult_patient_link="<?php echo base_url().'dashboard_management/getPatients/ADULT_ART/';?>"+period;
+			$("#ART_ADULT_PATIENT_graph").load(art_adult_patient_link);
+		}
+		else if(id=='paed_art_btn'){//Adult patients ON ART
+			var period = $("#nd_paed_art_period").val();
+			$(".paed_pa_period_display").text(period);
+			$("#ART_PAED_PATIENT_graph").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+			var art_paed_patient_link="<?php echo base_url().'dashboard_management/getPatients/PAED_ART/';?>"+period;
+			$("#ART_PAED_PATIENT_graph").load(art_adult_patient_link);
+		}
+		
 	});
 	
 	/*
@@ -494,6 +528,11 @@
 			 });
 	       });
 	}
+	
+	/*
+	 * Reporting Analysis Functions
+	 */
+	
 	
 	
 	/*
@@ -636,26 +675,51 @@
 		    </div>
 		</div>
       
-	  <!-- Stock status 
-      <div class="two_block" id="s_status">
-			<h3 class="dashboard_title">Stock Status</h3>
-			<div id="SOH_grid"></div>
-	  </div>
-	   Stock status end -->
     </div>
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
     	<div class="row-fluid">
 		  <div class="three_block span4" id="patient_by_art_by_pipeline">
-    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline for <?php echo date('F-Y');?></h3>
+    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline for <span class="pa_period_display"><?php echo date('F-Y');?></span></h3>
+    		<div id="" class="nd_menus">
+				<span>Select a period</span>
+				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small">
+					<?php foreach ($maps_report_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning nd_input_small" style="color:black" id="pa_bypipeline_btn">Get</button>
+			</div>
+			<hr size="2"><p></p>
     		<div id="ART_PATIENT_PIPELINE_graph"></div>
     	  </div>
     	  <div class="three_block span4" id="adult_patient_on_art">
-    		<h3 class="dashboard_title">Current Adult Patients on ART</h3>
+    		<h3 class="dashboard_title">Current Adult Patients on ART as of <span class="ad_pa_period_display"><?php echo date('F-Y');?></span></h3>
+    		<div id="" class="nd_menus">
+				<span>Select a period</span>
+				<select id="nd_adult_art_period" class="nd_period nd_input_small">
+					<?php foreach ($maps_report_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning nd_input_small" style="color:black" id="adult_art_btn">Get</button>
+			</div>
     		<div id="ART_ADULT_PATIENT_graph"></div>
     	  </div>
     	  <div class="three_block span4" id="paed_patient_on_art">
-    		<h3 class="dashboard_title">Current Paedriatic Patients on ART</h3>
+    		<h3 class="dashboard_title">Current Paedriatic Patients on ART as of <span class="paed_pa_period_display"><?php echo date('F-Y');?></span></h3>
+    		<div id="" class="nd_menus">
+				<span>Select a period</span>
+				<select id="nd_paed_art_period" class="nd_period nd_input_small">
+					<?php foreach ($maps_report_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning nd_input_small" style="color:black" id="paed_art_btn">Get</button>
+			</div>
     		<div id="ART_PAED_PATIENT_graph"></div>
     	  </div>
 		</div>
@@ -700,7 +764,18 @@
     	</div>
     	<div class="row-fluid">
     		<div class="two_block span6" id="">
-	    		<h3 class="dashboard_title">Reporting Sites Analysis for <?php echo  date('F-Y');?></h3>
+	    		<h3 class="dashboard_title">Reporting Sites Analysis for <span class="rs_period_display"><?php echo  date('F-Y');?></span></h3>
+	    			<div id="ra_menus" class="nd_menus">
+	    				<span>Select a period</span>
+						<select id="nd_ra_period" class="nd_period nd_input_small">
+							<?php foreach ($report_period as $value) {
+								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+							}?>
+						</select>
+						
+						<button class="generate btn btn-warning nd_input_small" style="color:black" id="rs_analysis_btn">Get</button>
+					</div>
+					<hr size="2">
 	    		<div id="chart_area_report_analysis"></div>
 	    	</div>
 	    	<div class="two_block span6" id="">

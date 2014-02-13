@@ -1224,8 +1224,7 @@ input[readonly] {
 	height: 70%;
 }
 .nd_input_small {
-	width: 6%;
-	height: 4%;
+	width: 10%;
 	padding: 0%;
 }
 .nd_input_medium {
@@ -1621,7 +1620,7 @@ td {
 	border-right: 1px solid #aaa;
 }
 .nat_dashboard_rep select {
-	width: 33%;
+	width: 20%;
 }
 .nat_dashboard_rep input {
 	width: 70%;
