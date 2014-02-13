@@ -3,7 +3,7 @@
 		margin-left:0px;
 	}
 	#tab2 .three_block{
-		height:45%;
+		height:50%;
 	}
 </style>
 <script type="text/javascript">
@@ -550,16 +550,14 @@
 	</ol>
   </div>
   <div class="tab-content nat_dashboard_rep" style="clear:left">
-  	
-  	<?php echo $this->session->flashdata("order_message");?>
   	<!--Ordering-->
   	<div class="tab-pane" id="tab7">
   		<div class="container">
+  			<?php echo $this->session->flashdata("order_message");?>
   			<div class="row-fluid" style="height:50%;">
   			<?php 
   			 if($this->session->userdata("upload_valid") !=""){
   			?>
-
   				<div class="span6">
   	                   		<h3>CDRR Upload</h3>
 						      <div class="accordion-inner">
@@ -622,9 +620,8 @@
   			    </div><!--End of second Span-->
   			    <?php }else{?>
   			       <div class="span4">
-	                        <?php echo $this -> session -> flashdata('login_message');?>
 	                       	<?php echo $this -> session -> flashdata('login_message');?>
-							<?php echo form_open('order/authenticate_user');?>
+							<?php echo form_open('order/authenticate_upload');?>
 							<?php echo form_fieldset('', array('id' => 'login_legend'));?>
 							<legend id="login_legend">
 								<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Log In
@@ -690,15 +687,15 @@
     	  </div>
 		</div>
 		<div class="row-fluid">
-			<div class="three_block span4" id="patient_by_art">
+			<div class="three_block span4" id="patient_by_art" style="height:auto;">
 	    		<h3 class="dashboard_title">Current Patients By ART Sites</h3>
 	    		<div id="ART_PATIENT_grid"></div>
 	    	</div>
-	    	<div class="three_block span4" id="patient_by_regimen">
+	    	<div class="three_block span4" id="patient_by_regimen" style="height:auto;">
 	    		<h3 class="dashboard_title">Patients By Regimen</h3>
 	    		<div id="BYREG_PATIENT_grid"></div>
 	    	</div>
-	    	<div class="three_block span4" id="patient_scale_up">
+	    	<div class="three_block span4" id="patient_scale_up" style="height:auto;">
 	    		<h3 class="dashboard_title">Patients Scale Up</h3>
 	    		<table class="table table-bordered table-striped tbl_nat_dashboard">
 	    			<thead>

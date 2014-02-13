@@ -180,6 +180,7 @@ class User_Management extends MY_Controller {
 			}
 		}
 		if ($type != 2) {
+			delete_cookie("nascop_actual_page");
 			redirect("user_management/change_password");
 		}
 
@@ -206,7 +207,7 @@ class User_Management extends MY_Controller {
 		$user = Users::getUserDetail($this -> session -> userdata('user_id'));
 		$dummy_user = new Users();
 		$dummy_user -> Password = $pass;
-		if ($user[0]['Password'] != $dummy_user -> Password) {
+		if ($user -> Password != $dummy_user -> Password) {
 			$this -> form_validation -> set_message('correct_current_password', 'The current password you provided is not correct.');
 			return FALSE;
 		} else {
@@ -311,7 +312,7 @@ class User_Management extends MY_Controller {
 				//looks good. Continue!
 				else {
 					$facility_details = Facilities::getCurrentFacility($logged_in -> Facility_Code);
-					$session_data = array('user_id' => $logged_in -> id, 'image_link' => $logged_in -> Image_Link, 'user_indicator' => $logged_in -> Access -> Indicator, 'facility_name' => $logged_in -> Facility -> name, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'Email_Address' => $logged_in -> Email_Address, 'Phone_Number' => $logged_in -> Phone_Number, 'facility' => $logged_in -> Facility_Code, 'facility_id' => $facility_details[0]['id'], 'county' => $facility_details[0]['county']);
+					$session_data = array('user_id' => $logged_in -> id, 'upload_valid' => $logged_in -> id, 'image_link' => $logged_in -> Image_Link, 'user_indicator' => $logged_in -> Access -> Indicator, 'facility_name' => $logged_in -> Facility -> name, 'access_level' => $logged_in -> Access_Level, 'username' => $logged_in -> Username, 'full_name' => $logged_in -> Name, 'Email_Address' => $logged_in -> Email_Address, 'Phone_Number' => $logged_in -> Phone_Number, 'facility' => $logged_in -> Facility_Code, 'facility_id' => $facility_details[0]['id'], 'county' => $facility_details[0]['county']);
 					$this -> session -> set_userdata($session_data);
 					$user = $this -> session -> userdata('user_id');
 					$sql = "update access_log set access_type='Logout' where user_id='$user'";

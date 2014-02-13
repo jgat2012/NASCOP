@@ -34,13 +34,13 @@ class Escm_Facility extends Doctrine_Record {
 	}
 
 	public function getAllNotHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility") -> where("id='108'");
 		$escm_facility = $query -> execute();
 		return $escm_facility;
 	}
-	
-	public function getFacilityCode($facility_id){
-		$query =  Doctrine_Query::create() -> select("code") -> from("escm_facility") ->where("id ='$facility_id'");
+
+	public function getFacilityCode($facility_id) {
+		$query = Doctrine_Query::create() -> select("code") -> from("escm_facility") -> where("id ='$facility_id'");
 		$escm_facility = $query -> execute();
 		return $escm_facility[0];
 	}

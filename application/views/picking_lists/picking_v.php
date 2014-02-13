@@ -10,17 +10,17 @@
 		</ul>
 	</div>
 	<div class="tab-content">
-		<div id="open_lists" class="tab-pane active">
-			<div class="menu_container">
-				<a data-toggle='modal' href='#add_list' class='btn'><i class="icon-plus"></i> Create List</a>
-				<br/>
-				<?php
+		<?php
 				if ($this -> session -> flashdata('order_delete')) {
 					echo '<p class="message error">' . $this -> session -> flashdata('order_delete') . '</p>';
 				} else if ($this -> session -> flashdata('list_message')) {
 					echo '<p class="message info">' . $this -> session -> flashdata('list_message') . '</p>';
 				}
-				?>
+		?>
+		<div id="open_lists" class="tab-pane active">
+			<div class="menu_container">
+				<a data-toggle='modal' href='#add_list' class='btn'><i class="icon-plus"></i> Create List</a>
+				<br/>
 			</div>
 			<?php echo $open_table;?>
 		</div>
@@ -29,7 +29,6 @@
 			<?php echo $closed_table;?>
 		</div>
 	</div>
-</div>
 <!-- Modal to Add Picking List -->
 <div id="add_list" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<form id="fmFillOrderForm" action="<?php echo base_url().'picking_list/create_list'?>" method="post" style="margin:0 auto;">
@@ -104,8 +103,44 @@
 		</div>
 	</form>
 </div>
+<!-- Modal to Display Email List -->
+
+			<div id="email_list" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<form class="form-horizontal" action="<?php echo base_url() . 'picking_list/send_list';?>" id="modal_action" method="post">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							×
+						</button>
+						<h3 id="myModalLabel"><span id="modal_header">Send Picking List</span></h3>
+					</div>
+					<div class="modal-body">
+						<div class='control-group'>
+						<label class='control-label'>Email List </label>
+						<div class='controls'>
+						<input type="hidden" name="mail_list_id" id="mail_list_id" value="" required="required"/>
+						    <select id="mail_list_data" class="multiselect" multiple="multiple" style='width:auto;padding:10px;'>
+						      <?php echo $mail_lists;?>
+							</select>
+							</select><input type='hidden' id='mail_list_holder' name='mail_list_holder' />
+							</div>
+						 </div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn" data-dismiss="modal" aria-hidden="true">
+							Close
+						</button>
+						<button class="btn btn-primary">
+							Send
+						</button>
+					</div>
+				</form>
+			</div>
+			</div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		$(".multiselect").multiselect().multiselectfilter();
+		$(".multiselect").multiselect("uncheckAll");
+		
 		$("#open_btn").click(function() {
 			$("#closed_btn").removeClass();
 			$(this).addClass("active");
@@ -139,6 +174,17 @@
 		$(".assign").click(function() {
 			var link_id = $(this).attr("assign_id");
 			$("#assign_list_id").val(link_id);
+		});
+		$(".mail_list").click(function() {
+			var link_id = $(this).attr("picking_list_id");
+			$("#mail_list_id").val(link_id);
+		});
+		
+		$("#modal_action").submit(function() {
+				var facilities = $("select#mail_list_data").multiselect("getChecked").map(function() {
+					return this.value;
+				}).get();
+				$("#mail_list_holder").val(facilities);
 		});
 	});
 

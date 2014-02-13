@@ -59,7 +59,7 @@ header {
 
 	padding-bottom: 1%;
 	margin: auto;
-	width: 50%;
+	width: 95%;
 	border-bottom: 2px solid #2B597E;
 	margin-bottom: 2%;
 }
@@ -71,7 +71,7 @@ header {
 	background: white;
 	padding: 1%;
 	height: 50px;
-	width: 35%;
+	width: 95%;
 	bottom: 0;
 	margin: 5% auto;
 }
@@ -90,6 +90,18 @@ header {
 	overflow: visible;
 	text-shadow: 0 1px rgba(0, 0, 0, 0.1);
 	position: fixed;
+}
+#footer_text2 {
+	font-weight: 300;
+	letter-spacing: 2px;
+	margin: 0 auto;
+	font-size: 1em;
+	color: #036;
+	height: 30px;
+	display: block;
+	overflow: visible;
+	text-shadow: 0 1px rgba(0, 0, 0, 0.1);
+	width:50%;
 }
 #wrapper {
 	width: 100%;
@@ -879,7 +891,7 @@ table.setting_table {
 	border-radius: 5px;
 	background: #2B597E;
 	padding: 1%;
-	width: 35%;
+	width:50%;
 	min-width:350px;
 	margin: auto;
 	box-shadow: 0 1.2px 3px 1px #000;
@@ -1589,13 +1601,17 @@ td {
 /*
  * National Dashboard Style
  */
-.fullest-content .three_block, .fullest-content .two_block, .fullest-content .onehalf_block {
+.fullest-content .two_block, .fullest-content .onehalf_block {
 	display: inline-block;
 	float: left;
 	margin-bottom: 1%;
 }
 .fullest-content .three_block {
-	min-width: 400px;
+	display: inline-block;
+	float: left;
+	min-width: 300px;
+	margin-bottom:3%;
+	min-height:300px;
 }
 .fullest-content .two_block {
 	min-height:300px;
@@ -1603,10 +1619,6 @@ td {
 .fullest-content .onehalf_block {
 	width: 65%;
 }
-.fullest-content #tab5 .two_block {
-	
-}
-
 .national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input, 
 .nat_dashboard_rep label {
 	font-size:0.9em !important;

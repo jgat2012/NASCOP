@@ -25,7 +25,10 @@
 					<a href="#" class="setting_link" id="sync_user">USERS</a>
 				</li>
 				<li>
-					<a href="#" class="setting_link" id="sync_mail">MAILING LISTS</a>
+					<a href="#" class="setting_link" id="mail_list">MAILING LISTS</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="user_emails">USER EMAILS</a>
 				</li>
 				<li class="divider"></li>
 				<li class="nav-header">
@@ -114,6 +117,12 @@
 		} else if(type == "sync_user") {
 			$("#create_setting").text("add user");
 			$("#modal_header").text("Add User");
+		}else if(type == "mail_list") {
+				$("#create_setting").text("add mail list");
+				$("#modal_header").text("Add Mail List");
+		}else if(type == "user_emails") {
+				$("#create_setting").text("add user email");
+				$("#modal_header").text("Add User Email");
 		}
 
 		var link = my_url + "settings/modal/" + type
@@ -158,6 +167,12 @@
 			} else if(type == "sync_user") {
 				$("#create_setting").text("add user");
 				$("#modal_header").text("Add User");
+			}else if(type == "mail_list") {
+				$("#create_setting").text("add mail list");
+				$("#modal_header").text("Add Mail List");
+			}else if(type == "user_emails") {
+				$("#create_setting").text("add user email");
+				$("#modal_header").text("Add User Email");
 			}
 			var link = my_url + "settings/modal/" + type
 			$(".modal_btn").attr("href", link);
@@ -172,10 +187,13 @@
 			var my_array = $(this).data("mydata");
 			var current = $("#current_setting").text();
 			
-			//facilities multifilter
+			// multifilter
 			if(current == "sync_user") {
 				$("#sync_user_facilities").multiselect().multiselectfilter();
 				$("#sync_user_facilities").multiselect("uncheckAll");
+			}else if(current == "user_emails") {
+				$("#user_emails_mail_list").multiselect().multiselectfilter();
+				$("#user_emails_mail_list").multiselect("uncheckAll");
 			}
 
 			$.each(my_array, function(i, v) {
@@ -189,6 +207,16 @@
 						var fplan = family_planning.split(',');
 						for(var i = 0; i < fplan.length; i++) {
 							$("select#sync_user_facilities").multiselect("widget").find(":checkbox[value='" + fplan[i] + "']").each(function() {
+								$(this).click();
+							});
+						}
+					}
+				}else if(i == "mail_list" && v !=null) {
+					var family_planning = $.parseJSON(v);
+					if(family_planning != null || family_planning != " ") {
+						var fplan = family_planning.split(',');
+						for(var i = 0; i < fplan.length; i++) {
+							$("select#user_emails_mail_list").multiselect("widget").find(":checkbox[value='" + fplan[i] + "']").each(function() {
 								$(this).click();
 							});
 						}
@@ -209,6 +237,10 @@
 				$("#sync_user_facilities").multiselect().multiselectfilter();
 				$("#sync_user_facilities").multiselect("uncheckAll");
 				$("#modal_template").modal('show');		
+			}else if(current=="user_emails"){
+				$("#user_emails_mail_list").multiselect().multiselectfilter();
+				$("#user_emails_mail_list").multiselect("uncheckAll");
+				$("#modal_template").modal('show');		
 			}else{
 			    $("#modal_template").modal('show');			
 			}
@@ -218,7 +250,7 @@
 			var type=$(this).attr("id");
 			if(type=="api_sync"){
 			   var url = my_url + "settings/api_sync";		
-			}else{
+			}else if(type=="order_sync"){
 			   var url = my_url + "settings/get_updates";				
 			}
 			$.ajax({
@@ -236,8 +268,13 @@
 				var facilities = $("select#sync_user_facilities").multiselect("getChecked").map(function() {
 					return this.value;
 				}).get();
+				$("#facilities_holder").val(facilities);
+			}else if(current == "user_emails") {
+				var facilities = $("select#user_emails_mail_list").multiselect("getChecked").map(function() {
+					return this.value;
+				}).get();
+				$("#mail_list_holder").val(facilities);
 			}
-			$("#facilities_holder").val(facilities);
 		});
 	});
 	function getTable(type, url, div_id) {
@@ -249,6 +286,10 @@
 			var columns = new Array("code", "name", "description", "options");
 		} else if(type == "sync_user") {
 			var columns = new Array("name", "email", "role", "phone", "options");
+		} else if(type == "mail_list") {
+			var columns = new Array("name", "created by","total emails","options");
+		} else if(type == "user_emails") {
+			var columns = new Array("email_address","total lists","options");
 		}
 		//Generate Columns
 		var thead = "<table id='setting_grid' class='table table-bordered table-hover table-condensed'><thead><tr>";

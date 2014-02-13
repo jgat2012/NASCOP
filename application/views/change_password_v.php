@@ -157,7 +157,7 @@
 	<form id="fmChangePassword" action="<?php echo base_url().'user_management/save_new_password/2'?>" method="post" class="well">
 	<legend>Change Password</legend>
 	<span class="message error" id="m_error_msg_change_pass"></span>
-	<div id="loadingDiv" style="display: none"><img style="width: 30px" src="<?php echo base_url().'Images/loading_spin.gif' ?>"></div>
+	<div id="loadingDiv" style="display: none"><img style="width: 30px" src="<?php echo base_url().'assets/img/loading_spin.gif' ?>"></div>
 	<br>
 	<br>
 	<table cellpadding="5">

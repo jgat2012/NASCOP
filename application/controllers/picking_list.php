@@ -8,6 +8,7 @@ class Picking_List extends MY_Controller {
 		$data['open_table'] = $this -> get_lists(0);
 		$data['closed_table'] = $this -> get_lists(1);
 		$data['assign_table'] = $this -> get_orders();
+		$data['mail_lists'] = $this -> getMailList();
 		$data['content_view'] = "picking_lists/picking_v";
 		$data['banner_text'] = "Picking Lists";
 		$this -> base_params($data);
@@ -92,7 +93,7 @@ class Picking_List extends MY_Controller {
 		if ($type == 0) {
 			$links = array("picking_list/view_orders" => "view orders", "picking_list/assign_orders" => "assign orders", "picking_list/update_list" => "update", "picking_list/close_list" => "close", "picking_list/delete_list" => "delete");
 		} else if ($type == 1) {
-			$links = array("picking_list/view_orders" => "view orders", "picking_list/print_list" => "print list","picking_list/mail_list" => "send list");
+			$links = array("picking_list/view_orders" => "view orders", "picking_list/print_list" => "print list", "picking_list/mail_list" => "send list");
 		}
 		return $this -> showTable($columns, $results, $links);
 	}
@@ -133,7 +134,7 @@ class Picking_List extends MY_Controller {
 		return $this -> showTable($columns, $results, $links);
 	}
 
-	public function generatePDF($data) {
+	public function generatePDF($data, $type = 0) {
 		$current_date = date("M d, Y");
 		$icon = site_url() . 'assets/img/coat_of_arms-resized.png';
 		$html_title = "<div style='width:100px; height:100px; margin:0 auto;'><img src='" . $icon . "' style='width:96px; height:96px;'></img></div>";
@@ -187,10 +188,14 @@ class Picking_List extends MY_Controller {
 		}
 
 		$this -> mpdf -> Output($report_name, 'F');
-		redirect($report_name);
+		if ($type == 0) {
+			redirect($report_name);
+		} else {
+			return $report_name;
+		}
 	}
 
-	public function print_list($list_id) {
+	public function print_list($list_id, $type = 0) {
 		//style
 		$data = "<style>
 					table.data-table {
@@ -232,8 +237,12 @@ class Picking_List extends MY_Controller {
 			}
 			$data .= '</tbody></table>';
 		}
-
-		$this -> generatePDF($data);
+		if ($type == 0) {
+			$this -> generatePDF($data, $type);
+		} else {
+			$file_name = $this -> generatePDF($data, $type);
+			return $file_name;
+		}
 	}
 
 	public function remove_order($cdrr_id) {
@@ -271,6 +280,8 @@ class Picking_List extends MY_Controller {
 					$link_values .= "<input type='checkbox' name='orders[]' value='" . $mydata['id'] . "'/>";
 				} else if ($link == "view commodities") {
 					$link_values .= "<a data-toggle='modal' href='#commodity_list' commodity_list_id='" . $mydata['id'] . "' class='commodity_list'>$link</a> | ";
+				} else if ($link == "send list") {
+					$link_values .= "<a data-toggle='modal' href='#email_list' picking_list_id='" . $mydata['id'] . "' class='mail_list'>$link</a> | ";
 				} else {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "'>$link</a> | ";
 				}
@@ -327,6 +338,87 @@ class Picking_List extends MY_Controller {
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		echo $this -> showTable($columns, $results);
+	}
+
+	public function getMailList() {
+		$options = '';
+		$lists = Mail_List::getAll();
+		foreach ($lists as $list) {
+			$options .= '<optgroup label="' . $list -> name . '">';
+			$emails = Mail_User::getMails($list -> id);
+			foreach ($emails as $email) {
+				$options .= '<option value="' . $email -> Email -> id . '"> ' . $email -> Email -> email_address . ' </option>';
+			}
+			$options .= '</optgroup>';
+		}
+		//others
+		$options .= '<optgroup label="Others">';
+		$sql = "SELECT ue.id,ue.email_address FROM user_emails ue WHERE ue.id NOT IN(SELECT email_id FROM mail_user WHERE list_id !='0')";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			foreach ($results as $email) {
+				$options .= '<option value="' . $email['id'] . '"> ' . $email['email_address'] . ' </option>';
+			}
+			$options .= '</optgroup>';
+		}
+		return $options;
+	}
+
+	public function send_list() {
+		$mail_list_id = $this -> input -> post("mail_list_id");
+		$mail_lists = $this -> input -> post("mail_list_holder");
+		$this -> session -> set_flashdata('list_message', "Mail Message Failed(no recipients)");
+		if ($mail_lists != null) {
+			//get the specific emails
+			$email_address = "";
+			$lists = explode(",", $mail_lists);
+			$lists = array_unique($lists);
+			foreach ($lists as $list) {
+				$mail = User_Emails::getMail($list);
+				$email_array[] = $mail['email_address'];
+			}
+			$email_address = implode(",", $email_array);
+
+			$file_name = $this -> print_list($mail_list_id, 1);
+			$email_user = stripslashes('webadt.chai@gmail.com');
+			$email_password = stripslashes('WebAdt_052013');
+			$subject = "NASCOP Picking List P-LIST#" . $mail_list_id;
+			$email_sender_title = "NASCOP SYSTEM";
+
+			$message = "Hello, <br/><br/>
+		                This Picking List was generated from the $email_sender_title </b><br/>
+						Please find the specific list attached.<br/><br/>
+						Regards,<br/>
+						$email_sender_title team.";
+
+			$config['mailtype'] = "html";
+			$config['protocol'] = 'smtp';
+			$config['smtp_host'] = 'ssl://smtp.googlemail.com';
+			$config['smtp_port'] = 465;
+			$config['smtp_user'] = $email_user;
+			$config['smtp_pass'] = $email_password;
+			ini_set("SMTP", "ssl://smtp.gmail.com");
+			ini_set("smtp_port", "465");
+
+			$this -> load -> library('email', $config);
+			$this -> email -> set_newline("\r\n");
+			$this -> email -> from('webadt.chai@gmail.com', $email_sender_title);
+			$this -> email -> to("$email_address");
+			$this -> email -> subject($subject);
+			$this -> email -> message($message);
+			$this -> email -> attach($file_name);
+
+			if ($this -> email -> send() && $email_address != "") {
+				$this -> email -> clear(TRUE);
+				$error_message = 'Mail Sent Successfully<br/>';
+			} else {
+				$error_message = $this -> email -> print_debugger();
+			}
+			$this -> session -> set_flashdata('list_message', $error_message);
+		}
+		redirect("picking_list");
+
 	}
 
 	public function base_params($data) {
