@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 class Order extends MY_Controller {
 	function __construct() {
 		parent::__construct();
