@@ -675,46 +675,6 @@ class Dashboard_Management extends MY_Controller {
 			$total_adults = $tot_adult_kemsa + $tot_adult_kp;
 			$total_paeds = $tot_paed_kemsa + $tot_paed_kp;
 			$grand_total = $total_adults + $total_paeds;
-			/*
-			 if($total_kemsa==0 && $total_kp==0){
-			 echo "<div style='text-align:center' class=''> No data reported yet for this period </div>";die();
-			 }
-			 $colors = array('#66aaf7','#f66c6f','#8bbc21','#910000','#1aadce','#492970','#f28f43','#77a1e5','#c42525','#a6c96a');
-
-			 $myData = array(
-			 array(
-			 'y'=>$total_kp,
-			 'color'=>$colors[1],
-			 'drilldown'=>array(
-			 'name'=>'Kenya Pharma Categories',
-			 'categories'=>array('Adults', 'Peads'),
-			 'data'=> array($tot_adult_kp,$tot_paed_kp),
-			 'color'=> $colors[0]
-			 )
-			 ),
-			 array(
-			 'y'=>$total_kemsa,
-			 'color'=>$colors[4],
-			 'drilldown'=>array(
-			 'name'=>'Kemsa Categories',
-			 'categories'=>array('Adults', 'Peads'),
-			 'data'=> array($tot_adult_kemsa,$tot_paed_kemsa),
-			 'color'=> $colors[6]
-			 )
-			 ),
-
-			 );
-
-			 $myData =json_encode($myData);
-			 //echo $myData;die();
-			 $categories = array('Kenya Pharma','Kemsa');
-			 $categories =json_encode($categories);
-
-			 $data['categories'] = $categories;
-			 $data['myData'] = $myData;
-			 //$this -> load -> view('dashboard/chart_report_pie_2l_v', $data);
-			 */
-
 			//Generate table for Number of Patients on ART
 			$tmpl = array('table_open' => '<table id="" class="table table-bordered table-striped dash_tables">');
 			$this -> table -> set_template($tmpl);
@@ -768,13 +728,15 @@ class Dashboard_Management extends MY_Controller {
 					$join2_kp = "SELECT mr.name as regimen_desc,test.total
                                 FROM escm_regimen mr
                                 LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total
+								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total,r.category_id
 								FROM escm_regimen r
 								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								WHERE (r.code NOT IN('AF1A','AF1B','AF2A','AF2B','AF3A','AF3B','AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
+								LEFT JOIN sync_category sc ON sc.id=r.category_id
+								WHERE sc.name LIKE '%Other Adult Regimen%'
+								AND mi.maps_id IN(SELECT maps_id FROM escm_maps)
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								WHERE mr.code NOT IN('AF1A','AF1B','AF2A','AF2B','AF3A','AF3B','AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
+								LEFT JOIN sync_category sc1 ON sc1.id=test.category_id
+								WHERE sc1.name LIKE '%Other Adult Regimen%'
 								GROUP BY mr.code";
 					$regimen_table = "escm_regimen";
 				}
@@ -782,7 +744,7 @@ class Dashboard_Management extends MY_Controller {
 
 				$regimen_lines['first_line'] = "WHERE r.code IN('AF1A','AF1B','AF2A','AF2B','AF3A','AF3B') GROUP BY r.code";
 				$regimen_lines['second_line'] = "WHERE r.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')";
-				$regimen_lines['other_lines'] = "WHERE r.code NOT IN('AF1A','AF1B','AF2A','AF2B','AF3A','AF3B','AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')";
+				$regimen_lines['other_lines'] = "LEFT JOIN sync_category sc ON sc.id=r.category_id WHERE sc.name LIKE '%Other Adult Regimen%'";
 
 				foreach ($regimen_lines as $index => $regimen_list) {
 					//Query to retrieve patients in this regimens
@@ -896,13 +858,15 @@ class Dashboard_Management extends MY_Controller {
 					$join2_kp = "SELECT mr.name as regimen_desc,test.total
                                 FROM escm_regimen mr
                                 LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total
+								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total,r.category_id
 								FROM escm_regimen r
 								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								WHERE (r.code NOT IN('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B','CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
+								LEFT JOIN sync_category sc ON sc.id=r.category_id
+								WHERE sc.name LIKE '%Other Paediatric ART Regimen%'
+								AND mi.maps_id IN(SELECT maps_id FROM escm_maps)
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								WHERE mr.code NOT IN('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B','CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
+								LEFT JOIN sync_category sc1 ON sc1.id=test.category_id
+								WHERE sc1.name LIKE '%Other Paediatric ART Regimen%'
 								GROUP BY mr.code";
 					$regimen_table = "escm_regimen";
 				}
@@ -910,7 +874,7 @@ class Dashboard_Management extends MY_Controller {
 
 				$regimen_lines['first_line'] = "WHERE r.code IN('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B') GROUP BY r.code";
 				$regimen_lines['second_line'] = "WHERE r.code IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')";
-				$regimen_lines['other_lines'] = "WHERE r.code NOT IN('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B','CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')";
+				$regimen_lines['other_lines'] = "LEFT JOIN sync_category sc ON sc.id=r.category_id WHERE sc.name LIKE '%Other Paediatric ART Regimen%'";
 
 				foreach ($regimen_lines as $index => $regimen_list) {
 					//Query to retrieve patients in this regimens
