@@ -452,6 +452,21 @@
 	});
 	
 	/*
+	 * Pipeline Upload
+	 */
+	$("#pu_menu").live("click",function(){
+		var check_login = "<?php echo $this->session->userdata("pipeline_logged_in")?>";
+   		if($.trim(check_login)==""){
+   			//$("#pipeline_login").modal("show");
+   		}
+   		else{
+   			
+   		}
+    });
+	
+	
+	
+	/*
 	 * Patient Analysis functions
 	 */
 	
@@ -527,6 +542,8 @@
 					"bServerSide" : false,
 			 });
 	       });
+	       
+	       
 	}
 	
 	/*
@@ -570,13 +587,14 @@
 		$('#chart_area_oa').load(order_analysis_link);
 	}
 </script>
+
 <div class="tabbable national_dashboard_content"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs " style="width:60%; float: left">
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
   	<li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
     <li id="ca_menu" class="main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
     <li id="ou_menu" class="main_menu"><a href="#tab7" data-toggle="tab">Orders Upload</a></li>
-    <li id="pu_menu" class="main_menu"><a href="#tab8" data-toggle="tab">Pipeline Upload</a></li>
+    <li id="pu_menu" class="main_menu"><a href="#tab8" id="pipeline_upload_link" data-toggle="tab">Pipeline Upload</a></li>
     
     <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
@@ -840,34 +858,8 @@
 		  </div>
 		</div>
     </div>
-    <!-- Order Analysis -->
-    <div class="tab-pane" id="tab4">
-      <div class="row-fluid">
-		  <div class="span12">
-		  	<div id="fa_menus" class="nd_menus">
-				<h3 class="font_responsive">
-					<select id="nd_oa_month" class="nd_month nd_input_small">
-						
-					</select>
-					<select id="nd_oa_year" class="nd_year nd_input_small">
-					</select> 
-					
-					<select id="nd_oa_pipeline" class="nd_pipeline nd_input_medium">
-						<?php //Load list of pipelines
-							foreach ($supporter as $value) {
-						?>
-						<option value="<?php echo $value['id']?>"><?php echo $value['Name']?></option>
-						<?php	
-							} 
-						?>
-					</select>
-					<button class="generate btn btn-warning nd_input_small order_analysis_btn" style="color:black" id="order_analysis_btn">Get</button>
-				</h3>
-			</div>
-			<div id="chart_area_oa" class="oa"></div>
-		  </div>
-	  </div>
-    </div>
+    
+    
     <div class="tab-pane nat_dashboard_rep" id="tab5">
     	<div class="three_block" id="patient_by_art">
     		<h3 class="dashboard_title">Current Patients By ART</h3>
@@ -900,6 +892,42 @@
     		<h3 class="dashboard_title">Patients Scale Up</h3>
     		
     	</div>
+    </div>
+    <!-- Pipelines Upload -->
+    <div class="tab-pane nat_dashboard_rep" id="tab8">
+    	<?php
+    	if(!$this->session->userdata("pipeline_logged_in")){
+    		$this ->load->view("dashboard/pipeline_login_v");
+    	}
+    	else{
+    		?>
+    	<div class="container" style="width: 40%">
+	    	<div class="row-fluid">
+	    		<div class="span12"><span >Welcome  <b><?php echo $this->session->userdata("pipeline_logged_in");?></b></span>, <?php echo anchor("user_management/logout/pipeline_logout","<i class='icon-off'></i>Logout");?></div>
+			</div>
+			<div class="row-fluid">
+	    		<div class="span12">	
+					<h3> Pipeline Upload</h3>
+					<?php echo form_open_multipart("order/import_order/pipeline_upload");?>
+					<input type="file" name="cms_file" id="cms_file" required="" accept="application/vnd.ms-excel" />
+					<div class="control-group">
+					    <div class="controls">
+					      <button type="submit" class="btn btn-primary"><i class="icon-upload"></i>Upload File</button>
+					    </div>
+					</div>
+					<?php echo form_close();?>
+				</div>
+			</div>
+			<div class="row-fluid">	
+				
+				<div class="span12">	
+					<h3>Central Medical Store and Pending Orders Template <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
+					<?php echo anchor("assets/template/pipeline_upload_template.xls","<i class='icon-download-alt'></i>Central Medical Store and Pending Orders Template");?>
+				</div>
+	    	</div>
+	    </div>	
+    	<?php
+    	}?>
     </div>
   </div>
 </div>

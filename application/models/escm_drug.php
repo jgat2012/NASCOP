@@ -1,5 +1,5 @@
 <?php
-class Sync_Drug extends Doctrine_Record {
+class Escm_Drug extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('name', 'varchar', 255);
@@ -15,37 +15,37 @@ class Sync_Drug extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('sync_drug');
+		$this -> setTableName('escm_drug');
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("*") -> from("sync_drug");
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_drug");
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug;
 	}
 
 	public function getAllSettings() {
-		$query = Doctrine_Query::create() -> select("name,abbreviation,strength,packsize,formulation,unit,weight") -> from("sync_drug");
+		$query = Doctrine_Query::create() -> select("name,abbreviation,strength,packsize,formulation,unit,weight") -> from("escm_drug");
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug;
 	}
 
 	public function getActive() {
 		$drug_name = "CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as name";
-		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("sync_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("category_id asc");
+		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("escm_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("category_id asc");
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug;
 	}
 
 	public function getActiveList() {
 		$drug_name = "CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as Drug,unit as Unit_Name,packsize as Pack_Size,category_id as Category";
-		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("sync_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("category_id asc");
+		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("escm_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("category_id asc");
 		$sync_drug = $query -> execute();
 		return $sync_drug;
 	}
 
 	public function getPackSize($id) {
-		$query = Doctrine_Query::create() -> select("packsize") -> from("sync_drug") -> where("id='$id'");
+		$query = Doctrine_Query::create() -> select("packsize") -> from("escm_drug") -> where("id='$id'");
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug[0];
 	}
@@ -61,7 +61,7 @@ class Sync_Drug extends Doctrine_Record {
 		if($pack_size!=''){
 			$and .= "AND packsize ='$pack_size' ";
 		}
-		$query = Doctrine_Query::create() -> select("id") -> from("sync_drug") -> where("name='$drug_name'  $and") ->limit('1');
+		$query = Doctrine_Query::create() -> select("id") -> from("escm_drug") -> where("name='$drug_name'  $and") ->limit('1');
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug;
 	}
