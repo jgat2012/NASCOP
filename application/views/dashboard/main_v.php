@@ -575,7 +575,8 @@
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
   	<li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
     <li id="ca_menu" class="main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
-    <li id="ca_menu" class="main_menu"><a href="#tab7" data-toggle="tab">Orders Upload</a></li>
+    <li id="ou_menu" class="main_menu"><a href="#tab7" data-toggle="tab">Orders Upload</a></li>
+    <li id="pu_menu" class="main_menu"><a href="#tab8" data-toggle="tab">Pipeline Upload</a></li>
     
     <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
