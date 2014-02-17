@@ -1,7 +1,7 @@
 <?php
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
-
+error_reporting(0);
 class Pharmacist_Management extends MY_Controller {
 
 	function __construct() {

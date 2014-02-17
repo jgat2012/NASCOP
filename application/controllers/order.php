@@ -1,4 +1,5 @@
 <?php
+error_reporting(0);
 class Order extends MY_Controller {
 	function __construct() {
 		parent::__construct();
@@ -72,6 +73,7 @@ class Order extends MY_Controller {
 		$data['order_array'] = $order_array;
 		$data['order_code'] = $order_array[0]['code'];
 
+		$data['amc'] = $this -> getAMC($order_array[0]['facility_id'], $order_array[0]['code'], $order_array[0]['period_begin']);
 		if ($order_array[0]['status_name'] == "received" || $order_array[0]['status_name'] == "rationalized") {
 			$data['option_links'] = "<li class='active'><a href='" . site_url("order/view_cdrr/" . $cdrr_id) . "'>view</a></li><li><a href='" . site_url("order/update_cdrr/" . $cdrr_id) . "'>update</a></li><li></li>";
 		} else {
@@ -854,9 +856,72 @@ class Order extends MY_Controller {
 			
 			
 		}
-		
-		
+		$main_array = array($main_array);
+		$this -> prepare_order($type, $main_array);
+		$content = "Order was successfully saved";
+
+		$dir = "Export";
+
+		/*Delete all files in export folder*/
+		if (is_dir($dir)) {
+			$files = scandir($dir);
+			foreach ($files as $object) {
+				if ($object != "." && $object != "..") {
+					unlink($dir . "/" . $object);
+				}
+			}
+		} else {
+			mkdir($dir);
+		}
+
+		//move the file
+		$file_location = $dir . "/" . $_FILES['file']['name'];
+		move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
+		//send excel file to email
+		$content .= $this -> send_file($file_location);
+
+		$this -> session -> set_flashdata('order_message', $content);
 		redirect("dashboard_management");
+	}
+
+	public function send_file($excel_file) {
+		$email_user = stripslashes('webadt.chai@gmail.com');
+		$email_password = stripslashes('WebAdt_052013');
+		$email_address = "kevomarete@gmail.com";
+		$subject = "NASCOP Order Upload";
+		$email_sender_title = "NASCOP SYSTEM";
+
+		$message = "Hello, <br/><br/>
+		                An order was just uploaded to the $email_sender_title </b><br/>
+						Please find the specific order attached.<br/><br/>
+						Regards,<br/>
+						$email_sender_title team.";
+
+		$config['mailtype'] = "html";
+		$config['protocol'] = 'smtp';
+		$config['smtp_host'] = 'ssl://smtp.googlemail.com';
+		$config['smtp_port'] = 465;
+		$config['smtp_user'] = $email_user;
+		$config['smtp_pass'] = $email_password;
+		ini_set("SMTP", "ssl://smtp.gmail.com");
+		ini_set("smtp_port", "465");
+
+		$this -> load -> library('email', $config);
+		$this -> email -> set_newline("\r\n");
+		$this -> email -> from('webadt.chai@gmail.com', $email_sender_title);
+		$this -> email -> to("$email_address");
+		$this -> email -> subject($subject);
+		$this -> email -> message($message);
+		$this -> email -> attach($excel_file);
+
+		if ($this -> email -> send()) {
+			$this -> email -> clear(TRUE);
+			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
+		} else {
+			$error_message = $this -> email -> print_debugger();
+		}
+
+		echo $error_message;
 	}
 
 	public function prepare_order($type = "cdrr", $responses = array()) {
@@ -1464,6 +1529,24 @@ class Order extends MY_Controller {
 			$query = $this -> db -> query($sql);
 		}
 		redirect("order");
+	}
+
+	public function getAMC($facility_id, $code, $period_begin = "") {
+		$earlier_begin = date('Y-m-d', strtotime($period_begin . "-3 months"));
+		$total = Cdrr::getAMC($facility_id, $code, $earlier_begin, $period_begin);
+		return $total;
+	}
+
+	public function authenticate_upload() {
+		$email_address = $this -> input -> post("email", TRUE);
+		$user = Sync_User::getUser($email_address);
+		if ($user) {
+			$this -> session -> set_userdata('upload_valid', $user['id']);
+		} else {
+			$this -> session -> set_flashdata('login_message', "Login Failed!");
+		}
+		redirect("dashboard_management");
+
 	}
 
 	public function base_params($data) {

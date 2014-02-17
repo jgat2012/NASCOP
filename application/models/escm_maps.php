@@ -3,6 +3,7 @@ class Escm_Maps extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('maps_id', 'int', 11);
+		$this -> hasColumn('escm_id', 'int', 11);
 	}
 
 	public function setUp() {
@@ -20,6 +21,12 @@ class Escm_Maps extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("*") -> from("escm_maps") -> where("maps_id='$maps_id'");
 		$maps = $query -> execute();
 		return $maps;
+	}
+
+	public function getEscm($escm_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_maps") -> where("escm_id='$escm_id'");
+		$maps = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $maps[0];
 	}
 
 }

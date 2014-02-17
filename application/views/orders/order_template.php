@@ -93,9 +93,13 @@
 						<th class="number">Quantity <br/>Received in this period</th>
 						<th class="number">End of Month Physical Count</th>
 						<th class="number">Reported Aggregated <br/>Quantity CONSUMED <br/>in the reporting period<br/> (Satellite sites plus <br/>Central site dispensing point where relevant)</th>
+						<th class="number">Average Monthly Consumption</th>
+						<th class="number">Average Monthly Issues</th>
 						<th class="number">Quantity required for RESUPPLY</th>
 					</tr>
 					<tr>
+						<th>In Packs</th>
+						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
@@ -107,6 +111,8 @@
 						<th>B</th>
 						<th>F</th>
 						<th>G</th>
+						<th></th>
+						<th></th>
 						<th>J</th>
 					</tr>
 			</thead>';	
@@ -117,11 +123,15 @@
 						<th class="number" rowspan="3">Unit Pack Size</th>
 						<th class="number">Beginning Balance</th>
 						<th class="number">Quantity <br/>Received in this period</th>
-						<th class="number">Quantity <br/>Received in this period</th>
+						<th class="number">Total Quantity Dispensed <br/>this period</th>
 						<th class="number">End of Month Physical Count</th>
+						<th class="number">Average Monthly Consumption</th>
+						<th class="number">Average Monthly Issues</th>
 						<th class="number">Quantity required for RESUPPLY</th>
 					</tr>
 					<tr>
+						<th>In Packs</th>
+						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
@@ -133,6 +143,8 @@
 						<th>B</th>
 						<th>C</th>
 						<th>F</th>
+						<th></th>
+						<th></th>
 						<th>J</th>
 					</tr>
 			</thead>';	
@@ -154,15 +166,15 @@
 			                   $counter = 0;
 			                   }
 							    if($commodity->Category==1 && $count_one==0){
-						  	  echo '<tr><td colspan="7" style="text-align:center;background:#999;">Adult Preparations</td></tr>';
+						  	  echo '<tr><td colspan="9" style="text-align:center;background:#999;">Adult Preparations</td></tr>';
 							  $count_one++;
 						  }	   
 						  if($commodity->Category==2 && $count_two==0){
-						  	  echo '<tr><td colspan="7" style="text-align:center;background:#999;">Pediatric Preparations</td></tr>';
+						  	  echo '<tr><td colspan="9" style="text-align:center;background:#999;">Pediatric Preparations</td></tr>';
 							  $count_two++;
 						  }
                           if($commodity->Category==3 && $count_three==0){
-						  	  echo '<tr><td colspan="7" style="text-align:center;background:#999;">Drugs for OIs</td></tr>';
+						  	  echo '<tr><td colspan="9" style="text-align:center;background:#999;">Drugs for OIs</td></tr>';
 							  $count_three++;
 						  }
 						 
@@ -174,12 +186,15 @@
 						<td class="number calc_count"><?php echo $commodity ->Pack_Size;?></td>
 						<td> <input name="opening_balance[]" id="opening_balance_<?php echo $commodity -> id;?>" type="text" class="opening_balance"/></td>
 						<td> <input name="quantity_received[]" id="received_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_received"/></td>
-						<td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
 						<?php if($order_code=="D-CDRR"){?>
+						<td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
 						<td> <input tabindex="-1" name="aggregated_qty[]" id="aggregated_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_qty"/></td>
 						<?php }else{?>
 							<td> <input tabindex="-1" name="quantity_dispensed_packs[]" id="dispensed_in_period_packs_<?php echo $commodity->id;?>" type="text" class="quantity_dispensed_packs"/></td>	
+						    <td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
 						<?php } ?>	
+						<td> <input tabindex="-1" name="avg_consumption[]" id="avg_consumption_<?php echo $commodity->id;?>" type="text" class="avg_consumption"/></td>
+						<td> <input tabindex="-1" name="avg_issues[]" id="avg_issues_<?php echo $commodity->id;?>" type="text" class="avg_issues"/></td>
 						<td> 
 							<input tabindex="-1" name="new_resupply[]" id="new_resupply_<?php echo $commodity -> id;?>" type="text" class="resupply"/>
 							<input tabindex="-1" name="resupply[]" id="resupply_<?php echo $commodity -> id;?>" class="resupply" type="hidden"/>
@@ -316,11 +331,12 @@
 	  });
 	  
 	     $(".delivery").click(function(){
+	     	/*
          	  var del_value=$("#delivery_note").val();
          	  if(del_value==""){
          	  	alert("Delivery Note is Blank");
          	  	return false;
-         	  }
+         	  }*/
          });
 	  
 	  <?php
@@ -341,6 +357,8 @@
 		  <?php }else{?>
 		  $("#dispensed_in_period_packs_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>");
 		  <?php }?>
+		  $("#avg_consumption_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['dispensed_packs']/$amc); ?>");
+		  $("#avg_issues_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['received']/$amc); ?>");
 		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		  $("#new_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		<?php	

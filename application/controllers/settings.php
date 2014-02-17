@@ -20,6 +20,8 @@ class settings extends MY_Controller {
 		$info_class = "<div class='alert alert-info'>";
 		$error_class = "<div class='alert alert-error'>";
 		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		$close_div = "</div>";
+
 		//Link array
 		$links = array();
 		$links['escm_drug'] = "drugs";
@@ -54,6 +56,76 @@ class settings extends MY_Controller {
 		$this -> session -> set_flashdata('alert_message', $content);
 	}
 
+	public function get_updates() {
+		ini_set("max_execution_time", "1000000");
+		$log = "";
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		$close_div = "</div>";
+
+		$curl = new Curl();
+		$url = $this -> esm_url;
+
+		$lists = Escm_Facility::getAllNotHydrated();
+		foreach ($lists as $list) {
+			$facility_id = $list -> id;
+			$links[] = "facility/" . $facility_id . "/cdrr";
+			$links[] = "facility/" . $facility_id . "/maps";
+		}
+
+		$username = "kevinmarete";
+		$password = "poltergeist";
+		$curl -> setBasicAuthentication($username, $password);
+		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
+		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
+
+		foreach ($links as $link) {
+			$target_url = $url . $link;
+			$curl -> get($target_url);
+			if ($curl -> error) {
+				$curl -> error_code;
+				$log = "Error: " . $curl -> error_code . "<br/>";
+			} else {
+				$main_array = json_decode($curl -> response, TRUE);
+				$clean_data = array();
+				foreach ($main_array as $main) {
+					if ($main['code'] == "D-CDRR" || $main['code'] == "F-CDRR_units" || $main['code'] == "F-CDRR_packs") {
+						$type = "cdrr";
+					} else {
+						$type = "maps";
+					}
+
+					$current_month_start = date('Y-m-01');
+					$current_month_end = date('Y-m-t');
+
+					$one_current_month_start = date('Y-m-d', strtotime($current_month_start . "-1 month"));
+					$one_current_month_end = date('Y-m-d', strtotime($current_month_end . "-1 month"));
+
+					$two_current_month_start = date('Y-m-d', strtotime($current_month_start . "-2 months"));
+					$two_current_month_end = date('Y-m-d', strtotime($current_month_end . "-2 months"));
+
+					$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
+					$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
+
+					if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start) {
+						if (is_array($main)) {
+							if (!empty($main)) {
+								$this -> extract_order($type, array($main), $main['id']);
+							}
+						}
+					}
+				}
+				$log = "Sync Complete";
+			}
+		}
+		$content = $info_class;
+		$content .= $close_btn_div;
+		$content .= $log;
+		$content .= $close_div;
+		$this -> session -> set_flashdata('alert_message', $content);
+	}
+
 	public function enable($type = "sync_drug", $id = null) {
 		$info_class = "<div class='alert alert-info'>";
 		$error_class = "<div class='alert alert-error'>";
@@ -66,6 +138,8 @@ class settings extends MY_Controller {
 				$columns = array("category_id" => 0);
 			} else if ($type == "sync_user") {
 				$columns = array("status" => "A");
+			} else if ($type == "mail_list" || $type == "user_emails") {
+				$columns = array("active" => "1");
 			}
 			$this -> db -> where('id', $id);
 			$this -> db -> update($type, $columns);
@@ -96,8 +170,8 @@ class settings extends MY_Controller {
 				$columns = array("category_id" => 14);
 			} else if ($type == "sync_regimen") {
 				$columns = array("category_id" => 15);
-			} else if ($type == "sync_user") {
-				$columns = array("status" => "N");
+			} else if ($type == "mail_list" || $type == "user_emails") {
+				$columns = array("active" => "0");
 			}
 			$this -> db -> where('id', $id);
 			$this -> db -> update($type, $columns);
@@ -128,6 +202,10 @@ class settings extends MY_Controller {
 			$columns = array("id", "code", "name", "description", "old_code", "category_id");
 		} else if ($type == "sync_user") {
 			$columns = array("s.id", "name", "email", "role", "username", "status", "facility");
+		} else if ($type == "mail_list") {
+			$columns = array("s.id", "s.name", "creator_id", "u.Name as creator", "COUNT(mu.id) as total_users", "s.active");
+		} else if ($type == "user_emails") {
+			$columns = array("s.id", "s.email_address", "COUNT(ml.id) as total_lists", "s.active");
 		}
 
 		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
@@ -174,13 +252,19 @@ class settings extends MY_Controller {
 		$this -> db -> from("$type s");
 		if ($type == "sync_user") {
 			$this -> db -> join("user_facilities uf", "uf.user_id=s.id", "left");
+		} else if ($type == "mail_list") {
+			$this -> db -> join("users u", "s.creator_id=u.id", "left");
+			$this -> db -> join("mail_user mu", "s.id=mu.list_id", "left");
+			$this -> db -> group_by("s.id");
+		} else if ($type == "user_emails") {
+			$this -> db -> join("mail_user mu", "s.id=mu.email_id", "left");
+			$this -> db -> join("mail_list ml", "mu.list_id=ml.id", "left");
+			$this -> db -> group_by("s.id");
 		}
 		$rResult = $this -> db -> get();
-
 		// Data set length after filtering
 		$this -> db -> select('FOUND_ROWS() AS found_rows');
 		$iFilteredTotal = $this -> db -> get() -> row() -> found_rows;
-
 		// Total data set length
 		$this -> db -> select("id");
 		$this -> db -> from("$type");
@@ -193,7 +277,7 @@ class settings extends MY_Controller {
 			$action_link = "delete";
 			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors") {
+				if ($i != "id" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
 					$myrow[] = $v;
 				} else {
 					if ($i == "id") {
@@ -210,7 +294,24 @@ class settings extends MY_Controller {
 				} else if ($type == "sync_regimen" && $i == "category_id" && $v == 15) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "mail_list" && $i == "active" && $v == 0) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "user_emails" && $i == "active" && $v == 0) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
 				}
+
+			}
+
+			if ($type == "user_emails") {
+				$lists = Mail_User::getLists($id);
+				$mylist = array();
+				foreach ($lists as $list) {
+					$mylist[] = $list['list_id'];
+				}
+				$mylist = implode(",", $mylist);
+				$row["mail_list"] = json_encode($mylist);
 			}
 			$links = "";
 			if ($action_link == "delete") {
@@ -243,6 +344,10 @@ class settings extends MY_Controller {
 			$inputs = array("code" => "code", "name" => "name", "description" => "description", "old_code" => "old_code");
 		} else if ($type == "sync_user") {
 			$inputs = array("name" => "name", "email" => "email", "role" => "role", "phone" => "username", "User Facilities" => "facilities");
+		} else if ($type == "mail_list") {
+			$inputs = array("List Name" => "name", " " => "creator_id");
+		} else if ($type == "user_emails") {
+			$inputs = array("Email Address" => "email_address", "Mailing List" => "mail_list");
 		}
 		foreach ($inputs as $text => $input) {
 			$content .= $group_div;
@@ -259,8 +364,14 @@ class settings extends MY_Controller {
 				$textfield .= "<option value='2'>ART Paeds</option>";
 				$textfield .= "<option value='3'>OI Drugs </option>";
 				$textfield .= "</select>";
+			} else if ($input == "name") {
+				$textfield = "<input type='text' required='required' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
 			} else if ($input == "username") {
 				$textfield = "<input type='text' id='" . $type . "_" . $input . "' name='" . $input . "' class='phone'/>";
+			} else if ($input == "creator_id") {
+				$textfield = "<input type='hidden' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
+			} else if ($input == "email_address") {
+				$textfield = "<input type='email' required='required' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
 			} else if ($input == "district_id") {
 				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
@@ -294,6 +405,13 @@ class settings extends MY_Controller {
 					$textfield .= "<option value='" . $facility['id'] . "'>" . " " . $facility['name'] . "</option>";
 				}
 				$textfield .= "</select><input type='hidden' id='" . $input . "_holder' name='" . $input . "_holder' />";
+			} else if ($input == "mail_list") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "[]' multiple='multiple' style='width:300px;'>";
+				$lists = Mail_List::getActive();
+				foreach ($lists as $list) {
+					$textfield .= "<option value='" . $list -> id . "'>" . " " . $list -> name . "</option>";
+				}
+				$textfield .= "</select><input type='hidden' id='" . $input . "_holder' name='" . $input . "_holder' />";
 			}
 			$content .= $textfield;
 			$content .= $close_div;
@@ -320,7 +438,12 @@ class settings extends MY_Controller {
 			$inputs = array("code" => "code", "name" => "name", "description" => "description");
 		} else if ($type == "sync_user") {
 			$inputs = array("name" => "name", "email" => "email", "role" => "role", "username" => "username", "facility_list" => "facilities_holder");
+		} else if ($type == "mail_list") {
+			$inputs = array("name" => "name", "creator_id" => "creator_id");
+		} else if ($type == "user_emails") {
+			$inputs = array("email_address" => "email_address", "mail_list" => "mail_list_holder");
 		}
+
 		foreach ($inputs as $index => $input) {
 			if ($index == "facility_list") {
 				if ($input == null) {
@@ -328,6 +451,15 @@ class settings extends MY_Controller {
 				} else {
 					$facility_list = json_encode($this -> input -> post($input));
 				}
+			} else if ($index == "mail_list") {
+				if ($input == null) {
+					$mail_list = "";
+				} else {
+					$mail_list = $this -> input -> post($input);
+					$mail_list = explode(",", $mail_list);
+				}
+			} else if ($index == "creator_id" && $id == null) {
+				$save_data[$index] = $this -> session -> userdata("user_id");
 			} else {
 				$save_data[$index] = $this -> input -> post($input);
 			}
@@ -340,6 +472,11 @@ class settings extends MY_Controller {
 			if ($type == "sync_user") {
 				$user_id = $this -> db -> insert_id();
 				$this -> db -> insert("user_facilities", array("user_id" => $user_id, "facility" => $facility_list));
+			} else if ($type == "user_emails") {
+				$email_id = $this -> db -> insert_id();
+				foreach ($mail_list as $mail) {
+					$this -> db -> insert("mail_user", array("email_id" => $user_id, "list_id" => $mail));
+				}
 			}
 		} else {
 			$this -> db -> where('id', $id);
@@ -355,6 +492,15 @@ class settings extends MY_Controller {
 				} else {
 					$this -> db -> insert("user_facilities", array("user_id" => $user_id, "facility" => $facility_list));
 				}
+			} else if ($type == "user_emails") {
+				$email_id = $id;
+				$sql = "DELETE FROM mail_user WHERE email_id='$email_id'";
+				$this -> db -> query($sql);
+				if (!empty($mail_list) || $mail_list !="") {
+					foreach ($mail_list as $mail) {
+						$this -> db -> insert("mail_user", array("email_id" => $email_id, "list_id" => $mail));
+					}
+				}
 			}
 		}
 
@@ -365,6 +511,328 @@ class settings extends MY_Controller {
 		$this -> session -> set_userdata("nav_link", $type);
 		redirect("settings");
 
+	}
+
+	public function extract_order($type = "cdrr", $responses = array(), $id = "") {
+		/*Steps
+		 * 1.Check if escm id is mapped to nascop id return mapped id or null if none
+		 * 2.Get nascop id if exits ad delete it from cdrr/maps
+		 * 3.Clean ids of array response
+		 * 4.a)If nascop id is not null Attach nascop id to id column as well as cdrr_id and maps_id
+		 *   b)if nascop is null save order as new and user last insert id as cdrr/maps id
+		 * 5.Map the escm_id to the nascop id
+		 */
+		if ($id != "") {
+			$escm_id = $id;
+			$nascop_id = $this -> check_map($escm_id, $type);
+			if ($nascop_id != null) {
+				$this -> delete_order($type, $nascop_id, 1);
+			}
+			$responses = $this -> clean_index($type, $responses);
+			$responses = array($responses);
+		}
+		$my_array = array();
+		if ($type == "cdrr") {
+			$cdrr = array();
+			$cdrr_items = array();
+			$cdrr_log = array();
+			$temp_items = array();
+			$temp_log = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownCdrr_item") {
+						$cdrr_items[$index] = $main;
+					} else if ($index == "ownCdrr_log") {
+						$cdrr_log[$index] = $main;
+					} else {
+						$cdrr[$index] = $main;
+					}
+				}
+			}
+			if ($nascop_id != null) {
+				$cdrr["id"] = $nascop_id;
+				$cdrr_id = $nascop_id;
+				//Insert the cdrr and use nascop id as cdrr id
+				$this -> db -> insert('cdrr', $cdrr);
+			} else {
+				//Insert the cdrr and retrieve the auto_id assigned to it,this will be the cdrr_id
+				$this -> db -> insert('cdrr', $cdrr);
+				$cdrr_id = $this -> db -> insert_id();
+			}
+			$this -> map_order($escm_id, $cdrr_id, $type);
+
+			//Loop through cdrr_log and add cdrr_id
+			foreach ($cdrr_log as $index => $my_log) {
+				foreach ($my_log as $counter => $log) {
+					foreach ($log as $ind => $lg) {
+						if ($ind == "cdrr_id") {
+							$temp_log[$counter]['cdrr_id'] = $cdrr_id;
+						} else {
+							$temp_log[$counter][$ind] = $lg;
+						}
+					}
+				}
+			}
+
+			$this -> db -> insert_batch('cdrr_log', $temp_log);
+
+			//Loop through cdrr_item and add cdrr_id
+			foreach ($cdrr_items as $index => $cdrr_item) {
+				foreach ($cdrr_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "cdrr_id") {
+							$temp_items[$counter]['cdrr_id'] = $cdrr_id;
+						} else {
+							$temp_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('cdrr_item', $temp_items);
+		} else if ($type == "maps") {
+			$maps = array();
+			$temp_items = array();
+			$temp_log = array();
+			$maps_log = array();
+			$maps_items = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownMaps_item") {
+						$temp_items['maps_item'] = $main;
+					} else if ($index == "ownMaps_log") {
+						$temp_log['maps_log'] = $main;
+					} else {
+						$maps[$index] = $main;
+					}
+				}
+			}
+
+			if ($nascop_id != null) {
+				$maps["id"] = $nascop_id;
+				$maps_id = $nascop_id;
+				//Insert the maps and use nascop id as maps id
+				$this -> db -> insert('maps', $maps);
+			} else {
+				//Insert the maps and retrieve the auto_id assigned to it,this will be the cdrr_id
+				$this -> db -> insert('maps', $maps);
+				$maps_id = $this -> db -> insert_id();
+			}
+			$this -> map_order($escm_id, $maps_id, $type);
+
+			//attach maps id to maps_log
+			foreach ($map_log as $index => $my_log) {
+				foreach ($my_log as $counter => $log) {
+					foreach ($log as $ind => $lg) {
+						if ($ind == "maps_id") {
+							$temp_log[$counter]['maps_id'] = $maps_id;
+						} else {
+							$temp_log[$counter][$ind] = $lg;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('maps_log', $maps_log);
+
+			//attach maps id to maps_item
+			foreach ($temp_items as $temp_item) {
+				foreach ($temp_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "maps_id") {
+							$maps_items[$counter]['maps_id'] = $maps_id;
+						} else {
+							$maps_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$this -> db -> insert_batch('maps_item', $maps_items);
+		}
+	}
+
+	public function clean_index($type = "cdrr", $responses = array()) {
+		$my_array = array();
+		if ($type == "cdrr") {
+			$cdrr = array();
+			$cdrr_items = array();
+			$cdrr_log = array();
+			$temp_items = array();
+			$temp_log = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownCdrr_item") {
+						$cdrr_items[$index] = $main;
+					} else if ($index == "ownCdrr_log") {
+						$cdrr_log[$index] = $main;
+					} else {
+						if ($index == "id") {
+							$cdrr[$index] = "";
+						} else {
+							$cdrr[$index] = $main;
+						}
+					}
+				}
+			}
+			$my_array = $cdrr;
+
+			//Loop through cdrr_item and add cdrr_id
+			foreach ($cdrr_items as $index => $cdrr_item) {
+				foreach ($cdrr_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "id") {
+							$temp_items[$counter]['id'] = "";
+						} else if ($ind == "cdrr_id") {
+							$temp_items[$counter]['cdrr_id'] = "";
+						} else {
+							$temp_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$my_array['ownCdrr_item'] = $temp_items;
+
+			//Loop through cdrr_log and add cdrr_id
+			foreach ($cdrr_log as $index => $my_log) {
+				foreach ($my_log as $counter => $log) {
+					foreach ($log as $ind => $lg) {
+						if ($ind == "id") {
+							$temp_log[$counter]['id'] = "";
+						} else if ($ind == "cdrr_id") {
+							$temp_log[$counter]['cdrr_id'] = "";
+						} else {
+							$temp_log[$counter][$ind] = $lg;
+						}
+					}
+				}
+			}
+			$my_array['ownCdrr_log'] = $temp_log;
+
+		} else if ($type == "maps") {
+			$map = array();
+			$map_items = array();
+			$map_log = array();
+			$temp_items = array();
+			$temp_log = array();
+			foreach ($responses as $response) {
+				foreach ($response as $index => $main) {
+					if ($index == "ownMaps_item") {
+						$map_items[$index] = $main;
+					} else if ($index == "ownMaps_log") {
+						$map_log[$index] = $main;
+					} else {
+						if ($index == "id") {
+							$map[$index] = "";
+						} else {
+							$map[$index] = $main;
+						}
+					}
+				}
+			}
+			$my_array = $map;
+
+			//Loop through cdrr_item and add cdrr_id
+			foreach ($map_items as $index => $map_item) {
+				foreach ($map_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "id") {
+							$temp_items[$counter]['id'] = "";
+						} else if ($ind == "maps_id") {
+							$temp_items[$counter]['maps_id'] = "";
+						} else {
+							$temp_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			$my_array['ownMaps_item'] = $temp_items;
+
+			//Loop through cdrr_log and add cdrr_id
+			foreach ($map_log as $index => $my_log) {
+				foreach ($my_log as $counter => $log) {
+					foreach ($log as $ind => $lg) {
+						if ($ind == "id") {
+							$temp_log[$counter]['id'] = "";
+						} else if ($ind == "maps_id") {
+							$temp_log[$counter]['maps_id'] = "";
+						} else {
+							$temp_log[$counter][$ind] = $lg;
+						}
+					}
+				}
+			}
+			$my_array['ownMaps_log'] = $temp_log;
+		}
+		return $my_array;
+	}
+
+	public function check_map($escm_id, $type = "cdrr") {
+		$return_column = "";
+		if ($type == "cdrr") {
+			$order = Escm_Orders::getEscm($escm_id);
+			$return_column = "cdrr_id";
+		} else if ($type == "maps") {
+			$order = Escm_Maps::getEscm($escm_id);
+			$return_column = "maps_id";
+		}
+
+		if ($order) {
+			return $order[$return_column];
+		}
+		return null;
+	}
+
+	public function map_order($escm_id = "", $nascop_id = "", $type = "cdrr") {
+		if ($type == "cdrr") {
+			$sql = "DELETE FROM escm_orders WHERE cdrr_id='$nascop_id'";
+			$this -> db -> query($sql);
+			$order = new Escm_Orders();
+			$order -> cdrr_id = $nascop_id;
+		} else if ($type == "maps") {
+			$sql = "DELETE FROM escm_maps WHERE maps_id='$nascop_id'";
+			$this -> db -> query($sql);
+			$order = new Escm_Maps();
+			$order -> maps_id = $nascop_id;
+		}
+		$order -> escm_id = $escm_id;
+		$order -> save();
+
+	}
+
+	public function delete_order($type = "cdrr", $id, $mission = 0) {
+		$sql = "SELECT status FROM $type WHERE id='$id'";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			$status = $results[0]['status'];
+			if (($status != "approved" || $mission == 1)) {
+				$sql_array = array();
+				if ($type == "cdrr") {
+					$this -> session -> set_userdata("order_go_back", "cdrr");
+					$sql_array[] = "DELETE FROM cdrr where id='$id'";
+					$sql_array[] = "DELETE FROM cdrr_item where cdrr_id='$id'";
+					$sql_array[] = "DELETE FROM cdrr_log where cdrr_id='$id'";
+				} else if ($type == "maps") {
+					$this -> session -> set_userdata("order_go_back", "maps");
+					$sql_array[] = "DELETE FROM maps where id='$id'";
+					$sql_array[] = "DELETE FROM maps_item where maps_id='$id'";
+					$sql_array[] = "DELETE FROM maps_log where maps_id='$id'";
+				}
+				foreach ($sql_array as $sql) {
+					$query = $this -> db -> query($sql);
+				}
+				if ($mission == 0) {
+					$this -> session -> set_flashdata("order_delete", $type . " was deleted successfully.");
+				}
+			} else {
+				if ($mission == 0) {
+					$this -> session -> set_flashdata("order_delete", $type . " delete failed!");
+				}
+			}
+		} else {
+			$this -> session -> set_flashdata("order_delete", $type . " not found!");
+		}
+		if ($mission == 0) {
+			redirect("order");
+		}
 	}
 
 	public function base_params($data) {
