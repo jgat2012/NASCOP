@@ -536,7 +536,8 @@
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
   	<li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
     <li id="ca_menu" class="main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
-    <li id="ca_menu" class="main_menu"><a href="#tab7" data-toggle="tab">Orders Upload</a></li>
+    <li id="ca_menu" class="main_menu"><a href="#tab8" data-toggle="tab">EID Analysis</a></li>
+    <li id="ca_menu" class="main_menu"><a href="#tab7" data-toggle="tab">Upload</a></li>
     
     <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
@@ -633,6 +634,14 @@
 								<div class="input-group">
 									<span class="input-group-addon"><i class="fa fa-user"></i></span>
 									<?php echo form_input(array('type' => 'email', 'name' => 'email', 'required' => 'required', 'id' => 'email', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => 'mail@yourmail.com'));?>
+								</div>
+			                    </div>
+			                    <div class="item">
+								<?php echo form_error('password', '<div class="error_message">', '</div>');?>
+								<?php echo form_label('Password:', 'password');?>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-key"></i></span>
+									<?php echo form_password(array('name' => 'password', 'required' => 'required', 'id' => 'password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
 								</div>
 			                    </div>
 	                        	<div style="margin-top:1em;">

@@ -16,7 +16,7 @@
 					<a href="#" class="setting_link" id="sync_drug">DRUGS</a>
 				</li>
 				<li>
-					<a href="#" class="setting_link" id="sync_facility">FACILITIES</a>
+					<a href="#" class="setting_link" id="sync_facility">KEMSA FACILITIES</a>
 				</li>
 				<li>
 					<a href="#" class="setting_link" id="sync_regimen">REGIMENS</a>
@@ -39,6 +39,25 @@
 				</li>
 				<li>
 					<a href="#" id="order_sync" class="api_sync">eSCM Orders</a>
+				</li>
+				<li class="divider"></li>
+				<li class="nav-header">
+					COMMON SETTINGS
+				</li>
+				<li class="active">
+					<a href="#" class="setting_link" id="sync_drugy">DRUGS</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="sync_regimen">DRUG CATEGORIES</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="sync_facility">FACILITIES</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="sync_regimen">REGIMENS</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="sync_regimen">REGIMEN CATEGORIES</a>
 				</li>
 			</ul>
 		</div>
