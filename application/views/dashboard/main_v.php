@@ -538,7 +538,7 @@
 	
 </script>
 
-<div class="tabbable national_dashboard_content" style="margin-top:2%"> <!-- Only required for left/right tabs -->
+<div class="tabbable national_dashboard_content" style="margin-top:1%"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs " style="width:60%; float: left">
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
   	<li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
