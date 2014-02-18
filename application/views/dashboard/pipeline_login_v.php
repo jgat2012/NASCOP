@@ -36,10 +36,7 @@
 
 <script>
 	$(document).ready(function(){
-		var check_login = "<?php echo $this->session->flashdata("pipeline_upload")?>";
-		if($.trim(check_login)!=1){
-			$("#tab5").hide();
-		}
+		
 		$("#btn_login_pipeline").live("click",function(){
 			var username =$.trim($("#p_username").val());
 			var password = $.trim($('#p_password').val());
@@ -69,7 +66,7 @@
 						$(".msg_info").text("Your username and/or password are invalid !");
 					}
 					else{
-						
+						location.reload();
 					}
 					
 				});

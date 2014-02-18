@@ -356,7 +356,7 @@ class User_Management extends MY_Controller {
 		}
 		else{
 			$this ->session->set_userdata("pipeline_logged_in",$username);
-			$this ->session->set_flashdata("pipeline_upload",1);
+			$this ->session->set_userdata("pipeline_upload",1);
 			$data['invalid'] = false;
 			echo json_encode($data);
 		}

@@ -8,6 +8,17 @@
 </style>
 <script type="text/javascript">
 	$(document).ready(function(){
+		//If pipeline has just logged in, display pipeline upload page
+		var check_login = "<?php echo $this->session->userdata("pipeline_upload")?>";
+		if($.trim(check_login)==1){
+			$("#tab5").hide();
+			$("#tab8").show();
+			$("#pu_menu").addClass("active");
+			$("#ra_menu").removeClass("active");
+			"<?php echo $this->session->unset_userdata("pipeline_upload")?>";
+		}
+		
+		
 		  $(".order_link").click(function() {
 			var upload_type = $(this).attr("order_type");
 			$("#modal_header").text(upload_type);
@@ -157,37 +168,6 @@
 		 	
 		 });
 		 
-		 //Generate chart for facility analysis by clicking get button
-		 $(".facility_analysis_btn").click(function(){
-		 	var id=$(this).attr("id");
-		 	var year=$("#nd_fa_year").val();
-		 	var month=$("#nd_fa_month").val();
-		 	var pipeline=$("#nd_fa_pipeline").val();
-		 	//Check which button was clicked
-		 	if(id=="orderingsite_l_btn"){
-		 		ordering_site_summary(year,month,pipeline);
-		 		
-		 	}
-		 	else if(id=="orderingsite_s_btn"){
-		 		ordering_site_summary(year,month,pipeline);
-		 	}
-		 	else if(id=="servicepoint_l_btn"){
-		 		service_point_summary(year,month,pipeline);
-		 	}
-		 	else if(id=="servicepoint_s_btn"){
-		 		service_point_summary(year,month,pipeline);
-		 	}
-		 	
-		 });
-		 
-		 //Order Analysis
-		 $(".order_analysis_btn").click(function(){
-		 	var id=$(this).attr("id");
-		 	var year=$("#nd_oa_year").val();
-		 	var month=$("#nd_oa_month").val();
-		 	var pipeline=$("#nd_oa_pipeline").val();
-		 	order_analysis(year,month,pipeline);
-		 });
 		 
 		  /*
 		  * Click get button to generate charts end -----------------------------------
@@ -454,18 +434,22 @@
 	/*
 	 * Pipeline Upload
 	 */
-	$("#pu_menu").live("click",function(){
-		var check_login = "<?php echo $this->session->userdata("pipeline_logged_in")?>";
-   		if($.trim(check_login)==""){
-   			//$("#pipeline_login").modal("show");
-   		}
-   		else{
-   			
-   		}
+	//check which menu is clicked
+	$(".main_menu").live("click",function(){
+		var id = $(this).attr("id");
+		if(id=="pu_menu"){
+			$("#tab5").hide();
+			$("#tab8").show();
+		}
+		else if(id=="ra_menu"){
+			$("#tab8").hide();
+			$("#tab5").show();
+		}
+		else{//Hide reporting analysis and pipeline upload tab
+			$("#tab5").hide();
+			$("#tab8").hide();
+		}
     });
-	
-	
-	
 	/*
 	 * Patient Analysis functions
 	 */
@@ -552,40 +536,6 @@
 	
 	
 	
-	/*
-	 * Facility Analysis functions
-	 */
-	function ordering_site_list(year,month,pipeline){
-		var facility_analysis_link="<?php echo base_url().'national_management/fa_ordering_sites_list/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_fa').load(facility_analysis_link);
-	}
-	function ordering_site_summary(year,month,pipeline){
-		$(".os").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var facility_analysis_link="<?php echo base_url().'national_management/fa_ordering_sites_summary/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_fa_sum').load(facility_analysis_link,function(){
-			ordering_site_list(year,month,pipeline);
-		});
-	}
-	function service_point_list(year,month,pipeline){
-		var facility_analysis_link="<?php echo base_url().'national_management/fa_service_points_list/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_fa').load(facility_analysis_link);
-	}
-	function service_point_summary(year,month,pipeline){
-		$(".os").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var facility_analysis_link="<?php echo base_url().'national_management/fa_service_points_summary/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_fa_sum').load(facility_analysis_link,function(){
-			service_point_list(year,month,pipeline);
-		});
-	}
-	
-	/*
-	 * Order Analysis
-	 */
-	function order_analysis(year,month,pipeline){
-		$(".oa").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-		var order_analysis_link="<?php echo base_url().'national_management/oa_orders_by_commodity/';?>"+year+'/'+month+'/'+pipeline;
-		$('#chart_area_oa').load(order_analysis_link);
-	}
 </script>
 
 <div class="tabbable national_dashboard_content"> <!-- Only required for left/right tabs -->

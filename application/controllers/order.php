@@ -794,7 +794,7 @@ class Order extends MY_Controller {
 			$content = "Order was successfully saved";
 			$this -> session -> set_flashdata('order_message', $content);
 		}
-		else if($type=="pipeline_upload"){
+		else if($type=="pipeline_upload"){//Upload Central medical stores and pending orders data
 			$this -> load -> library('PHPExcel');
 			$objReader = new PHPExcel_Reader_Excel5();
 			if ($_FILES['cms_file']['tmp_name']) {
@@ -829,16 +829,17 @@ class Order extends MY_Controller {
 					//get drug details
 					$drug = $arr[$x]["A"];
 					$drug_array = explode("-", $drug);
-					$drug_name = $drug_array[0];
-					$drug_abbrev = $drug_array[1];
-					$drug_strength = $drug_array[2];
-					echo $drug_name." : ".$drug_abbrev."(".$drug_strength.")<br>";
-					if(isset($drug_abbrev[3])){
-						$drug_packsize = $drug_abbrev[3];
+					$drug_name = trim($drug_array[0]);
+					$drug_abbrev = trim($drug_array[1]);
+					$drug_strength = trim($drug_array[2]);
+					
+					if(isset($drug_abbrev[3]) and $drug_abbrev[3]!=null){
+						$drug_packsize = trim($drug_array[3]);
 					}
 					else{
 						$drug_packsize = "";
 					}
+					echo $drug_name." : ".$drug_abbrev."(".$drug_strength.")".$drug_packsize."<br>";
 					//Get drugs ids
 					if(strtolower($pipeline)=="kemsa"){
 						$drug_id = sync_drug::getDrugId($drug_name,$drug_abbrev,$drug_strength,$drug_packsize);
