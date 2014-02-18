@@ -792,7 +792,29 @@ class Order extends MY_Controller {
 			$main_array = array($main_array);
 			$this -> prepare_order($type, $main_array);
 			$content = "Order was successfully saved";
+	
+			$dir = "Export";
+	
+			/*Delete all files in export folder*/
+			if (is_dir($dir)) {
+				$files = scandir($dir);
+				foreach ($files as $object) {
+					if ($object != "." && $object != "..") {
+						unlink($dir . "/" . $object);
+					}
+				}
+			} else {
+				mkdir($dir);
+			}
+	
+			//move the file
+			$file_location = $dir . "/" . $_FILES['file']['name'];
+			move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
+			//send excel file to email
+			$content .= $this -> send_file($file_location);
+	
 			$this -> session -> set_flashdata('order_message', $content);
+			redirect("dashboard_management");
 		}
 		else if($type=="pipeline_upload"){//Upload Central medical stores and pending orders data
 			$this -> load -> library('PHPExcel');
@@ -811,9 +833,11 @@ class Order extends MY_Controller {
 	
 			$period = $arr[2]['C'];
 			$period = trim($period);
+			$period = date("Y-m-01",strtotime($period));
 			$pipeline = $arr[3]['C'];
 			$pipeline = trim($pipeline);
-			
+			$data = array();
+			$z = 0;
 			//Check if period and pipeline are entered
 			if($period=="" || $pipeline ==""){
 				$this -> session -> set_flashdata('order_message', "Please make sure you fill the period and the pipeline name!");
@@ -825,6 +849,11 @@ class Order extends MY_Controller {
 				$text = $arr[2]['A'];
 				$x = 7;
 				$y = $highestRow;
+				$sql = "";
+				$pipeline = strtolower($pipeline);
+				if($pipeline=="kenya pharma"){
+					$pipeline ="kp";
+				}
 				while ($x <= $y) {
 					//get drug details
 					$drug = $arr[$x]["A"];
@@ -839,7 +868,7 @@ class Order extends MY_Controller {
 					else{
 						$drug_packsize = "";
 					}
-					echo $drug_name." : ".$drug_abbrev."(".$drug_strength.")".$drug_packsize."<br>";
+					//echo $drug_name." : ".$drug_abbrev."(".$drug_strength.")".$drug_packsize."<br>";
 					//Get drugs ids
 					if(strtolower($pipeline)=="kemsa"){
 						$drug_id = sync_drug::getDrugId($drug_name,$drug_abbrev,$drug_strength,$drug_packsize);
@@ -848,41 +877,44 @@ class Order extends MY_Controller {
 						$drug_id = escm_drug::getDrugId($drug_name,$drug_abbrev,$drug_strength,$drug_packsize);
 					}
 					
-					echo var_dump($drug_id)."<br>";
+					//echo var_dump($drug_id)."<br>";
+					if($drug_id!=""){
+						$drug_id= $drug_id[0]['id'];
+						$cms = $arr[$x]["B"];
+						$pending = $arr[$x]["C"];
+						//echo $cms.'<br>';
+						if(trim($cms)!="" or trim($pending)!=""){//Only populate if cms or pending has data
+							$data[$z] = array(
+									"cms"=>"$cms",
+									"pending"=>"$pending",
+									"period_begin" =>"$period",
+									"pipeline" =>"$pipeline",
+									"drug_id" =>"$drug_id"
+									); 
+							$z++;
+						}
+						
+					}
+					
 					
 					$x++;
+					
 				}
+				//die();
+				//Run batch
+				if($data[0]!=""){
+					$query = $this->db->insert_batch('facility_soh', $data); 
+				}
+				$this -> session -> set_flashdata('order_message', "You data have been successfully imported!");
+				$this -> session -> set_flashdata('pipeline_upload', 1);
+				redirect("dashboard_management");
 				die();
+				
 			}
 			
 			
 		}
-		$main_array = array($main_array);
-		$this -> prepare_order($type, $main_array);
-		$content = "Order was successfully saved";
-
-		$dir = "Export";
-
-		/*Delete all files in export folder*/
-		if (is_dir($dir)) {
-			$files = scandir($dir);
-			foreach ($files as $object) {
-				if ($object != "." && $object != "..") {
-					unlink($dir . "/" . $object);
-				}
-			}
-		} else {
-			mkdir($dir);
-		}
-
-		//move the file
-		$file_location = $dir . "/" . $_FILES['file']['name'];
-		move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
-		//send excel file to email
-		$content .= $this -> send_file($file_location);
-
-		$this -> session -> set_flashdata('order_message', $content);
-		redirect("dashboard_management");
+		
 	}
 
 	public function send_file($excel_file) {
