@@ -30,10 +30,16 @@ class Users extends Doctrine_Record {
 		$this -> _set('Password', md5($value));
 	}
 
-	public function login($username, $password) {
-
-		$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("Username = '" . $username . "' or Email_Address='" . $username . "' or Phone_Number='" . $username . "'");
-
+	public function login($username, $password,$type = "") {
+		if($type==""){
+			$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("Username = '" . $username . "' or Email_Address='" . $username . "' or Phone_Number='" . $username . "'");
+			
+		}
+		else{
+			$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("Username = '" . $username . "' or Email_Address='" . $username . "' or Phone_Number='" . $username . "'");
+			
+		}
+		
 		$user = $query -> fetchOne();
 		if ($user) {
 

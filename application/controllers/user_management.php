@@ -38,6 +38,11 @@ class User_Management extends MY_Controller {
 			$users = Users::getAll();
 
 		}
+		else if($access_level == "nascop_administrator"){
+			$user_type = "indicator='nascop_pharmacist' or indicator='pipeline_user'";
+			$facilities = Facilities::getAll();
+			$users = Users::getAll();
+		}
 		//If user is a facility admin, allow him to add only facilty users
 		else if ($access_level == "facility_administrator") {
 			$facility_code = $this -> session -> userdata('facility');
@@ -339,6 +344,25 @@ class User_Management extends MY_Controller {
 		}
 	}
 
+	public function authenticate_pipeline(){
+		$username = $this ->input->post("username");
+		$password = $this ->input->post("password");
+		$key = $this -> encrypt -> get_key();
+		$encrypted_password = $key . $password;
+		$logged_in = Users::login($username, $encrypted_password);
+		if ($logged_in == false) {
+			$data['invalid'] = true;
+			echo json_encode($data);
+		}
+		else{
+			$this ->session->set_userdata("pipeline_logged_in",$username);
+			$this ->session->set_userdata("pipeline_upload",1);
+			$data['invalid'] = false;
+			echo json_encode($data);
+		}
+		
+	}
+
 	private function _submit_validate() {
 		// validation rules
 		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|min_length[4]|max_length[30]');
@@ -456,10 +480,16 @@ class User_Management extends MY_Controller {
 		$last_id = Access_Log::getLastUser($this -> session -> userdata('user_id'));
 		$this -> db -> where('id', $last_id);
 		$this -> db -> update("access_log", array('access_type' => "Logout", 'end_time' => date("Y-m-d H:i:s")));
-		$this -> session -> sess_destroy();
+		if($param=="pipeline_logout"){
+			$this -> session -> unset_userdata('pipeline_logged_in');
+		}
+		else if($param==""){
+			$this -> session -> sess_destroy();
+		}
 		if ($param == "2") {
 			delete_cookie("nascop_actual_page");
 		}
+		
 		redirect("system_management");
 	}
 

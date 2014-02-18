@@ -404,388 +404,458 @@ class Order extends MY_Controller {
 		redirect("order");
 	}
 
-	public function import_order() {
-		$code = $this -> input -> post("upload_type");
-		$status = "approved";
-
-		if ($code == "D-CDRR") {
-			$status_code = 0;
-			$resupply = "N";
-		} else if ($code == "F-CDRR_packs") {
-			$status_code = 3;
-			$resupply = "M";
-		} else if ($code == "D-MAPS") {
-			$status_code = 0;
-		} else if ($code == "F-MAPS") {
-			$status_code = 3;
-		}
-
-		$this -> load -> library('PHPExcel');
-		$objReader = new PHPExcel_Reader_Excel5();
-		if ($_FILES['file']['tmp_name']) {
-			$objPHPExcel = $objReader -> load($_FILES['file']['tmp_name']);
-		} else {
-			redirect("order");
-		}
-
-		$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
-		$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
-		$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
-
-		$text = $arr[2]['A'];
-
-		$file_type = $this -> checkFileType($code, $text);
-		if ($file_type == false) {
-			$this -> session -> set_flashdata('order_message', "Incorrect File Selected");
-			redirect("dashboard_management");
-		}
-
-		if ($code == "D-CDRR" || $code == "F-CDRR_packs") {
-			$first_row = 4;
-			$facility_name = trim($arr[$first_row]['C'] . $arr[$first_row]['D'] . $arr[$first_row]['E']);
-			$facility_code = trim($arr[$first_row]['G'] . $arr[$first_row]['H'] . $arr[$first_row]['I']);
-
-			$second_row = 5;
-			$province = trim($arr[$second_row]['C'] . $arr[$second_row]['D'] . $arr[$second_row]['E']);
-			$district = trim($arr[$second_row]['G'] . $arr[$second_row]['H'] . $arr[$second_row]['I']);
-
-			$third_row = 7;
-			$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
-			$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
-
-			if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
-				$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
+	public function import_order($type ="") {
+		
+		if($type==""){
+			$code = $this -> input -> post("upload_type");
+			$status = "approved";
+	
+			if ($code == "D-CDRR") {
+				$status_code = 0;
+				$resupply = "N";
+			} else if ($code == "F-CDRR_packs") {
+				$status_code = 3;
+				$resupply = "M";
+			} else if ($code == "D-MAPS") {
+				$status_code = 0;
+			} else if ($code == "F-MAPS") {
+				$status_code = 3;
+			}
+	
+			$this -> load -> library('PHPExcel');
+			$objReader = new PHPExcel_Reader_Excel5();
+			if ($_FILES['file']['tmp_name']) {
+				$objPHPExcel = $objReader -> load($_FILES['file']['tmp_name']);
+			} else {
 				redirect("order");
 			}
-
-			$fourth_row = 9;
-			$sponsor_gok = trim($arr[$fourth_row]['D']);
-			$sponsor_pepfar = trim($arr[$fourth_row]['F']);
-			$sponsor_msf = trim($arr[$fourth_row]['H']);
-			if ($sponsor_gok) {
-				$sponsors = "GOK";
-			}
-			if ($sponsor_pepfar) {
-				$sponsors = "PEPFAR";
-			}
-			if ($sponsor_msf) {
-				$sponsors = "MSF";
-			}
-
-			$fifth_row = 11;
-			$service = array();
-			$service_art = trim($arr[$fifth_row]['D']);
-			$service_pmtct = trim($arr[$fifth_row]['F']);
-			$service_pep = trim($arr[$fifth_row]['H']);
-			if ($service_art) {
-				$service[] = "ART";
-			}
-			if ($service_pmtct) {
-				$service[] = "PMTCT";
-			}
-			if ($service_pep) {
-				$service[] = "PEP";
-			}
-
-			$services = implode(",", $service);
-
-			$seventh_row = 95;
-
-			$comments = trim($arr[$seventh_row]['A']);
-			$comments .= trim($arr[$seventh_row]['B']);
-			$comments .= trim($arr[$seventh_row]['C']);
-			$comments .= trim($arr[$seventh_row]['D']);
-			$comments .= trim($arr[$seventh_row]['E']);
-			$comments .= trim($arr[$seventh_row]['F']);
-			$comments .= trim($arr[$seventh_row]['G']);
-			$comments .= trim($arr[$seventh_row]['H']);
-			$comments .= trim($arr[$seventh_row]['I']);
-			$comments .= trim($arr[$seventh_row]['J']);
-			$comments .= trim($arr[$seventh_row]['K']);
-			$comments .= trim($arr[$seventh_row]['L']);
-
-			$main_array = array();
-			$main_array['id'] = "";
-			$main_array['status'] = $status;
-			$main_array['created'] = date('Y-m-d H:i:s');
-			$main_array['updated'] = "";
-			$main_array['code'] = $code;
-			$main_array['period_begin'] = $period_begin;
-			$main_array['period_end'] = $period_end;
-			$main_array['comments'] = $comments;
-			$main_array['reports_expected'] = null;
-			$main_array['reports_actual'] = null;
-			$main_array['services'] = $services;
-			$main_array['sponsors'] = $sponsors;
-			$main_array['non_arv'] = 0;
-			$main_array['delivery_note'] = null;
-			$main_array['order_id'] = 0;
-			$facilities = Sync_Facility::getId($facility_code, $status_code);
-			if ($facilities == "") {
+	
+			$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
+			$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
+			$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
+	
+			$text = $arr[2]['A'];
+	
+			$file_type = $this -> checkFileType($code, $text);
+			if ($file_type == false) {
+				$this -> session -> set_flashdata('order_message', "Incorrect File Selected");
 				redirect("dashboard_management");
 			}
-			$main_array['facility_id'] = $facilities['id'];
-			$facility_id = $facilities['id'];
-
-			$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
-			if ($duplicate == true) {
-				$this -> session -> set_flashdata('order_message', "An cdrr report already exists for this month !");
-				redirect("dashboard_management");
-			}
-
-			$sixth_row = 18;
-			$cdrr_array = array();
-			$commodity_counter = 0;
-
-			for ($i = $sixth_row; $sixth_row, $i <= 89; $i++) {
-				if ($i != 34 || $i != 57) {
-					if (trim($arr[$i][$resupply]) != 0) {
-						$drug_name = trim($arr[$i]['A']);
-						$pack_size = trim($arr[$i]['B']);
-						$commodity = $this -> getMappedDrug($drug_name, $pack_size);
-						if ($commodity != null) {
-							$cdrr_array[$commodity_counter]['id'] = "";
-							if ($code == "D-CDRR") {
-								$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
-								$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
-								$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@trim($arr[$i]['E']) * @$pack_size);
-								$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['E']);
-								$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['F']);
-								$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['G']);
-								$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['H']);
-								$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['K']);
-								$expiry_date = trim($arr[$i]['L']);
-								if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
-									$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
-								} else {
-									$cdrr_array[$commodity_counter]['expiry_date'] = "";
+	
+			if ($code == "D-CDRR" || $code == "F-CDRR_packs") {
+				$first_row = 4;
+				$facility_name = trim($arr[$first_row]['C'] . $arr[$first_row]['D'] . $arr[$first_row]['E']);
+				$facility_code = trim($arr[$first_row]['G'] . $arr[$first_row]['H'] . $arr[$first_row]['I']);
+	
+				$second_row = 5;
+				$province = trim($arr[$second_row]['C'] . $arr[$second_row]['D'] . $arr[$second_row]['E']);
+				$district = trim($arr[$second_row]['G'] . $arr[$second_row]['H'] . $arr[$second_row]['I']);
+	
+				$third_row = 7;
+				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
+				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
+	
+				if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
+					$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
+					redirect("order");
+				}
+	
+				$fourth_row = 9;
+				$sponsor_gok = trim($arr[$fourth_row]['D']);
+				$sponsor_pepfar = trim($arr[$fourth_row]['F']);
+				$sponsor_msf = trim($arr[$fourth_row]['H']);
+				if ($sponsor_gok) {
+					$sponsors = "GOK";
+				}
+				if ($sponsor_pepfar) {
+					$sponsors = "PEPFAR";
+				}
+				if ($sponsor_msf) {
+					$sponsors = "MSF";
+				}
+	
+				$fifth_row = 11;
+				$service = array();
+				$service_art = trim($arr[$fifth_row]['D']);
+				$service_pmtct = trim($arr[$fifth_row]['F']);
+				$service_pep = trim($arr[$fifth_row]['H']);
+				if ($service_art) {
+					$service[] = "ART";
+				}
+				if ($service_pmtct) {
+					$service[] = "PMTCT";
+				}
+				if ($service_pep) {
+					$service[] = "PEP";
+				}
+	
+				$services = implode(",", $service);
+	
+				$seventh_row = 95;
+	
+				$comments = trim($arr[$seventh_row]['A']);
+				$comments .= trim($arr[$seventh_row]['B']);
+				$comments .= trim($arr[$seventh_row]['C']);
+				$comments .= trim($arr[$seventh_row]['D']);
+				$comments .= trim($arr[$seventh_row]['E']);
+				$comments .= trim($arr[$seventh_row]['F']);
+				$comments .= trim($arr[$seventh_row]['G']);
+				$comments .= trim($arr[$seventh_row]['H']);
+				$comments .= trim($arr[$seventh_row]['I']);
+				$comments .= trim($arr[$seventh_row]['J']);
+				$comments .= trim($arr[$seventh_row]['K']);
+				$comments .= trim($arr[$seventh_row]['L']);
+	
+				$main_array = array();
+				$main_array['id'] = "";
+				$main_array['status'] = $status;
+				$main_array['created'] = date('Y-m-d H:i:s');
+				$main_array['updated'] = "";
+				$main_array['code'] = $code;
+				$main_array['period_begin'] = $period_begin;
+				$main_array['period_end'] = $period_end;
+				$main_array['comments'] = $comments;
+				$main_array['reports_expected'] = null;
+				$main_array['reports_actual'] = null;
+				$main_array['services'] = $services;
+				$main_array['sponsors'] = $sponsors;
+				$main_array['non_arv'] = 0;
+				$main_array['delivery_note'] = null;
+				$main_array['order_id'] = 0;
+				$facilities = Sync_Facility::getId($facility_code, $status_code);
+				if ($facilities == "") {
+					redirect("dashboard_management");
+				}
+				$main_array['facility_id'] = $facilities['id'];
+				$facility_id = $facilities['id'];
+	
+				$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
+				if ($duplicate == true) {
+					$this -> session -> set_flashdata('order_message', "An cdrr report already exists for this month !");
+					redirect("dashboard_management");
+				}
+	
+				$sixth_row = 18;
+				$cdrr_array = array();
+				$commodity_counter = 0;
+	
+				for ($i = $sixth_row; $sixth_row, $i <= 89; $i++) {
+					if ($i != 34 || $i != 57) {
+						if (trim($arr[$i][$resupply]) != 0) {
+							$drug_name = trim($arr[$i]['A']);
+							$pack_size = trim($arr[$i]['B']);
+							$commodity = $this -> getMappedDrug($drug_name, $pack_size);
+							if ($commodity != null) {
+								$cdrr_array[$commodity_counter]['id'] = "";
+								if ($code == "D-CDRR") {
+									$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
+									$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
+									$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@trim($arr[$i]['E']) * @$pack_size);
+									$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['E']);
+									$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['F']);
+									$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['G']);
+									$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['H']);
+									$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['K']);
+									$expiry_date = trim($arr[$i]['L']);
+									if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+										$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+									} else {
+										$cdrr_array[$commodity_counter]['expiry_date'] = "";
+									}
+									$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['M']);
+									$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['N']);
+									$cdrr_array[$commodity_counter]['aggr_consumed'] = trim($arr[$i]['I']);
+									$cdrr_array[$commodity_counter]['aggr_on_hand'] = trim($arr[$i]['J']);
+								} else if ($code == "F-CDRR_packs") {
+									$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
+									$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
+									$cdrr_array[$commodity_counter]['dispensed_units'] = trim($arr[$i]['E']);
+									$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['F']);
+									$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['G']);
+									$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['H']);
+									$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['I']);
+									$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['J']);
+									$expiry_date = trim($arr[$i]['K']);
+									if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+										$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+									} else {
+										$cdrr_array[$commodity_counter]['expiry_date'] = "";
+									}
+									$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['L']);
+									$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['M']);
+									$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
+									$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
 								}
-								$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['M']);
-								$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['N']);
-								$cdrr_array[$commodity_counter]['aggr_consumed'] = trim($arr[$i]['I']);
-								$cdrr_array[$commodity_counter]['aggr_on_hand'] = trim($arr[$i]['J']);
-							} else if ($code == "F-CDRR_packs") {
-								$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
-								$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
-								$cdrr_array[$commodity_counter]['dispensed_units'] = trim($arr[$i]['E']);
-								$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['F']);
-								$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['G']);
-								$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['H']);
-								$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['I']);
-								$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['J']);
-								$expiry_date = trim($arr[$i]['K']);
-								if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
-									$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
-								} else {
-									$cdrr_array[$commodity_counter]['expiry_date'] = "";
-								}
-								$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['L']);
-								$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['M']);
-								$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
-								$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
+								$cdrr_array[$commodity_counter]['publish'] = 0;
+								$cdrr_array[$commodity_counter]['cdrr_id'] = "";
+								$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
+								$commodity_counter++;
 							}
-							$cdrr_array[$commodity_counter]['publish'] = 0;
-							$cdrr_array[$commodity_counter]['cdrr_id'] = "";
-							$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
-							$commodity_counter++;
 						}
 					}
 				}
-			}
-			$main_array['ownCdrr_item'] = $cdrr_array;
-
-			$log_array[0]['id'] = "";
-			$log_array[0]['description'] = "prepared";
-			if ($code == "D-CDRR") {
-				$log_array[0]['created'] = $this -> clean_date(trim($arr[113]['G']));
-				$log_array[0]['user_id'] = $this -> getUser(trim($arr[111]['C']));
-			} else {
-				$log_array[0]['created'] = $this -> clean_date(trim($arr[109]['G']));
-				$log_array[0]['user_id'] = $this -> getUser(trim($arr[107]['C']));
-			}
-			$log_array[0]['cdrr_id'] = "";
-
-			$log_array[1]['id'] = "";
-			$log_array[1]['description'] = "approved";
-			if ($code == "D-CDRR") {
-				$log_array[1]['created'] = $this -> clean_date(trim($arr[117]['G']));
-				$log_array[1]['user_id'] = $this -> getUser(trim($arr[115]['C']));
-			} else {
-				$log_array[1]['created'] = $this -> clean_date(trim($arr[113]['G']));
-				$log_array[1]['user_id'] = $this -> getUser(trim($arr[111]['C']));
-			}
-			$log_array[1]['cdrr_id'] = "";
-
-			$main_array['ownCdrr_log'] = $log_array;
-			$type = "cdrr";
-
-		} else if ($code == "D-MAPS" || $code == "F-MAPS") {
-			$first_row = 4;
-			$facility_name = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
-			$facility_code = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
-
-			$second_row = 5;
-			$province = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
-			$district = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
-
-			$third_row = 7;
-			$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
-			$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
-
-			if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
-				$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
-				redirect("dashboard_management");
-			}
-
-			$fourth_row = 9;
-			$sponsors = "";
-			$sponsor_gok = trim($arr[$fourth_row]['D']);
-			$sponsor_pepfar = trim($arr[$fourth_row]['F']);
-			$sponsor_msf = trim($arr[$fourth_row]['H']);
-			if ($sponsor_gok) {
-				$sponsors = "GOK";
-			}
-			if ($sponsor_pepfar) {
-				$sponsors = "PEPFAR";
-			}
-			if ($sponsor_msf) {
-				$sponsors = "MSF";
-			}
-
-			$fifth_row = 11;
-			$service = array();
-			$service_art = trim($arr[$fifth_row]['D']);
-			$service_pmtct = trim($arr[$fifth_row]['F']);
-			$service_pep = trim($arr[$fifth_row]['H']);
-			if ($service_art) {
-				$service[] = "ART";
-			}
-			if ($service_pmtct) {
-				$service[] = "PMTCT";
-			}
-			if ($service_pep) {
-				$service[] = "PEP";
-			}
-
-			$services = implode(",", $service);
-
-			$art_adult = $arr[14]["D"];
-			$art_child = $arr[14]["F"];
-			$new_male = $arr[18]["D"];
-			$new_female = $arr[18]["F"];
-			$revisit_male = $arr[18]["E"];
-			$revisit_female = $arr[18]["G"];
-			$new_pmtct = $arr[26]["H"];
-			$revisit_pmtct = $arr[27]["H"];
-			$total_infant = $arr[38]["H"];
-			$pep_adult = $arr[107]["H"];
-			$pep_child = $arr[108]["H"];
-			$total_adult = $arr[124]["E"];
-			$total_child = $arr[124]["G"];
-			$diflucan_adult = $arr[128]["E"];
-			$diflucan_child = $arr[128]["G"];
-			$new_cm = $arr[134]["D"];
-			$revisit_cm = $arr[134]["E"];
-			$new_oc = $arr[134]["F"];
-			$revisit_oc = $arr[134]["G"];
-			$facilities = Sync_Facility::getId($facility_code, $status_code);
-			if ($facilities == "") {
-				redirect("dashboard_management");
-			}
-			$facility_id = $facilities['id'];
-
-			$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
-			if ($duplicate == true) {
-				$this -> session -> set_flashdata('order_message', "An fmap report already exists for this month !");
-				redirect("dashboard_management");
-			}
-
-			//Save Import Values
-
-			$created = date('Y-m-d H:i:s');
-			$main_array = array();
-			$main_array['id'] = "";
-			$main_array['status'] = $status;
-			$main_array['created'] = $created;
-			$main_array['updated'] = "";
-			$main_array['code'] = $code;
-			$main_array['period_begin'] = $period_begin;
-			$main_array['period_end'] = $period_end;
-			$main_array['reports_expected'] = "";
-			$main_array['reports_actual'] = "";
-			$main_array['services'] = $services;
-			$main_array['sponsors'] = $sponsors;
-			$main_array['art_adult'] = $art_adult;
-			$main_array['art_child'] = $art_child;
-			$main_array['new_male'] = $new_male;
-			$main_array['revisit_male'] = $revisit_male;
-			$main_array['new_female'] = $new_female;
-			$main_array['revisit_female'] = $revisit_female;
-			$main_array['new_pmtct'] = $new_pmtct;
-			$main_array['revisit_pmtct'] = $revisit_pmtct;
-			$main_array['total_infant'] = $total_infant;
-			$main_array['pep_adult'] = $pep_adult;
-			$main_array['pep_child'] = $pep_child;
-			$main_array['total_adult'] = $total_adult;
-			$main_array['total_child'] = $total_child;
-			$main_array['diflucan_adult'] = $diflucan_adult;
-			$main_array['diflucan_child'] = $diflucan_child;
-			$main_array['new_cm'] = $new_cm;
-			$main_array['revisit_cm'] = $revisit_cm;
-			$main_array['new_oc'] = $new_oc;
-			$main_array['revisit_oc'] = $revisit_oc;
-			$main_array['comments'] = "";
-			$main_array['report_id'] = "";
-			$main_array['facility_id'] = $facility_id;
-
-			//Insert Maps items
-			$sixth_row = 25;
-			$maps_array = array();
-			$regimen_counter = 0;
-
-			for ($i = $sixth_row; $sixth_row, $i <= 120; $i++) {
-				if ($i != 36 || $i != 43 || $i != 53 || $i != 68 || $i != 75 || $i != 88 || $i != 99 || $i != 105 || $i != 113) {
-					if ($arr[$i]['E'] != 0 || trim($arr[$i]['A']) != "") {
-						$regimen_code = $arr[$i]['A'];
-						$regimen_desc = $arr[$i]['B'];
-						$regimen_id = $this -> getMappedRegimen($regimen_code, $regimen_desc);
-						$total = $arr[$i]['E'];
-						if ($regimen_id != null && $total != null) {
-							$maps_array[$regimen_counter]["id"] = "";
-							$maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
-							$maps_array[$regimen_counter]["total"] = $total;
-							$maps_array[$regimen_counter]["maps_id"] = "";
+				$main_array['ownCdrr_item'] = $cdrr_array;
+	
+				$log_array[0]['id'] = "";
+				$log_array[0]['description'] = "prepared";
+				if ($code == "D-CDRR") {
+					$log_array[0]['created'] = $this -> clean_date(trim($arr[113]['G']));
+					$log_array[0]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+				} else {
+					$log_array[0]['created'] = $this -> clean_date(trim($arr[109]['G']));
+					$log_array[0]['user_id'] = $this -> getUser(trim($arr[107]['C']));
+				}
+				$log_array[0]['cdrr_id'] = "";
+	
+				$log_array[1]['id'] = "";
+				$log_array[1]['description'] = "approved";
+				if ($code == "D-CDRR") {
+					$log_array[1]['created'] = $this -> clean_date(trim($arr[117]['G']));
+					$log_array[1]['user_id'] = $this -> getUser(trim($arr[115]['C']));
+				} else {
+					$log_array[1]['created'] = $this -> clean_date(trim($arr[113]['G']));
+					$log_array[1]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+				}
+				$log_array[1]['cdrr_id'] = "";
+	
+				$main_array['ownCdrr_log'] = $log_array;
+				$type = "cdrr";
+	
+			} else if ($code == "D-MAPS" || $code == "F-MAPS") {
+				$first_row = 4;
+				$facility_name = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
+				$facility_code = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
+	
+				$second_row = 5;
+				$province = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
+				$district = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
+	
+				$third_row = 7;
+				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
+				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
+	
+				if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
+					$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
+					redirect("dashboard_management");
+				}
+	
+				$fourth_row = 9;
+				$sponsors = "";
+				$sponsor_gok = trim($arr[$fourth_row]['D']);
+				$sponsor_pepfar = trim($arr[$fourth_row]['F']);
+				$sponsor_msf = trim($arr[$fourth_row]['H']);
+				if ($sponsor_gok) {
+					$sponsors = "GOK";
+				}
+				if ($sponsor_pepfar) {
+					$sponsors = "PEPFAR";
+				}
+				if ($sponsor_msf) {
+					$sponsors = "MSF";
+				}
+	
+				$fifth_row = 11;
+				$service = array();
+				$service_art = trim($arr[$fifth_row]['D']);
+				$service_pmtct = trim($arr[$fifth_row]['F']);
+				$service_pep = trim($arr[$fifth_row]['H']);
+				if ($service_art) {
+					$service[] = "ART";
+				}
+				if ($service_pmtct) {
+					$service[] = "PMTCT";
+				}
+				if ($service_pep) {
+					$service[] = "PEP";
+				}
+	
+				$services = implode(",", $service);
+	
+				$art_adult = $arr[14]["D"];
+				$art_child = $arr[14]["F"];
+				$new_male = $arr[18]["D"];
+				$new_female = $arr[18]["F"];
+				$revisit_male = $arr[18]["E"];
+				$revisit_female = $arr[18]["G"];
+				$new_pmtct = $arr[26]["H"];
+				$revisit_pmtct = $arr[27]["H"];
+				$total_infant = $arr[38]["H"];
+				$pep_adult = $arr[107]["H"];
+				$pep_child = $arr[108]["H"];
+				$total_adult = $arr[124]["E"];
+				$total_child = $arr[124]["G"];
+				$diflucan_adult = $arr[128]["E"];
+				$diflucan_child = $arr[128]["G"];
+				$new_cm = $arr[134]["D"];
+				$revisit_cm = $arr[134]["E"];
+				$new_oc = $arr[134]["F"];
+				$revisit_oc = $arr[134]["G"];
+				$facilities = Sync_Facility::getId($facility_code, $status_code);
+				if ($facilities == "") {
+					redirect("dashboard_management");
+				}
+				$facility_id = $facilities['id'];
+	
+				$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
+				if ($duplicate == true) {
+					$this -> session -> set_flashdata('order_message', "An fmap report already exists for this month !");
+					redirect("dashboard_management");
+				}
+	
+				//Save Import Values
+	
+				$created = date('Y-m-d H:i:s');
+				$main_array = array();
+				$main_array['id'] = "";
+				$main_array['status'] = $status;
+				$main_array['created'] = $created;
+				$main_array['updated'] = "";
+				$main_array['code'] = $code;
+				$main_array['period_begin'] = $period_begin;
+				$main_array['period_end'] = $period_end;
+				$main_array['reports_expected'] = "";
+				$main_array['reports_actual'] = "";
+				$main_array['services'] = $services;
+				$main_array['sponsors'] = $sponsors;
+				$main_array['art_adult'] = $art_adult;
+				$main_array['art_child'] = $art_child;
+				$main_array['new_male'] = $new_male;
+				$main_array['revisit_male'] = $revisit_male;
+				$main_array['new_female'] = $new_female;
+				$main_array['revisit_female'] = $revisit_female;
+				$main_array['new_pmtct'] = $new_pmtct;
+				$main_array['revisit_pmtct'] = $revisit_pmtct;
+				$main_array['total_infant'] = $total_infant;
+				$main_array['pep_adult'] = $pep_adult;
+				$main_array['pep_child'] = $pep_child;
+				$main_array['total_adult'] = $total_adult;
+				$main_array['total_child'] = $total_child;
+				$main_array['diflucan_adult'] = $diflucan_adult;
+				$main_array['diflucan_child'] = $diflucan_child;
+				$main_array['new_cm'] = $new_cm;
+				$main_array['revisit_cm'] = $revisit_cm;
+				$main_array['new_oc'] = $new_oc;
+				$main_array['revisit_oc'] = $revisit_oc;
+				$main_array['comments'] = "";
+				$main_array['report_id'] = "";
+				$main_array['facility_id'] = $facility_id;
+	
+				//Insert Maps items
+				$sixth_row = 25;
+				$maps_array = array();
+				$regimen_counter = 0;
+	
+				for ($i = $sixth_row; $sixth_row, $i <= 120; $i++) {
+					if ($i != 36 || $i != 43 || $i != 53 || $i != 68 || $i != 75 || $i != 88 || $i != 99 || $i != 105 || $i != 113) {
+						if ($arr[$i]['E'] != 0 || trim($arr[$i]['A']) != "") {
+							$regimen_code = $arr[$i]['A'];
+							$regimen_desc = $arr[$i]['B'];
+							$regimen_id = $this -> getMappedRegimen($regimen_code, $regimen_desc);
+							$total = $arr[$i]['E'];
+							if ($regimen_id != null && $total != null) {
+								$maps_array[$regimen_counter]["id"] = "";
+								$maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
+								$maps_array[$regimen_counter]["total"] = $total;
+								$maps_array[$regimen_counter]["maps_id"] = "";
+							}
+							$regimen_counter++;
 						}
-						$regimen_counter++;
 					}
 				}
+				$main_array['ownMaps_item'] = $maps_array;
+	
+				$log_array[0]['id'] = "";
+				$log_array[0]['description'] = "prepared";
+				if ($code == "D-MAPS") {
+					$log_array[0]['created'] = $this -> clean_date(trim($arr[143]['E']));
+					$log_array[0]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+				} else {
+					$log_array[0]['created'] = $this -> clean_date(trim($arr[139]['E']));
+					$log_array[0]['user_id'] = $this -> getUser(trim($arr[137]['B']));
+				}
+				$log_array[0]['maps_id'] = "";
+	
+				$log_array[1]['id'] = "";
+				$log_array[1]['description'] = "approved";
+				if ($code == "D-MAPS") {
+					$log_array[1]['created'] = $this -> clean_date(trim($arr[147]['E']));
+					$log_array[1]['user_id'] = $this -> getUser(trim($arr[145]['B']));
+				} else {
+					$log_array[1]['created'] = $this -> clean_date(trim($arr[143]['E']));
+					$log_array[1]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+				}
+				$log_array[1]['maps_id'] = "";
+	
+				$main_array['ownMaps_log'] = $log_array;
+				$type = "maps";
 			}
-			$main_array['ownMaps_item'] = $maps_array;
-
-			$log_array[0]['id'] = "";
-			$log_array[0]['description'] = "prepared";
-			if ($code == "D-MAPS") {
-				$log_array[0]['created'] = $this -> clean_date(trim($arr[143]['E']));
-				$log_array[0]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+			$main_array = array($main_array);
+			$this -> prepare_order($type, $main_array);
+			$content = "Order was successfully saved";
+			$this -> session -> set_flashdata('order_message', $content);
+		}
+		else if($type=="pipeline_upload"){//Upload Central medical stores and pending orders data
+			$this -> load -> library('PHPExcel');
+			$objReader = new PHPExcel_Reader_Excel5();
+			if ($_FILES['cms_file']['tmp_name']) {
+				$objPHPExcel = $objReader -> load($_FILES['cms_file']['tmp_name']);
 			} else {
-				$log_array[0]['created'] = $this -> clean_date(trim($arr[139]['E']));
-				$log_array[0]['user_id'] = $this -> getUser(trim($arr[137]['B']));
+				$this -> session -> set_flashdata('order_message', "No file found !");
+				$this -> session -> set_flashdata('pipeline_upload', 1);
+				redirect("order");
 			}
-			$log_array[0]['maps_id'] = "";
-
-			$log_array[1]['id'] = "";
-			$log_array[1]['description'] = "approved";
-			if ($code == "D-MAPS") {
-				$log_array[1]['created'] = $this -> clean_date(trim($arr[147]['E']));
-				$log_array[1]['user_id'] = $this -> getUser(trim($arr[145]['B']));
-			} else {
-				$log_array[1]['created'] = $this -> clean_date(trim($arr[143]['E']));
-				$log_array[1]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+	
+			$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
+			$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
+			$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
+	
+			$period = $arr[2]['C'];
+			$period = trim($period);
+			$pipeline = $arr[3]['C'];
+			$pipeline = trim($pipeline);
+			
+			//Check if period and pipeline are entered
+			if($period=="" || $pipeline ==""){
+				$this -> session -> set_flashdata('order_message', "Please make sure you fill the period and the pipeline name!");
+				$this -> session -> set_flashdata('pipeline_upload', 1);
+				redirect("dashboard_management");
+				die();
 			}
-			$log_array[1]['maps_id'] = "";
-
-			$main_array['ownMaps_log'] = $log_array;
-			$type = "maps";
+			else{
+				$text = $arr[2]['A'];
+				$x = 7;
+				$y = $highestRow;
+				while ($x <= $y) {
+					//get drug details
+					$drug = $arr[$x]["A"];
+					$drug_array = explode("-", $drug);
+					$drug_name = trim($drug_array[0]);
+					$drug_abbrev = trim($drug_array[1]);
+					$drug_strength = trim($drug_array[2]);
+					
+					if(isset($drug_abbrev[3]) and $drug_abbrev[3]!=null){
+						$drug_packsize = trim($drug_array[3]);
+					}
+					else{
+						$drug_packsize = "";
+					}
+					echo $drug_name." : ".$drug_abbrev."(".$drug_strength.")".$drug_packsize."<br>";
+					//Get drugs ids
+					if(strtolower($pipeline)=="kemsa"){
+						$drug_id = sync_drug::getDrugId($drug_name,$drug_abbrev,$drug_strength,$drug_packsize);
+					}
+					else{//Kenya Pharma Pipeline
+						$drug_id = escm_drug::getDrugId($drug_name,$drug_abbrev,$drug_strength,$drug_packsize);
+					}
+					
+					echo var_dump($drug_id)."<br>";
+					
+					$x++;
+				}
+				die();
+			}
+			
+			
 		}
 		$main_array = array($main_array);
 		$this -> prepare_order($type, $main_array);

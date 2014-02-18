@@ -22,6 +22,7 @@ class Cdrr extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('cdrr');
 		$this -> hasOne('Sync_Facility as Facility', array('local' => 'facility_id', 'foreign' => 'id'));
+		$this -> hasOne('maps as map', array('local' => 'period_begin', 'foreign' => 'period_begin'));
 	}
 
 	public function getAll() {
@@ -90,6 +91,13 @@ class Cdrr extends Doctrine_Record {
 	
 	public function getCdrrPeriod(){
 		$query = Doctrine_Query::create() -> select("*") -> from("cdrr") -> where("code='D-CDRR' or code='F-CDRR_packs'") ->groupBy("period_begin");
+		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $items;
+	}
+	
+	public function getOrderPeriods(){
+		$query = Doctrine_Query::create() -> select("c.period_begin") -> from("cdrr c")
+		 -> leftJoin('c.map m') -> where("(m.code='D-MAPS') AND (code='D-CDRR' or code='F-CDRR_packs')")->groupBy("c.period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
