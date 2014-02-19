@@ -24,22 +24,22 @@ class Escm_Facility extends Doctrine_Record {
 		$this -> setTableName('escm_facility');
 		$this -> hasOne('District as Parent_District', array('local' => 'district_id', 'foreign' => 'id'));
 		$this -> hasOne('Counties as County', array('local' => 'county_id', 'foreign' => 'id'));
-		$this -> hasMany('Adt_Sites as adt', array('local' => 'id', 'foreign' => 'facility_id'));
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("f.*,d.name as district,c.county as county_name,IF(sites.facility_id is null,'NO','YES') as adt_installed") -> from("escm_facility f") -> leftJoin('f.Parent_District d, f.County c,f.adt sites');
+		$query = Doctrine_Query::create() -> select("f.*,d.name as district,c.county as county_name") -> from("escm_facility f") -> leftJoin('f.Parent_District d, f.County c');
 		$escm_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $escm_facility;
 	}
 
 	public function getAllNotHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility") -> where("id='108'");
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
 		$escm_facility = $query -> execute();
 		return $escm_facility;
 	}
+
 	public function getAllHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility") -> where("id='108'");
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
 		$escm_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $escm_facility;
 	}

@@ -138,7 +138,7 @@ class settings extends MY_Controller {
 				$columns = array("category_id" => 0);
 			} else if ($type == "sync_user") {
 				$columns = array("status" => "A");
-			} else if ($type == "mail_list" || $type == "user_emails") {
+			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen") {
 				$columns = array("active" => "1");
 			}
 			$this -> db -> where('id', $id);
@@ -170,7 +170,9 @@ class settings extends MY_Controller {
 				$columns = array("category_id" => 14);
 			} else if ($type == "sync_regimen") {
 				$columns = array("category_id" => 15);
-			} else if ($type == "mail_list" || $type == "user_emails") {
+			} else if ($type == "sync_user") {
+				$columns = array("status" => "N");
+			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen") {
 				$columns = array("active" => "0");
 			}
 			$this -> db -> where('id', $id);
@@ -206,6 +208,12 @@ class settings extends MY_Controller {
 			$columns = array("s.id", "s.name", "creator_id", "u.Name as creator", "COUNT(mu.id) as total_users", "s.active");
 		} else if ($type == "user_emails") {
 			$columns = array("s.id", "s.email_address", "COUNT(ml.id) as total_lists", "s.active");
+		} else if ($type == "drugcode") {
+			$columns = array("id", "name", "unit", "pack_size", "category_id", "arv_drug", "n_map", "e_map", "active");
+		} else if ($type == "facilities") {
+			$columns = array("s.id", "facilitycode", "name", "type", "c.county", "s.active", "facilitytype", "district", "s.county as county_id", "supported_by", "service_art", "service_pmtct", "service_pep", "supplied_by", "parent", "map", "IF(a.facility_id !='NULL','1','0') as adt_site");
+		} else if ($type == "regimen") {
+			$columns = array("s.id", "regimen_code", "regimen_desc", "r.Name", "category", "line", "type_of_service", "n_map", "e_map", "s.active");
 		}
 
 		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
@@ -260,6 +268,11 @@ class settings extends MY_Controller {
 			$this -> db -> join("mail_user mu", "s.id=mu.email_id", "left");
 			$this -> db -> join("mail_list ml", "mu.list_id=ml.id", "left");
 			$this -> db -> group_by("s.id");
+		} else if ($type == "facilities") {
+			$this -> db -> join("counties c", "c.id=s.county", "left");
+			$this -> db -> join("adt_sites a", "a.facility_id=s.map", "left");
+		} else if ($type == "regimen") {
+			$this -> db -> join("regimen_category r", "r.id=s.category", "left");
 		}
 		$rResult = $this -> db -> get();
 		// Data set length after filtering
@@ -277,7 +290,7 @@ class settings extends MY_Controller {
 			$action_link = "delete";
 			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
+				if ($i != "id" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "category" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
 					$myrow[] = $v;
 				} else {
 					if ($i == "id") {
@@ -298,6 +311,15 @@ class settings extends MY_Controller {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
 				} else if ($type == "user_emails" && $i == "active" && $v == 0) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "drugcode" && $i == "active" && $v == 0) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "facilities" && $i == "active" && $v == 0) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "regimen" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
 				}
@@ -348,7 +370,14 @@ class settings extends MY_Controller {
 			$inputs = array("List Name" => "name", " " => "creator_id");
 		} else if ($type == "user_emails") {
 			$inputs = array("Email Address" => "email_address", "Mailing List" => "mail_list");
+		} else if ($type == "drugcode") {
+			$inputs = array("name" => "name", "unit" => "unit", "pack size" => "pack_size", "category" => "category_id", "is ARV drug?" => "arv_drug", "nascop drug" => "n_map", "escm drug" => "e_map");
+		} else if ($type == "facilities") {
+			$inputs = array("code" => "facilitycode", "name" => "name", "category" => "type", "type" => "facilitytype", "is ADT site?" => "adt_site", "county" => "county_id", "district" => "district", "supplier" => "supplied_by", "supporter" => "supported_by", "service ART" => "service_art", "service PEP" => "service_pep", "service PMTCT" => "service_pmtct", "parent" => "parent", "mapped facility" => "map");
+		} else if ($type == "regimen") {
+			$inputs = array("code" => "regimen_code", "name" => "regimen_desc", "category" => "category", "Line" => "line", "service" => "type_of_service", "nascop regimen" => "n_map", "escm regimen" => "e_map");
 		}
+
 		foreach ($inputs as $text => $input) {
 			$content .= $group_div;
 			$label = "<label class='control-label'>" . $text . "</label>";
@@ -380,6 +409,54 @@ class settings extends MY_Controller {
 					$textfield .= "<option value='" . $district['id'] . "'>" . $district['Name'] . "</option>";
 				}
 				$textfield .= "</select>";
+			} else if ($input == "n_map" && $type == "drugcode") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$drugs = Sync_Drug::getActive();
+				foreach ($drugs as $drug) {
+					$textfield .= "<option value='" . $drug['id'] . "'>" . $drug['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "e_map" && $type == "drugcode") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$drugs = Escm_Drug::getActive();
+				foreach ($drugs as $drug) {
+					$textfield .= "<option value='" . $drug['id'] . "'>" . $drug['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "n_map" && $type == "regimen") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$regimens = Sync_Regimen::getAllHydrated();
+				foreach ($regimens as $regimen) {
+					$textfield .= "<option value='" . $regimen['id'] . "'>" . $regimen['code'] . " | " . $regimen['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "e_map" && $type == "regimen") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$regimens = Escm_Regimen::getAllHydrated();
+				foreach ($regimens as $regimen) {
+					$textfield .= "<option value='" . $regimen['id'] . "'>" . $regimen['code'] . " | " . $regimen['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "category" && $type == "regimen") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$regimens = Regimen_Category::getAllHydrate();
+				foreach ($regimens as $regimen) {
+					$textfield .= "<option value='" . $regimen['id'] . "'>" . $regimen['Name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "type_of_service" && $type == "regimen") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$regimens = Regimen_Service_Type::getHydratedAll();
+				foreach ($regimens as $regimen) {
+					$textfield .= "<option value='" . $regimen['id'] . "'>" . $regimen['Name'] . "</option>";
+				}
+				$textfield .= "</select>";
 			} else if ($input == "county_id") {
 				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
@@ -388,7 +465,92 @@ class settings extends MY_Controller {
 					$textfield .= "<option value='" . $county['id'] . "'>" . $county['county'] . "</option>";
 				}
 				$textfield .= "</select>";
+			} else if ($input == "facilitytype" && $type == "facilities") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$types = Facility_Types::getActive();
+				foreach ($types as $ftype) {
+					$textfield .= "<option value='" . $ftype['id'] . "'>" . $ftype['Name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "parent" && $type == "facilities") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$facilities = Facilities::getActive();
+				foreach ($facilities as $facility) {
+					$textfield .= "<option value='" . $facility['facilitycode'] . "'>" . $facility['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "map" && $type == "facilities") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$facilities = Sync_Facility::getAllHydrated();
+				foreach ($facilities as $facility) {
+					$textfield .= "<option value='" . $facility['id'] . "'>" . $facility['name'] . "</option>";
+				}
+				$facilities = Escm_Facility::getAllHydrated();
+				foreach ($facilities as $facility) {
+					$textfield .= "<option value='" . $facility['id'] . "'>" . $facility['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "county") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$counties = Counties::getActive();
+				foreach ($counties as $county) {
+					$textfield .= "<option value='" . $county['id'] . "'>" . $county['county'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "district") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$districts = District::getActive();
+				foreach ($districts as $district) {
+					$textfield .= "<option value='" . $district['id'] . "'>" . $district['Name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "supplied_by") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$suppliers = Suppliers::getActive();
+				foreach ($suppliers as $supplier) {
+					$textfield .= "<option value='" . $supplier['id'] . "'>" . $supplier['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "supported_by") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$supporters = Supporter::getAllActive();
+				foreach ($supporters as $supporter) {
+					$textfield .= "<option value='" . $supporter['id'] . "'>" . $supporter['Name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			} else if ($input == "service_art") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>NO</option>";
+				$textfield .= "<option value='1'>YES</option>";
+				$textfield .= "</select>";
+			} else if ($input == "service_pep") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>NO</option>";
+				$textfield .= "<option value='1'>YES</option>";
+				$textfield .= "</select>";
+			} else if ($input == "service_pmtct") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>NO</option>";
+				$textfield .= "<option value='1'>YES</option>";
+				$textfield .= "</select>";
 			} else if ($input == "ordering") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>NO</option>";
+				$textfield .= "<option value='1'>YES</option>";
+				$textfield .= "</select>";
+			} else if ($input == "arv_drug") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>NO</option>";
+				$textfield .= "<option value='1'>YES</option>";
+				$textfield .= "</select>";
+			} else if ($input == "adt_site") {
 				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
 				$textfield .= "<option value='0' selected='selected'>NO</option>";
 				$textfield .= "<option value='1'>YES</option>";
@@ -442,6 +604,12 @@ class settings extends MY_Controller {
 			$inputs = array("name" => "name", "creator_id" => "creator_id");
 		} else if ($type == "user_emails") {
 			$inputs = array("email_address" => "email_address", "mail_list" => "mail_list_holder");
+		} else if ($type == "drugcode") {
+			$inputs = array("name" => "name", "unit" => "unit", "pack_size" => "pack_size", "category_id" => "category", "arv_drug" => "arv_drug", "n_map" => "n_map", "e_map" => "e_map");
+		} else if ($type == "facilities") {
+			$inputs = array("facilitycode" => "facilitycode", "name" => "name", "type" => "type", "facilitytype" => "facilitytype", "facility_id" => "adt_site", "county" => "county_id", "district" => "district", "supplied_by" => "supplied_by", "supported_by" => "supported_by", "service_art" => "service_art", "service_pep" => "service_pep", "service_pmtct" => "service_pmtct", "parent" => "parent", "map" => "map");
+		} else if ($type == "regimen") {
+			$inputs = array("regimen_code" => "regimen_code", "regimen_desc" => "regimen_desc", "category" => "category", "line" => "line", "type_of_service" => "type_of_service", "n_map" => "n_map", "e_map" => "e_map");
 		}
 
 		foreach ($inputs as $index => $input) {
@@ -458,8 +626,29 @@ class settings extends MY_Controller {
 					$mail_list = $this -> input -> post($input);
 					$mail_list = explode(",", $mail_list);
 				}
+			} else if ($index == "email" && $id == null) {
+				$password = "";
+				$characters = strtoupper("abcdefghijklmnopqrstuvwxyz");
+				$characters = $characters . 'abcdefghijklmnopqrstuvwxyz0123456789';
+				$password_length = 6;
+				$string = '';
+				for ($i = 0; $i < $password_length; $i++) {
+					$password .= $characters[rand(0, strlen($characters) - 1)];
+				}
+				$save_data[$index] = $this -> input -> post($input);
+				$save_data["password"] = md5($password);
+				$this -> send_password($this -> input -> post($input), $password);
+
 			} else if ($index == "creator_id" && $id == null) {
 				$save_data[$index] = $this -> session -> userdata("user_id");
+			} else if ($input == "adt_site" && $this -> input -> post("supplied_by") != 0) {
+				$facility_id = $this -> input -> post("map");
+				$sql = "DELETE FROM adt_sites WHERE facility_id='$facility_id'";
+				$this -> db -> query($sql);
+				if ($this -> input -> post("adt_site") == 1) {
+					$supplied_by = $this -> input -> post("supplied_by");
+					$this -> db -> insert("adt_sites", array("facility_id" => $facility_id, "pipeline" => $supplied_by));
+				}
 			} else {
 				$save_data[$index] = $this -> input -> post($input);
 			}
@@ -496,7 +685,7 @@ class settings extends MY_Controller {
 				$email_id = $id;
 				$sql = "DELETE FROM mail_user WHERE email_id='$email_id'";
 				$this -> db -> query($sql);
-				if (!empty($mail_list) || $mail_list !="") {
+				if (!empty($mail_list) || $mail_list != "") {
 					foreach ($mail_list as $mail) {
 						$this -> db -> insert("mail_user", array("email_id" => $email_id, "list_id" => $mail));
 					}
@@ -833,6 +1022,44 @@ class settings extends MY_Controller {
 		if ($mission == 0) {
 			redirect("order");
 		}
+	}
+
+	public function send_password($email_address, $password) {
+		$email_user = stripslashes('webadt.chai@gmail.com');
+		$email_password = stripslashes('WebAdt_052013');
+		$subject = "NASCOP User Password Reset";
+		$email_sender_title = "NASCOP SYSTEM";
+
+		$message = "Hello NASCOP USER, <br/><br/>
+		                Your account for the $email_sender_title was reset</b><br/>
+						The new password is <b> $password </b><br/><br/>
+						Regards,<br/>
+						$email_sender_title team.";
+
+		$config['mailtype'] = "html";
+		$config['protocol'] = 'smtp';
+		$config['smtp_host'] = 'ssl://smtp.googlemail.com';
+		$config['smtp_port'] = 465;
+		$config['smtp_user'] = $email_user;
+		$config['smtp_pass'] = $email_password;
+		ini_set("SMTP", "ssl://smtp.gmail.com");
+		ini_set("smtp_port", "465");
+
+		$this -> load -> library('email', $config);
+		$this -> email -> set_newline("\r\n");
+		$this -> email -> from('webadt.chai@gmail.com', $email_sender_title);
+		$this -> email -> to("$email_address");
+		$this -> email -> subject($subject);
+		$this -> email -> message($message);
+
+		if ($this -> email -> send()) {
+			$this -> email -> clear(TRUE);
+			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
+		} else {
+			$error_message = $this -> email -> print_debugger();
+		}
+
+		return $error_message;
 	}
 
 	public function base_params($data) {

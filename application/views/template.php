@@ -278,9 +278,6 @@ if(isset($reports)|| isset($report_title)){
 					<li>
 						<a  id="addDistrict" class="admin_link"><i class="icon-eye-open icon-black"></i>View Districts</a>
 					</li>
-				     <li>
-						<a  id="addFacility" class="admin_link"><i class="icon-eye-open icon-black"></i>View Facilities</a>
-					</li>
 					<li>
 						<a  id="addMenu" class="admin_link"><i class="icon-eye-open icon-black"></i>View Menus</a>
 					</li>

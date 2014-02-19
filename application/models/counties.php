@@ -28,7 +28,7 @@ class Counties extends Doctrine_Record {
 	}
 	
 	public function getActive() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Counties")->where("active='1'");
+		$query = Doctrine_Query::create() -> select("*") -> from("Counties")->where("active='1'")->orderBy("county asc");
 		$counties = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $counties;
 	}

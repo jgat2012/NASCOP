@@ -1,4 +1,4 @@
-body {
+/*body {
 	margin: 0;
 	padding: 0;
 	font-family: "Helvetica";
@@ -7,8 +7,19 @@ body {
 	vertical-align: baseline;
 	min-width:480px;
 	width: auto !important;  /* Firefox will set width as auto */
-	width:400px;
-
+	/*width:400px;*/
+/*
+}*/
+body
+{
+    background: #FFFFFF;
+    font-size: .80em;
+    font-family: "Helvetica Neue" , "Lucida Grande" , "Segoe UI" , Arial, Helvetica, Verdana, sans-serif;
+    margin: 0px;
+    padding: 0px;
+    color: #696969;
+    height: 780px;
+    width: 100%;
 }
 .msginfo {
 	border: 1px solid #99c4ea;
@@ -143,6 +154,16 @@ header {
 	border-bottom: 2px solid #036;
 	width: 100%;
 	height: auto;
+	background: white;
+	z-index: 5;
+	min-width: 980px;
+	position: fixed;
+}
+#top-panel_dashboard {
+	overflow: hidden;
+	border-bottom: 2px solid #036;
+	width: 100%;
+	height:9em;
 	background: white;
 	z-index: 5;
 	min-width: 980px;
@@ -672,7 +693,7 @@ tr th {
 .full-content {
 	width: 90%;
 	margin: auto;
-	padding: 150px 1% 5% 1%;
+	padding: 10% 1% 5% 1%;
 	zoom: 0.8;
 }
 .full-content form {

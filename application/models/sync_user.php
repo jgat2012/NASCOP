@@ -27,10 +27,22 @@ class Sync_User extends Doctrine_Record {
 		return $sync_user[0];
 	}
 
+	public function getAuthenticUser($email, $password) {
+		$query = Doctrine_Query::create() -> select("*") -> from("sync_user") -> where("email ='" . $email . "' and password='$password'");
+		$sync_user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $sync_user[0];
+	}
+
 	public function getId($name) {
 		$query = Doctrine_Query::create() -> select("id") -> from("sync_user") -> where("name like '%$name%'");
 		$sync_user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return @$sync_user[0];
+	}
+
+	public function getCurrentPassword($id) {
+		$query = Doctrine_Query::create() -> select("password") -> from("sync_user") -> where("id ='" . $id . "'");
+		$sync_user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $sync_user[0]['password'];
 	}
 
 }

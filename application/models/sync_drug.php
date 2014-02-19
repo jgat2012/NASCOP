@@ -32,7 +32,7 @@ class Sync_Drug extends Doctrine_Record {
 
 	public function getActive() {
 		$drug_name = "CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as name";
-		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("sync_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("category_id asc");
+		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("sync_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("name asc");
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug;
 	}

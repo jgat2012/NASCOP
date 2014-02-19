@@ -13,7 +13,7 @@ $this -> load -> view('sections/head');
 <body onload="set_interval()" onmousemove="set_interval()" onclick="set_interval" onkeypress="set_interval()" onscroll="set_interval()">
 
 
-	<div id="top-panel" style="margin:0px;">
+	<div id="top-panel_dashboard" style="margin:0px;">
 		<div class="container-fluid">
 <div class="row-fluid">
 	<div class="span4">

@@ -136,7 +136,7 @@
 							$("#m_error_msg_change_pass").removeClass("error");
 							$("#m_error_msg_change_pass").addClass("success");
 							$("#m_error_msg_change_pass").html("Your password was successfully updated!");
-							<?php delete_cookie('actual_page') ?>
+							<?php delete_cookie('nascop_actual_page') ?>
 							window.setTimeout('location="login"', 3000);
 						} else {
 							alert(value);
