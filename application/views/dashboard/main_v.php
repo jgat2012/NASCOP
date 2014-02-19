@@ -550,13 +550,18 @@
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
     
   </ul>
-  <div >
+  <div>
   	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
 	  <li><a href="#">National Dashboard</a><span class="divider">/</span></li>
 	  <li><a id="sub_active" href="#"></a><span class="divider">/</span></li>
 	  <li id="active_menu" class="active"></li>
 	</ol>
   </div>
+  <?php 
+  if($this -> session -> flashdata('order_message')){
+  	echo "<span class='message info'>".$this -> session -> flashdata('order_message')."</span>";
+  }
+  ?>
   <div class="tab-content nat_dashboard_rep" style="clear:left">
   	<!--Ordering-->
   	<div class="tab-pane" id="tab7">

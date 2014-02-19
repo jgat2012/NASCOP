@@ -88,12 +88,12 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('AC3', "MOS at Facilities");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('AD3', "MOS at Central Stores");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('AE3', "MOS - Pending With Suppliers");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('AH3', "MOS at Facilities");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('AI3', "MOS at Central Stores");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('AJ3', "MOS - Pending With Suppliers");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('AL3', "MOS at Facilities");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('AM3', "MOS at Central Stores");
-			$objPHPExcel -> getActiveSheet() -> SetCellValue('AN3', "MOS - Pending With Suppliers");
+			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AH3', "MOS at Facilities");
+			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AI3', "MOS at Central Stores");
+			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AJ3', "MOS - Pending With Suppliers");
+			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AL3', "MOS at Facilities");
+			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AM3', "MOS at Central Stores");
+			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AN3', "MOS - Pending With Suppliers");
 			
 			$result_drugs = sync_drug::getAll();
 			$period = date("Y-m-01",strtotime($period));
@@ -106,6 +106,8 @@ class Dashboard_Management extends MY_Controller {
 				$drug_id = $value['id'];
 				$drug_name =$value['name'];
 				$drug_abbr = $value['abbreviation'];
+				$drug_str = $value['strength'];
+				$drug_pack = $value['packsize'];
 				$drug_category = $value['category_id'];//Adults or paeds
 				$three_month_back =date('Y-m-d',strtotime(date($period, mktime()) . " - 2 months"));
 				
@@ -114,7 +116,7 @@ class Dashboard_Management extends MY_Controller {
 				*/
 				
 				//Count months back so as to get the average consumption
-				$sql_months = "SELECT COUNT(c.period_begin) as total_months FROM cdrr c
+				$sql_months = "SELECT COUNT(DISTINCT(c.period_begin)) as total_months FROM cdrr c
 								LEFT JOIN cdrr_item ci ON c.id=ci.cdrr_id
 								INNER JOIN escm_orders eo ON eo.cdrr_id=c.id
 								WHERE c.period_begin BETWEEN '$three_month_back' AND '$period'
@@ -124,7 +126,6 @@ class Dashboard_Management extends MY_Controller {
 				$query = $this ->db->query($sql_months);
 				$result = $query ->result_array();
 				$no_months_kp = $result[0]['total_months'];
-				
 				//If drug has not been reported
 				if($no_months_kp==0){
 					$avg_cons_kp = 0;
@@ -149,23 +150,16 @@ class Dashboard_Management extends MY_Controller {
 						$cur_cons_kp = $result[0]['cur_cons'];
 					}
 								
-								
 					$sql_kp = "
 									SELECT $drug_id as c_drug_id, ROUND((SUM(aggr_consumed)/$no_months_kp)) as avg_cons,s.aggr_on_hand,soh.pending,soh.cms FROM cdrr_item ci
 									LEFT JOIN cdrr c ON c.id=ci.cdrr_id
 									INNER JOIN escm_orders eo ON eo.cdrr_id=c.id
 									LEFT JOIN  
 									(
-										SELECT $drug_id as drug_id,SUM(fs.pending) as pending,SUM(fs.cms) as cms FROM cdrr_item ci
-										LEFT JOIN cdrr c ON c.id=ci.cdrr_id
-										INNER JOIN escm_orders eo ON eo.cdrr_id=c.id
-										LEFT JOIN facility_soh fs ON fs.drug_id = ci.drug_id 
-										WHERE c.period_begin='$period'
-										AND fs.period_begin='$period'
-										AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
-										AND ci.drug_id = '$drug_id'
+										SELECT $drug_id as drug_id,SUM(fs.pending) as pending,SUM(fs.cms) as cms FROM facility_soh fs
+										WHERE fs.period_begin='$period'
+										AND fs.drug_id='$drug_id'
 										AND fs.pipeline ='kp'
-										GROUP BY ci.drug_id
 									) as soh ON soh.drug_id=ci.drug_id
 									LEFT JOIN  
 									(
@@ -200,7 +194,7 @@ class Dashboard_Management extends MY_Controller {
 				/*
 				 * Kemsa details
 				*/
-				$sql_months = "SELECT COUNT(c.period_begin) as total_months FROM cdrr c
+				$sql_months = "SELECT COUNT(DISTINCT(c.period_begin)) as total_months FROM cdrr c
 								LEFT JOIN cdrr_item ci ON c.id=ci.cdrr_id
 								LEFT JOIN escm_orders eo ON eo.cdrr_id=c.id
 								WHERE c.period_begin BETWEEN '$three_month_back' AND '$period'
@@ -238,13 +232,9 @@ class Dashboard_Management extends MY_Controller {
 									LEFT JOIN cdrr c ON c.id=ci.cdrr_id
 									LEFT JOIN  
 									(
-										SELECT $drug_id as drug_id,SUM(fs.pending) as pending,SUM(fs.cms) as cms FROM cdrr_item ci
-										LEFT JOIN cdrr c ON c.id=ci.cdrr_id
-										LEFT JOIN facility_soh fs ON fs.drug_id = ci.drug_id 
-										WHERE c.period_begin='$period'
-										AND fs.period_begin='$period'
-										AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
-										AND ci.drug_id = '$drug_id'
+										SELECT $drug_id as drug_id,SUM(fs.pending) as pending,SUM(fs.cms) as cms FROM facility_soh fs
+										WHERE fs.period_begin='$period'
+										AND fs.drug_id='$drug_id'
 										AND fs.pipeline ='kemsa'
 									) as soh ON soh.drug_id=ci.drug_id
 									LEFT JOIN  
@@ -262,9 +252,11 @@ class Dashboard_Management extends MY_Controller {
 									AND ci.drug_id = '$drug_id'
 									AND c.id NOT IN(SELECT cdrr_id FROM escm_orders)
 									";
+					
 					$query = $this ->db->query($sql_kp_kemsa);
 					$result = $query ->result_array();
 					$count = count($result);
+					
 					if($count>0){
 						$avg_cons_kemsa = (int)$result[0]['avg_cons'];
 						$aggr_on_hand_kemsa = (int)$result[0]['aggr_on_hand'];
@@ -275,9 +267,9 @@ class Dashboard_Management extends MY_Controller {
 				}
 				
 				//Populating drugs in the table
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('A'.$x, $drug_abbr);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('A'.$x, $drug_name.'('.$drug_abbr.')');
 				
-				$avg_cons =(int)$avg_cons_kemsa+ $avg_cons_kp;
+				$avg_cons =(int)$avg_cons_kemsa+ (int)$avg_cons_kp;
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('C'.$x, $cur_cons_kemsa);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('D'.$x, $cur_cons_kp);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('E'.$x, $avg_cons);
@@ -290,9 +282,27 @@ class Dashboard_Management extends MY_Controller {
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('M'.$x, $cms_kp);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('N'.$x, $pending_kp);
 				//National Level
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('P'.$x, (int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('Q'.$x, (int)$cms_kemsa+(int)$cms_kp);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('R'.$x, (int)$pending_kemsa+(int)$pending_kp);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('P'.$x, (int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp);//National Facililties SOH
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('Q'.$x, (int)$cms_kemsa+(int)$cms_kp);//National Central Medical Store
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('R'.$x, (int)$pending_kemsa+(int)$pending_kp);//National Pending
+				
+				//MOS
+				if($avg_cons!=0){
+					$national_mos = number_format((((int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp)+((int)$cms_kemsa+(int)$cms_kp)+((int)$pending_kemsa+(int)$pending_kp))/$avg_cons,1);
+					$facility_mos = number_format(((int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp)/$avg_cons,1);
+					$cms_mos = number_format(((int)$cms_kemsa+(int)$cms_kp)/$avg_cons,1);
+					$pending_mos = number_format(((int)$pending_kemsa+(int)$pending_kp)/$avg_cons,1);
+				}
+				else{
+					$national_mos = ((int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp)+((int)$cms_kemsa+(int)$cms_kp)+((int)$pending_kemsa+(int)$pending_kp);
+					$facility_mos = (int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp;
+					$cms_mos = (int)$cms_kemsa+(int)$cms_kp;
+					$pending_mos = (int)$pending_kemsa+(int)$pending_kp;
+				}
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('T'.$x, $national_mos);//National MOS =(Fac SOH+CMS+Pending)/agg avg consumption 
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('V'.$x, $facility_mos);//MoS at facilities
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('W'.$x, $cms_mos);//Mos at central stores
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('X'.$x, $pending_mos);
 				
 				$x++;
 			}
