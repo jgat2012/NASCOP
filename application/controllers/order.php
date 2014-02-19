@@ -74,6 +74,7 @@ class Order extends MY_Controller {
 		$data['order_code'] = $order_array[0]['code'];
 
 		$data['amc'] = $this -> getAMC($order_array[0]['facility_id'], $order_array[0]['code'], $order_array[0]['period_begin']);
+
 		if ($order_array[0]['status_name'] == "received" || $order_array[0]['status_name'] == "rationalized") {
 			$data['option_links'] = "<li class='active'><a href='" . site_url("order/view_cdrr/" . $cdrr_id) . "'>view</a></li><li><a href='" . site_url("order/update_cdrr/" . $cdrr_id) . "'>update</a></li><li></li>";
 		} else {
@@ -93,8 +94,10 @@ class Order extends MY_Controller {
 		$data['banner_text'] = "Central Aggregate(D-CDRR)";
 		$data['hide_side_menu'] = 1;
 		$data['cdrr_id'] = $cdrr_id;
+
 		$data['regimens'] = Regimen::getAllObjects();
 		$data['regimen_categories'] = Regimen_Category::getAll();
+
 		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as Drug,unit as Unit_Name,packsize as Pack_Size,category_id as Category
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
@@ -106,6 +109,7 @@ class Order extends MY_Controller {
 		$data['commodities'] = $query -> result();
 		$data['logs'] = Cdrr_Log::getObjectLogs($cdrr_id);
 		$data['maps_id'] = $maps_id;
+
 		$this -> base_params($data);
 	}
 
@@ -404,12 +408,12 @@ class Order extends MY_Controller {
 		redirect("order");
 	}
 
-	public function import_order($type ="") {
-		
-		if($type==""){
+	public function import_order($type = "") {
+
+		if ($type == "") {
 			$code = $this -> input -> post("upload_type");
 			$status = "approved";
-	
+
 			if ($code == "D-CDRR") {
 				$status_code = 0;
 				$resupply = "N";
@@ -421,7 +425,7 @@ class Order extends MY_Controller {
 			} else if ($code == "F-MAPS") {
 				$status_code = 3;
 			}
-	
+
 			$this -> load -> library('PHPExcel');
 			$objReader = new PHPExcel_Reader_Excel5();
 			if ($_FILES['file']['tmp_name']) {
@@ -429,37 +433,37 @@ class Order extends MY_Controller {
 			} else {
 				redirect("order");
 			}
-	
+
 			$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
 			$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
 			$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
-	
+
 			$text = $arr[2]['A'];
-	
+
 			$file_type = $this -> checkFileType($code, $text);
 			if ($file_type == false) {
 				$this -> session -> set_flashdata('order_message', "Incorrect File Selected");
 				redirect("dashboard_management");
 			}
-	
+
 			if ($code == "D-CDRR" || $code == "F-CDRR_packs") {
 				$first_row = 4;
 				$facility_name = trim($arr[$first_row]['C'] . $arr[$first_row]['D'] . $arr[$first_row]['E']);
 				$facility_code = trim($arr[$first_row]['G'] . $arr[$first_row]['H'] . $arr[$first_row]['I']);
-	
+
 				$second_row = 5;
 				$province = trim($arr[$second_row]['C'] . $arr[$second_row]['D'] . $arr[$second_row]['E']);
 				$district = trim($arr[$second_row]['G'] . $arr[$second_row]['H'] . $arr[$second_row]['I']);
-	
+
 				$third_row = 7;
 				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
-	
+
 				if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
 					$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
 					redirect("order");
 				}
-	
+
 				$fourth_row = 9;
 				$sponsor_gok = trim($arr[$fourth_row]['D']);
 				$sponsor_pepfar = trim($arr[$fourth_row]['F']);
@@ -473,7 +477,7 @@ class Order extends MY_Controller {
 				if ($sponsor_msf) {
 					$sponsors = "MSF";
 				}
-	
+
 				$fifth_row = 11;
 				$service = array();
 				$service_art = trim($arr[$fifth_row]['D']);
@@ -488,11 +492,11 @@ class Order extends MY_Controller {
 				if ($service_pep) {
 					$service[] = "PEP";
 				}
-	
+
 				$services = implode(",", $service);
-	
+
 				$seventh_row = 95;
-	
+
 				$comments = trim($arr[$seventh_row]['A']);
 				$comments .= trim($arr[$seventh_row]['B']);
 				$comments .= trim($arr[$seventh_row]['C']);
@@ -505,7 +509,7 @@ class Order extends MY_Controller {
 				$comments .= trim($arr[$seventh_row]['J']);
 				$comments .= trim($arr[$seventh_row]['K']);
 				$comments .= trim($arr[$seventh_row]['L']);
-	
+
 				$main_array = array();
 				$main_array['id'] = "";
 				$main_array['status'] = $status;
@@ -528,17 +532,17 @@ class Order extends MY_Controller {
 				}
 				$main_array['facility_id'] = $facilities['id'];
 				$facility_id = $facilities['id'];
-	
+
 				$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 				if ($duplicate == true) {
 					$this -> session -> set_flashdata('order_message', "An cdrr report already exists for this month !");
 					redirect("dashboard_management");
 				}
-	
+
 				$sixth_row = 18;
 				$cdrr_array = array();
 				$commodity_counter = 0;
-	
+
 				for ($i = $sixth_row; $sixth_row, $i <= 89; $i++) {
 					if ($i != 34 || $i != 57) {
 						if (trim($arr[$i][$resupply]) != 0) {
@@ -595,7 +599,7 @@ class Order extends MY_Controller {
 					}
 				}
 				$main_array['ownCdrr_item'] = $cdrr_array;
-	
+
 				$log_array[0]['id'] = "";
 				$log_array[0]['description'] = "prepared";
 				if ($code == "D-CDRR") {
@@ -606,7 +610,7 @@ class Order extends MY_Controller {
 					$log_array[0]['user_id'] = $this -> getUser(trim($arr[107]['C']));
 				}
 				$log_array[0]['cdrr_id'] = "";
-	
+
 				$log_array[1]['id'] = "";
 				$log_array[1]['description'] = "approved";
 				if ($code == "D-CDRR") {
@@ -617,28 +621,28 @@ class Order extends MY_Controller {
 					$log_array[1]['user_id'] = $this -> getUser(trim($arr[111]['C']));
 				}
 				$log_array[1]['cdrr_id'] = "";
-	
+
 				$main_array['ownCdrr_log'] = $log_array;
 				$type = "cdrr";
-	
+
 			} else if ($code == "D-MAPS" || $code == "F-MAPS") {
 				$first_row = 4;
 				$facility_name = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
 				$facility_code = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
-	
+
 				$second_row = 5;
 				$province = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
 				$district = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
-	
+
 				$third_row = 7;
 				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
-	
+
 				if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
 					$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
 					redirect("dashboard_management");
 				}
-	
+
 				$fourth_row = 9;
 				$sponsors = "";
 				$sponsor_gok = trim($arr[$fourth_row]['D']);
@@ -653,7 +657,7 @@ class Order extends MY_Controller {
 				if ($sponsor_msf) {
 					$sponsors = "MSF";
 				}
-	
+
 				$fifth_row = 11;
 				$service = array();
 				$service_art = trim($arr[$fifth_row]['D']);
@@ -668,9 +672,9 @@ class Order extends MY_Controller {
 				if ($service_pep) {
 					$service[] = "PEP";
 				}
-	
+
 				$services = implode(",", $service);
-	
+
 				$art_adult = $arr[14]["D"];
 				$art_child = $arr[14]["F"];
 				$new_male = $arr[18]["D"];
@@ -695,15 +699,15 @@ class Order extends MY_Controller {
 					redirect("dashboard_management");
 				}
 				$facility_id = $facilities['id'];
-	
+
 				$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
 				if ($duplicate == true) {
 					$this -> session -> set_flashdata('order_message', "An fmap report already exists for this month !");
 					redirect("dashboard_management");
 				}
-	
+
 				//Save Import Values
-	
+
 				$created = date('Y-m-d H:i:s');
 				$main_array = array();
 				$main_array['id'] = "";
@@ -739,12 +743,12 @@ class Order extends MY_Controller {
 				$main_array['comments'] = "";
 				$main_array['report_id'] = "";
 				$main_array['facility_id'] = $facility_id;
-	
+
 				//Insert Maps items
 				$sixth_row = 25;
 				$maps_array = array();
 				$regimen_counter = 0;
-	
+
 				for ($i = $sixth_row; $sixth_row, $i <= 120; $i++) {
 					if ($i != 36 || $i != 43 || $i != 53 || $i != 68 || $i != 75 || $i != 88 || $i != 99 || $i != 105 || $i != 113) {
 						if ($arr[$i]['E'] != 0 || trim($arr[$i]['A']) != "") {
@@ -763,7 +767,7 @@ class Order extends MY_Controller {
 					}
 				}
 				$main_array['ownMaps_item'] = $maps_array;
-	
+
 				$log_array[0]['id'] = "";
 				$log_array[0]['description'] = "prepared";
 				if ($code == "D-MAPS") {
@@ -774,7 +778,7 @@ class Order extends MY_Controller {
 					$log_array[0]['user_id'] = $this -> getUser(trim($arr[137]['B']));
 				}
 				$log_array[0]['maps_id'] = "";
-	
+
 				$log_array[1]['id'] = "";
 				$log_array[1]['description'] = "approved";
 				if ($code == "D-MAPS") {
@@ -785,7 +789,7 @@ class Order extends MY_Controller {
 					$log_array[1]['user_id'] = $this -> getUser(trim($arr[141]['B']));
 				}
 				$log_array[1]['maps_id'] = "";
-	
+
 				$main_array['ownMaps_log'] = $log_array;
 				$type = "maps";
 			}
@@ -793,8 +797,7 @@ class Order extends MY_Controller {
 			$this -> prepare_order($type, $main_array);
 			$content = "Order was successfully saved";
 			$this -> session -> set_flashdata('order_message', $content);
-		}
-		else if($type=="pipeline_upload"){//Upload Central medical stores and pending orders data
+		} else if ($type == "pipeline_upload") {//Upload Central medical stores and pending orders data
 			$this -> load -> library('PHPExcel');
 			$objReader = new PHPExcel_Reader_Excel5();
 			if ($_FILES['cms_file']['tmp_name']) {
@@ -804,24 +807,23 @@ class Order extends MY_Controller {
 				$this -> session -> set_flashdata('pipeline_upload', 1);
 				redirect("order");
 			}
-	
+
 			$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
 			$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
 			$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
-	
+
 			$period = $arr[2]['C'];
 			$period = trim($period);
 			$pipeline = $arr[3]['C'];
 			$pipeline = trim($pipeline);
-			
+
 			//Check if period and pipeline are entered
-			if($period=="" || $pipeline ==""){
+			if ($period == "" || $pipeline == "") {
 				$this -> session -> set_flashdata('order_message', "Please make sure you fill the period and the pipeline name!");
 				$this -> session -> set_flashdata('pipeline_upload', 1);
 				redirect("dashboard_management");
 				die();
-			}
-			else{
+			} else {
 				$text = $arr[2]['A'];
 				$x = 7;
 				$y = $highestRow;
@@ -832,30 +834,27 @@ class Order extends MY_Controller {
 					$drug_name = trim($drug_array[0]);
 					$drug_abbrev = trim($drug_array[1]);
 					$drug_strength = trim($drug_array[2]);
-					
-					if(isset($drug_abbrev[3]) and $drug_abbrev[3]!=null){
+
+					if (isset($drug_abbrev[3]) and $drug_abbrev[3] != null) {
 						$drug_packsize = trim($drug_array[3]);
-					}
-					else{
+					} else {
 						$drug_packsize = "";
 					}
-					echo $drug_name." : ".$drug_abbrev."(".$drug_strength.")".$drug_packsize."<br>";
+					echo $drug_name . " : " . $drug_abbrev . "(" . $drug_strength . ")" . $drug_packsize . "<br>";
 					//Get drugs ids
-					if(strtolower($pipeline)=="kemsa"){
-						$drug_id = sync_drug::getDrugId($drug_name,$drug_abbrev,$drug_strength,$drug_packsize);
+					if (strtolower($pipeline) == "kemsa") {
+						$drug_id = sync_drug::getDrugId($drug_name, $drug_abbrev, $drug_strength, $drug_packsize);
+					} else {//Kenya Pharma Pipeline
+						$drug_id = escm_drug::getDrugId($drug_name, $drug_abbrev, $drug_strength, $drug_packsize);
 					}
-					else{//Kenya Pharma Pipeline
-						$drug_id = escm_drug::getDrugId($drug_name,$drug_abbrev,$drug_strength,$drug_packsize);
-					}
-					
-					echo var_dump($drug_id)."<br>";
-					
+
+					echo var_dump($drug_id) . "<br>";
+
 					$x++;
 				}
 				die();
 			}
-			
-			
+
 		}
 		$main_array = array($main_array);
 		$this -> prepare_order($type, $main_array);

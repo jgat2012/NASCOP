@@ -24,12 +24,6 @@
 				<li>
 					<a href="#" class="setting_link" id="sync_user">USERS</a>
 				</li>
-				<li>
-					<a href="#" class="setting_link" id="mail_list">MAILING LISTS</a>
-				</li>
-				<li>
-					<a href="#" class="setting_link" id="user_emails">USER EMAILS</a>
-				</li>
 				<li class="divider"></li>
 				<li class="nav-header">
 					eSCM SETTINGS
@@ -45,19 +39,19 @@
 					COMMON SETTINGS
 				</li>
 				<li class="active">
-					<a href="#" class="setting_link" id="sync_drugy">DRUGS</a>
+					<a href="#" class="setting_link" id="drugcode">DRUGS</a>
 				</li>
 				<li>
-					<a href="#" class="setting_link" id="sync_regimen">DRUG CATEGORIES</a>
+					<a href="#" class="setting_link" id="facilities">FACILITIES</a>
 				</li>
 				<li>
-					<a href="#" class="setting_link" id="sync_facility">FACILITIES</a>
+					<a href="#" class="setting_link" id="regimen">REGIMENS</a>
 				</li>
 				<li>
-					<a href="#" class="setting_link" id="sync_regimen">REGIMENS</a>
+					<a href="#" class="setting_link" id="mail_list">MAILING LISTS</a>
 				</li>
 				<li>
-					<a href="#" class="setting_link" id="sync_regimen">REGIMEN CATEGORIES</a>
+					<a href="#" class="setting_link" id="user_emails">USER EMAILS</a>
 				</li>
 			</ul>
 		</div>
@@ -140,8 +134,17 @@
 				$("#create_setting").text("add mail list");
 				$("#modal_header").text("Add Mail List");
 		}else if(type == "user_emails") {
-				$("#create_setting").text("add user email");
+				$("#create_setting").text("add email");
 				$("#modal_header").text("Add User Email");
+		}else if(type == "facilities") {
+				$("#create_setting").text("add facility");
+				$("#modal_header").text("Add Facility");
+		}else if(type == "drugcode") {
+				$("#create_setting").text("add drug");
+				$("#modal_header").text("Add Drug");
+	    }else if(type == "regimen") {
+				$("#create_setting").text("add regimen");
+				$("#modal_header").text("Add Regimen");
 		}
 
 		var link = my_url + "settings/modal/" + type
@@ -190,8 +193,17 @@
 				$("#create_setting").text("add mail list");
 				$("#modal_header").text("Add Mail List");
 			}else if(type == "user_emails") {
-				$("#create_setting").text("add user email");
+				$("#create_setting").text("add email");
 				$("#modal_header").text("Add User Email");
+			}else if(type == "facilities") {
+				$("#create_setting").text("add facility");
+				$("#modal_header").text("Add Facility");
+			}else if(type == "drugcode") {
+				$("#create_setting").text("add drug");
+				$("#modal_header").text("Add Drug");
+			}else if(type == "regimen") {
+				$("#create_setting").text("add regimen");
+				$("#modal_header").text("Add Regimen");
 			}
 			var link = my_url + "settings/modal/" + type
 			$(".modal_btn").attr("href", link);
@@ -309,6 +321,12 @@
 			var columns = new Array("name", "created by","total emails","options");
 		} else if(type == "user_emails") {
 			var columns = new Array("email_address","total lists","options");
+		} else if(type == "drugcode") {
+			var columns = new Array("name","unit","pack size","options");
+		} else if(type == "facilities") {
+			var columns = new Array("mfl code", "name", "category","county","options");
+		} else if(type == "regimen") {
+			var columns = new Array("code", "name", "category","options");
 		}
 		//Generate Columns
 		var thead = "<table id='setting_grid' class='table table-bordered table-hover table-condensed'><thead><tr>";

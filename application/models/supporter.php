@@ -17,7 +17,7 @@ class Supporter extends Doctrine_Record {
 	}
 	
 	public function getAllActive() {
-		$query = Doctrine_Query::create() -> select("*") -> from("supporter")->where("Active='1'");
+		$query = Doctrine_Query::create() -> select("*") -> from("supporter")->where("Active='1'")->orderBy("Name asc");
 		$supporters = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $supporters;
 	}

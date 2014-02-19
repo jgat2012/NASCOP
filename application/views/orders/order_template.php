@@ -231,7 +231,7 @@
 					<td style="border-right:2px solid #DDD;padding-right:2em;"><?php echo $regimen -> regimen_code;?></td>
 					<td regimen_id="<?php echo $regimen -> id;?>" class="regimen_desc col_drug"><?php echo $regimen -> regimen_desc;?></td>
 					<td regimen_id="<?php echo $regimen -> id;?>" class="regimen_numbers">
-					<input name="patient_numbers[]" id="patient_numbers_<?php echo $regimen -> map;?>" type="text">
+					<input name="patient_numbers[]" id="patient_numbers_<?php echo $regimen -> n_map;?>" type="text">
 					<input name="patient_regimens[]" value="<?php echo $regimen -> regimen_code." | ".$regimen -> regimen_desc;?>" type="hidden">
 					</td>
 				</tr>

@@ -3,16 +3,13 @@ class Regimen extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('regimen_code', 'varchar', 20);
-		$this -> hasColumn('regimen_desc', 'varchar', 50);
+		$this -> hasColumn('regimen_desc', 'varchar', 150);
 		$this -> hasColumn('category', 'varchar', 30);
 		$this -> hasColumn('line', 'varchar', 4);
 		$this -> hasColumn('type_Of_service', 'varchar', 20);
-		$this -> hasColumn('remarks', 'varchar', 30);
-		$this -> hasColumn('enabled', 'varchar', 4);
-		$this -> hasColumn('source', 'varchar', 10);
-		$this -> hasColumn('optimality', 'varchar', 1);
-		$this -> hasColumn('Merged_To', 'varchar', 50);
-		$this -> hasColumn('map', 'int', 11);
+		$this -> hasColumn('active', 'int', 11);
+		$this -> hasColumn('n_map', 'int', 11);
+		$this -> hasColumn('e_map', 'int', 11);
 	}
 
 	public function setUp() {
@@ -20,6 +17,8 @@ class Regimen extends Doctrine_Record {
 		$this -> hasOne('Regimen_Category as Regimen_Category', array('local' => 'Category', 'foreign' => 'id'));
 		$this -> hasOne('Regimen_Service_Type as Regimen_Service_Type', array('local' => 'Type_Of_Service', 'foreign' => 'id'));
 		$this -> hasMany('Regimen_Drug as Drugs', array('local' => 'id', 'foreign' => 'Regimen'));
+		$this -> hasOne('Sync_Regimen as S_Regimen', array('local' => 'n_map', 'foreign' => 'id'));
+		$this -> hasOne('Escm_Regimen as E_Regimen', array('local' => 'e_map', 'foreign' => 'id'));
 	}
 
 	public function getAll($source = 0) {
@@ -41,7 +40,7 @@ class Regimen extends Doctrine_Record {
 	}
 
 	public function getAllObjects($source = 0) {
-		$query = Doctrine_Query::create() -> select("*") -> from("regimen") -> where('source = "' . $source . '" or source ="0"') -> orderBy("regimen_code asc");
+		$query = Doctrine_Query::create() -> select("*") -> from("regimen") -> where('active ="1"') -> orderBy("regimen_code asc");
 		$regimens = $query -> execute();
 		return $regimens;
 	}

@@ -4,21 +4,17 @@ class Facilities extends Doctrine_Record {
 		$this -> hasColumn('facilitycode', 'int', 32);
 		$this -> hasColumn('name', 'varchar', 100);
 		$this -> hasColumn('facilitytype', 'varchar', 5);
-		$this -> hasColumn('parent', 'varchar', 10);
 		$this -> hasColumn('district', 'varchar', 5);
 		$this -> hasColumn('county', 'int', 11);
-		$this -> hasColumn('flag', 'varchar', 2);
-		$this -> hasColumn('email', 'varchar', 50);
-		$this -> hasColumn('phone', 'varchar', 50);
-		$this -> hasColumn('adult_age', 'varchar', 10);
-		$this -> hasColumn('weekday_max', 'varchar', 20);
-		$this -> hasColumn('weekend_max', 'varchar', 20);
 		$this -> hasColumn('supported_by', 'int', 5);
 		$this -> hasColumn('service_art', 'int', 2);
 		$this -> hasColumn('service_pmtct', 'int', 2);
 		$this -> hasColumn('service_pep', 'int', 2);
 		$this -> hasColumn('supplied_by', 'int', 2);
+		$this -> hasColumn('type', 'varchar', 50);
+		$this -> hasColumn('parent', 'varchar', 10);
 		$this -> hasColumn('map', 'int', 11);
+		$this -> hasColumn('active', 'int', 11);
 	}
 
 	public function setUp() {
@@ -93,6 +89,12 @@ class Facilities extends Doctrine_Record {
 		return $facility;
 	}
 
+	public function getActive() {
+		$query = Doctrine_Query::create() -> select("*") -> from("Facilities") -> where("active='1'") -> orderBy("name");
+		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $facility;
+	}
+
 	public function getFacilities() {
 		$query = Doctrine_Query::create() -> select("facilitycode,name") -> from("Facilities") -> orderBy("name");
 		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
@@ -134,7 +136,5 @@ class Facilities extends Doctrine_Record {
 		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $facility[0]['total'];
 	}
-	
-	
 
 }

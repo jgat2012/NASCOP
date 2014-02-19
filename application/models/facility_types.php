@@ -15,7 +15,7 @@ class Facility_Types extends Doctrine_Record {
 		return $types;
 	}	
 	public function getActive() {
-		$query = Doctrine_Query::create() -> select("id,Name") -> from("Facility_Types");
+		$query = Doctrine_Query::create() -> select("id,Name") -> from("Facility_Types")->orderBy("Name asc");
 		$types = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $types;
 	}
