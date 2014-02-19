@@ -441,7 +441,7 @@
 			$(".paed_pa_period_display").text(period);
 			$("#ART_PAED_PATIENT_graph").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 			var art_paed_patient_link="<?php echo base_url().'dashboard_management/getPatients/PAED_ART/';?>"+period;
-			$("#ART_PAED_PATIENT_graph").load(art_adult_patient_link);
+			$("#ART_PAED_PATIENT_graph").load(art_paed_patient_link);
 		}
 		
 	});
@@ -567,7 +567,7 @@
   </ul>
   <div>
   	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
-	  <li><a href="#">National Dashboard</a><span class="divider">/</span></li>
+	  <li><a href="<?php echo base_url();?>">National Dashboard</a><span class="divider">/</span></li>
 	  <li><a id="sub_active" href="#"></a><span class="divider">/</span></li>
 	  <li id="active_menu" class="active"></li>
 	</ol>
