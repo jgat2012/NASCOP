@@ -796,9 +796,9 @@ class Order extends MY_Controller {
 			$main_array = array($main_array);
 			$this -> prepare_order($type, $main_array);
 			$content = "Order was successfully saved";
-	
+
 			$dir = "Export";
-	
+
 			/*Delete all files in export folder*/
 			if (is_dir($dir)) {
 				$files = scandir($dir);
@@ -810,17 +810,16 @@ class Order extends MY_Controller {
 			} else {
 				mkdir($dir);
 			}
-	
+
 			//move the file
 			$file_location = $dir . "/" . $_FILES['file']['name'];
 			move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
 			//send excel file to email
 			$content .= $this -> send_file($file_location);
-	
+
 			$this -> session -> set_flashdata('order_message', $content);
 			redirect("dashboard_management");
-		}
-		else if($type=="pipeline_upload"){//Upload Central medical stores and pending orders data
+		} else if ($type == "pipeline_upload") {//Upload Central medical stores and pending orders data
 			$this -> load -> library('PHPExcel');
 			$objReader = new PHPExcel_Reader_Excel5();
 			if ($_FILES['cms_file']['tmp_name']) {
@@ -837,7 +836,7 @@ class Order extends MY_Controller {
 
 			$period = $arr[2]['C'];
 			$period = trim($period);
-			$period = date("Y-m-01",strtotime($period));
+			$period = date("Y-m-01", strtotime($period));
 			$pipeline = $arr[3]['C'];
 			$pipeline = trim($pipeline);
 			$data = array();
@@ -854,8 +853,8 @@ class Order extends MY_Controller {
 				$y = $highestRow;
 				$sql = "";
 				$pipeline = strtolower($pipeline);
-				if($pipeline=="kenya pharma"){
-					$pipeline ="kp";
+				if ($pipeline == "kenya pharma") {
+					$pipeline = "kp";
 				}
 				while ($x <= $y) {
 					//get drug details
@@ -876,42 +875,36 @@ class Order extends MY_Controller {
 						$drug_id = sync_drug::getDrugId($drug_name, $drug_abbrev, $drug_strength, $drug_packsize);
 					} else {//Kenya Pharma Pipeline
 						$drug_id = escm_drug::getDrugId($drug_name, $drug_abbrev, $drug_strength, $drug_packsize);
-					}			
+					}
 					//echo var_dump($drug_id)."<br>";
-					if($drug_id!=""){
-						$drug_id= $drug_id[0]['id'];
+					if ($drug_id != "") {
+						$drug_id = $drug_id[0]['id'];
 						$cms = $arr[$x]["B"];
 						$pending = $arr[$x]["C"];
 						//echo $cms.'<br>';
-						if(trim($cms)!="" or trim($pending)!=""){//Only populate if cms or pending has data
-							$data[$z] = array(
-									"cms"=>"$cms",
-									"pending"=>"$pending",
-									"period_begin" =>"$period",
-									"pipeline" =>"$pipeline",
-									"drug_id" =>"$drug_id"
-									); 
+						if (trim($cms) != "" or trim($pending) != "") {//Only populate if cms or pending has data
+							$data[$z] = array("cms" => "$cms", "pending" => "$pending", "period_begin" => "$period", "pipeline" => "$pipeline", "drug_id" => "$drug_id");
 							$z++;
 						}
-						
+
 					}
 					$x++;
-					
+
 				}
 				//die();
 				//Run batch
-				if($data[0]!=""){
-					$query = $this->db->insert_batch('facility_soh', $data); 
+				if ($data[0] != "") {
+					$query = $this -> db -> insert_batch('facility_soh', $data);
 				}
 				$this -> session -> set_flashdata('order_message', "You data have been successfully imported!");
 				$this -> session -> set_flashdata('pipeline_upload', 1);
 				redirect("dashboard_management");
 				die();
-				
+
 			}
 
 		}
-		
+
 	}
 
 	public function send_file($excel_file) {
@@ -1567,16 +1560,115 @@ class Order extends MY_Controller {
 		return $total;
 	}
 
-	public function authenticate_upload() {
+	public function upload_authenticate() {
 		$email_address = $this -> input -> post("email", TRUE);
-		$user = Sync_User::getUser($email_address);
+		$password = md5($this -> input -> post("password", TRUE));
+		$user = Sync_User::getAuthenticUser($email_address, $password);
 		if ($user) {
-			$this -> session -> set_userdata('upload_valid', $user['id']);
+			if ($user['status'] != 'A') {
+				$this -> session -> set_flashdata('login_message', "Account has been deactivated!<br/>Contact the Administrator.");
+			} else {
+				if (strtoupper(trim($user['role'])) == trim('PIPELINE')) {
+					$this -> session -> set_userdata("order_pipeline", "yes");
+				}
+				$this -> session -> set_userdata('upload_valid', $user['id']);
+				$this -> session -> set_userdata("order_user", $user['name']);
+			}
 		} else {
 			$this -> session -> set_flashdata('login_message', "Login Failed!");
 		}
 		redirect("dashboard_management");
 
+	}
+
+	public function upload_logout() {
+		$this -> session -> unset_userdata("upload_valid");
+		$this -> session -> unset_userdata("order_pipeline");		
+		redirect("dashboard_management");
+	}
+
+	public function upload_forgot() {
+		//forgot password
+		$email_address = $this -> input -> post("email");
+		$user = Sync_User::getUser($email_address);
+		$password = "";
+		if ($user) {
+			$user_id = $user['id'];
+			$characters = strtoupper("abcdefghijklmnopqrstuvwxyz");
+			$characters = $characters . 'abcdefghijklmnopqrstuvwxyz0123456789';
+			$password_length = 6;
+			$string = '';
+			for ($i = 0; $i < $password_length; $i++) {
+				$password .= $characters[rand(0, strlen($characters) - 1)];
+			}
+			$this -> db -> where('id', $user_id);
+			$this -> db -> update("sync_user", array("password" => md5($password)));
+			$message = $this -> send_password($email_address, $password);
+			$this -> session -> set_flashdata('login_message', $message);
+
+		} else {
+			$this -> session -> set_flashdata('login_message', "not a valid user email!");
+		}
+		redirect("dashboard_management");
+	}
+
+	public function upload_password() {
+		//change password
+		$current_password = $this -> input -> post("current_password");
+		$new_password = $this -> input -> post("new_password");
+		$confirm_password = $this -> input -> post("confirm_password");
+		$user_id = $this -> session -> userdata('upload_valid');
+		$db_password = Sync_User::getCurrentPassword($user_id);
+		if ($db_password == md5($current_password)) {
+			if ($new_password == $confirm_password) {
+				$this -> db -> where('id', $user_id);
+				$this -> db -> update("sync_user", array("password" => md5($new_password)));
+				$this -> session -> set_flashdata('login_message', "password updated successfully");
+			} else {
+				$this -> session -> set_flashdata('login_message', "new password and confirm password are mismatch");
+			}
+		} else {
+			$this -> session -> set_flashdata('login_message', "current password incorrect!");
+		}
+		redirect("dashboard_management");
+	}
+
+	public function send_password($email_address, $password) {
+		$email_user = stripslashes('webadt.chai@gmail.com');
+		$email_password = stripslashes('WebAdt_052013');
+		$subject = "NASCOP User Password Reset";
+		$email_sender_title = "NASCOP SYSTEM";
+
+		$message = "Hello NASCOP USER, <br/><br/>
+		                Your account for the $email_sender_title was reset</b><br/>
+						The new password is <b> $password </b><br/><br/>
+						Regards,<br/>
+						$email_sender_title team.";
+
+		$config['mailtype'] = "html";
+		$config['protocol'] = 'smtp';
+		$config['smtp_host'] = 'ssl://smtp.googlemail.com';
+		$config['smtp_port'] = 465;
+		$config['smtp_user'] = $email_user;
+		$config['smtp_pass'] = $email_password;
+		ini_set("SMTP", "ssl://smtp.gmail.com");
+		ini_set("smtp_port", "465");
+
+		$this -> load -> library('email', $config);
+		$this -> email -> set_newline("\r\n");
+		$this -> email -> from('webadt.chai@gmail.com', $email_sender_title);
+		$this -> email -> to("$email_address");
+		$this -> email -> subject($subject);
+		$this -> email -> message($message);
+
+		if ($this -> email -> send()) {
+			$this -> email -> clear(TRUE);
+			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
+		} else {
+			$error_message = $this -> email -> print_debugger();
+		}
+
+		return $error_message;
 	}
 
 	public function base_params($data) {

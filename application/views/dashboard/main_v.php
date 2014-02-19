@@ -8,6 +8,21 @@
 </style>
 <script type="text/javascript">
 	$(document).ready(function(){
+		$(".forgot").click(function(){
+			$("#forgot_frm").show();
+			$("#login_frm").hide();
+		});
+		
+		$(".login").click(function(){
+			$("#forgot_frm").hide();
+			$("#login_frm").show();
+		});
+		
+		$(".password").click(function(){
+			$("#order_frm").hide();
+			$("#change_frm").show();
+		});
+		
 		//If pipeline has just logged in, display pipeline upload page
 		var check_login = "<?php echo $this->session->userdata("pipeline_upload")?>";
 		if($.trim(check_login)==1){
@@ -570,7 +585,31 @@
   			<div class="row-fluid" style="height:50%;">
   			<?php 
   			 if($this->session->userdata("upload_valid") !=""){
+  			 	if($this -> session ->userdata('order_pipeline') !="yes"){
   			?>
+  			<div id="order_frm">
+  				<div class="row-fluid">
+  					<div class="span6">
+  						<?php if($this -> session -> flashdata('login_message') !=""){?>
+                		  	<div class="alert alert-info">
+							    <button type='button' class='close' data-dismiss='alert'>&times;</button>
+							     <?php echo $this -> session -> flashdata('login_message');?>
+							</div>
+							<?php }?>
+  					</div>
+  				 <div class="span6">
+  			      	<label style="float:right;border 1px solid #000;">Welcome <b><?php echo $this->session->userdata("order_user"); ?></b>
+  			      	<div class="dropdown" style="display:inline;">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+					    <li><a tabindex="-1" href='#' class="password">change password</a></li>
+					  </ul>
+					</div>
+					<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
+					</label>			
+                 </div>
+                 </div>
+                <div class="row-fluid">
   				<div class="span6">
   	                   		<h3>CDRR Upload</h3>
 						      <div class="accordion-inner">
@@ -631,10 +670,102 @@
 						        <a href="<?php echo base_url().'downloads/F-MAPS for Standalone Sites.xls' ;?>"><i class="icon-download-alt"></i> F-MAPS for Stand-alone Sites.xls</a>
 						      </div>
   			    </div><!--End of second Span-->
+  			    </div>
+  			    </div>
   			    <?php }else{?>
-  			       <div class="span4">
-	                       	<?php echo $this -> session -> flashdata('login_message');?>
-							<?php echo form_open('order/authenticate_upload');?>
+  			    <div id="order_frm">
+  				<div class="row-fluid">
+  					<div class="span6">
+  						<?php if($this -> session -> flashdata('login_message') !=""){?>
+                		  	<div class="alert alert-info">
+							    <button type='button' class='close' data-dismiss='alert'>&times;</button>
+							     <?php echo $this -> session -> flashdata('login_message');?>
+							</div>
+							<?php }?>
+  					</div>
+  				 <div class="span6">
+  				 	<label style="float:right;border 1px solid #000;">Welcome <b><?php echo $this->session->userdata("order_user"); ?></b>
+  			      	<div class="dropdown" style="display:inline;">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+					    <li><a tabindex="-1" href='#' class="password">change password</a></li>
+					  </ul>
+					</div>
+					<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
+					</label>			
+                 </div>
+                 </div>
+                <div class="row-fluid">
+  				<div class="span12">
+  					Put pipeline upload here!
+  				</div>
+                 </div>
+                 </div>
+  			    	
+  			    <?php }?>	
+  			    <div id="change_frm" style="display:none;">
+  				<div class="row-fluid">
+  				 <div class="span12">
+  			      	<label style="float:right;border 1px solid #000;">Welcome <b><?php echo $this->session->userdata("order_user"); ?></b>
+  			      	<div class="dropdown" style="display:inline;">
+					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+					    <li><a tabindex="-1" href='#' class="password">change password</a></li>
+					  </ul>
+					</div>
+					<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
+					</label>			
+                 </div>
+                 </div>
+                <div class="row-fluid">
+                	<div class="span6">
+							<?php echo form_open('order/upload_password');?>
+							<?php echo form_fieldset('', array('id' => 'login_legend'));?>
+							<legend id="login_legend">
+								<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Change Password
+							</legend>
+							<?php echo $this -> session -> flashdata('error_message');?>
+								<div class="item">
+								<?php echo form_error('current_password', '<div class="error_message">', '</div>');?>
+								<?php echo form_label('Current Password:', 'current_password');?>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-key"></i></span>
+									<?php echo form_password(array('name' => 'current_password', 'required' => 'required', 'id' => 'current_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
+								</div>
+			                    </div>
+							   	<div class="item">
+								<?php echo form_error('new_password', '<div class="error_message">', '</div>');?>
+								<?php echo form_label('New Password:', 'new_password');?>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-key"></i></span>
+									<?php echo form_password(array('name' => 'new_password', 'required' => 'required', 'id' => 'new_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
+								</div>
+			                    </div>
+			                    <div class="item">
+								<?php echo form_error('confirm_password', '<div class="error_message">', '</div>');?>
+								<?php echo form_label('Confirm Password:', 'confirm_password');?>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-key"></i></span>
+									<?php echo form_password(array('name' => 'confirm_password', 'required' => 'required', 'id' => 'confirm_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
+								</div>
+			                    </div>
+	                        	<div style="margin-top:1em;">
+	                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
+								    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:20%;'), 'Save');?> 
+								    <?php echo form_fieldset_close();?>
+	                        	</div>
+	                        </form>
+                	</div>
+                </div>
+                </div>
+  			    <?php }else{?>
+  			       <div class="span4" id="login_frm">
+  			                <?php if($this -> session -> flashdata('login_message') !=""){?>
+  			       			<div class="alert alert-info">
+							    <button type='button' class='close' data-dismiss='alert'>&times;</button>
+							     <?php echo $this -> session -> flashdata('login_message');?>
+							</div>
+							<?php } echo form_open('order/upload_authenticate');?>
 							<?php echo form_fieldset('', array('id' => 'login_legend'));?>
 							<legend id="login_legend">
 								<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Log In
@@ -656,9 +787,41 @@
 									<?php echo form_password(array('name' => 'password', 'required' => 'required', 'id' => 'password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
 								</div>
 			                    </div>
+			                    <div class="item">
+			                    	<div class="input-group">
+			                    	<strong><a href="#" class="forgot" >Forgot Password?</a></strong>
+			                        </div>
+			                    </div>
 	                        	<div style="margin-top:1em;">
 	                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
 								    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:20%;'), 'Go');?> 
+								    <?php echo form_fieldset_close();?>
+	                        	</div>
+	                        </form>
+		           </div>
+		           <div class="span4" id="forgot_frm" style="display:none;">
+							<?php echo form_open('order/Upload_forgot');?>
+							<?php echo form_fieldset('', array('id' => 'login_legend'));?>
+							<legend id="login_legend">
+								<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Forgot Password
+							</legend>
+							<?php echo $this -> session -> flashdata('error_message');?>
+							    <div class="item">
+								<?php echo form_error('email', '<div class="error_message">', '</div>');?>
+								<?php echo form_label('Email Address:', 'username');?>
+								<div class="input-group">
+									<span class="input-group-addon"><i class="fa fa-user"></i></span>
+									<?php echo form_input(array('type' => 'email', 'name' => 'email', 'required' => 'required', 'id' => 'email', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => 'mail@yourmail.com'));?>
+								</div>
+			                    </div>
+			                    <div class="item">
+			                    	<div class="input-group">
+			                    	<strong><a href="#" class="login">Back to Login</a></strong></strong>
+			                        </div>
+			                    </div>
+	                        	<div style="margin-top:1em;">
+	                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
+								    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:30%;'), 'Submit');?> 
 								    <?php echo form_fieldset_close();?>
 	                        	</div>
 	                        </form>

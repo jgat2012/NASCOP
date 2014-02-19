@@ -561,11 +561,10 @@ class User_Management extends MY_Controller {
 			$data['error'] = $message;
 		}
 		$data['title'] = "Reset password";
-		$data['content_view'] = "resend_password_v";
 		$data['link'] = "settings_management";
 		$data['banner_text'] = "Reset Password";
 		$data['hide_side_menu'] = 1;
-		$this -> load -> view('template', $data);
+		$this -> load -> view('resend_password_v', $data);
 
 	}
 

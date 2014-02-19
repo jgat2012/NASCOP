@@ -170,6 +170,8 @@ class settings extends MY_Controller {
 				$columns = array("category_id" => 14);
 			} else if ($type == "sync_regimen") {
 				$columns = array("category_id" => 15);
+			} else if ($type == "sync_user") {
+				$columns = array("status" => "N");
 			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen") {
 				$columns = array("active" => "0");
 			}
@@ -311,13 +313,13 @@ class settings extends MY_Controller {
 				} else if ($type == "user_emails" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
-				}else if ($type == "drugcode" && $i == "active" && $v == 0) {
+				} else if ($type == "drugcode" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
-				}else if ($type == "facilities" && $i == "active" && $v == 0) {
+				} else if ($type == "facilities" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
-				}else if ($type == "regimen" && $i == "active" && $v == 0) {
+				} else if ($type == "regimen" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
 				}
@@ -624,6 +626,19 @@ class settings extends MY_Controller {
 					$mail_list = $this -> input -> post($input);
 					$mail_list = explode(",", $mail_list);
 				}
+			} else if ($index == "email" && $id == null) {
+				$password = "";
+				$characters = strtoupper("abcdefghijklmnopqrstuvwxyz");
+				$characters = $characters . 'abcdefghijklmnopqrstuvwxyz0123456789';
+				$password_length = 6;
+				$string = '';
+				for ($i = 0; $i < $password_length; $i++) {
+					$password .= $characters[rand(0, strlen($characters) - 1)];
+				}
+				$save_data[$index] = $this -> input -> post($input);
+				$save_data["password"] = md5($password);
+				$this -> send_password($this -> input -> post($input), $password);
+
 			} else if ($index == "creator_id" && $id == null) {
 				$save_data[$index] = $this -> session -> userdata("user_id");
 			} else if ($input == "adt_site" && $this -> input -> post("supplied_by") != 0) {
@@ -1007,6 +1022,44 @@ class settings extends MY_Controller {
 		if ($mission == 0) {
 			redirect("order");
 		}
+	}
+
+	public function send_password($email_address, $password) {
+		$email_user = stripslashes('webadt.chai@gmail.com');
+		$email_password = stripslashes('WebAdt_052013');
+		$subject = "NASCOP User Password Reset";
+		$email_sender_title = "NASCOP SYSTEM";
+
+		$message = "Hello NASCOP USER, <br/><br/>
+		                Your account for the $email_sender_title was reset</b><br/>
+						The new password is <b> $password </b><br/><br/>
+						Regards,<br/>
+						$email_sender_title team.";
+
+		$config['mailtype'] = "html";
+		$config['protocol'] = 'smtp';
+		$config['smtp_host'] = 'ssl://smtp.googlemail.com';
+		$config['smtp_port'] = 465;
+		$config['smtp_user'] = $email_user;
+		$config['smtp_pass'] = $email_password;
+		ini_set("SMTP", "ssl://smtp.gmail.com");
+		ini_set("smtp_port", "465");
+
+		$this -> load -> library('email', $config);
+		$this -> email -> set_newline("\r\n");
+		$this -> email -> from('webadt.chai@gmail.com', $email_sender_title);
+		$this -> email -> to("$email_address");
+		$this -> email -> subject($subject);
+		$this -> email -> message($message);
+
+		if ($this -> email -> send()) {
+			$this -> email -> clear(TRUE);
+			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
+		} else {
+			$error_message = $this -> email -> print_debugger();
+		}
+
+		return $error_message;
 	}
 
 	public function base_params($data) {
