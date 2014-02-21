@@ -23,15 +23,73 @@
 			$("#change_frm").show();
 		});
 		
-		//If pipeline has just logged in, display pipeline upload page
-		var check_login = "<?php echo $this->session->userdata("pipeline_upload")?>";
-		if($.trim(check_login)==1){
-			$("#tab5").hide();
-			$("#tab8").show();
-			$("#pu_menu").addClass("active");
-			$("#ra_menu").removeClass("active");
-			"<?php echo $this->session->unset_userdata("pipeline_upload")?>";
-		}
+		$(".home").click(function(){
+			$("#order_frm").show();
+			$("#change_frm").hide();
+		});
+		
+		//Check default tab
+		var type = "<?php if($this -> session -> userdata("tab_session") !=""){echo $this -> session -> userdata("tab_session");}else{echo "ra_menu";} ?>";
+		$(".main_menu").removeClass("active");
+		$("#"+type).addClass("active");
+		var _function = $("#"+type).attr("data-function");//Call function to load data
+		_function;
+		var a_href = $("#"+type).find("a").attr("href");
+		$(".tab-pane").hide();
+		$(a_href).show();
+		if(type=="pa_menu"){//Patient Analysis
+	 		allPatientAnalysis();
+	 	}
+	 	else if(type=="ra_menu"){//Reporting Analysis
+	 		  reporting_analysis();
+	 	}
+	 	else if(type=="ca_menu"){//Reporting Analysis
+	 		  commodity_analysis();
+	 	}
+		
+		//When one clicks tab, keep it in session
+		$(".main_menu").live("click",function(){
+			$(".tab-pane").hide();
+			//Update breadcrumbs
+		 	var selected_menu=$(this).find("a").text();
+		 	$("#sub_active").text(selected_menu);
+		 	var id=$(this).attr("id");
+		 	var someDate = new Date();
+			var dd = ("0" + someDate.getDate()).slice(-2);
+			var prev_m = ("0" + (someDate.getMonth() + 0)).slice(-2);
+			var y = someDate.getFullYear();
+			
+			
+			
+			var url = "<?php echo base_url().'dashboard_management/set_tab_session';?>";
+			var tab_id = $(this).attr("id");
+			$.ajax({
+				url : url,
+				type : 'POST',
+				data: {"tab_id":tab_id},
+				success : function(data) {
+					var type = data;
+					var a_href = $(type).find("a").attr("href");
+					$(a_href).show();
+					if(id=="pa_menu"){//Patient Analysis
+				 		//Update breadcrumbs
+						var active_menu=$(".patient_analysis_menus.active").find("a").text();
+						$("#active_menu").text(active_menu);
+				 		//patient_by_regimen(y,mm,1);
+				 		allPatientAnalysis();
+				 	}
+				 	else if(id=="ra_menu"){//Reporting Analysis
+				 		  reporting_analysis();
+				 	}
+				 	else if(type=="ca_menu"){//Reporting Analysis
+				 		  commodity_analysis();
+				 	}
+				}
+			});
+			
+			
+		});
+		
 		
 		
 		  $(".order_link").click(function() {
@@ -53,17 +111,6 @@
 				"bServerSide" : false,
 		 });
 		 
-		  var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/table';?>";//Table Reporting Sites Summary
-		  var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
-		  var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";//ARV Sites
-		  var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites Analysis
-		
-		
-       $("#chart_area_report_summary").load(report_analysis_summary_link);
-	   $("#chart_area_report").load(report_analysis_link);
-	   $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
-       
-       $("#report_summary_table").load(report_analysis_table_link);
        
        
        
@@ -188,59 +235,7 @@
 		  * Click get button to generate charts end -----------------------------------
 		  */
 		 
-		 /*
-		  * What happens when someone clicks a menu -----------------------------------
-		  */
-		 $(".main_menu").click(function(){
-		 	//Update breadcrumbs
-		 	var selected_menu=$(this).find("a").text();
-		 	$("#sub_active").text(selected_menu);
-		 	
-		 	var id=$(this).attr("id");
-		 	var someDate = new Date();
-			var dd = ("0" + someDate.getDate()).slice(-2);
-			var prev_m = ("0" + (someDate.getMonth() + 0)).slice(-2);
-			var y = someDate.getFullYear();
-			//Commodity analysis
-			if(id=="ca_menu"){
-				//Update breadcrumbs
-				var active_menu=$(".commodity_analysis_menus.active").find("a").text();
-				$("#active_menu").text(active_menu);
-		 		$("#chart_area_ca").html('<div class="loadingDiv" style="margin:0 auto;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-				commodity_analysis();
-		 	}
-		 	else if(id=="pa_menu"){//Patient Analysis
-		 		//Update breadcrumbs
-				var active_menu=$(".patient_analysis_menus.active").find("a").text();
-				$("#active_menu").text(active_menu);
-		 		//patient_by_regimen(y,mm,1);
-		 		allPatientAnalysis();
-		 	}
-		 	else if(id=="fa_menu"){
-		 		//Update breadcrumbs
-				var active_menu=$(".facility_analysis_menus.active").find("a").text();
-				$("#active_menu").text(active_menu);
-		 		ordering_site_summary(y,mm,1);
-		 	}
-		 	else if(id=="oa_menu"){
-		 		//Update breadcrumbs
-				var active_menu=$(".order_analysis_menus.active").find("a").text();
-				$("#active_menu").text(active_menu);
-		 		order_analysis(y,mm,1);
-		 	}
-		 	else if(id=="ra_menu"){
-		 		  // if($("#chart_area_report_summary").children().length == 0){
-		 		  	   $("#report_summary_table").load(report_analysis_table_link);
-		 		   	   $("#chart_area_report_summary").load(report_analysis_summary_link);
-				       $("#chart_area_report").load(report_analysis_link);
-				       $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
-		 		  // }
-		 		   
-		 	}
-		 })
-		 /*
-		  * What happens when someone clicks a menu end-----------------------------------
-		  */
+		 
 		 
 		 //-----------------------------What happens when someone clicks a submenu
 		 //Commodity analysis
@@ -441,30 +436,12 @@
 			$(".paed_pa_period_display").text(period);
 			$("#ART_PAED_PATIENT_graph").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 			var art_paed_patient_link="<?php echo base_url().'dashboard_management/getPatients/PAED_ART/';?>"+period;
-			$("#ART_PAED_PATIENT_graph").load(art_adult_patient_link);
+			$("#ART_PAED_PATIENT_graph").load(art_paed_patient_link);
 		}
 		
 	});
 	
-	/*
-	 * Pipeline Upload
-	 */
-	//check which menu is clicked
-	$(".main_menu").live("click",function(){
-		var id = $(this).attr("id");
-		if(id=="pu_menu"){
-			$("#tab5").hide();
-			$("#tab8").show();
-		}
-		else if(id=="ra_menu"){
-			$("#tab8").hide();
-			$("#tab5").show();
-		}
-		else{//Hide reporting analysis and pipeline upload tab
-			$("#tab5").hide();
-			$("#tab8").hide();
-		}
-    });
+	
 	/*
 	 * Patient Analysis functions
 	 */
@@ -508,6 +485,7 @@
 	}
 	
 	
+	
 	/*
 	 * Commodity Analysis functions
 	 */
@@ -549,6 +527,17 @@
 	 * Reporting Analysis Functions
 	 */
 	
+	function reporting_analysis(){
+		var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/table';?>";//Table Reporting Sites Summary
+		var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
+	  	var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";//ARV Sites
+	  	var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites Analysis
+
+	    $("#report_summary_table").load(report_analysis_table_link);
+   	    $("#chart_area_report_summary").load(report_analysis_summary_link);
+        $("#chart_area_report").load(report_analysis_link);
+        $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
+	}
 	
 	
 </script>
@@ -556,10 +545,10 @@
 <div class="tabbable national_dashboard_content" style="margin-top:1%"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs " style="width:60%; float: left">
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
-  	<li id="pa_menu" class="main_menu"><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
-    <li id="ca_menu" class="main_menu"><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
-    <li id="ca_menu" class="main_menu"><a href="#tab8" data-toggle="tab">EID Analysis</a></li>
-    <li id="ca_menu" class="main_menu"><a href="#tab7" data-toggle="tab">Upload</a></li>
+  	<li id="pa_menu" class="main_menu" ><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
+    <li id="ca_menu" class="main_menu" ><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
+    <li id="eid_menu" class="main_menu" ><a href="#tab8" data-toggle="tab">EID Analysis</a></li>
+    <li id="up_menu" class="main_menu" ><a href="#tab7" data-toggle="tab">Upload</a></li>
     
     <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
@@ -567,21 +556,16 @@
   </ul>
   <div>
   	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
-	  <li><a href="#">National Dashboard</a><span class="divider">/</span></li>
+	  <li><a href="<?php echo base_url();?>">National Dashboard</a><span class="divider">/</span></li>
 	  <li><a id="sub_active" href="#"></a><span class="divider">/</span></li>
 	  <li id="active_menu" class="active"></li>
 	</ol>
   </div>
-  <?php 
-  if($this -> session -> flashdata('order_message')){
-  	echo "<span class='message info'>".$this -> session -> flashdata('order_message')."</span>";
-  }
-  ?>
+
   <div class="tab-content nat_dashboard_rep" style="clear:left">
   	<!--Ordering-->
   	<div class="tab-pane" id="tab7">
   		<div class="container">
-  			<?php echo $this->session->flashdata("order_message");?>
   			<div class="row-fluid" style="height:50%;">
   			<?php 
   			 if($this->session->userdata("upload_valid") !=""){
@@ -598,7 +582,7 @@
 							<?php }?>
   					</div>
   				 <div class="span6">
-  			      	<label style="float:right;border 1px solid #000;">Welcome <b><?php echo $this->session->userdata("order_user"); ?></b>
+  			      	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
   			      	<div class="dropdown" style="display:inline;">
 					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -676,6 +660,11 @@
   			    <div id="order_frm">
   				<div class="row-fluid">
   					<div class="span6">
+  						  <?php 
+						  if($this -> session -> flashdata('order_message')){
+						  	echo "<div class='alert alert-info'><button type='button' class='close' data-dismiss='alert'>&times;</button>".$this -> session -> flashdata('order_message')."</div>";
+						  }
+						  ?>
   						<?php if($this -> session -> flashdata('login_message') !=""){?>
                 		  	<div class="alert alert-info">
 							    <button type='button' class='close' data-dismiss='alert'>&times;</button>
@@ -684,7 +673,7 @@
 							<?php }?>
   					</div>
   				 <div class="span6">
-  				 	<label style="float:right;border 1px solid #000;">Welcome <b><?php echo $this->session->userdata("order_user"); ?></b>
+  				 	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
   			      	<div class="dropdown" style="display:inline;">
 					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -697,7 +686,26 @@
                  </div>
                 <div class="row-fluid">
   				<div class="span12">
-  					Put pipeline upload here!
+  					<div class="row-fluid">
+			    		<div class="span12">	
+							<h3> Pipeline Upload</h3>
+							<?php echo form_open_multipart("order/import_order/pipeline_upload");?>
+							<input type="file" name="cms_file" id="cms_file" required="" accept="application/vnd.ms-excel" />
+							<div class="control-group">
+							    <div class="controls">
+							      <button type="submit" class="btn btn-primary"><i class="icon-upload"></i>Upload File</button>
+							    </div>
+							</div>
+							<?php echo form_close();?>
+						</div>
+					</div>
+					<div class="row-fluid">	
+						
+						<div class="span12">	
+							<h3>Central Medical Store and Pending Orders Template <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
+							<?php echo anchor("assets/template/pipeline_upload_template.xls","<i class='icon-download-alt'></i>Central Medical Store and Pending Orders Template");?>
+						</div>
+			    	</div>
   				</div>
                  </div>
                  </div>
@@ -706,7 +714,7 @@
   			    <div id="change_frm" style="display:none;">
   				<div class="row-fluid">
   				 <div class="span12">
-  			      	<label style="float:right;border 1px solid #000;">Welcome <b><?php echo $this->session->userdata("order_user"); ?></b>
+  			      	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
   			      	<div class="dropdown" style="display:inline;">
 					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
@@ -855,13 +863,13 @@
     		<h3 class="dashboard_title">Number of Patients on ART By Pipeline for <span class="pa_period_display"><?php echo date('F-Y');?></span></h3>
     		<div id="" class="nd_menus">
 				<span>Select a period</span>
-				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small">
+				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span3">
 					<?php foreach ($maps_report_period as $value) {
 						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
 					}?>
 				</select>
 				
-				<button class="generate btn btn-warning nd_input_small" style="color:black" id="pa_bypipeline_btn">Get</button>
+				<button class="generate btn btn-warning" style="color:black" id="pa_bypipeline_btn">Get</button>
 			</div>
 			<hr size="2"><p></p>
     		<div id="ART_PATIENT_PIPELINE_graph"></div>
@@ -870,13 +878,13 @@
     		<h3 class="dashboard_title">Current Adult Patients on ART as of <span class="ad_pa_period_display"><?php echo date('F-Y');?></span></h3>
     		<div id="" class="nd_menus">
 				<span>Select a period</span>
-				<select id="nd_adult_art_period" class="nd_period nd_input_small">
+				<select id="nd_adult_art_period" class="nd_period nd_input_small span3">
 					<?php foreach ($maps_report_period as $value) {
 						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
 					}?>
 				</select>
 				
-				<button class="generate btn btn-warning nd_input_small" style="color:black" id="adult_art_btn">Get</button>
+				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
 			</div>
     		<div id="ART_ADULT_PATIENT_graph"></div>
     	  </div>
@@ -884,13 +892,13 @@
     		<h3 class="dashboard_title">Current Paedriatic Patients on ART as of <span class="paed_pa_period_display"><?php echo date('F-Y');?></span></h3>
     		<div id="" class="nd_menus">
 				<span>Select a period</span>
-				<select id="nd_paed_art_period" class="nd_period nd_input_small">
+				<select id="nd_paed_art_period" class="nd_period nd_input_small span3">
 					<?php foreach ($maps_report_period as $value) {
 						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
 					}?>
 				</select>
 				
-				<button class="generate btn btn-warning nd_input_small" style="color:black" id="paed_art_btn">Get</button>
+				<button class="generate btn btn-warning" style="color:black" id="paed_art_btn">Get</button>
 			</div>
     		<div id="ART_PAED_PATIENT_graph"></div>
     	  </div>
@@ -939,13 +947,13 @@
 	    		<h3 class="dashboard_title">Reporting Sites Analysis for <span class="rs_period_display"><?php echo  date('F-Y');?></span></h3>
 	    			<div id="ra_menus" class="nd_menus">
 	    				<span>Select a period</span>
-						<select id="nd_ra_period" class="nd_period nd_input_small">
+						<select id="nd_ra_period" class="nd_period nd_input_small span3">
 							<?php foreach ($report_period as $value) {
 								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
 							}?>
 						</select>
 						
-						<button class="generate btn btn-warning nd_input_small" style="color:black" id="rs_analysis_btn">Get</button>
+						<button class="generate btn btn-warning" style="color:black" id="rs_analysis_btn">Get</button>
 					</div>
 					<hr size="2">
 	    		<div id="chart_area_report_analysis"></div>
@@ -986,7 +994,7 @@
 		  <div class="span12">
 		  		<div id="fa_menus" class="nd_menus">
 							<h3 class="font_responsive">
-								<select id="nd_fa_month" class="nd_month nd_input_small">
+								<select id="nd_fa_month" class="nd_month nd_input_small span3">
 									
 								</select>
 								<select id="nd_fa_year" class="nd_year nd_input_small">
@@ -1001,7 +1009,7 @@
 										} 
 									?>
 								</select>
-								<button class="generate btn btn-warning nd_input_small facility_analysis_btn" style="color:black" id="orderingsite_l_btn">Get</button>
+								<button class="generate btn btn-warning facility_analysis_btn" style="color:black" id="orderingsite_l_btn">Get</button>
 							</h3>
 				</div>
 				<div class="row-fluid">
@@ -1045,42 +1053,6 @@
     		<h3 class="dashboard_title">Patients Scale Up</h3>
     		
     	</div>
-    </div>
-    <!-- Pipelines Upload -->
-    <div class="tab-pane nat_dashboard_rep" id="tab8">
-    	<?php
-    	if(!$this->session->userdata("pipeline_logged_in")){
-    		$this ->load->view("dashboard/pipeline_login_v");
-    	}
-    	else{
-    		?>
-    	<div class="container" style="width: 40%">
-	    	<div class="row-fluid">
-	    		<div class="span12"><span >Welcome  <b><?php echo $this->session->userdata("pipeline_logged_in");?></b></span>, <?php echo anchor("user_management/logout/pipeline_logout","<i class='icon-off'></i>Logout");?></div>
-			</div>
-			<div class="row-fluid">
-	    		<div class="span12">	
-					<h3> Pipeline Upload</h3>
-					<?php echo form_open_multipart("order/import_order/pipeline_upload");?>
-					<input type="file" name="cms_file" id="cms_file" required="" accept="application/vnd.ms-excel" />
-					<div class="control-group">
-					    <div class="controls">
-					      <button type="submit" class="btn btn-primary"><i class="icon-upload"></i>Upload File</button>
-					    </div>
-					</div>
-					<?php echo form_close();?>
-				</div>
-			</div>
-			<div class="row-fluid">	
-				
-				<div class="span12">	
-					<h3>Central Medical Store and Pending Orders Template <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
-					<?php echo anchor("assets/template/pipeline_upload_template.xls","<i class='icon-download-alt'></i>Central Medical Store and Pending Orders Template");?>
-				</div>
-	    	</div>
-	    </div>	
-    	<?php
-    	}?>
     </div>
   </div>
 </div>

@@ -107,8 +107,12 @@ class settings extends MY_Controller {
 
 					$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
 					$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
+					
+					$four_current_month_start = date('Y-m-d', strtotime($current_month_start . "-4 months"));
+					$five_current_month_start = date('Y-m-d', strtotime($current_month_start . "-5 months"));
+					$six_current_month_start = date('Y-m-d', strtotime($current_month_start . "-6 months"));
 
-					if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start) {
+					if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start || $main['period_begin'] == $four_current_month_start || $main['period_begin'] == $five_current_month_start || $main['period_begin'] == $six_current_month_start) {
 						if (is_array($main)) {
 							if (!empty($main)) {
 								$this -> extract_order($type, array($main), $main['id']);

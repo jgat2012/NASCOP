@@ -459,7 +459,7 @@ class Order extends MY_Controller {
 				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
-				if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
+			    if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
 					$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
 					redirect("order");
 				}
