@@ -41,10 +41,13 @@ class Sync extends MY_Controller {
 		echo json_encode($user);
 	}
 
-	public function facility($facility_id, $type) {
+	public function facility($facility_id, $type, $period_begin = "") {
 		$total_array = array();
 		if ($type == "cdrr") {
 			$cdrrs = Cdrr::getFacilityCdrr($facility_id);
+			if ($period_begin != "") {
+				$cdrrs = Cdrr::getFacilityCdrr($facility_id, $period_begin);
+			}
 			foreach ($cdrrs as $cdrr) {
 				$id = $cdrr['id'];
 				$items = Cdrr_Item::getItems($id);
@@ -57,6 +60,9 @@ class Sync extends MY_Controller {
 
 		} else if ($type == "maps") {
 			$maps = Maps::getFacilityMap($facility_id);
+			if ($period_begin != "") {
+				$maps = Maps::getFacilityMap($facility_id, $period_begin);
+			}
 			foreach ($maps as $map) {
 				$id = $map['id'];
 				$items = Maps_Item::getItems($id);
@@ -92,7 +98,7 @@ class Sync extends MY_Controller {
 						} else {
 							$cdrr[$index] = $main;
 							//Get facility id
-							if($index=='facility_id'){
+							if ($index == 'facility_id') {
 								$facility_id = $main;
 							}
 						}
@@ -112,7 +118,7 @@ class Sync extends MY_Controller {
 						} else {
 							$maps[$index] = $main;
 							//Get facility id
-							if($index=='facility_id'){
+							if ($index == 'facility_id') {
 								$facility_id = $main;
 							}
 						}
@@ -121,20 +127,17 @@ class Sync extends MY_Controller {
 				$this -> db -> insert("maps", $maps);
 				$maps_id = $this -> db -> insert_id();
 				$this -> db -> insert("escm_maps", array("maps_id" => $maps_id));
-				
-				
+
 			}
-			
+
 			//Check if facility already uses adt
 			$sql = "SELECT * FROM adt_sites WHERE facility_id='$facility_id' AND pipeline='$pipeline'";
-			$query = $this ->db ->query($sql);
-			$result = $query ->result_array($query);
+			$query = $this -> db -> query($sql);
+			$result = $query -> result_array($query);
 			$count = count($result);
-			if($count==0 && $facility_id!=''){//If facility not found
-				$data_facility = array(
-										"facility_id "=>$facility_id,
-										"pipeline"=>$pipeline);
-				$this->db->insert('adt_sites', $data_facility);
+			if ($count == 0 && $facility_id != '') {//If facility not found
+				$data_facility = array("facility_id " => $facility_id, "pipeline" => $pipeline);
+				$this -> db -> insert('adt_sites', $data_facility);
 			}
 
 		} else {
@@ -155,7 +158,7 @@ class Sync extends MY_Controller {
 						} else {
 							$cdrr[$index] = $main;
 							//Get facility id
-							if($index=='facility_id'){
+							if ($index == 'facility_id') {
 								$facility_id = $main;
 							}
 						}
@@ -171,7 +174,7 @@ class Sync extends MY_Controller {
 						foreach ($log as $ind => $lg) {
 							if ($ind == "cdrr_id") {
 								$temp_log[$counter]['cdrr_id'] = $cdrr_id;
-							}else {
+							} else {
 								$temp_log[$counter][$index] = $lg;
 							}
 						}
@@ -209,7 +212,7 @@ class Sync extends MY_Controller {
 						} else {
 							$maps[$index] = $main;
 							//Get facility id
-							if($index=='facility_id'){
+							if ($index == 'facility_id') {
 								$facility_id = $main;
 							}
 						}
@@ -249,16 +252,14 @@ class Sync extends MY_Controller {
 			}
 			//Check if facility already uses adt
 			$sql = "SELECT * FROM adt_sites WHERE facility_id='$facility_id' AND pipeline='$pipeline'";
-			$query = $this ->db ->query($sql);
-			$result = $query ->result_array($query);
+			$query = $this -> db -> query($sql);
+			$result = $query -> result_array($query);
 			$count = count($result);
-			if($count==0 && $facility_id!=''){//If facility not found
-				$data_facility = array(
-										"facility_id "=>$facility_id,
-										"pipeline"=>$pipeline);
-				$this->db->insert('adt_sites', $data_facility);
+			if ($count == 0 && $facility_id != '') {//If facility not found
+				$data_facility = array("facility_id " => $facility_id, "pipeline" => $pipeline);
+				$this -> db -> insert('adt_sites', $data_facility);
 			}
-			
+
 			echo json_encode($my_array);
 		}
 	}
