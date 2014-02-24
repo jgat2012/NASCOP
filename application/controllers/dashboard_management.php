@@ -16,8 +16,9 @@ class Dashboard_Management extends MY_Controller {
 		$data['banner_text'] = "National Dashboard";
 		$data['title'] = "webADT | National Dashboard";
 		$data['supporter'] = Supporter::getThemAll();
-		$data['report_period'] = cdrr::getOrderPeriods();//Includes facilities that reported for both maps and cdrrs
-		$data['maps_report_period'] =maps::getReportPeriods();
+		$data['report_period'] = cdrr::getOrderPeriods();
+		//Includes facilities that reported for both maps and cdrrs
+		$data['maps_report_period'] = maps::getReportPeriods();
 		$this -> base_params($data);
 	}
 
@@ -33,21 +34,17 @@ class Dashboard_Management extends MY_Controller {
 			$dir = "Export";
 			$objPHPExcel = $this -> generateExcelDefaultStyle($filename);
 			$objPHPExcel -> setActiveSheetIndex(0);
-			$objPHPExcel->getDefaultStyle()->getFont()
-		    ->setName('Book Antiqua')
-		    ->setSize(10);
-			
-			$objPHPExcel->getActiveSheet()->getColumnDimension("B")
-			        ->setAutoSize(true);
-			$objPHPExcel->getActiveSheet()->getStyle('C3:AN3')->getAlignment()->setWrapText(true);
-			$objPHPExcel->getActiveSheet()->getRowDimension('3')->setRowHeight(-1);
-			foreach(range('C','AN') as $columnID) {
-				
-				if($columnID=="F" || $columnID=="G" || $columnID=="K" || $columnID=="O" || $columnID=="S" || $columnID=="U" || $columnID=="Y" || $columnID=="Z" || $columnID=="AB" || $columnID=="AF" || $columnID=="AG" || $columnID=="AK"){
-					$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)->setWidth(5);
-				}
-				else{
-					$objPHPExcel->getActiveSheet()->getColumnDimension($columnID)->setWidth(15);
+			$objPHPExcel -> getDefaultStyle() -> getFont() -> setName('Book Antiqua') -> setSize(10);
+
+			$objPHPExcel -> getActiveSheet() -> getColumnDimension("B") -> setAutoSize(true);
+			$objPHPExcel -> getActiveSheet() -> getStyle('C3:AN3') -> getAlignment() -> setWrapText(true);
+			$objPHPExcel -> getActiveSheet() -> getRowDimension('3') -> setRowHeight(-1);
+			foreach (range('C','AN') as $columnID) {
+
+				if ($columnID == "F" || $columnID == "G" || $columnID == "K" || $columnID == "O" || $columnID == "S" || $columnID == "U" || $columnID == "Y" || $columnID == "Z" || $columnID == "AB" || $columnID == "AF" || $columnID == "AG" || $columnID == "AK") {
+					$objPHPExcel -> getActiveSheet() -> getColumnDimension($columnID) -> setWidth(5);
+				} else {
+					$objPHPExcel -> getActiveSheet() -> getColumnDimension($columnID) -> setWidth(15);
 				}
 
 			}
@@ -94,9 +91,9 @@ class Dashboard_Management extends MY_Controller {
 			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AL3', "MOS at Facilities");
 			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AM3', "MOS at Central Stores");
 			//$objPHPExcel -> getActiveSheet() -> SetCellValue('AN3', "MOS - Pending With Suppliers");
-			
+
 			$result_drugs = sync_drug::getAll();
-			$period = date("Y-m-01",strtotime($period));
+			$period = date("Y-m-01", strtotime($period));
 			$cur_cons_kp = '-';
 			$cur_cons_kemsa = '-';
 			$avg_cons_kemsa = '-';
@@ -104,17 +101,18 @@ class Dashboard_Management extends MY_Controller {
 			$x = 5;
 			foreach ($result_drugs as $value) {
 				$drug_id = $value['id'];
-				$drug_name =$value['name'];
+				$drug_name = $value['name'];
 				$drug_abbr = $value['abbreviation'];
 				$drug_str = $value['strength'];
 				$drug_pack = $value['packsize'];
-				$drug_category = $value['category_id'];//Adults or paeds
-				$three_month_back =date('Y-m-d',strtotime(date($period, mktime()) . " - 2 months"));
-				
+				$drug_category = $value['category_id'];
+				//Adults or paeds
+				$three_month_back = date('Y-m-d', strtotime(date($period, mktime()) . " - 2 months"));
+
 				/*
 				 * Loop through Kenya Pharma orders to get MOS
-				*/
-				
+				 */
+
 				//Count months back so as to get the average consumption
 				$sql_months = "SELECT COUNT(DISTINCT(c.period_begin)) as total_months FROM cdrr c
 								LEFT JOIN cdrr_item ci ON c.id=ci.cdrr_id
@@ -123,18 +121,17 @@ class Dashboard_Management extends MY_Controller {
 								AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
 								AND ci.drug_id = '$drug_id'
 								";
-				$query = $this ->db->query($sql_months);
-				$result = $query ->result_array();
+				$query = $this -> db -> query($sql_months);
+				$result = $query -> result_array();
 				$no_months_kp = $result[0]['total_months'];
 				//If drug has not been reported
-				if($no_months_kp==0){
+				if ($no_months_kp == 0) {
 					$avg_cons_kp = 0;
 					$aggr_on_hand_kp = 0;
 					$pending_kp = 0;
 					$cms_kp = 0;
 					$cur_cons_kp = 0;
-				}
-				else{
+				} else {
 					//Get current consumption for the drug
 					$sql_cur_cons = "SELECT SUM(aggr_consumed) as cur_cons FROM cdrr_item ci
 								LEFT JOIN cdrr c ON c.id=ci.cdrr_id
@@ -142,14 +139,14 @@ class Dashboard_Management extends MY_Controller {
 								WHERE c.period_begin='$period'
 								AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
 								AND ci.drug_id = '$drug_id'";
-					
-					$query = $this ->db->query($sql_cur_cons);
-					$result = $query ->result_array();
+
+					$query = $this -> db -> query($sql_cur_cons);
+					$result = $query -> result_array();
 					$count = count($result);
-					if($count>0){
+					if ($count > 0) {
 						$cur_cons_kp = $result[0]['cur_cons'];
 					}
-								
+
 					$sql_kp = "
 									SELECT $drug_id as c_drug_id, ROUND((SUM(aggr_consumed)/$no_months_kp)) as avg_cons,s.aggr_on_hand,soh.pending,soh.cms FROM cdrr_item ci
 									LEFT JOIN cdrr c ON c.id=ci.cdrr_id
@@ -176,24 +173,21 @@ class Dashboard_Management extends MY_Controller {
 									AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
 									AND ci.drug_id = '$drug_id'
 									";
-					$query = $this ->db->query($sql_kp);
-					$result = $query ->result_array();
+					$query = $this -> db -> query($sql_kp);
+					$result = $query -> result_array();
 					$count = count($result);
-					if($count>0){
+					if ($count > 0) {
 						$avg_cons_kp = (int)$result[0]['avg_cons'];
 						$aggr_on_hand_kp = (int)$result[0]['aggr_on_hand'];
 						$pending_kp = (int)$result[0]['pending'];
 						$cms_kp = (int)$result[0]['cms'];
 					}
-					
-					
+
 				}
-				
-				
-				
+
 				/*
 				 * Kemsa details
-				*/
+				 */
 				$sql_months = "SELECT COUNT(DISTINCT(c.period_begin)) as total_months FROM cdrr c
 								LEFT JOIN cdrr_item ci ON c.id=ci.cdrr_id
 								LEFT JOIN escm_orders eo ON eo.cdrr_id=c.id
@@ -202,17 +196,16 @@ class Dashboard_Management extends MY_Controller {
 								AND ci.drug_id = '$drug_id'
 								AND eo.cdrr_id IS NULL
 								";
-				$query = $this ->db->query($sql_months);
-				$result = $query ->result_array();
+				$query = $this -> db -> query($sql_months);
+				$result = $query -> result_array();
 				$no_months_kemsa = $result[0]['total_months'];
-				if($no_months_kemsa==0){
+				if ($no_months_kemsa == 0) {
 					$avg_cons_kemsa = 0;
 					$aggr_on_hand_kemsa = 0;
 					$pending_kemsa = 0;
 					$cms_kemsa = 0;
 					$cur_cons_kemsa = 0;
-				}
-				else{
+				} else {
 					//Get current consumption for the drug
 					$sql_cur_cons = "SELECT SUM(aggr_consumed) as cur_cons FROM cdrr_item ci
 								LEFT JOIN cdrr c ON c.id=ci.cdrr_id
@@ -221,12 +214,12 @@ class Dashboard_Management extends MY_Controller {
 								AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
 								AND ci.drug_id = '$drug_id'
 								AND eo.cdrr_id IS NULL";
-					$query = $this ->db->query($sql_cur_cons);
-					$result = $query ->result_array();
+					$query = $this -> db -> query($sql_cur_cons);
+					$result = $query -> result_array();
 					$count = count($result);
-					if($count>0){
+					if ($count > 0) {
 						$cur_cons_kemsa = $result[0]['cur_cons'];
-					}		
+					}
 					$sql_kp_kemsa = "
 									SELECT $drug_id as c_drug_id, ROUND((SUM(aggr_consumed)/$no_months_kp)) as avg_cons,s.aggr_on_hand,soh.pending,soh.cms FROM cdrr_item ci
 									LEFT JOIN cdrr c ON c.id=ci.cdrr_id
@@ -252,65 +245,69 @@ class Dashboard_Management extends MY_Controller {
 									AND ci.drug_id = '$drug_id'
 									AND c.id NOT IN(SELECT cdrr_id FROM escm_orders)
 									";
-					
-					$query = $this ->db->query($sql_kp_kemsa);
-					$result = $query ->result_array();
+
+					$query = $this -> db -> query($sql_kp_kemsa);
+					$result = $query -> result_array();
 					$count = count($result);
-					
-					if($count>0){
+
+					if ($count > 0) {
 						$avg_cons_kemsa = (int)$result[0]['avg_cons'];
 						$aggr_on_hand_kemsa = (int)$result[0]['aggr_on_hand'];
 						$pending_kemsa = (int)$result[0]['pending'];
 						$cms_kemsa = (int)$result[0]['cms'];
 					}
-					
+
 				}
-				
+
 				//Populating drugs in the table
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('A'.$x, $drug_name.'('.$drug_abbr.')');
-				
-				$avg_cons =(int)$avg_cons_kemsa+ (int)$avg_cons_kp;
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('C'.$x, $cur_cons_kemsa);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('D'.$x, $cur_cons_kp);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('E'.$x, $avg_cons);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $x, $drug_name . '(' . $drug_abbr . ')');
+
+				$avg_cons = (int)$avg_cons_kemsa + (int)$avg_cons_kp;
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $x, $cur_cons_kemsa);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $x, $cur_cons_kp);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('E' . $x, $avg_cons);
 				//KEMSA
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('H'.$x, $aggr_on_hand_kemsa);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('I'.$x, $cms_kemsa);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('J'.$x, $pending_kemsa);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('H' . $x, $aggr_on_hand_kemsa);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $x, $cms_kemsa);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('J' . $x, $pending_kemsa);
 				//KP
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('L'.$x, $aggr_on_hand_kp);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('M'.$x, $cms_kp);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('N'.$x, $pending_kp);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('L' . $x, $aggr_on_hand_kp);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('M' . $x, $cms_kp);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('N' . $x, $pending_kp);
 				//National Level
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('P'.$x, (int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp);//National Facililties SOH
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('Q'.$x, (int)$cms_kemsa+(int)$cms_kp);//National Central Medical Store
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('R'.$x, (int)$pending_kemsa+(int)$pending_kp);//National Pending
-				
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('P' . $x, (int)$aggr_on_hand_kemsa + (int)$aggr_on_hand_kp);
+				//National Facililties SOH
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('Q' . $x, (int)$cms_kemsa + (int)$cms_kp);
+				//National Central Medical Store
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('R' . $x, (int)$pending_kemsa + (int)$pending_kp);
+				//National Pending
+
 				//MOS
-				if($avg_cons!=0){
-					$national_mos = number_format((((int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp)+((int)$cms_kemsa+(int)$cms_kp)+((int)$pending_kemsa+(int)$pending_kp))/$avg_cons,1);
-					$facility_mos = number_format(((int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp)/$avg_cons,1);
-					$cms_mos = number_format(((int)$cms_kemsa+(int)$cms_kp)/$avg_cons,1);
-					$pending_mos = number_format(((int)$pending_kemsa+(int)$pending_kp)/$avg_cons,1);
+				if ($avg_cons != 0) {
+					$national_mos = number_format((((int)$aggr_on_hand_kemsa + (int)$aggr_on_hand_kp) + ((int)$cms_kemsa + (int)$cms_kp) + ((int)$pending_kemsa + (int)$pending_kp)) / $avg_cons, 1);
+					$facility_mos = number_format(((int)$aggr_on_hand_kemsa + (int)$aggr_on_hand_kp) / $avg_cons, 1);
+					$cms_mos = number_format(((int)$cms_kemsa + (int)$cms_kp) / $avg_cons, 1);
+					$pending_mos = number_format(((int)$pending_kemsa + (int)$pending_kp) / $avg_cons, 1);
+				} else {
+					$national_mos = ((int)$aggr_on_hand_kemsa + (int)$aggr_on_hand_kp) + ((int)$cms_kemsa + (int)$cms_kp) + ((int)$pending_kemsa + (int)$pending_kp);
+					$facility_mos = (int)$aggr_on_hand_kemsa + (int)$aggr_on_hand_kp;
+					$cms_mos = (int)$cms_kemsa + (int)$cms_kp;
+					$pending_mos = (int)$pending_kemsa + (int)$pending_kp;
 				}
-				else{
-					$national_mos = ((int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp)+((int)$cms_kemsa+(int)$cms_kp)+((int)$pending_kemsa+(int)$pending_kp);
-					$facility_mos = (int)$aggr_on_hand_kemsa+(int)$aggr_on_hand_kp;
-					$cms_mos = (int)$cms_kemsa+(int)$cms_kp;
-					$pending_mos = (int)$pending_kemsa+(int)$pending_kp;
-				}
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('T'.$x, $national_mos);//National MOS =(Fac SOH+CMS+Pending)/agg avg consumption 
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('V'.$x, $facility_mos);//MoS at facilities
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('W'.$x, $cms_mos);//Mos at central stores
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('X'.$x, $pending_mos);
-				
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('T' . $x, $national_mos);
+				//National MOS =(Fac SOH+CMS+Pending)/agg avg consumption
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('V' . $x, $facility_mos);
+				//MoS at facilities
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('W' . $x, $cms_mos);
+				//Mos at central stores
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('X' . $x, $pending_mos);
+
 				$x++;
 			}
-			
-			$this->generateExcel($filename,$dir,$objPHPExcel);
-		}
-		else if($type=="CONS"){// Stock consumption
-			$period = date('Y-m-01',strtotime($period));
+
+			$this -> generateExcel($filename, $dir, $objPHPExcel);
+		} else if ($type == "CONS") {// Stock consumption
+			$period = date('Y-m-01', strtotime($period));
 			$drug_table = '';
 			$facility_table = '';
 			//Get consumption for that period
@@ -405,15 +402,14 @@ class Dashboard_Management extends MY_Controller {
 			$period = date('Y-m-01', strtotime($period));
 			$facility_table = '';
 			$regimen_table = '';
-			$cols='';
-			if($pipeline == 'kemsa'){
-				$facility_table ='sync_facility';
-				$regimen_table ='sync_regimen';
+			$cols = '';
+			if ($pipeline == 'kemsa') {
+				$facility_table = 'sync_facility';
+				$regimen_table = 'sync_regimen';
 				$cols = 'r.id,r.code,r.description';
-			}
-			else if($pipeline == 'kenya_pharma'){
-				$facility_table ='escm_facility';
-				$regimen_table ='escm_regimen';
+			} else if ($pipeline == 'kenya_pharma') {
+				$facility_table = 'escm_facility';
+				$regimen_table = 'escm_regimen';
 				$cols = 'r.id,r.code,r.description';
 			}
 			//Get ART Facilities
@@ -464,7 +460,7 @@ class Dashboard_Management extends MY_Controller {
 			$x = "E";
 			foreach ($results as $value) {
 				$drug = $value['code'];
-				$objPHPExcel -> getActiveSheet() -> SetCellValue($x.'6',$drug);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '6', $drug);
 				$x++;
 
 			}
@@ -523,7 +519,7 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN maps_item mi ON mi.regimen_id=r.id
 							LEFT JOIN maps m ON m.id=mi.maps_id
 							LEFT JOIN $facility_table f ON f.id=m.facility_id
-							WHERE m.period_begin = '".$period."'
+							WHERE m.period_begin = '" . $period . "'
 							AND (m.code='D-MAPS')
 							GROUP BY r.id
 						) as reg ON reg.id=r.id
@@ -850,18 +846,17 @@ class Dashboard_Management extends MY_Controller {
 		echo $this -> showTable($columns, $result, $links, $table_name);
 	}
 
-	public function getPatients($type="ART_PATIENT",$period = ""){
-		if($period==''){
+	public function getPatients($type = "ART_PATIENT", $period = "") {
+		if ($period == '') {
 			$current_period = date('Y-m-01');
 			$join_maps = "";
 			$and = "";
-		}
-		else{
-			$current_period = date('Y-m-01',strtotime($period));
+		} else {
+			$current_period = date('Y-m-01', strtotime($period));
 			$join_maps = "INNER JOIN maps m ON m.id=mi.maps_id";
 			$and = "AND m.period_begin <='$current_period'";
 		}
-		
+
 		$data = array();
 		if ($type == "BYPIPELINE_ART") {//Number of ART Patients BY Pipeline
 			$data['container'] = 'report_by_pipeline';
@@ -872,7 +867,7 @@ class Dashboard_Management extends MY_Controller {
 					SELECT SUM(m.art_adult) as total_adult_kp,SUM(m.art_child) as total_paed_kp 
 					FROM maps m 
 					LEFT JOIN escm_maps em ON em.maps_id = m.id 
-					WHERE STR_TO_DATE(m.period_begin,'%Y-%m-%d')  ='".$current_period."' 
+					WHERE STR_TO_DATE(m.period_begin,'%Y-%m-%d')  ='" . $current_period . "' 
 					AND em.maps_id IS NOT NULL
 					";
 			$query = $this -> db -> query($sql_kp);
@@ -890,7 +885,7 @@ class Dashboard_Management extends MY_Controller {
 					SELECT SUM(m.art_adult) as total_adult_kemsa,SUM(m.art_child) as total_paed_kemsa 
 					FROM maps m 
 					LEFT JOIN escm_maps em ON em.maps_id = m.id 
-					WHERE STR_TO_DATE(m.period_begin,'%Y-%m-%d')  ='".$current_period."'
+					WHERE STR_TO_DATE(m.period_begin,'%Y-%m-%d')  ='" . $current_period . "'
 					AND em.maps_id IS NULL
 					";
 			$query = $this -> db -> query($sql_kemsa);
@@ -917,7 +912,7 @@ class Dashboard_Management extends MY_Controller {
 			$table_display = $this -> table -> generate();
 			echo $table_display;
 		} elseif ($type == "ADULT_ART") {
-			
+
 			//Bar Chart
 			$data = array();
 			$list = array();
@@ -947,7 +942,6 @@ class Dashboard_Management extends MY_Controller {
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
 								GROUP BY mr.code";
-								
 
 					$join1_kp = "SELECT mr.name as regimen_desc,test.total
                                 FROM escm_regimen mr
@@ -1249,11 +1243,11 @@ class Dashboard_Management extends MY_Controller {
 			$tenth = date('Y-m-10', strtotime($period));
 			$last_day = date('Y-m-t', strtotime($period));
 			$sql = "SELECT (
-							SELECT COUNT(DISTINCT(c.facility_id)) as kemsa FROM cdrr c
-							LEFT JOIN escm_orders ec ON ec.cdrr_id=c.id          
+							SELECT COUNT(DISTINCT(c.facility_id)) as kemsa FROM cdrr c      
 							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "
 							WHERE c.id NOT IN ec.cdrr_id'
 							AND(c.code='D-CDRR' OR c.code='F-CDRR_packs')
+							AND (c.id NOT IN(SELECT ec.cdrr_id FROM escm_orders ec))
 							) as kemsa_count,
 							(SELECT COUNT(DISTINCT(c.facility_id)) as kenya_pharma FROM cdrr c
 							INNER JOIN escm_orders ec ON ec.cdrr_id=c.id
@@ -1324,9 +1318,10 @@ class Dashboard_Management extends MY_Controller {
 		$this -> load -> view('dashboard/chart_report_line_v', $data);
 
 	}
-	public function reportSummary($type="",$period=''){
-		
-		if($type=='table'){//Reporting site summary
+
+	public function reportSummary($type = "", $period = '') {
+
+		if ($type == 'table') {//Reporting site summary
 			//Total Number of ARV Sites
 			$sql_kemsa = "SELECT COUNT(f.code) as total FROM sync_facility f";
 			$query = $this -> db -> query($sql_kemsa);
@@ -1355,11 +1350,10 @@ class Dashboard_Management extends MY_Controller {
 			$query = $this -> db -> query($sql_tenth);
 			$results = $query -> result_array();
 			$tot_tenth = $results[0]['total'];
-			if($tot_adtsites==0){
-				$x=0;
-			}
-			else{
-				$x=number_format(($tot_tenth/$total_arv_sites)*100,2);
+			if ($tot_adtsites == 0) {
+				$x = 0;
+			} else {
+				$x = number_format(($tot_tenth / $total_arv_sites) * 100, 2);
 			}
 
 			//Sites that have reported this month
@@ -1369,11 +1363,10 @@ class Dashboard_Management extends MY_Controller {
 			$query = $this -> db -> query($sql_report);
 			$results = $query -> result_array();
 			$tot_reportsites = $results[0]['total'];
-			if($tot_adtsites==0){
-				$y=0;
-			}
-			else{
-				$y=number_format(($tot_reportsites/$total_arv_sites)*100,2);
+			if ($tot_adtsites == 0) {
+				$y = 0;
+			} else {
+				$y = number_format(($tot_reportsites / $total_arv_sites) * 100, 2);
 			}
 			$tmpl = array('table_open' => '<table id="" class="table table-bordered table-striped">');
 			$this -> table -> set_template($tmpl);
@@ -1384,20 +1377,16 @@ class Dashboard_Management extends MY_Controller {
 			$this -> table -> add_row('', 'Total No of Sites That Have Reported this month', $tot_reportsites, $y . ' %');
 			$table_display = $this -> table -> generate();
 			echo $table_display;
-		}
-
-		
-		else if($type=='site_reporting'){//Reporting site Analysis
-			$data =array();
-			if($period==''){
-				$tenth=date('Y-m-10');
+		} else if ($type == 'site_reporting') {//Reporting site Analysis
+			$data = array();
+			if ($period == '') {
+				$tenth = date('Y-m-10');
 				$first = date('Y-m-01');
 				$last_day = date('Y-m-t');
-			}
-			else{
-				$tenth=date('Y-m-10',strtotime($period));
-				$first = date('Y-m-01',strtotime($period));
-				$last_day = date('Y-m-t',strtotime($period));
+			} else {
+				$tenth = date('Y-m-10', strtotime($period));
+				$first = date('Y-m-01', strtotime($period));
+				$last_day = date('Y-m-t', strtotime($period));
 			}
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "'";
@@ -1477,11 +1466,11 @@ class Dashboard_Management extends MY_Controller {
 		}
 		return $this -> table -> generate();
 	}
-	
-	public function set_tab_session(){
-		$tab_id = $this->input->post("tab_id");
-		$this->session->set_userdata("tab_session",$tab_id);
-		echo "#".$tab_id;
+
+	public function set_tab_session() {
+		$tab_id = $this -> input -> post("tab_id");
+		$this -> session -> set_userdata("tab_session", $tab_id);
+		echo "#" . $tab_id;
 	}
 
 	public function base_params($data) {
