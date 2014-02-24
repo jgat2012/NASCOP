@@ -76,6 +76,16 @@ class Sync extends MY_Controller {
 		echo json_encode($total_array, JSON_PRETTY_PRINT);
 	}
 
+	public function eid($facility_code) {
+		$post_array = $_POST;
+		$main_array = $post_array['json_data'];
+		$responses = json_decode($main_array, TRUE);
+		$sql = "DELETE FROM eid_info WHERE facility_code='$facility_code'";
+		$this -> db -> query($sql);
+		$this -> db -> insert_batch("eid_info", $responses);
+		echo json_encode(array('EID Sync Success'));
+	}
+
 	public function save($link = "nascop", $type = "cdrr", $id = "") {
 		$post_array = $_POST;
 		$main_array = $post_array['json_data'];

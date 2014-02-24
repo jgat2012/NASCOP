@@ -523,11 +523,11 @@ fieldset {
 }
 .error {
 	background: red;
-	background-image: linear-gradient(bottom, rgb(179,43,43) 25%, rgb(194,74,74) 99%);
+	/*background-image: linear-gradient(bottom, rgb(179,43,43) 25%, rgb(194,74,74) 99%);
 	background-image: -o-linear-gradient(bottom, rgb(179,43,43) 25%, rgb(194,74,74) 99%);
 	background-image: -moz-linear-gradient(bottom, rgb(179,43,43) 25%, rgb(194,74,74) 99%);
 	background-image: -webkit-linear-gradient(bottom, rgb(179,43,43) 25%, rgb(194,74,74) 99%);
-	background-image: -ms-linear-gradient(bottom, rgb(179,43,43) 25%, rgb(194,74,74) 99%);
+	background-image: -ms-linear-gradient(bottom, rgb(179,43,43) 25%, rgb(194,74,74) 99%);*/
 	background-image: -webkit-gradient(
 	linear,
 	left bottom,
