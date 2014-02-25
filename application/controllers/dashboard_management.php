@@ -1244,8 +1244,7 @@ class Dashboard_Management extends MY_Controller {
 			$last_day = date('Y-m-t', strtotime($period));
 			$sql = "SELECT (
 							SELECT COUNT(DISTINCT(c.facility_id)) as kemsa FROM cdrr c      
-							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "
-							WHERE c.id NOT IN ec.cdrr_id'
+							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "'
 							AND(c.code='D-CDRR' OR c.code='F-CDRR_packs')
 							AND (c.id NOT IN(SELECT ec.cdrr_id FROM escm_orders ec))
 							) as kemsa_count,
@@ -1264,7 +1263,6 @@ class Dashboard_Management extends MY_Controller {
 							(
 							SELECT COUNT(DISTINCT(id)) as total_kemsa FROM sync_facility
 							) as total_arv_kemsa
-							
 							FROM cdrr LIMIT 1
 							";
 
@@ -1471,6 +1469,65 @@ class Dashboard_Management extends MY_Controller {
 		$tab_id = $this -> input -> post("tab_id");
 		$this -> session -> set_userdata("tab_session", $tab_id);
 		echo "#" . $tab_id;
+	}
+
+	public function eid($type = "gender", $period = "February-2013") {
+		$period_start = date('Y-m-01', strtotime($period));
+		$period_end = date('Y-m-t', strtotime($period));
+
+		if ($type == "gender") {
+			$column = "gender";
+			$container = "chart_area_eid_gender";
+		} else if ($type == "line") {
+			$column = "service";
+			$container = "chart_area_eid_line";
+		} else if ($type == "regimen") {
+			$column = "regimen";
+			$container = "chart_area_eid_regimen";
+		}
+
+		if ($type != "comparison") {
+			$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
+					FROM eid_info ei 
+					WHERE ei.enrollment_date
+					BETWEEN '$period_start'
+					AND '$period_end'
+					GROUP BY ei.$column";
+		} else {
+			$column = "gender";
+			$container = "chart_area_eid_comparison";
+			$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
+					FROM eid_info ei 
+					WHERE ei.enrollment_date
+					BETWEEN '$period_start'
+					AND '$period_end'
+					GROUP BY ei.$column";
+		}
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		$inner_array = array();
+		$resultArray = array();
+		$categories = array('Label', 'Total');
+		$inner_array['type'] = 'pie';
+		$inner_array['name'] = 'eid_analysis';
+		$lower_array = array();
+		foreach ($results as $result) {
+			$lower_array[] = array($result['label'], (int)$result['total']);
+		}
+		$inner_array['data'] = $lower_array;
+		$resultArray[] = $inner_array;
+		$resultArray = json_encode($resultArray);
+		$categories = json_encode($categories);
+		$data['container'] = $container;
+		$data['chartType'] = 'pie';
+		$data['resultArraySize'] = 6;
+		$data['title'] = 'EID ' . $column;
+		$data['chartTitle'] = 'EID Analysis By ' . $type;
+		$data['categories'] = $categories;
+		$data['yAxix'] = '% Total';
+		$data['myData'] = $resultArray;
+		$this -> load -> view('dashboard/chart_pie_v', $data);
+
 	}
 
 	public function base_params($data) {

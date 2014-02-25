@@ -45,6 +45,9 @@
 	 	}
 	 	else if(type=="ca_menu"){//Reporting Analysis
 	 		  commodity_analysis();
+	 	} 	
+	 	else if(type=="eid_menu"){//Eid Analysis
+	 		  eid_analysis();
 	 	}
 		
 		//When one clicks tab, keep it in session
@@ -539,6 +542,18 @@
         $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
 	}
 	
+	function eid_analysis(){
+		var chart_area_eid_gender_link="<?php echo base_url().'dashboard_management/eid/gender';?>";
+		var chart_area_eid_line_link="<?php echo base_url().'dashboard_management/eid/line';?>";
+	  	var chart_area_eid_regimen_link="<?php echo base_url().'dashboard_management/eid/regimen';?>";
+	  	var chart_area_eid_comparison_link = "<?php echo base_url().'dashboard_management/eid/comparison';?>";
+
+	    $("#chart_area_eid_gender").load(chart_area_eid_gender_link);
+   	    $("#chart_area_eid_line").load(chart_area_eid_line_link);
+        $("#chart_area_eid_regimen").load(chart_area_eid_regimen_link);
+        $("#chart_area_eid_comparison").load(chart_area_eid_comparison_link);
+	}
+	
 	
 </script>
 
@@ -855,6 +870,29 @@
 		    </div>
 		</div>
       
+    </div>
+    <!--EID Analysis-->
+    <div class="tab-pane nat_dashboard_rep active" id="tab8">
+    	<div class="row-fluid">
+    		<div class="two_block span6">
+	    		<h3 class="dashboard_title">EID By Gender</h3>
+	    		<div id="chart_area_eid_gender"></div>
+	    	</div>
+	    	<div class="two_block span6">
+	    		<h3 class="dashboard_title">EID By Line</h3>
+	    		<div id="chart_area_eid_line"></div>
+	    	</div>
+    	</div>
+    	<div class="row-fluid">
+    		<div class="two_block span6">
+	    		<h3 class="dashboard_title">EID By Regimen</h3>   
+	    		<div id="chart_area_eid_regimen"></div>
+	    	</div>
+	    	<div class="two_block span6">
+	    		<h3 class="dashboard_title">EID Comparison</h3>
+	    		<div id="chart_area_eid_comparison"></div>
+	    	</div>
+    	</div>
     </div>
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
