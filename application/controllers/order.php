@@ -442,7 +442,7 @@ class Order extends MY_Controller {
 
 			$file_type = $this -> checkFileType($code, $text);
 			if ($file_type == false) {
-				$this -> session -> set_flashdata('order_message', "Incorrect File Selected");
+				$this -> session -> set_flashdata('login_message', "Incorrect File Selected");
 				redirect("dashboard_management");
 			}
 
@@ -460,8 +460,8 @@ class Order extends MY_Controller {
 				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
 			    if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
-					$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
-					redirect("order");
+					$this -> session -> set_flashdata('login_message', "You can only report for previous month. Kindly check the period fields !");
+					redirect("dashboard_management");
 				}
 
 				$fourth_row = 9;
@@ -535,8 +535,8 @@ class Order extends MY_Controller {
 
 				$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 				if ($duplicate == true) {
-					$this -> session -> set_flashdata('order_message', "An cdrr report already exists for this month !");
-					redirect("dashboard_management");
+					$this -> session -> set_flashdata('login_message', "An cdrr report already exists for this month !");
+					//redirect("dashboard_management");
 				}
 
 				$sixth_row = 18;
@@ -567,7 +567,7 @@ class Order extends MY_Controller {
 										$cdrr_array[$commodity_counter]['expiry_date'] = "";
 									}
 									$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['M']);
-									$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['N']);
+									$cdrr_array[$commodity_counter]['resupply'] = str_replace(",","",$arr[$i]['N']);
 									$cdrr_array[$commodity_counter]['aggr_consumed'] = trim($arr[$i]['I']);
 									$cdrr_array[$commodity_counter]['aggr_on_hand'] = trim($arr[$i]['J']);
 								} else if ($code == "F-CDRR_packs") {
@@ -586,7 +586,7 @@ class Order extends MY_Controller {
 										$cdrr_array[$commodity_counter]['expiry_date'] = "";
 									}
 									$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['L']);
-									$cdrr_array[$commodity_counter]['resupply'] = trim($arr[$i]['M']);
+									$cdrr_array[$commodity_counter]['resupply'] = str_replace(",","",$arr[$i]['M']);
 									$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
 									$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
 								}
@@ -638,8 +638,8 @@ class Order extends MY_Controller {
 				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
-				if ($period_begin != date('Y-m-01') || $period_end != date('Y-m-t')) {
-					$this -> session -> set_flashdata('order_message', "You can only report for current month. Kindly check the period fields !");
+			    if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
+					$this -> session -> set_flashdata('login_message', "You can only report for current month. Kindly check the period fields !");
 					redirect("dashboard_management");
 				}
 
@@ -702,7 +702,7 @@ class Order extends MY_Controller {
 
 				$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
 				if ($duplicate == true) {
-					$this -> session -> set_flashdata('order_message', "An fmap report already exists for this month !");
+					$this -> session -> set_flashdata('login_message', "An fmap report already exists for this month !");
 					redirect("dashboard_management");
 				}
 
@@ -817,7 +817,7 @@ class Order extends MY_Controller {
 			//send excel file to email
 			$content .= $this -> send_file($file_location);
 
-			$this -> session -> set_flashdata('order_message', $content);
+			$this -> session -> set_flashdata('login_message', $content);
 			redirect("dashboard_management");
 		} else if ($type == "pipeline_upload") {//Upload Central medical stores and pending orders data
 			$this -> load -> library('PHPExcel');
@@ -827,7 +827,7 @@ class Order extends MY_Controller {
 			} else {
 				$this -> session -> set_flashdata('order_message', "No file found !");
 				$this -> session -> set_flashdata('pipeline_upload', 1);
-				redirect("order");
+				redirect("dashboard_management");
 			}
 
 			$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
@@ -896,7 +896,7 @@ class Order extends MY_Controller {
 				if ($data[0] != "") {
 					$query = $this -> db -> insert_batch('facility_soh', $data);
 				}
-				$this -> session -> set_flashdata('order_message', "You data have been successfully imported!");
+				$this -> session -> set_flashdata('login_message', "You data have been successfully imported!");
 				$this -> session -> set_flashdata('pipeline_upload', 1);
 				redirect("dashboard_management");
 				die();
@@ -910,7 +910,8 @@ class Order extends MY_Controller {
 	public function send_file($excel_file) {
 		$email_user = stripslashes('webadt.chai@gmail.com');
 		$email_password = stripslashes('WebAdt_052013');
-		$email_address = "kevomarete@gmail.com";
+		//$email_address = "kevomarete@gmail.com";
+		$email_address="gimaiyo@gmail.com";
 		$subject = "NASCOP Order Upload";
 		$email_sender_title = "NASCOP SYSTEM";
 
@@ -1506,14 +1507,14 @@ class Order extends MY_Controller {
 
 	public function getMappedRegimen($regimen_code = "", $regimen_desc = "") {
 		if ($regimen_code != "") {
-			$sql = "SELECT r.map
+			$sql = "SELECT r.n_map
 				    FROM regimen r
 				    WHERE(r.regimen_code='$regimen_code'
 				    OR r.regimen_desc='$regimen_desc')";
 			$query = $this -> db -> query($sql);
 			$results = $query -> result_array();
 			if ($results) {
-				return $results[0]['map'];
+				return $results[0]['n_map'];
 			} else {
 				return null;
 			}
