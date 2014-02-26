@@ -1477,6 +1477,12 @@ class Dashboard_Management extends MY_Controller {
 		}
 		return $this -> table -> generate();
 	}
+	
+	public function set_tab_session(){
+		$tab_id = $this->input->post("tab_id");
+		$this->session->set_userdata("tab_session",$tab_id);
+		echo "#".$tab_id;
+	}
 
 	public function base_params($data) {
 		$this -> load -> view("template_national", $data);

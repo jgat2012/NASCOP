@@ -342,24 +342,6 @@ class User_Management extends MY_Controller {
 		}
 	}
 
-	public function authenticate_pipeline() {
-		$username = $this -> input -> post("username");
-		$password = $this -> input -> post("password");
-		$key = $this -> encrypt -> get_key();
-		$encrypted_password = $key . $password;
-		$logged_in = Users::login($username, $encrypted_password);
-		if ($logged_in == false) {
-			$data['invalid'] = true;
-			echo json_encode($data);
-		} else {
-			$this -> session -> set_userdata("pipeline_logged_in", $username);
-			$this -> session -> set_userdata("pipeline_upload", 1);
-			$data['invalid'] = false;
-			echo json_encode($data);
-		}
-
-	}
-
 	private function _submit_validate() {
 		// validation rules
 		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|min_length[4]|max_length[30]');
