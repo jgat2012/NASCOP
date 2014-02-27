@@ -336,11 +336,11 @@ class settings extends MY_Controller {
 					$action_icon = "<i class='icon-ok'></i>";
 				}else if($type=="gitlog" && $i=="hash_value"){
 					if($hash==""){
-						$status="<div class='alert-error'>cannot connect to server</div>";
+						$status="<div class='alert-info'>cannot connect to server</div>";
 					}else if($hash==$v){
-						$status="<span class='alert-success'>up to update</span>";
+						$status="<div class='alert-success'>up to update</div>";
 					}else{
-						$status="<span class='alert-warning'>need update</span>";
+						$status="<div class='alert-error'>need to update</div>";
 					}
 					$myrow[]=$status;
 				}
