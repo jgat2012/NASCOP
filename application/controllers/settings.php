@@ -3,8 +3,11 @@ class settings extends MY_Controller {
 	var $esm_url = "https://api.kenyapharma.org/";
 	function __construct() {
 		parent::__construct();
+				$this -> load -> library('github_updater');
+		$this -> load -> library('Unzip');
 		$this -> load -> library('encrypt');
 		$this -> load -> library('Curl');
+
 	}
 
 	public function index() {
@@ -107,7 +110,7 @@ class settings extends MY_Controller {
 
 					$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
 					$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
-					
+
 					$four_current_month_start = date('Y-m-d', strtotime($current_month_start . "-4 months"));
 					$five_current_month_start = date('Y-m-d', strtotime($current_month_start . "-5 months"));
 					$six_current_month_start = date('Y-m-d', strtotime($current_month_start . "-6 months"));
@@ -218,6 +221,9 @@ class settings extends MY_Controller {
 			$columns = array("s.id", "facilitycode", "name", "type", "c.county", "s.active", "facilitytype", "district", "s.county as county_id", "supported_by", "service_art", "service_pmtct", "service_pep", "supplied_by", "parent", "map", "IF(a.facility_id !='NULL','1','0') as adt_site");
 		} else if ($type == "regimen") {
 			$columns = array("s.id", "regimen_code", "regimen_desc", "r.Name", "category", "line", "type_of_service", "n_map", "e_map", "s.active");
+		} else if ($type == "gitlog") {
+			$columns = array("s.id", "f.name", "hash_value", "update_time");
+			$hash = $this -> github_updater -> get_hash();
 		}
 
 		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
@@ -277,6 +283,8 @@ class settings extends MY_Controller {
 			$this -> db -> join("adt_sites a", "a.facility_id=s.map", "left");
 		} else if ($type == "regimen") {
 			$this -> db -> join("regimen_category r", "r.id=s.category", "left");
+		} else if ($type == "gitlog") {
+			$this -> db -> join("facilities f", "f.facilitycode=s.facility_code", "left");
 		}
 		$rResult = $this -> db -> get();
 		// Data set length after filtering
@@ -326,8 +334,16 @@ class settings extends MY_Controller {
 				} else if ($type == "regimen" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
+				}else if($type=="gitlog" && $i=="hash_value"){
+					if($hash==""){
+						$status="<div class='alert-error'>cannot connect to server</div>";
+					}else if($hash==$v){
+						$status="<span class='alert-success'>up to update</span>";
+					}else{
+						$status="<span class='alert-warning'>need update</span>";
+					}
+					$myrow[]=$status;
 				}
-
 			}
 
 			if ($type == "user_emails") {
@@ -343,11 +359,11 @@ class settings extends MY_Controller {
 			if ($action_link == "delete") {
 				$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
 				$links .= "  ";
-				if ($type != "sync_facility") {
+				if ($type != "sync_facility" || $type != "gitlog") {
 					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
 				}
 			} else {
-				if ($type != "sync_facility") {
+				if ($type != "sync_facility" || $type != "gitlog") {
 					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
 				}
 			}

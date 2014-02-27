@@ -86,6 +86,16 @@ class Sync extends MY_Controller {
 		echo json_encode(array('EID Sync Success'));
 	}
 
+	public function gitlog() {
+		$post_array = $_POST;
+		$main_array = $post_array['json_data'];
+		$responses = json_decode($main_array, TRUE);
+		$sql = "DELETE FROM gitlog WHERE facility_code='$facility_code'";
+		$this -> db -> query($sql);
+		$this -> db -> insert_batch("gitlog", $responses);
+		echo json_encode(array('GITLOG Sync Success'));
+	}
+
 	public function save($link = "nascop", $type = "cdrr", $id = "") {
 		$post_array = $_POST;
 		$main_array = $post_array['json_data'];

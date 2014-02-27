@@ -53,6 +53,9 @@
 				<li>
 					<a href="#" class="setting_link" id="user_emails">USER EMAILS</a>
 				</li>
+				<li>
+					<a href="#" class="setting_link" id="gitlog">VERSIONS</a>
+				</li>
 			</ul>
 		</div>
 		<div class="span9">
@@ -145,7 +148,10 @@
 	    }else if(type == "regimen") {
 				$("#create_setting").text("add regimen");
 				$("#modal_header").text("Add Regimen");
-		}
+		}else if(type == "gitlog") {
+			$("#add_btn").hide();
+			$("#modal_header").text("Add Log");
+		} 
 
 		var link = my_url + "settings/modal/" + type
 		$(".modal_btn").attr("href", link);
@@ -327,6 +333,8 @@
 			var columns = new Array("mfl code", "name", "category","county","options");
 		} else if(type == "regimen") {
 			var columns = new Array("code", "name", "category","options");
+		}else if(type == "gitlog") {
+			var columns = new Array("Facility", "hash value","Status","last update");
 		}
 		//Generate Columns
 		var thead = "<table id='setting_grid' class='table table-bordered table-hover table-condensed'><thead><tr>";
