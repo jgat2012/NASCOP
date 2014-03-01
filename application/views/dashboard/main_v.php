@@ -84,9 +84,12 @@
 				 	else if(id=="ra_menu"){//Reporting Analysis
 				 		  reporting_analysis();
 				 	}
-				 	else if(type=="ca_menu"){//Reporting Analysis
+				 	else if(id=="ca_menu"){//Reporting Analysis
 				 		  commodity_analysis();
 				 	}
+				 	else if(id=="eid_menu"){//Eid Analysis
+	 		              eid_analysis();
+	 	            }
 				}
 			});
 			
