@@ -3,7 +3,7 @@ class settings extends MY_Controller {
 	var $esm_url = "https://api.kenyapharma.org/";
 	function __construct() {
 		parent::__construct();
-				$this -> load -> library('github_updater');
+		$this -> load -> library('github_updater');
 		$this -> load -> library('Unzip');
 		$this -> load -> library('encrypt');
 		$this -> load -> library('Curl');
@@ -334,15 +334,15 @@ class settings extends MY_Controller {
 				} else if ($type == "regimen" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
-				}else if($type=="gitlog" && $i=="hash_value"){
-					if($hash==""){
-						$status="<div class='alert-info'>cannot connect to server</div>";
-					}else if($hash==$v){
-						$status="<div class='alert-success'>up to update</div>";
-					}else{
-						$status="<div class='alert-error'>need to update</div>";
+				} else if ($type == "gitlog" && $i == "hash_value") {
+					if ($hash == "") {
+						$status = "<div class='alert-info'>cannot connect to server</div>";
+					} else if ($hash == $v) {
+						$status = "<div class='alert-success'>up to update</div>";
+					} else {
+						$status = "<div class='alert-error'>need to update</div>";
 					}
-					$myrow[]=$status;
+					$myrow[] = $status;
 				}
 			}
 
@@ -494,7 +494,7 @@ class settings extends MY_Controller {
 				}
 				$textfield .= "</select>";
 			} else if ($input == "parent" && $type == "facilities") {
-				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span8'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
 				$facilities = Facilities::getActive();
 				foreach ($facilities as $facility) {
@@ -502,13 +502,14 @@ class settings extends MY_Controller {
 				}
 				$textfield .= "</select>";
 			} else if ($input == "map" && $type == "facilities") {
-				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
-				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
-				$facilities = Sync_Facility::getAllHydrated();
-				foreach ($facilities as $facility) {
-					$textfield .= "<option value='" . $facility['id'] . "'>" . $facility['name'] . "</option>";
-				}
-				$facilities = Escm_Facility::getAllHydrated();
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span10'>";
+				$textfield .= "<option value='0' selected='selected'></option>";
+				$facilities1 = Sync_Facility::getAllHydrated();
+				$facilities2 = Escm_Facility::getAllHydrated();
+				$facilities3 = Satellites::getAllHydrated();
+				$facilities4 = array_merge($facilities1, $facilities2);
+				$facilities = array_merge($facilities3, $facilities4);
+				sort($facilities);
 				foreach ($facilities as $facility) {
 					$textfield .= "<option value='" . $facility['id'] . "'>" . $facility['name'] . "</option>";
 				}

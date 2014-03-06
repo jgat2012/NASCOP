@@ -2,7 +2,10 @@
 	.full-content {
 		width: 95%;
 		zoom: 100%;
-	}
+	}
+	#facilities_map{
+		width:200px;
+	}
 </style>
 <div class="container-fluid full-content">
 	<!--Grid-->
@@ -106,6 +109,7 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		$("#facilities_map").searchable();
         var my_url = "<?php echo base_url(); ?>";
 		//default link
 		var type = "<?php if($this -> session -> userdata("nav_link") !=""){echo $this -> session -> userdata("nav_link");}else{echo "sync_drug";} ?>";
@@ -261,6 +265,7 @@
 				}
 			});
 			$("#modal_template").modal('show');
+			$("#facilities_map").searchable();
 		});
 
 		$("#add_btn").click(function() {

@@ -10,6 +10,7 @@ class Adt_Sites extends Doctrine_Record {
 		$this -> setTableName('adt_sites');
 		$this -> hasOne('Sync_Facility as S_Facility', array('local' => 'facility_id', 'foreign' => 'id'));
 		$this -> hasOne('Escm_Facility as E_Facility', array('local' => 'facility_id', 'foreign' => 'id'));
+		$this -> hasOne('Satellites as Satellite', array('local' => 'facility_id', 'foreign' => 'id'));
 	}
 
 	public function getAll() {

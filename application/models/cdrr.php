@@ -99,7 +99,7 @@ class Cdrr extends Doctrine_Record {
 	}
 
 	public function getOrderPeriods() {
-		$query = Doctrine_Query::create() -> select("c.period_begin") -> from("cdrr c") -> leftJoin('c.map m') -> where("(m.code='D-MAPS') AND (code='D-CDRR' or code='F-CDRR_packs')") -> groupBy("c.period_begin");
+		$query = Doctrine_Query::create() -> select("c.period_begin") -> from("cdrr c") -> leftJoin('c.map m') -> where("(m.code='D-MAPS') AND (code='D-CDRR' or code='F-CDRR_packs')") -> groupBy("c.period_begin")->orderBy("c.period_begin desc");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}

@@ -432,17 +432,31 @@
 		}
 		else if(id=='adult_art_btn'){//Adult patients ON ART
 			var period = $("#nd_adult_art_period").val();
+			var county = $("#nd_adult_art_county").val();
+			var facility = $("#nd_adult_art_facility").val();
 			$(".ad_pa_period_display").text(period);
 			$("#ART_ADULT_PATIENT_graph").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-			var art_adult_patient_link="<?php echo base_url().'dashboard_management/getPatients/ADULT_ART/';?>"+period;
+			var art_adult_patient_link="<?php echo base_url().'dashboard_management/adult_patients/';?>"+period+"/"+facility+"/"+county;
 			$("#ART_ADULT_PATIENT_graph").load(art_adult_patient_link);
 		}
 		else if(id=='paed_art_btn'){//Adult patients ON ART
 			var period = $("#nd_paed_art_period").val();
+			var county = $("#nd_paed_art_county").val();
+			var facility = $("#nd_paed_art_facility").val();
 			$(".paed_pa_period_display").text(period);
 			$("#ART_PAED_PATIENT_graph").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
-			var art_paed_patient_link="<?php echo base_url().'dashboard_management/getPatients/PAED_ART/';?>"+period;
+			var art_paed_patient_link="<?php echo base_url().'dashboard_management/paed_patients/';?>"+period+"/"+facility+"/"+county;
 			$("#ART_PAED_PATIENT_graph").load(art_paed_patient_link);
+		}else if(id=="rs_satellite_btn"){
+			var period = $("#satellite_period").val();
+			$("#chart_area_report_analysis").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+			var satellite_link="<?php echo base_url().'dashboard_management/reportingSatellites/';?>"+period;
+			$("#chart_area_report_analysis").load(satellite_link);
+		}else if(id=="rs_ordering_btn"){
+			var period = $("#ordering_period").val();
+			$("#report_summary_table").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+			var ordering_link="<?php echo base_url().'dashboard_management/reportSummary/table/';?>"+period;
+			$("#report_summary_table").load(ordering_link);
 		}
 		
 	});
@@ -457,8 +471,8 @@
 		var art_patient_link="<?php echo base_url().'dashboard_management/getPatients/ART_PATIENT';?>";
 	    var byregimen_patient_link="<?php echo base_url().'dashboard_management/getPatients/BYREG_PATIENT';?>";
 	    var art_bypipeline_link="<?php echo base_url().'dashboard_management/getPatients/BYPIPELINE_ART';?>";
-	    var art_adult_patient_link="<?php echo base_url().'dashboard_management/getPatients/ADULT_ART';?>";
-	    var art_paed_patient_link="<?php echo base_url().'dashboard_management/getPatients/PAED_ART';?>";
+	    var art_adult_patient_link="<?php echo base_url().'dashboard_management/adult_patients';?>";
+	    var art_paed_patient_link="<?php echo base_url().'dashboard_management/paed_patients';?>";
 		$("#ART_PATIENT_grid").load(art_patient_link, function() {
             $("#ART_PATIENT_listing").dataTable({
 		 		 "bJQueryUI" : true,
@@ -537,7 +551,7 @@
 		var report_analysis_table_link="<?php echo base_url().'dashboard_management/reportSummary/table';?>";//Table Reporting Sites Summary
 		var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
 	  	var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";//ARV Sites
-	  	var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportSummary/site_reporting';?>";//Reporting Sites Analysis
+	  	var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportingSatellites';?>";//Reporting Sites Analysis
 
 	    $("#report_summary_table").load(report_analysis_table_link);
    	    $("#chart_area_report_summary").load(report_analysis_summary_link);
@@ -901,46 +915,68 @@
     <div class="tab-pane nat_dashboard_rep" id="tab2">
     	<div class="row-fluid">
 		  <div class="three_block span4" id="patient_by_art_by_pipeline">
-    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline for <span class="pa_period_display"><?php echo date('F-Y');?></span></h3>
-    		<div id="" class="nd_menus">
-				<span>Select a period</span>
-				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span3">
+    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline<br/> For
+				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span4">
 					<?php foreach ($maps_report_period as $value) {
 						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
 					}?>
-				</select>
-				
+				</select>	
 				<button class="generate btn btn-warning" style="color:black" id="pa_bypipeline_btn">Get</button>
-			</div>
+				</h3>
 			<hr size="2"><p></p>
     		<div id="ART_PATIENT_PIPELINE_graph"></div>
     	  </div>
     	  <div class="three_block span4" id="adult_patient_on_art">
-    		<h3 class="dashboard_title">Current Adult Patients on ART as of <span class="ad_pa_period_display"><?php echo date('F-Y');?></span></h3>
-    		<div id="" class="nd_menus">
-				<span>Select a period</span>
-				<select id="nd_adult_art_period" class="nd_period nd_input_small span3">
+    		<h3 class="dashboard_title">Current Adult Patients on ART as of 
+				<select id="nd_adult_art_period" class="nd_period nd_input_small span4">
 					<?php foreach ($maps_report_period as $value) {
 						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				<br/>
+				<span>County</span>
+				<select id="nd_adult_art_county" class="nd_period nd_input_small span3">
+					<option value="">All</option>
+					<?php foreach ($county_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($facility_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				
 				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
-			</div>
+			</h3>
     		<div id="ART_ADULT_PATIENT_graph"></div>
     	  </div>
     	  <div class="three_block span4" id="paed_patient_on_art">
-    		<h3 class="dashboard_title">Current Paedriatic Patients on ART as of <span class="paed_pa_period_display"><?php echo date('F-Y');?></span></h3>
-    		<div id="" class="nd_menus">
-				<span>Select a period</span>
-				<select id="nd_paed_art_period" class="nd_period nd_input_small span3">
+    		<h3 class="dashboard_title">Current Paedriatic Patients on ART as of 
+				<select id="nd_paed_art_period" class="nd_period nd_input_small span4">
 					<?php foreach ($maps_report_period as $value) {
 						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
 					}?>
 				</select>
-				
+				<br/>
+				<span>County</span>
+				<select id="nd_paed_art_county" class="nd_period nd_input_small span3">
+					<option value="">All</option>
+					<?php foreach ($county_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="nd_paed_art_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($facility_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
 				<button class="generate btn btn-warning" style="color:black" id="paed_art_btn">Get</button>
-			</div>
+			</h3>
     		<div id="ART_PAED_PATIENT_graph"></div>
     	  </div>
 		</div>
@@ -985,22 +1021,29 @@
     	</div>
     	<div class="row-fluid">
     		<div class="two_block span6" id="">
-	    		<h3 class="dashboard_title">Reporting Sites Analysis for <span class="rs_period_display"><?php echo  date('F-Y');?></span></h3>
-	    			<div id="ra_menus" class="nd_menus">
-	    				<span>Select a period</span>
-						<select id="nd_ra_period" class="nd_period nd_input_small span3">
+	    		<h3 class="dashboard_title">Reporting Satellite Sites Summary for 
+						<select id="satellite_period" class="nd_period nd_input_small span3">
 							<?php foreach ($report_period as $value) {
-								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".strtoupper(date('F-Y',strtotime($value['period_begin'])))."</option>";
 							}?>
 						</select>
 						
-						<button class="generate btn btn-warning" style="color:black" id="rs_analysis_btn">Get</button>
-					</div>
+						<button class="generate btn btn-warning" style="color:black" id="rs_satellite_btn">Get</button>
+					</h3>
 					<hr size="2">
 	    		<div id="chart_area_report_analysis"></div>
 	    	</div>
 	    	<div class="two_block span6" id="">
-	    		<h3 class="dashboard_title">Reporting Sites Rate Summary for <?php echo  date('F-Y');?></h3>
+	    		<h3 class="dashboard_title">Reporting Ordering Sites Rate Summary for 
+						<select id="ordering_period" class="nd_period nd_input_small span3">
+							<?php foreach ($report_period as $value) {
+								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".strtoupper(date('F-Y',strtotime($value['period_begin'])))."</option>";
+							}?>
+						</select>
+						
+						<button class="generate btn btn-warning" style="color:black" id="rs_ordering_btn">Get</button>
+				</h3>
+				<hr size="2">
 	    		<div id="report_summary_table"></div>
 	    	</div>
     	</div>

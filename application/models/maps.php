@@ -76,7 +76,7 @@ class Maps extends Doctrine_Record {
 	}
 
 	public function getReportPeriods() {//Only get aggregated maps
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code ='D-MAPS'") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code ='D-MAPS'") -> groupBy("period_begin")->OrderBy("period_begin desc");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
