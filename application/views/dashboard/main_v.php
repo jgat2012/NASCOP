@@ -892,21 +892,90 @@
     <div class="tab-pane nat_dashboard_rep active" id="tab8">
     	<div class="row-fluid">
     		<div class="two_block span6">
-	    		<h3 class="dashboard_title">EID By Gender</h3>
+	    		<h3 class="dashboard_title">EID Gender Analysis:
+	    		<span>County</span>
+				<select id="eid_county" class="nd_period nd_input_small span2">
+					<option value="">All</option>
+					<?php foreach ($county_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($facility_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
+	    		</h3>
 	    		<div id="chart_area_eid_gender"></div>
 	    	</div>
 	    	<div class="two_block span6">
-	    		<h3 class="dashboard_title">EID By Line</h3>
+	    		<h3 class="dashboard_title">EID Line Analysis:
+	    		<span>County</span>
+				<select id="eid_county" class="nd_period nd_input_small span2">
+					<option value="">All</option>
+					<?php foreach ($county_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($facility_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
+				</h3>
 	    		<div id="chart_area_eid_line"></div>
 	    	</div>
     	</div>
     	<div class="row-fluid">
     		<div class="two_block span6">
-	    		<h3 class="dashboard_title">EID By Regimen</h3>   
+	    		<h3 class="dashboard_title">EID Regimen Analysis:
+	    			    		<span>County</span>
+				<select id="eid_county" class="nd_period nd_input_small span2">
+					<option value="">All</option>
+					<?php foreach ($county_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($facility_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>	
+	    		</h3>   
 	    		<div id="chart_area_eid_regimen"></div>
 	    	</div>
 	    	<div class="two_block span6">
-	    		<h3 class="dashboard_title">EID Comparison</h3>
+	    		<h3 class="dashboard_title">WebADT/EID Comparison Analysis
+	    		<span>County</span>
+				<select id="eid_county" class="nd_period nd_input_small span2">
+					<option value="">All</option>
+					<?php foreach ($county_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($facility_period as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>	
+	    			
+	    		</h3>
 	    		<div id="chart_area_eid_comparison"></div>
 	    	</div>
     	</div>
