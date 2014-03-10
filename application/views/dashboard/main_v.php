@@ -457,7 +457,38 @@
 			$("#report_summary_table").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 			var ordering_link="<?php echo base_url().'dashboard_management/reportSummary/table/';?>"+period;
 			$("#report_summary_table").load(ordering_link);
+		}else if(id=="eid_gender_btn"){
+	      var eid_period=$("#gender_eid_period").val();
+		  var eid_county=$("#gender_eid_county").val();
+		  var eid_facility=$("#gender_eid_facility").val();
+		  var chart_area_eid_gender_link="<?php echo base_url().'dashboard_management/eid/gender/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
+	      $("#chart_area_eid_gender").load(chart_area_eid_gender_link);
+		}else if(id=="eid_line_btn"){
+		  var eid_period=$("#line_eid_period").val();
+		  var eid_county=$("#line_eid_county").val();
+		  var eid_facility=$("#line_eid_facility").val();
+		  var chart_area_eid_line_link="<?php echo base_url().'dashboard_management/eid/line/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
+   	      $("#chart_area_eid_line").load(chart_area_eid_line_link);
+		}else if(id=="eid_regimen_btn"){
+		  var eid_period=$("#regimen_eid_period").val();
+		  var eid_county=$("#regimen_eid_county").val();
+		  var eid_facility=$("#regimen_eid_facility").val();
+	  	  var chart_area_eid_regimen_link="<?php echo base_url().'dashboard_management/eid/regimen/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
+          $("#chart_area_eid_regimen").load(chart_area_eid_regimen_link);
+		}else if(id=="eid_source_btn"){
+		  var eid_period=$("#source_eid_period").val();
+		  var eid_county=$("#source_eid_county").val();
+		  var eid_facility=$("#source_eid_facility").val();
+	  	  var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/source/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
+          $("#chart_area_eid_source").load(chart_area_eid_source_link);
+		}else if(id=="eid_comparison_btn"){
+		  var eid_period=$("#comparison_eid_period").val();
+		  var eid_county=$("#comparison_eid_county").val();
+		  var eid_facility=$("#comparison_eid_facility").val();
+	  	  var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/comparison/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
+          $("#chart_area_eid_comparison").load(chart_area_eid_source_link);
 		}
+		
 		
 	});
 	
@@ -563,12 +594,14 @@
 		var chart_area_eid_gender_link="<?php echo base_url().'dashboard_management/eid/gender';?>";
 		var chart_area_eid_line_link="<?php echo base_url().'dashboard_management/eid/line';?>";
 	  	var chart_area_eid_regimen_link="<?php echo base_url().'dashboard_management/eid/regimen';?>";
-	  	var chart_area_eid_comparison_link = "<?php echo base_url().'dashboard_management/eid/comparison';?>";
+	  	var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/source';?>";
+	  	var chart_area_eid_comaprison_link= "<?php echo base_url().'dashboard_management/eid/comparison';?>";
 
 	    $("#chart_area_eid_gender").load(chart_area_eid_gender_link);
    	    $("#chart_area_eid_line").load(chart_area_eid_line_link);
         $("#chart_area_eid_regimen").load(chart_area_eid_regimen_link);
-        $("#chart_area_eid_comparison").load(chart_area_eid_comparison_link);
+        $("#chart_area_eid_source").load(chart_area_eid_source_link);
+        $("#chart_area_eid_comparison").load(chart_area_eid_comaprison_link);
 	}
 	
 	
@@ -601,7 +634,6 @@
   			<div class="row-fluid" style="height:50%;">
   			<?php 
   			 if($this->session->userdata("upload_valid") !=""){
-  			 	if($this -> session ->userdata('order_pipeline') !="yes"){
   			?>
   			<div id="order_frm">
   				<div class="row-fluid">
@@ -688,61 +720,6 @@
   			    </div><!--End of second Span-->
   			    </div>
   			    </div>
-  			    <?php }else{?>
-  			    <div id="order_frm">
-  				<div class="row-fluid">
-  					<div class="span6">
-  						  <?php 
-						  if($this -> session -> flashdata('order_message')){
-						  	echo "<div class='alert alert-info'><button type='button' class='close' data-dismiss='alert'>&times;</button>".$this -> session -> flashdata('order_message')."</div>";
-						  }
-						  ?>
-  						<?php if($this -> session -> flashdata('login_message') !=""){?>
-                		  	<div class="alert alert-info">
-							    <button type='button' class='close' data-dismiss='alert'>&times;</button>
-							     <?php echo $this -> session -> flashdata('login_message');?>
-							</div>
-							<?php }?>
-  					</div>
-  				 <div class="span6">
-  				 	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
-  			      	<div class="dropdown" style="display:inline;">
-					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
-					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-					    <li><a tabindex="-1" href='#' class="password">change password</a></li>
-					  </ul>
-					</div>
-					<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
-					</label>			
-                 </div>
-                 </div>
-                <div class="row-fluid">
-  				<div class="span12">
-  					<div class="row-fluid">
-			    		<div class="span12">	
-							<h3> Pipeline Upload</h3>
-							<?php echo form_open_multipart("order/import_order/pipeline_upload");?>
-							<input type="file" name="cms_file" id="cms_file" required="" accept="application/vnd.ms-excel" />
-							<div class="control-group">
-							    <div class="controls">
-							      <button type="submit" class="btn btn-primary"><i class="icon-upload"></i>Upload File</button>
-							    </div>
-							</div>
-							<?php echo form_close();?>
-						</div>
-					</div>
-					<div class="row-fluid">	
-						
-						<div class="span12">	
-							<h3>Central Medical Store and Pending Orders Template <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
-							<?php echo anchor("assets/template/pipeline_upload_template.xls","<i class='icon-download-alt'></i>Central Medical Store and Pending Orders Template");?>
-						</div>
-			    	</div>
-  				</div>
-                 </div>
-                 </div>
-  			    	
-  			    <?php }?>	
   			    <div id="change_frm" style="display:none;">
   				<div class="row-fluid">
   				 <div class="span12">
@@ -891,89 +868,146 @@
     <!--EID Analysis-->
     <div class="tab-pane nat_dashboard_rep active" id="tab8">
     	<div class="row-fluid">
-    		<div class="two_block span6">
+    		<div class="three_block span4">
 	    		<h3 class="dashboard_title">EID Gender Analysis:
+	    		 For	
+	    		<select id="gender_eid_period" class="nd_period nd_input_small span4">
+					<?php foreach ($eid_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				<br/>
 	    		<span>County</span>
-				<select id="eid_county" class="nd_period nd_input_small span2">
-					<option value="">All</option>
-					<?php foreach ($county_period as $index=>$value) {
+				<select id="gender_eid_county" class="nd_period nd_input_small span3">
+					<option value="0">All</option>
+					<?php foreach ($eid_county as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				<span>Facility</span>
-				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
-					<?php foreach ($facility_period as $index=>$value) {
+				<select id="gender_eid_facility" class="nd_period nd_input_small span4">
+					<option value="0">All</option>
+					<?php foreach ($eid_facility as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				
-				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
+				<button class="generate btn btn-warning" style="color:black" id="eid_gender_btn">Get</button>
 	    		</h3>
 	    		<div id="chart_area_eid_gender"></div>
 	    	</div>
-	    	<div class="two_block span6">
+	    	<div class="three_block span4">
 	    		<h3 class="dashboard_title">EID Line Analysis:
+                For
+	    		<select id="line_eid_period" class="nd_period nd_input_small span4">
+					<?php foreach ($eid_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				<br/>
 	    		<span>County</span>
-				<select id="eid_county" class="nd_period nd_input_small span2">
-					<option value="">All</option>
-					<?php foreach ($county_period as $index=>$value) {
+				<select id="line_eid_county" class="nd_period nd_input_small span3">
+					<option value="0">All</option>
+					<?php foreach ($eid_county as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				<span>Facility</span>
-				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
-					<?php foreach ($facility_period as $index=>$value) {
+				<select id="line_eid_facility" class="nd_period nd_input_small span4">
+					<option value="0">All</option>
+					<?php foreach ($eid_facility as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				
-				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
+				<button class="generate btn btn-warning" style="color:black" id="eid_line_btn">Get</button>
 				</h3>
 	    		<div id="chart_area_eid_line"></div>
 	    	</div>
-    	</div>
-    	<div class="row-fluid">
-    		<div class="two_block span6">
+	    	 <div class="three_block span4">
 	    		<h3 class="dashboard_title">EID Regimen Analysis:
-	    			    		<span>County</span>
-				<select id="eid_county" class="nd_period nd_input_small span2">
-					<option value="">All</option>
-					<?php foreach ($county_period as $index=>$value) {
+	    			For
+	    		<select id="regimen_eid_period" class="nd_period nd_input_small span4">
+					<?php foreach ($eid_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				<br/>
+	    		<span>County</span>
+				<select id="regimen_eid_county" class="nd_period nd_input_small span3">
+					<option value="0">All</option>
+					<?php foreach ($eid_county as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				<span>Facility</span>
-				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
-					<?php foreach ($facility_period as $index=>$value) {
+				<select id="regimen_eid_facility" class="nd_period nd_input_small span4">
+					<option value="0">All</option>
+					<?php foreach ($eid_facility as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				
-				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>	
+				<button class="generate btn btn-warning" style="color:black" id="eid_regimen_btn">Get</button>	
 	    		</h3>   
 	    		<div id="chart_area_eid_regimen"></div>
 	    	</div>
-	    	<div class="two_block span6">
-	    		<h3 class="dashboard_title">WebADT/EID Comparison Analysis
+    	</div>
+    	<div class="row-fluid">
+    		  <div class="two_block span6">
+	    		<h3 class="dashboard_title">EID Source Analysis:
+	    			For
+	    		<select id="source_eid_period" class="nd_period nd_input_small span4">
+					<?php foreach ($eid_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				<br/>
 	    		<span>County</span>
-				<select id="eid_county" class="nd_period nd_input_small span2">
-					<option value="">All</option>
-					<?php foreach ($county_period as $index=>$value) {
+				<select id="source_eid_county" class="nd_period nd_input_small span3">
+					<option value="0">All</option>
+					<?php foreach ($eid_county as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				<span>Facility</span>
-				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
-					<?php foreach ($facility_period as $index=>$value) {
+				<select id="source_eid_facility" class="nd_period nd_input_small span4">
+					<option value="0">All</option>
+					<?php foreach ($eid_facility as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				
-				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>	
+				<button class="generate btn btn-warning" style="color:black" id="eid_source_btn">Get</button>	
+	    		</h3>   
+	    		<div id="chart_area_eid_source"></div>
+	    	</div>
+
+	    	<div class="two_block span6">
+	    		<h3 class="dashboard_title">WebADT/EID Comparison Analysis:
+	    		For
+	    		<select id="comparison_eid_period" class="nd_period nd_input_small span4">
+					<?php foreach ($eid_adt_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				<br/>	
+	    		<span>County</span>
+				<select id="comparison_eid_county" class="nd_period nd_input_small span3">
+					<option value="">All</option>
+					<?php foreach ($eid_adt_county as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="comparison_eid_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($eid_adt_facility as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				
+				<button class="generate btn btn-warning" style="color:black" id="eid_comparison_btn">Get</button>	
 	    			
 	    		</h3>
 	    		<div id="chart_area_eid_comparison"></div>
@@ -983,7 +1017,7 @@
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
     	<div class="row-fluid">
-		  <div class="three_block span4" id="patient_by_art_by_pipeline">
+		  <div class="two_block span4" id="patient_by_art_by_pipeline">
     		<h3 class="dashboard_title">Number of Patients on ART By Pipeline<br/> For
 				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span4">
 					<?php foreach ($maps_report_period as $value) {
@@ -1005,14 +1039,14 @@
 				<br/>
 				<span>County</span>
 				<select id="nd_adult_art_county" class="nd_period nd_input_small span3">
-					<option value="">All</option>
+					<option value="0">All</option>
 					<?php foreach ($county_period as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				<span>Facility</span>
 				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
+					<option value="0">All</option>
 					<?php foreach ($facility_period as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
@@ -1032,14 +1066,14 @@
 				<br/>
 				<span>County</span>
 				<select id="nd_paed_art_county" class="nd_period nd_input_small span3">
-					<option value="">All</option>
+					<option value="0">All</option>
 					<?php foreach ($county_period as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>
 				</select>
 				<span>Facility</span>
 				<select id="nd_paed_art_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
+					<option value="0">All</option>
 					<?php foreach ($facility_period as $index=>$value) {
 						echo "<option value='".$index."'>".$value."</option>";
 					}?>

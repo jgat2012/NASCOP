@@ -21,7 +21,87 @@ class Dashboard_Management extends MY_Controller {
 		$data['maps_report_period'] = maps::getReportPeriods();
 		$data['county_period'] = $this -> getCountyList();
 		$data['facility_period'] = $this -> getFacilityList();
+		$data['eid_period'] = $this -> getEidPeriod();
+		$data['eid_county'] = $this -> getEidCounty();
+		$data['eid_facility'] = $this -> getEidFacility();
+		$data['eid_adt_period'] = $this -> getEidADTPeriod();
+		$data['eid_adt_county'] = $this -> getEidADTCounty();
+		$data['eid_adt_facility'] = $this -> getEidADTFacility();
 		$this -> base_params($data);
+	}
+
+	public function getEidADTPeriod() {
+		$sql = "SELECT dateinitiatedontreatment as period_begin FROM eid_master WHERE dateinitiatedontreatment!='' AND dateinitiatedontreatment<=CURDATE() AND dateinitiatedontreatment !='1970-01-01' GROUP BY YEAR(dateinitiatedontreatment),MONTH(dateinitiatedontreatment) ORDER BY dateinitiatedontreatment desc";
+		$query = $this -> db -> query($sql);
+		return $results = $query -> result_array();
+	}
+
+	public function getEidPeriod() {
+		$sql = "SELECT enrollment_date as period_begin FROM eid_info GROUP BY YEAR(enrollment_date),MONTH(enrollment_date) ORDER BY enrollment_date desc";
+		$query = $this -> db -> query($sql);
+		return $results = $query -> result_array();
+	}
+
+	public function getEidADTCounty() {
+		$sql = "SELECT c.id,c.county
+			    FROM eid_master em
+			    LEFT JOIN facilities f ON f.facilitycode=em.facilitycode
+			    LEFT JOIN counties c ON c.id=f.county
+			    WHERE c.id !=''
+			    GROUP BY c.id";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		$counties = array();
+		foreach ($results as $result) {
+			$counties[$result['id']] = $result['county'];
+		}
+		$counties = array_unique($counties);
+		asort($counties);
+		return $counties;
+	}
+
+	public function getEidCounty() {
+		$sql = "SELECT c.id,c.county
+			    FROM eid_info ei
+			    LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+			    LEFT JOIN counties c ON c.id=f.county
+			    GROUP BY c.id";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		foreach ($results as $result) {
+			$counties[$result['id']] = $result['county'];
+		}
+		return $counties;
+	}
+
+	public function getEidADTFacility() {
+		$sql = "SELECT f.facilitycode,f.name
+			    FROM eid_master em
+			    LEFT JOIN facilities f ON f.facilitycode=em.facilitycode
+			    WHERE f.name !=''
+			    GROUP BY em.facilitycode";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		$facilities = array();
+		foreach ($results as $result) {
+			$facilities[$result['facilitycode']] = $result['name'];
+		}
+		$facilities = array_unique($facilities);
+		asort($facilities);
+		return $facilities;
+	}
+
+	public function getEidFacility() {
+		$sql = "SELECT f.facilitycode,f.name
+			    FROM eid_info ei
+			    LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+			    GROUP BY ei.facility_code";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		foreach ($results as $result) {
+			$facilities[$result['facilitycode']] = $result['name'];
+		}
+		return $facilities;
 	}
 
 	public function getCountyList() {
@@ -52,7 +132,6 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($results as $result) {
 			$counties[$result['id']] = $result['county'];
 		}
-
 		$counties = array_unique($counties);
 		asort($counties);
 		return $counties;
@@ -84,7 +163,6 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($results as $result) {
 			$facilities[$result['id']] = $result['name'];
 		}
-
 		$facilities = array_unique($facilities);
 		asort($facilities);
 		return $facilities;
@@ -1615,9 +1693,31 @@ class Dashboard_Management extends MY_Controller {
 		echo "#" . $tab_id;
 	}
 
-	public function eid($type = "gender", $period = "February-2013") {
-		$period_start = date('Y-m-01', strtotime($period));
-		$period_end = date('Y-m-t', strtotime($period));
+	public function eid($type = "gender", $period = "", $facility = 0, $county = 0) {
+		$conditions = "";
+		$conditions_adt = "";
+		$conditions_eid = "";
+
+		if ($period != "") {
+			$period_start = date('Y-m-01', strtotime($period));
+			$period_end = date('Y-m-t', strtotime($period));
+		} else {
+			$sql = "SELECT enrollment_date as period_begin FROM eid_info GROUP BY YEAR(enrollment_date),MONTH(enrollment_date) ORDER BY enrollment_date desc LIMIT 1";
+			$query = $this -> db -> query($sql);
+			$results = $query -> result_array();
+			if ($results) {
+				$period = $results[0]['period_begin'];
+			}
+			$period_start = date('Y-m-01', strtotime($period));
+			$period_end = date('Y-m-t', strtotime($period));
+		}
+
+		if ($facility != 0) {
+			$conditions .= "AND em.facilitycode='$facility'";
+		}
+		if ($county != 0) {
+			$conditions .= "AND c.id='$county'";
+		}
 
 		if ($type == "gender") {
 			$column = "gender";
@@ -1628,24 +1728,115 @@ class Dashboard_Management extends MY_Controller {
 		} else if ($type == "regimen") {
 			$column = "regimen";
 			$container = "chart_area_eid_regimen";
+		} else if ($type == "source") {
+			$column = "source";
+			$container = "chart_area_eid_source";
 		}
 
 		if ($type != "comparison") {
 			$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
 					FROM eid_info ei 
+					LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+					LEFT JOIN counties c ON c.id=f.county
 					WHERE ei.enrollment_date
 					BETWEEN '$period_start'
 					AND '$period_end'
+					$conditions
 					GROUP BY ei.$column";
 		} else {
-			$column = "gender";
-			$container = "chart_area_eid_comparison";
-			$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
-					FROM eid_info ei 
-					WHERE ei.enrollment_date
-					BETWEEN '$period_start'
-					AND '$period_end'
-					GROUP BY ei.$column";
+			if ($facility != 0) {
+				$conditions_adt .= "AND ei.facility_code='$facility'";
+				$conditions_eid .= "AND em.facilitycode='$facility'";
+			}
+			if ($county != 0) {
+				$conditions_adt .= "AND c.id='$county'";
+				$conditions_eid .= "AND c.id='$county'";
+			}
+
+			$sql = "
+			SELECT eid_total.total_eid,adt_total.total_adt,both_eid_adt.both_eid_adt,only_eid.only_eid,only_adt.only_adt
+			FROM
+			(SELECT COUNT(*)as total_eid
+			        FROM eid_master em
+			        LEFT JOIN facilities f ON f.facilitycode=em.facilitycode
+			        LEFT JOIN counties c ON c.id=f.county
+			        WHERE em.dateinitiatedontreatment
+				    BETWEEN '$period_start'
+				    AND '$period_end'
+					$conditions_eid) as eid_total,
+		    (SELECT COUNT(*)as total_adt
+			        FROM eid_info ei
+			        LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+			        LEFT JOIN counties c ON c.id=f.county
+			        WHERE ei.enrollment_date
+				    BETWEEN '$period_start'
+				    AND '$period_end'
+					$conditions_adt) as adt_total,
+			(SELECT COUNT(*) as both_eid_adt
+			        FROM eid_master em,eid_info ei
+			        LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+			        LEFT JOIN counties c ON c.id=f.county
+			        WHERE ei.enrollment_date
+				    BETWEEN '$period_start'
+				    AND '$period_end'
+				    AND em.facilitycode=ei.facility_code
+			        AND em.enrollmentcccno=ei.patient_no
+					$conditions_adt)as both_eid_adt,
+			 (SELECT COUNT(*) as only_eid
+			        FROM eid_master em
+			        LEFT JOIN facilities f ON f.facilitycode=em.facilitycode
+			        LEFT JOIN counties c ON c.id=f.county
+			        WHERE em.dateinitiatedontreatment
+				    BETWEEN '$period_start'
+				    AND '$period_end'
+			        AND em.enrollmentcccno NOT IN(SELECT patient_no FROM eid_info WHERE enrollment_date BETWEEN '$period_start' AND '$period_end')
+					$conditions_eid) as only_eid,
+			  (SELECT COUNT(*) as only_adt
+			        FROM eid_info ei
+			        LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+			        LEFT JOIN counties c ON c.id=f.county
+			        WHERE ei.enrollment_date
+				    BETWEEN '$period_start'
+				    AND '$period_end'
+			        AND ei.patient_no NOT IN(SELECT enrollmentcccno FROM eid_master WHERE dateinitiatedontreatment BETWEEN '$period_start' AND '$period_end')
+					$conditions_adt) as only_adt";
+			$query = $this -> db -> query($sql);
+			$results = $query -> result_array();
+			if ($results) {
+				$total_eid = $results[0]['total_eid'];
+				if ($total_eid > 0) {
+					$total_adt = $results[0]['total_adt'];
+					$total_adt_percent = number_format(($total_adt / $total_eid) * 100, 1);
+					$both_eid_adt = $results[0]['both_eid_adt'];
+					$both_eid_adt_percent = number_format(($both_eid_adt / $total_eid) * 100, 1);
+					$on_eid_only = $results[0]['only_eid'];
+					$on_eid_only_percent = number_format(($on_eid_only / $total_eid) * 100, 1);
+					$on_adt_only = $results[0]['only_adt'];
+					$on_adt_only_percent = number_format(($on_adt_only / $total_eid) * 100, 1);
+				} else {
+					$total_adt = 0;
+					$total_adt = 0;
+					$both_eid_adt = 0;
+					$on_eid_only = 0;
+					$on_adt_only = 0;
+					$total_adt_percent = number_format(0 * 100, 1);
+					$both_eid_adt_percent = number_format(0 * 100, 1);
+					$on_eid_only_percent = number_format(0 * 100, 1);
+					$on_adt_only_percent = number_format(0 * 100, 1);
+				}
+			}
+
+			$tmpl = array('table_open' => '<table id="" class="table table-bordered table-striped">');
+			$this -> table -> set_template($tmpl);
+			$this -> table -> set_heading('', 'Description', 'Total', 'Rate');
+			$this -> table -> add_row('', 'Total Enrolled on EID', number_format($total_eid), '100.0%');
+			$this -> table -> add_row('', 'Total Enrolled on webADT', number_format($total_adt), $total_adt_percent . '%');
+			$this -> table -> add_row('', 'Total Enrolled on both EID and webADT', number_format($both_eid_adt), $both_eid_adt_percent . '%');
+			$this -> table -> add_row('', 'Total Enrolled on EID and not on webADT', number_format($on_eid_only), $on_eid_only_percent . '%');
+			$this -> table -> add_row('', 'Total Enrolled on webADT and not on EID', number_format($on_adt_only), $on_adt_only_percent . '%');
+			$table_display = $this -> table -> generate();
+			echo $table_display;
+			exit();
 		}
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
@@ -1656,7 +1847,12 @@ class Dashboard_Management extends MY_Controller {
 		$inner_array['name'] = 'eid_analysis';
 		$lower_array = array();
 		foreach ($results as $result) {
-			$lower_array[] = array($result['label'], (int)$result['total']);
+			if ($type == "regimen") {
+				$label = explode("|", $result['label']);
+				$lower_array[] = array($label[0], (int)$result['total']);
+			} else {
+				$lower_array[] = array($result['label'], (int)$result['total']);
+			}
 		}
 		$inner_array['data'] = $lower_array;
 		$resultArray[] = $inner_array;
@@ -1762,7 +1958,7 @@ class Dashboard_Management extends MY_Controller {
 		echo $this -> showTable($columns, $total_data, $links = array(), $table_name = "satellites");
 	}
 
-	public function adult_patients($period = "", $facility = "", $county = "") {
+	public function adult_patients($period = "", $facility = 0, $county = 0) {
 		$conditions = "";
 		$regimens = array();
 
@@ -1781,10 +1977,10 @@ class Dashboard_Management extends MY_Controller {
 		$regimens["2ND LINE"] = 0;
 		$regimens["OTHER REGIMENS"] = 0;
 
-		if ($facility != "") {
+		if ($facility != 0) {
 			$conditions .= "AND m.facility_id='$facility'";
 		}
-		if ($county != "") {
+		if ($county != 0) {
 			$conditions .= "AND c.id='$county'";
 		}
 		//scripts
@@ -1940,7 +2136,7 @@ class Dashboard_Management extends MY_Controller {
 		$this -> load -> view('dashboard/chart_report_bar_v', $data);
 	}
 
-	public function paed_patients($period = "", $facility = "", $county = "") {
+	public function paed_patients($period = "", $facility = 0, $county = 0) {
 		$conditions = "";
 		$regimens = array();
 
@@ -1959,10 +2155,10 @@ class Dashboard_Management extends MY_Controller {
 		$regimens["2ND LINE"] = 0;
 		$regimens["OTHER REGIMENS"] = 0;
 
-		if ($facility != "") {
+		if ($facility != 0) {
 			$conditions .= "AND m.facility_id='$facility'";
 		}
-		if ($county != "") {
+		if ($county != 0) {
 			$conditions .= "AND c.id='$county'";
 		}
 		//scripts

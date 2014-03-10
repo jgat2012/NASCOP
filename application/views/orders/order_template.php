@@ -81,7 +81,9 @@
 			</tbody>
 		</table>
 	</div>
+
 	<div id="commodity-table">
+			<form method="post" action="<?php echo site_url('order/rationalize_cdrr/'.$cdrr_id."/".$maps_id)?>">	
 		<table class="table table-bordered"  id="generate_order" style="background:#FFF;">
 		<?php
 		if($order_code=="D-CDRR"){
@@ -96,8 +98,10 @@
 						<th class="number">Average Monthly Consumption</th>
 						<th class="number">Average Monthly Issues</th>
 						<th class="number">Quantity required for RESUPPLY</th>
+						<th class="number">Rationalized Quantity</th>
 					</tr>
 					<tr>
+						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
@@ -114,6 +118,7 @@
 						<th></th>
 						<th></th>
 						<th>J</th>
+						<th>K</th>
 					</tr>
 			</thead>';	
 		}else{
@@ -128,8 +133,10 @@
 						<th class="number">Average Monthly Consumption</th>
 						<th class="number">Average Monthly Issues</th>
 						<th class="number">Quantity required for RESUPPLY</th>
+						<th class="number">Rationalized Quantity</th>
 					</tr>
 					<tr>
+						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
@@ -146,6 +153,7 @@
 						<th></th>
 						<th></th>
 						<th>J</th>
+						<th>K</th>
 					</tr>
 			</thead>';	
 			
@@ -166,15 +174,15 @@
 			                   $counter = 0;
 			                   }
 							    if($commodity->Category==1 && $count_one==0){
-						  	  echo '<tr><td colspan="9" style="text-align:center;background:#999;">Adult Preparations</td></tr>';
+						  	  echo '<tr><td colspan="10" style="text-align:center;background:#999;">Adult Preparations</td></tr>';
 							  $count_one++;
 						  }	   
 						  if($commodity->Category==2 && $count_two==0){
-						  	  echo '<tr><td colspan="9" style="text-align:center;background:#999;">Pediatric Preparations</td></tr>';
+						  	  echo '<tr><td colspan="10" style="text-align:center;background:#999;">Pediatric Preparations</td></tr>';
 							  $count_two++;
 						  }
                           if($commodity->Category==3 && $count_three==0){
-						  	  echo '<tr><td colspan="9" style="text-align:center;background:#999;">Drugs for OIs</td></tr>';
+						  	  echo '<tr><td colspan="10" style="text-align:center;background:#999;">Drugs for OIs</td></tr>';
 							  $count_three++;
 						  }
 						 
@@ -197,7 +205,9 @@
 						<td> <input tabindex="-1" name="avg_issues[]" id="avg_issues_<?php echo $commodity->id;?>" type="text" class="avg_issues"/></td>
 						<td> 
 							<input tabindex="-1" name="new_resupply[]" id="new_resupply_<?php echo $commodity -> id;?>" type="text" class="resupply"/>
-							<input tabindex="-1" name="resupply[]" id="resupply_<?php echo $commodity -> id;?>" class="resupply" type="hidden"/>
+						</td>
+						<td>
+							<input tabindex="-1" name="resupply[]" id="resupply_<?php echo $commodity -> id;?>" class="resupply rationalized" type="text"/>
 						</td>	
 						<input type="hidden" name="commodity[]" value="<?php echo $commodity -> id;?>"/>					
 					</tr>					
@@ -207,7 +217,10 @@
 					?>
 		</tbody>
 	</table>
+		<input type="submit" class="btn btn-info rationalized" id="update_btn" name="update" value="Update"/>
+		</form>
 	</div>
+	
 <table class=" table table-bordered regimen-table  research" style="background:#FFF;" >
 			<thead>
 				<tr>
@@ -360,8 +373,12 @@
 		  $("#avg_consumption_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['dispensed_packs']/$amc); ?>");
 		  $("#avg_issues_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['received']/$amc); ?>");
 		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
+		  <?php if( $cdrr['old_resupply']==''){?>
 		  $("#new_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
-		<?php	
+		  <?php }else{?>
+	      $("#new_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['old_resupply']; ?>");
+		  <?php
+		    }	
 		   }
 		}
 	   ?>
@@ -373,9 +390,17 @@
 	   $("#patient_numbers_<?php echo $maps['regimen_id']; ?>").val("<?php echo $maps['total']; ?>");
 	   <?php
 		  }
-		}
+		}if($order_array[0]['status_name']=="received"){
 		?>
 	   $("input").attr("readonly","readonly");
-	   //$(".resupply").attr("readonly",false); 	
+	   $(".rationalized").attr("readonly",false); 
+	   $("#update_btn").show();
+	   <?php
+	   }else{
+	   ?>	
+	   $("input").attr("readonly","readonly");
+	   $("#update_btn").hide();
+	   <?php
+	   }?>
 });
 </script>

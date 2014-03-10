@@ -5,18 +5,23 @@
         chart: {
             plotBackgroundColor: null,
             plotBorderWidth: null,
-            plotShadow: false
+            plotShadow: false,
+            height:300
         },
         title: {
             text: '<?php echo $chartTitle;?>'
         },
         tooltip: {
-    	    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    	   
         },
+        credits: {
+			   enabled: false
+			},
         plotOptions: {
             pie: {
                 allowPointSelect: true,
                 cursor: 'pointer',
+                showInLegend: true,
                 dataLabels: {
                     enabled: true,
                     color: '#000000',

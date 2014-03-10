@@ -60,13 +60,14 @@ class Order extends MY_Controller {
 	public function view_order($cdrr_id, $maps_id) {
 		$order_array = array();
 		$and = "";
-		$sql = "SELECT c.*,ci.*,f.*,co.county as county_name,d.name as district_name,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,sf.name as facility_name
+		$sql = "SELECT c.*,ci.*,f.*,co.county as county_name,d.name as district_name,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_label,c.status as status_name,sf.name as facility_name,rc.resupply as old_resupply
 				FROM cdrr c
 				LEFT JOIN cdrr_item ci ON ci.cdrr_id=c.id
 				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
 				LEFT JOIN facilities f ON f.facilitycode=sf.code
 				LEFT JOIN counties co ON co.id=f.county
 				LEFT JOIN district d ON d.id=f.district
+				LEFT JOIN resupply_change rc ON rc.cdrr_id=ci.cdrr_id AND ci.drug_id=rc.drug_id
 				WHERE c.id='$cdrr_id'";
 		$query = $this -> db -> query($sql);
 		$order_array = $query -> result_array();
@@ -459,7 +460,7 @@ class Order extends MY_Controller {
 				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
-			    if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
+				if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
 					$this -> session -> set_flashdata('login_message', "You can only report for previous month. Kindly check the period fields !");
 					redirect("dashboard_management");
 				}
@@ -567,7 +568,7 @@ class Order extends MY_Controller {
 										$cdrr_array[$commodity_counter]['expiry_date'] = "";
 									}
 									$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['M']);
-									$cdrr_array[$commodity_counter]['resupply'] = str_replace(",","",$arr[$i]['N']);
+									$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['N']);
 									$cdrr_array[$commodity_counter]['aggr_consumed'] = trim($arr[$i]['I']);
 									$cdrr_array[$commodity_counter]['aggr_on_hand'] = trim($arr[$i]['J']);
 								} else if ($code == "F-CDRR_packs") {
@@ -586,7 +587,7 @@ class Order extends MY_Controller {
 										$cdrr_array[$commodity_counter]['expiry_date'] = "";
 									}
 									$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['L']);
-									$cdrr_array[$commodity_counter]['resupply'] = str_replace(",","",$arr[$i]['M']);
+									$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['M']);
 									$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
 									$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
 								}
@@ -638,7 +639,7 @@ class Order extends MY_Controller {
 				$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 				$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
-			    if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
+				if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
 					$this -> session -> set_flashdata('login_message', "You can only report for current month. Kindly check the period fields !");
 					redirect("dashboard_management");
 				}
@@ -827,7 +828,7 @@ class Order extends MY_Controller {
 			} else {
 				$this -> session -> set_flashdata('order_message', "No file found !");
 				$this -> session -> set_flashdata('pipeline_upload', 1);
-				redirect("dashboard_management");
+				redirect("order/pipeline_upload");
 			}
 
 			$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
@@ -845,7 +846,7 @@ class Order extends MY_Controller {
 			if ($period == "" || $pipeline == "") {
 				$this -> session -> set_flashdata('order_message', "Please make sure you fill the period and the pipeline name!");
 				$this -> session -> set_flashdata('pipeline_upload', 1);
-				redirect("dashboard_management");
+				redirect("order/pipeline_upload");
 				die();
 			} else {
 				$text = $arr[2]['A'];
@@ -898,7 +899,7 @@ class Order extends MY_Controller {
 				}
 				$this -> session -> set_flashdata('login_message', "You data have been successfully imported!");
 				$this -> session -> set_flashdata('pipeline_upload', 1);
-				redirect("dashboard_management");
+				redirect("order/pipeline_upload");
 				die();
 
 			}
@@ -911,7 +912,7 @@ class Order extends MY_Controller {
 		$email_user = stripslashes('webadt.chai@gmail.com');
 		$email_password = stripslashes('WebAdt_052013');
 		//$email_address = "kevomarete@gmail.com";
-		$email_address="gimaiyo@gmail.com";
+		$email_address = "gimaiyo@gmail.com";
 		$subject = "NASCOP Order Upload";
 		$email_sender_title = "NASCOP SYSTEM";
 
@@ -1569,9 +1570,6 @@ class Order extends MY_Controller {
 			if ($user['status'] != 'A') {
 				$this -> session -> set_flashdata('login_message', "Account has been deactivated!<br/>Contact the Administrator.");
 			} else {
-				if (strtoupper(trim($user['role'])) == trim('PIPELINE')) {
-					$this -> session -> set_userdata("order_pipeline", "yes");
-				}
 				$this -> session -> set_userdata('upload_valid', $user['id']);
 				$this -> session -> set_userdata("order_user", $user['name']);
 			}
@@ -1584,7 +1582,7 @@ class Order extends MY_Controller {
 
 	public function upload_logout() {
 		$this -> session -> unset_userdata("upload_valid");
-		$this -> session -> unset_userdata("order_pipeline");		
+		$this -> session -> unset_userdata("order_pipeline");
 		redirect("dashboard_management");
 	}
 
@@ -1670,6 +1668,38 @@ class Order extends MY_Controller {
 		}
 
 		return $error_message;
+	}
+
+	public function pipeline_upload() {
+		$data['title'] = 'webADT | Pipeline Upload';
+		$data['banner_text'] = 'Pipeline Upload';
+		$data['content_view'] = 'pipeline_v';
+		$data['page_title'] = 'Pipeline Upload';
+		$this -> base_params($data);
+	}
+
+	public function rationalize_cdrr($cdrr_id,$maps_id) {
+		$commodities = $this -> input -> post('commodity');
+		$resupply = $this -> input -> post('resupply');
+		$old_resupply = $this -> input -> post('new_resupply');
+		$commodity_counter = 0;
+		$cdrr_array = array();
+		foreach ($commodities as $commodity) {
+			if ($resupply[$commodity_counter] != null || $resupply[$commodity_counter] != "") {
+				if (((int)$resupply[$commodity_counter] - (int)$old_resupply[$commodity_counter]) != 0) {
+					$sql = "UPDATE cdrr_item SET resupply='" . $resupply[$commodity_counter] . "' WHERE cdrr_id='$cdrr_id' and drug_id='" . $commodity . "'";
+					$this -> db -> query($sql);
+					$change = new Resupply_Change();
+					$change -> cdrr_id = $cdrr_id;
+					$change -> drug_id = $commodity;
+					$change -> resupply = $old_resupply[$commodity_counter];
+					$change -> save();
+				}
+			}
+		}
+		$this -> session -> set_flashdata('order_message', "Order Updated Successfully");
+		redirect("order/view_order/" . $cdrr_id . "/" . $maps_id);
+
 	}
 
 	public function base_params($data) {

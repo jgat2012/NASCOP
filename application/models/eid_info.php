@@ -9,6 +9,7 @@ class Eid_Info extends Doctrine_Record {
 		$this -> hasColumn('service', 'varchar', 50);
 		$this -> hasColumn('regimen', 'varchar', 200);
 		$this -> hasColumn('enrollment_date', 'varchar', 50);
+		$this -> hasColumn('source', 'varchar', 100);
 	}
 
 	public function setUp() {
