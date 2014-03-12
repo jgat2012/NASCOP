@@ -2,7 +2,10 @@
 	.full-content {
 		width: 95%;
 		zoom: 100%;
-	}
+	}
+	#facilities_map{
+		width:200px;
+	}
 </style>
 <div class="container-fluid full-content">
 	<!--Grid-->
@@ -29,10 +32,20 @@
 					eSCM SETTINGS
 				</li>
 				<li>
+					<a href="#" class="setting_link" id="escm_facility">eSCM FACILITIES</a>
+				</li>
+				<li>
 					<a href="#" id="api_sync" class="api_sync">eSCM Settings</a>
 				</li>
 				<li>
 					<a href="#" id="order_sync" class="api_sync">eSCM Orders</a>
+				</li>
+				<li class="divider"></li>
+				<li class="nav-header">
+					EID SETTINGS
+				</li>
+				<li>
+					<a href="#" class="api_sync" id="eid_sync">EID/HEI Sync</a>
 				</li>
 				<li class="divider"></li>
 				<li class="nav-header">
@@ -52,6 +65,9 @@
 				</li>
 				<li>
 					<a href="#" class="setting_link" id="user_emails">USER EMAILS</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="gitlog">VERSIONS</a>
 				</li>
 			</ul>
 		</div>
@@ -103,6 +119,7 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		$("#facilities_map").searchable();
         var my_url = "<?php echo base_url(); ?>";
 		//default link
 		var type = "<?php if($this -> session -> userdata("nav_link") !=""){echo $this -> session -> userdata("nav_link");}else{echo "sync_drug";} ?>";
@@ -145,6 +162,12 @@
 	    }else if(type == "regimen") {
 				$("#create_setting").text("add regimen");
 				$("#modal_header").text("Add Regimen");
+		}else if(type == "gitlog") {
+			$("#add_btn").hide();
+			$("#modal_header").text("Add Log");
+		}  else if(type == "escm_facility") {
+			$("#add_btn").hide();
+			$("#modal_header").text("Add Facility");
 		}
 
 		var link = my_url + "settings/modal/" + type
@@ -204,7 +227,10 @@
 			}else if(type == "regimen") {
 				$("#create_setting").text("add regimen");
 				$("#modal_header").text("Add Regimen");
-			}
+			}else if(type == "escm_facility") {
+				$("#add_btn").hide();
+				$("#modal_header").text("Add Facility");
+			} 
 			var link = my_url + "settings/modal/" + type
 			$(".modal_btn").attr("href", link);
 			$(".modal-body").load(link);
@@ -255,6 +281,7 @@
 				}
 			});
 			$("#modal_template").modal('show');
+			$("#facilities_map").searchable();
 		});
 
 		$("#add_btn").click(function() {
@@ -283,6 +310,8 @@
 			   var url = my_url + "settings/api_sync";		
 			}else if(type=="order_sync"){
 			   var url = my_url + "settings/get_updates";				
+			}else if(type=="eid_sync"){
+			   var url = my_url + "settings/eid_sync";				
 			}
 			$.ajax({
 				url : url,
@@ -327,6 +356,10 @@
 			var columns = new Array("mfl code", "name", "category","county","options");
 		} else if(type == "regimen") {
 			var columns = new Array("code", "name", "category","options");
+		}else if(type == "gitlog") {
+			var columns = new Array("Facility", "hash value","Status","last update");
+		}else if(type == "escm_facility") {
+			var columns = new Array("mfl code", "name", "category", "services", "options");
 		}
 		//Generate Columns
 		var thead = "<table id='setting_grid' class='table table-bordered table-hover table-condensed'><thead><tr>";

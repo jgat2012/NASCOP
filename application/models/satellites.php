@@ -1,5 +1,5 @@
 <?php
-class Escm_Facility extends Doctrine_Record {
+class Satellites extends Doctrine_Record {
 
 	public function setTableDefinition() {
 		$this -> hasColumn('name', 'varchar', 255);
@@ -21,33 +21,29 @@ class Escm_Facility extends Doctrine_Record {
 	}
 
 	public function setUp() {
-		$this -> setTableName('escm_facility');
+		$this -> setTableName('satellites');
 		$this -> hasOne('District as Parent_District', array('local' => 'district_id', 'foreign' => 'id'));
 		$this -> hasOne('Counties as County', array('local' => 'county_id', 'foreign' => 'id'));
+		$this -> hasMany('Adt_Sites as adt', array('local' => 'id', 'foreign' => 'facility_id'));
+
 	}
 
 	public function getAll() {
-		$query = Doctrine_Query::create() -> select("f.*,d.name as district,c.county as county_name") -> from("escm_facility f") -> leftJoin('f.Parent_District d, f.County c');
-		$escm_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
-		return $escm_facility;
-	}
-
-	public function getAllNotHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility") -> orderBy("name asc");
-		$escm_facility = $query -> execute();
-		return $escm_facility;
+		$query = Doctrine_Query::create() -> select("*") -> from("satellites") -> orderBy("name asc");
+		$facility = $query -> execute();
+		return $facility;
 	}
 
 	public function getAllHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
-		$escm_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
-		return $escm_facility;
+		$query = Doctrine_Query::create() -> select("*") -> from("satellites") -> orderBy("name asc");
+		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $facility;
 	}
-
-	public function getFacilityCode($facility_id) {
-		$query = Doctrine_Query::create() -> select("code") -> from("escm_facility") -> where("id ='$facility_id'");
-		$escm_facility = $query -> execute();
-		return $escm_facility[0];
+	
+	public function getTotal() {
+		$query = Doctrine_Query::create() -> select("COUNT(*) as total") -> from("satellites") -> orderBy("name asc");
+		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $facility[0]['total'];
 	}
 
 }

@@ -46,8 +46,11 @@ class Maps extends Doctrine_Record {
 		return $items[0];
 	}
 
-	public function getFacilityMap($facility_id) {
+	public function getFacilityMap($facility_id, $period_begin = "") {
 		$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("faciltiy_id='$facility_id'");
+		if ($period_begin != "") {
+			$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("faciltiy_id='$facility_id' and period_begin='$period_begin'");
+		}
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
@@ -71,12 +74,12 @@ class Maps extends Doctrine_Record {
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
+
 	public function getReportPeriods() {//Only get aggregated maps
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code ='D-MAPS'") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("maps") -> where("code ='D-MAPS'") -> groupBy("period_begin")->OrderBy("period_begin desc");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
-	
 
 }
 ?>

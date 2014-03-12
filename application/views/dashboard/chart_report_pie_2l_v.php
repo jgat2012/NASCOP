@@ -4,7 +4,6 @@ $chartSize=320;
 ?>
 <script>
 	$(function () {
-    
         var colors = [
                 '#66aaf7',
 				'#f66c6f',

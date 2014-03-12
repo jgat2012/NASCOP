@@ -1,10 +1,14 @@
 <?php
 class settings extends MY_Controller {
 	var $esm_url = "https://api.kenyapharma.org/";
+	var $eid_url = "http://nascop.org/eid/";
 	function __construct() {
 		parent::__construct();
+		$this -> load -> library('github_updater');
+		$this -> load -> library('Unzip');
 		$this -> load -> library('encrypt');
 		$this -> load -> library('Curl');
+
 	}
 
 	public function index() {
@@ -108,7 +112,11 @@ class settings extends MY_Controller {
 					$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
 					$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
 
-					if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start) {
+					$four_current_month_start = date('Y-m-d', strtotime($current_month_start . "-4 months"));
+					$five_current_month_start = date('Y-m-d', strtotime($current_month_start . "-5 months"));
+					$six_current_month_start = date('Y-m-d', strtotime($current_month_start . "-6 months"));
+
+					if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start || $main['period_begin'] == $four_current_month_start || $main['period_begin'] == $five_current_month_start || $main['period_begin'] == $six_current_month_start) {
 						if (is_array($main)) {
 							if (!empty($main)) {
 								$this -> extract_order($type, array($main), $main['id']);
@@ -117,6 +125,46 @@ class settings extends MY_Controller {
 					}
 				}
 				$log = "Sync Complete";
+			}
+		}
+		$content = $info_class;
+		$content .= $close_btn_div;
+		$content .= $log;
+		$content .= $close_div;
+		$this -> session -> set_flashdata('alert_message', $content);
+	}
+
+	public function eid_sync() {
+		$log = "";
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		$close_div = "</div>";
+
+		//Link array
+		$links = array();
+		$links['eid_master'] = "heiapi.php";
+
+		$curl = new Curl();
+		$url = $this -> eid_url;
+
+		foreach ($links as $table => $link) {
+			$target_url = $url . $link;
+			$curl -> get($target_url);
+			if ($curl -> error) {
+				$curl -> error_code;
+				$log .= "Error " . $curl -> error_code . " ! Sync Failed<br/>";
+			} else {
+				$main_array = json_decode($curl -> response, TRUE);
+				//clear table
+				$this -> db -> query("TRUNCATE $table");
+
+				foreach ($main_array as $main) {
+					foreach ($main as $post) {
+						$this -> db -> insert($table, $post['post']);
+					}
+				}
+				$log .= "Sync " . $table . "! Synched Succesful<br/>";
 			}
 		}
 		$content = $info_class;
@@ -213,7 +261,12 @@ class settings extends MY_Controller {
 		} else if ($type == "facilities") {
 			$columns = array("s.id", "facilitycode", "name", "type", "c.county", "s.active", "facilitytype", "district", "s.county as county_id", "supported_by", "service_art", "service_pmtct", "service_pep", "supplied_by", "parent", "map", "IF(a.facility_id !='NULL','1','0') as adt_site");
 		} else if ($type == "regimen") {
-			$columns = array("s.id", "regimen_code", "regimen_desc", "r.Name", "category", "line", "type_of_service", "n_map", "e_map", "s.active");
+			$columns = array("s.id", "regimen_code", "regimen_desc", "r.Name", "s.category as regimen_category", "line", "type_of_service", "n_map", "e_map", "s.active");
+		} else if ($type == "gitlog") {
+			$columns = array("s.id", "f.name", "hash_value", "update_time");
+			$hash = $this -> github_updater -> get_hash();
+		} else if ($type == "escm_facility") {
+			$columns = array("id", "code", "name", "category", "sponsors", "services", "district_id", "ordering", "service_point", "county_id");
 		}
 
 		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
@@ -273,6 +326,8 @@ class settings extends MY_Controller {
 			$this -> db -> join("adt_sites a", "a.facility_id=s.map", "left");
 		} else if ($type == "regimen") {
 			$this -> db -> join("regimen_category r", "r.id=s.category", "left");
+		} else if ($type == "gitlog") {
+			$this -> db -> join("facilities f", "f.facilitycode=s.facility_code", "left");
 		}
 		$rResult = $this -> db -> get();
 		// Data set length after filtering
@@ -290,7 +345,7 @@ class settings extends MY_Controller {
 			$action_link = "delete";
 			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "category" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
+				if ($i != "id" && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
 					$myrow[] = $v;
 				} else {
 					if ($i == "id") {
@@ -322,8 +377,16 @@ class settings extends MY_Controller {
 				} else if ($type == "regimen" && $i == "active" && $v == 0) {
 					$action_link = "enable";
 					$action_icon = "<i class='icon-ok'></i>";
+				} else if ($type == "gitlog" && $i == "hash_value") {
+					if ($hash == "") {
+						$status = "<div class='alert-info'>cannot connect to server</div>";
+					} else if ($hash == $v) {
+						$status = "<div class='alert-success'>up to update</div>";
+					} else {
+						$status = "<div class='alert-error'>need to update</div>";
+					}
+					$myrow[] = $status;
 				}
-
 			}
 
 			if ($type == "user_emails") {
@@ -339,11 +402,11 @@ class settings extends MY_Controller {
 			if ($action_link == "delete") {
 				$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
 				$links .= "  ";
-				if ($type != "sync_facility") {
+				if ($type != "sync_facility" || $type != "gitlog") {
 					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
 				}
 			} else {
-				if ($type != "sync_facility") {
+				if ($type != "sync_facility" || $type != "gitlog") {
 					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
 				}
 			}
@@ -375,7 +438,9 @@ class settings extends MY_Controller {
 		} else if ($type == "facilities") {
 			$inputs = array("code" => "facilitycode", "name" => "name", "category" => "type", "type" => "facilitytype", "is ADT site?" => "adt_site", "county" => "county_id", "district" => "district", "supplier" => "supplied_by", "supporter" => "supported_by", "service ART" => "service_art", "service PEP" => "service_pep", "service PMTCT" => "service_pmtct", "parent" => "parent", "mapped facility" => "map");
 		} else if ($type == "regimen") {
-			$inputs = array("code" => "regimen_code", "name" => "regimen_desc", "category" => "category", "Line" => "line", "service" => "type_of_service", "nascop regimen" => "n_map", "escm regimen" => "e_map");
+			$inputs = array("code" => "regimen_code", "name" => "regimen_desc", "category" => "regimen_category", "Line" => "line", "service" => "type_of_service", "nascop regimen" => "n_map", "escm regimen" => "e_map");
+		} else if ($type == "escm_facility") {
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district" => "district_id", "is ordering point?" => "ordering", " is service point?" => "service_point", "county" => "county_id");
 		}
 
 		foreach ($inputs as $text => $input) {
@@ -441,7 +506,7 @@ class settings extends MY_Controller {
 					$textfield .= "<option value='" . $regimen['id'] . "'>" . $regimen['code'] . " | " . $regimen['name'] . "</option>";
 				}
 				$textfield .= "</select>";
-			} else if ($input == "category" && $type == "regimen") {
+			} else if ($input == "regimen_category" && $type == "regimen") {
 				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
 				$regimens = Regimen_Category::getAllHydrate();
@@ -474,7 +539,7 @@ class settings extends MY_Controller {
 				}
 				$textfield .= "</select>";
 			} else if ($input == "parent" && $type == "facilities") {
-				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span8'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
 				$facilities = Facilities::getActive();
 				foreach ($facilities as $facility) {
@@ -482,13 +547,14 @@ class settings extends MY_Controller {
 				}
 				$textfield .= "</select>";
 			} else if ($input == "map" && $type == "facilities") {
-				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span5'>";
-				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
-				$facilities = Sync_Facility::getAllHydrated();
-				foreach ($facilities as $facility) {
-					$textfield .= "<option value='" . $facility['id'] . "'>" . $facility['name'] . "</option>";
-				}
-				$facilities = Escm_Facility::getAllHydrated();
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span10'>";
+				$textfield .= "<option value='0' selected='selected'></option>";
+				$facilities1 = Sync_Facility::getAllHydrated();
+				$facilities2 = Escm_Facility::getAllHydrated();
+				$facilities3 = Satellites::getAllHydrated();
+				$facilities4 = array_merge($facilities1, $facilities2);
+				$facilities = array_merge($facilities3, $facilities4);
+				sort($facilities);
 				foreach ($facilities as $facility) {
 					$textfield .= "<option value='" . $facility['id'] . "'>" . $facility['name'] . "</option>";
 				}
@@ -609,7 +675,9 @@ class settings extends MY_Controller {
 		} else if ($type == "facilities") {
 			$inputs = array("facilitycode" => "facilitycode", "name" => "name", "type" => "type", "facilitytype" => "facilitytype", "facility_id" => "adt_site", "county" => "county_id", "district" => "district", "supplied_by" => "supplied_by", "supported_by" => "supported_by", "service_art" => "service_art", "service_pep" => "service_pep", "service_pmtct" => "service_pmtct", "parent" => "parent", "map" => "map");
 		} else if ($type == "regimen") {
-			$inputs = array("regimen_code" => "regimen_code", "regimen_desc" => "regimen_desc", "category" => "category", "line" => "line", "type_of_service" => "type_of_service", "n_map" => "n_map", "e_map" => "e_map");
+			$inputs = array("regimen_code" => "regimen_code", "regimen_desc" => "regimen_desc", "category" => "regimen_category", "line" => "line", "type_of_service" => "type_of_service", "n_map" => "n_map", "e_map" => "e_map");
+		} else if ($type == "escm_facility") {
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district_id" => "district_id", "ordering" => "ordering", "service_point" => "service_point", "county_id" => "county_id");
 		}
 
 		foreach ($inputs as $index => $input) {
