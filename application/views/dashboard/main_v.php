@@ -583,13 +583,11 @@
 		var report_analysis_link="<?php echo base_url().'dashboard_management/getReport';?>";
 	  	var report_analysis_summary_link="<?php echo base_url().'dashboard_management/reportSummary';?>";//ARV Sites
 	  	var chart_area_report_analysis_link = "<?php echo base_url().'dashboard_management/reportingSatellites';?>";//Reporting Sites Analysis
-
 	    $("#report_summary_table").load(report_analysis_table_link);
    	    $("#chart_area_report_summary").load(report_analysis_summary_link);
         $("#chart_area_report").load(report_analysis_link);
         $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
 	}
-	
 	function eid_analysis(){
 		var chart_area_eid_gender_link="<?php echo base_url().'dashboard_management/eid/gender';?>";
 		var chart_area_eid_line_link="<?php echo base_url().'dashboard_management/eid/line';?>";
@@ -603,8 +601,6 @@
         $("#chart_area_eid_source").load(chart_area_eid_source_link);
         $("#chart_area_eid_comparison").load(chart_area_eid_comaprison_link);
 	}
-	
-	
 </script>
 
 <div class="tabbable national_dashboard_content" style="margin-top:1%"> <!-- Only required for left/right tabs -->
@@ -1017,6 +1013,7 @@
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
     	<div class="row-fluid">
+
 		  <div class="two_block span4" id="patient_by_art_by_pipeline">
     		<h3 class="dashboard_title">Number of Patients on ART By Pipeline<br/> For
 				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span4">
@@ -1130,7 +1127,6 @@
 								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".strtoupper(date('F-Y',strtotime($value['period_begin'])))."</option>";
 							}?>
 						</select>
-						
 						<button class="generate btn btn-warning" style="color:black" id="rs_satellite_btn">Get</button>
 					</h3>
 					<hr size="2">

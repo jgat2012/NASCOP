@@ -997,7 +997,6 @@ class Dashboard_Management extends MY_Controller {
 
 		echo $this -> showTable($columns, $result, $links, $table_name);
 	}
-
 	public function getPatients($type = "ART_PATIENT", $period = "", $county = "", $facility = "") {
 		if ($period == '') {
 			$current_period = date('Y-m-01', strtotime("-1 month"));
@@ -1107,7 +1106,6 @@ class Dashboard_Management extends MY_Controller {
 			$table_display = $this -> table -> generate();
 			echo $table_display;
 		} elseif ($type == "ADULT_ART") {
-
 			//Bar Chart
 			$data = array();
 			$list = array();
@@ -1137,6 +1135,7 @@ class Dashboard_Management extends MY_Controller {
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
 								GROUP BY mr.code";
+								
 
 					$join1_kp = "SELECT mr.name as regimen_desc,test.total
                                 FROM escm_regimen mr
@@ -1686,11 +1685,11 @@ class Dashboard_Management extends MY_Controller {
 		}
 		return $this -> table -> generate();
 	}
-
-	public function set_tab_session() {
-		$tab_id = $this -> input -> post("tab_id");
-		$this -> session -> set_userdata("tab_session", $tab_id);
-		echo "#" . $tab_id;
+	
+	public function set_tab_session(){
+		$tab_id = $this->input->post("tab_id");
+		$this->session->set_userdata("tab_session",$tab_id);
+		echo "#".$tab_id;
 	}
 
 	public function eid($type = "gender", $period = "", $facility = 0, $county = 0) {
