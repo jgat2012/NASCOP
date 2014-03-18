@@ -687,7 +687,7 @@
 										  <label class="control-label" for="inputIcon">Upload File <i class="icon-file"></i></label>
 										  <div class="controls">
 										      <input type="hidden"  name="upload_type" id="upload_type" />
-				                              <input type="file"  name="file" size="30" id="inputIcon"  required="required" accept="application/vnd.ms-excel"/>
+				                              <input type="file"  name="file[]" multiple="multiple" size="30" id="inputIcon"  required="required" accept="application/vnd.ms-excel"/>
 										  </div>
 										</div>
 									</div>

@@ -1892,49 +1892,23 @@ class Dashboard_Management extends MY_Controller {
 
 		$columns = array("#", "Description", "Total No", "Rate");
 		//get total arv satellites
-		$satellite_arv_total = Satellites::getTotal();
+		$satellite_arv_total = Facilities::getSatellitesTotal();
 		$total_data[0]['description'] = 'Total No of Satellite ARV Sites';
 		$total_data[0]['total'] = $satellite_arv_total;
 		$total_data[0]['rate'] = '-';
 		//get satellites with webADT
-		$sql = "SELECT COUNT(DISTINCT(s.id)) as total
-			    FROM satellites s
-			    WHERE s.id IN(SELECT facility_id FROM adt_sites)";
-		$query = $this -> db -> query($sql);
-		$results = $query -> result_array();
-		if ($results) {
-			$sites_with_adt = $results[0]['total'];
-		}
-
+		$sites_with_adt=Facilities::getSatellitesADTTotal();
+		
 		$total_data[1]['description'] = 'No of Satellite Sites with Web ADT Installed';
 		$total_data[1]['total'] = $sites_with_adt;
 		$total_data[1]['rate'] = '-';
 
-		$satellites = Satellites::getAllHydrated();
+		$satellites = Facilities::getOrderingSatellites();
 		$satellite_list = array();
 		foreach ($satellites as $satellite) {
 			$satellite_list[] = $satellite['id'];
 		}
 		$satellite_list = implode(",", $satellite_list);
-
-		//get total satellites that reported by 10th
-		$sql = "SELECT COUNT(DISTINCT(c.facility_id))as total
-			    FROM cdrr c
-			    WHERE c.created
-			    BETWEEN '$first'
-			    AND '$tenth'
-			    AND c.facility_id IN($satellite_list)
-			    AND c.period_begin='$period_begin'
-			    AND c.period_end='$period_end'";
-		$query = $this -> db -> query($sql);
-		$results = $query -> result_array();
-		if ($results) {
-			$total_sites_reported_by_10 = $results[0]['total'];
-		}
-
-		$total_data[2]['description'] = 'No of Satellite Sites That Have Reported this month (By the 10th)';
-		$total_data[2]['total'] = $total_sites_reported_by_10;
-		$total_data[2]['rate'] = number_format(($total_sites_reported_by_10 / $satellite_arv_total), 2) . "%";
 
 		//get total satellites that reported
 		$sql = "SELECT COUNT(DISTINCT(c.facility_id))as total

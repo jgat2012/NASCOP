@@ -30,16 +30,15 @@ class Users extends Doctrine_Record {
 		$this -> _set('Password', md5($value));
 	}
 
-	public function login($username, $password,$type = "") {
-		if($type==""){
+	public function login($username, $password, $type = "") {
+		if ($type == "") {
 			$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("Username = '" . $username . "' or Email_Address='" . $username . "' or Phone_Number='" . $username . "'");
-			
-		}
-		else{
+
+		} else {
 			$query = Doctrine_Query::create() -> select("*") -> from("Users") -> where("Username = '" . $username . "' or Email_Address='" . $username . "' or Phone_Number='" . $username . "'");
-			
+
 		}
-		
+
 		$user = $query -> fetchOne();
 		if ($user) {
 
@@ -133,6 +132,12 @@ class Users extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("u.Name,u.Username, a.Level_Name as Access, u.Email_Address, u.Phone_Number, b.Name as Creator,u.Active as Active") -> from("Users u") -> leftJoin('u.Access a, u.Creator b') -> where($q);
 		$users = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $users;
+	}
+
+	public function getPharmacistEmail() {
+		$query = Doctrine_Query::create() -> select("u.Email_Address as email") -> from("Users u") -> where("u.Access.Indicator='nascop_pharmacist'");
+		$user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $user;
 	}
 
 }

@@ -10,7 +10,7 @@ class Picking_List extends MY_Controller {
 		$data['assign_table'] = $this -> get_orders();
 		$data['mail_lists'] = $this -> getMailList();
 		$data['content_view'] = "picking_lists/picking_v";
-		$data['banner_text'] = "Picking Lists";
+		$data['banner_text'] = "MEMOs";
 		$this -> base_params($data);
 	}
 
@@ -80,7 +80,7 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function get_lists($type = 0) {
-		$sql = "SELECT p.id,CONCAT('P-LIST#',p.id) as list_label,p.name,u.Name as full_name,p.timestamp,COUNT(c.order_id) as order_no
+		$sql = "SELECT p.id,CONCAT('MEMO#',p.id) as list_label,p.name,u.Name as full_name,p.timestamp,COUNT(c.order_id) as order_no
 		        FROM picking_list_details p
 		        LEFT JOIN users u ON u.id=p.created_by
 		        LEFT JOIN cdrr c ON c.order_id=p.id
@@ -93,7 +93,7 @@ class Picking_List extends MY_Controller {
 		if ($type == 0) {
 			$links = array("picking_list/view_orders" => "view orders", "picking_list/assign_orders" => "assign orders", "picking_list/update_list" => "update", "picking_list/close_list" => "close", "picking_list/delete_list" => "delete");
 		} else if ($type == 1) {
-			$links = array("picking_list/view_orders" => "view orders", "picking_list/print_list" => "print list", "picking_list/mail_list" => "send list");
+			$links = array("picking_list/view_orders" => "view orders", "picking_list/print_list" => "print memo", "picking_list/mail_list" => "send memo");
 		}
 		return $this -> showTable($columns, $results, $links);
 	}
@@ -165,13 +165,13 @@ class Picking_List extends MY_Controller {
 		/* 1 to include line below header/above footer */
 		$this -> mpdf -> mirrorMargins = 1;
 		@$mpdf -> defaultfooterfontstyle = B;
-		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|{PAGENO}|Warehouse Picking List');
+		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|{PAGENO}|Warehouse Memo');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$dir = "Export/";
-		$report_name = $dir . "Warehouse Picking List.pdf";
+		$report_name = $dir . "Warehouse Memo.pdf";
 		$html_title . "\n";
 		$data . "\n";
 
@@ -270,7 +270,7 @@ class Picking_List extends MY_Controller {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='delete link'>$link</a> | ";
 				} else if ($link == "remove order") {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='delete link'>$link</a> | ";
-				} else if ($link == "print list") {
+				} else if ($link == "print memo") {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' target='_blank' class='link'>$link</a> | ";
 				} else if ($link == "update") {
 					$link_values .= "<a data-toggle='modal' href='#edit_list' class='update' link_id='" . $mydata['id'] . "' link_name='" . $mydata['name'] . "'>$link</a> | ";
@@ -280,7 +280,7 @@ class Picking_List extends MY_Controller {
 					$link_values .= "<input type='checkbox' name='orders[]' value='" . $mydata['id'] . "'/>";
 				} else if ($link == "view commodities") {
 					$link_values .= "<a data-toggle='modal' href='#commodity_list' commodity_list_id='" . $mydata['id'] . "' class='commodity_list'>$link</a> | ";
-				} else if ($link == "send list") {
+				} else if ($link == "send memo") {
 					$link_values .= "<a data-toggle='modal' href='#email_list' picking_list_id='" . $mydata['id'] . "' class='mail_list'>$link</a> | ";
 				} else {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "'>$link</a> | ";
@@ -301,7 +301,7 @@ class Picking_List extends MY_Controller {
 				SET p.name='$list_name'
 				WHERE p.id='$list_id'";
 		$query = $this -> db -> query($sql);
-		$this -> session -> set_flashdata('list_message', "List Updated Successfully");
+		$this -> session -> set_flashdata('list_message', "Memo Updated Successfully");
 		redirect("picking_list");
 	}
 
@@ -322,7 +322,7 @@ class Picking_List extends MY_Controller {
 		$data['orders_table'] = $this -> get_orders_list($list_id, @$results[0] -> status);
 		$data['page_title'] = 'Picking List Details';
 		$data['content_view'] = "picking_lists/picking_template";
-		$data['banner_text'] = "Picking List Details";
+		$data['banner_text'] = "Memo Details";
 		$this -> base_params($data);
 	}
 
@@ -383,7 +383,7 @@ class Picking_List extends MY_Controller {
 			$file_name = $this -> print_list($mail_list_id, 1);
 			$email_user = stripslashes('webadt.chai@gmail.com');
 			$email_password = stripslashes('WebAdt_052013');
-			$subject = "NASCOP Picking List P-LIST#" . $mail_list_id;
+			$subject = "NASCOP MEMO#" . $mail_list_id;
 			$email_sender_title = "NASCOP SYSTEM";
 
 			$message = "Hello, <br/><br/>
@@ -422,7 +422,7 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function base_params($data) {
-		$data['title'] = "Warehouse Picking Lists";
+		$data['title'] = "Warehouse Memos";
 		$this -> load -> view('template', $data);
 	}
 

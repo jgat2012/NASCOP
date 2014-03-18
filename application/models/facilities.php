@@ -24,6 +24,7 @@ class Facilities extends Doctrine_Record {
 		$this -> hasOne('Facility_Types as Type', array('local' => 'facilitytype', 'foreign' => 'id'));
 		$this -> hasOne('Suppliers as supplier', array('local' => 'supplied_by', 'foreign' => 'id'));
 		$this -> hasOne('Supporter as support', array('local' => 'supported_by', 'foreign' => 'id'));
+		$this -> hasOne('Adt_Sites as Sites', array('local' => 'map', 'foreign' => 'facility_id'));
 	}
 
 	public function getDistrictFacilities($district) {
@@ -135,6 +136,24 @@ class Facilities extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("count(*) as total") -> from("Facilities") -> where("parent = '$facility_code'");
 		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $facility[0]['total'];
+	}
+
+	public function getSatellitesTotal() {
+		$query = Doctrine_Query::create() -> select("COUNT(*) as total") -> from("Facilities") -> where("facilitycode!=parent and parent !=''") -> orderBy("name asc");
+		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $facility[0]['total'];
+	}
+
+	public function getSatellitesADTTotal() {
+		$query = Doctrine_Query::create() -> select("COUNT(*) as total") -> from("Facilities f") -> where("f.facilitycode!=f.parent and f.parent !='' and f.Sites.facility_id=f.map") -> orderBy("name asc");
+		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $facility[0]['total'];
+	}
+
+	public function getOrderingSatellites() {
+		$query = Doctrine_Query::create() -> select("map as id") -> from("Facilities") -> where("facilitycode!=parent and parent !='' and map !=''") -> orderBy("name asc");
+		$facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $facility;
 	}
 
 }

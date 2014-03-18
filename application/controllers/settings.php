@@ -673,7 +673,7 @@ class settings extends MY_Controller {
 		} else if ($type == "drugcode") {
 			$inputs = array("name" => "name", "unit" => "unit", "pack_size" => "pack_size", "category_id" => "category", "arv_drug" => "arv_drug", "n_map" => "n_map", "e_map" => "e_map");
 		} else if ($type == "facilities") {
-			$inputs = array("facilitycode" => "facilitycode", "name" => "name", "type" => "type", "facilitytype" => "facilitytype", "facility_id" => "adt_site", "county" => "county_id", "district" => "district", "supplied_by" => "supplied_by", "supported_by" => "supported_by", "service_art" => "service_art", "service_pep" => "service_pep", "service_pmtct" => "service_pmtct", "parent" => "parent", "map" => "map");
+			$inputs = array("facilitycode" => "facilitycode", "name" => "name", "type" => "type", "facilitytype" => "facilitytype", "adt_site" => "adt_site", "county" => "county_id", "district" => "district", "supplied_by" => "supplied_by", "supported_by" => "supported_by", "service_art" => "service_art", "service_pep" => "service_pep", "service_pmtct" => "service_pmtct", "parent" => "parent", "map" => "map");
 		} else if ($type == "regimen") {
 			$inputs = array("regimen_code" => "regimen_code", "regimen_desc" => "regimen_desc", "category" => "regimen_category", "line" => "line", "type_of_service" => "type_of_service", "n_map" => "n_map", "e_map" => "e_map");
 		} else if ($type == "escm_facility") {
@@ -721,6 +721,11 @@ class settings extends MY_Controller {
 				$save_data[$index] = $this -> input -> post($input);
 			}
 		}
+
+		if ($type == "facilities") {
+			unset($save_data['adt_site']);
+		}
+
 		//insert or update
 		if ($id == null) {
 			$this -> db -> insert($type, $save_data);
