@@ -452,7 +452,8 @@ class Dashboard_Management extends MY_Controller {
 			}
 
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
-		} else if ($type == "CONS") {// Stock consumption
+		} 
+		else if ($type == "CONS") {// Stock consumption
 			$period = date('Y-m-01', strtotime($period));
 			$drug_table = '';
 			$facility_table = '';
@@ -466,6 +467,8 @@ class Dashboard_Management extends MY_Controller {
 				$facility_table = 'escm_facility';
 				$results_f = Escm_Facility::getAllHydrated();
 			}
+			
+			//Get Facilities
 
 			$sql = "SELECT sd.id as d_id,f.id as facility_id,sd.name as drug_name,CONCAT('(',sd.abbreviation,' ',sd.strength,')') as descr,IF(f.category='standalone',SUM(ci.dispensed_packs),SUM(ci.aggr_consumed)) as tot_consumption FROM $drug_table sd
 					LEFT JOIN cdrr_item ci ON ci.drug_id=sd.id
@@ -476,6 +479,7 @@ class Dashboard_Management extends MY_Controller {
 					AND ad.pipeline = '$pipeline'
 					AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
 					GROUP BY sd.name
+					
 					";
 			$query = $this -> db -> query($sql);
 			$results = $query -> result_array();
@@ -513,6 +517,19 @@ class Dashboard_Management extends MY_Controller {
 			$y = 1;
 			$p = 9;
 			foreach ($results_f as $value) {
+				$sql = "SELECT sd.id as d_id,f.id as facility_id,sd.name as drug_name,CONCAT('(',sd.abbreviation,' ',sd.strength,')') as descr,IF(f.category='standalone',SUM(ci.dispensed_packs),SUM(ci.aggr_consumed)) as tot_consumption FROM $drug_table sd
+					LEFT JOIN cdrr_item ci ON ci.drug_id=sd.id
+					LEFT JOIN cdrr c ON c.id=ci.cdrr_id
+					LEFT JOIN $facility_table f ON f.id =c.facility_id
+					LEFT JOIN arv_drug ad ON ad.drug_id = sd.id
+					WHERE c.period_begin = '" . $period . "'
+					AND ad.pipeline = '$pipeline'
+					AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
+					GROUP BY sd.name
+					
+					";
+				
+				
 				$id = $value['id'];
 				$code = $value['code'];
 				$name = $value['name'];
@@ -561,12 +578,14 @@ class Dashboard_Management extends MY_Controller {
 				$cols = 'r.id,r.code,r.description';
 				//Check for maps that came from Kemsa
 				$and .=' and m.id NOT IN (SELECT maps_id FROM escm_maps)';
+				$results_f = Sync_Facility::getAllHydrated();
 			} else if ($pipeline == 'kenya_pharma') {
 				$facility_table = 'escm_facility';
 				$regimen_table = 'escm_regimen';
 				$cols = 'r.id,r.code,r.description';
 				//Check for maps that came from kenya Pharma
 				$and .=' and m.id IN (SELECT maps_id FROM escm_maps)';
+				$results_f = Escm_Facility::getAllHydrated();
 			}
 			
 			//Generate excel start here
@@ -596,13 +615,7 @@ class Dashboard_Management extends MY_Controller {
 			//Styling
 			$objPHPExcel -> getActiveSheet() -> getStyle('A1:D8') -> getFont() -> setBold(true);
 			
-			//Get ART Facilities
-			$sql_facility = "
-							SELECT f.id,f.name,CAST(f.code AS UNSIGNED) as code,f.services FROM $facility_table f
-							ORDER BY name ASC
-							";
-			$query_f = $this -> db -> query($sql_facility);
-			$results_f = $query_f -> result_array();
+			
 			
 			//start looping through each facility
 			$y = 1;
@@ -1085,6 +1098,7 @@ class Dashboard_Management extends MY_Controller {
 			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
 
 			//kenya pharma
+			//Adults patients from Kenya Pharma
 			$sql_adult_kp = "SELECT SUM( mi.total ) AS total_adult_kp
 							FROM maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
@@ -1105,7 +1119,7 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN sync_category sc ON sc.id = er.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
 							AND em.maps_id IS NOT NULL 
-							AND sc.name LIKE  '%paediatric%'
+							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
 							AND sc.name NOT LIKE '%delete%'";
 
 			$query1 = $this -> db -> query($sql_adult_kp);
@@ -1146,7 +1160,7 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN sync_category sc ON sc.id = sr.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
 							AND em.maps_id IS NULL 
-							AND sc.name LIKE  '%paediatric%'
+							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
 							AND sc.name NOT LIKE '%delete%'";
 
 			$query1 = $this -> db -> query($sql_adult_kem);
@@ -1179,7 +1193,8 @@ class Dashboard_Management extends MY_Controller {
 			$this -> table -> add_row('', '<h5>TOTAL</h5>', '<b><center>' . number_format($total_kemsa) . '</center></b>', '<b><center>' . number_format($total_kp) . '</center></b>', '<b><center>' . number_format($grand_total) . '</center></b>');
 			$table_display = $this -> table -> generate();
 			echo $table_display;
-		} elseif ($type == "ADULT_ART") {
+		} 
+		elseif ($type == "ADULT_ART") {
 			
 
 			//Bar Chart
