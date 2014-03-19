@@ -27,7 +27,7 @@ class Escm_Orders extends Doctrine_Record {
 	public function getEscm($escm_id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("escm_orders") -> where("escm_id='$escm_id'");
 		$cdrrs = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
-		return $cdrrs[0];
+		return @$cdrrs[0];
 	}
 
 }
