@@ -26,7 +26,7 @@ class Escm_Maps extends Doctrine_Record {
 	public function getEscm($escm_id) {
 		$query = Doctrine_Query::create() -> select("*") -> from("escm_maps") -> where("escm_id='$escm_id'");
 		$maps = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
-		return $maps[0];
+		return @$maps[0];
 	}
 
 }

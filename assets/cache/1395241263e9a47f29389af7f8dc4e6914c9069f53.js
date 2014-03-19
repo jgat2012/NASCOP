@@ -16413,7 +16413,7 @@ function reset_interval() {
 		clearInterval(timer);
 		timer = 0;
 		// second step: implement the timer again
-		timer = setInterval("auto_logout()", 10000);
+		timer = setInterval("auto_logout()", 3600000);
 		// completed the reset of the timer
 	}
 }

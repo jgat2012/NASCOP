@@ -2,7 +2,7 @@
 	<div>
 		<ul class="breadcrumb">
 			<li>
-				<a href="<?php echo site_url().'picking_list' ?>">Picking Lists</a><span class="divider">/</span>
+				<a href="<?php echo site_url().'picking_list' ?>">Memos</a><span class="divider">/</span>
 			</li>
 			<li class="active" id="actual_page">
 				<?php echo $page_title;?>
@@ -19,7 +19,7 @@
 					<td><?php echo $list -> full_name;?></td>
 				</tr>
 				<tr>
-					<td><b>List Name</b></td>
+					<td><b>Memo Name</b></td>
 					<td><?php echo $list -> name;?></td>
 					<td><b>Created On</b></td>
 					<td><?php echo date('d-M-Y h:i:s a', $list -> timestamp);?></td>

@@ -2,10 +2,10 @@
 	<div>
 		<ul class="nav nav-tabs">
 			<li id="open_btn" class="active">
-				<a  href="#open_lists"><i class="icon-folder-open"></i> Open Lists</a>
+				<a  href="#open_lists"><i class="icon-folder-open"></i> Open Memos</a>
 			</li>
 			<li id="closed_btn">
-				<a  href="#closed_lists"> <i class="icon-folder-close"></i> Closed Lists</a>
+				<a  href="#closed_lists"> <i class="icon-folder-close"></i> Closed Memos</a>
 			</li>
 		</ul>
 	</div>
@@ -19,7 +19,7 @@
 		?>
 		<div id="open_lists" class="tab-pane active">
 			<div class="menu_container">
-				<a data-toggle='modal' href='#add_list' class='btn'><i class="icon-plus"></i> Create List</a>
+				<a data-toggle='modal' href='#add_list' class='btn'><i class="icon-plus"></i> Create Memo</a>
 				<br/>
 			</div>
 			<?php echo $open_table;?>
@@ -36,12 +36,12 @@
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 				×
 			</button>
-			<h3 id="myModalLabel">Create Picking List</h3>
+			<h3 id="myModalLabel">Create Memo</h3>
 		</div>
 		<div class="modal-body">
 			<table  cellpadding="5">
 				<tr>
-					<td colspan='2'><label for="list_name">List Name</label>
+					<td colspan='2'><label for="list_name">Memo Name</label>
 					<input type="text" name="list_name" id="list_name" value="" required="required"/>
 					</td>
 				</tr>
@@ -62,12 +62,12 @@
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 				×
 			</button>
-			<h3 id="myModalLabel">Update Picking List</h3>
+			<h3 id="myModalLabel">Update Memo</h3>
 		</div>
 		<div class="modal-body">
 			<table  cellpadding="5">
 				<tr>
-					<td colspan='2'><label for="list_name">List Name</label>
+					<td colspan='2'><label for="list_name">Memo Name</label>
 					<input type="hidden" name="edit_list_id" id="edit_list_id" value="" required="required"/>
 					<input type="text" name="edit_list_name" id="edit_list_name" value="" required="required"/>
 					</td>
@@ -111,7 +111,7 @@
 						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
 							×
 						</button>
-						<h3 id="myModalLabel"><span id="modal_header">Send Picking List</span></h3>
+						<h3 id="myModalLabel"><span id="modal_header">Send Memo</span></h3>
 					</div>
 					<div class="modal-body">
 						<div class='control-group'>

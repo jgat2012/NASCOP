@@ -77,7 +77,6 @@ class settings extends MY_Controller {
 			$links[] = "facility/" . $facility_id . "/cdrr";
 			$links[] = "facility/" . $facility_id . "/maps";
 		}
-
 		$username = "kevinmarete";
 		$password = "poltergeist";
 		$curl -> setBasicAuthentication($username, $password);
@@ -93,32 +92,32 @@ class settings extends MY_Controller {
 			} else {
 				$main_array = json_decode($curl -> response, TRUE);
 				$clean_data = array();
+
+				$current_month_start = date('Y-m-01');
+				$current_month_end = date('Y-m-t');
+
+				$one_current_month_start = date('Y-m-d', strtotime($current_month_start . "-1 month"));
+				$one_current_month_end = date('Y-m-d', strtotime($current_month_end . "-1 month"));
+
+				$two_current_month_start = date('Y-m-d', strtotime($current_month_start . "-2 months"));
+				$two_current_month_end = date('Y-m-d', strtotime($current_month_end . "-2 months"));
+
+				$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
+				$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
+
+				$four_current_month_start = date('Y-m-d', strtotime($current_month_start . "-4 months"));
+				$five_current_month_start = date('Y-m-d', strtotime($current_month_start . "-5 months"));
+				$six_current_month_start = date('Y-m-d', strtotime($current_month_start . "-6 months"));
+
 				foreach ($main_array as $main) {
 					if ($main['code'] == "D-CDRR" || $main['code'] == "F-CDRR_units" || $main['code'] == "F-CDRR_packs") {
 						$type = "cdrr";
 					} else {
 						$type = "maps";
 					}
-
-					$current_month_start = date('Y-m-01');
-					$current_month_end = date('Y-m-t');
-
-					$one_current_month_start = date('Y-m-d', strtotime($current_month_start . "-1 month"));
-					$one_current_month_end = date('Y-m-d', strtotime($current_month_end . "-1 month"));
-
-					$two_current_month_start = date('Y-m-d', strtotime($current_month_start . "-2 months"));
-					$two_current_month_end = date('Y-m-d', strtotime($current_month_end . "-2 months"));
-
-					$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
-					$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
-
-					$four_current_month_start = date('Y-m-d', strtotime($current_month_start . "-4 months"));
-					$five_current_month_start = date('Y-m-d', strtotime($current_month_start . "-5 months"));
-					$six_current_month_start = date('Y-m-d', strtotime($current_month_start . "-6 months"));
-
-					if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start || $main['period_begin'] == $four_current_month_start || $main['period_begin'] == $five_current_month_start || $main['period_begin'] == $six_current_month_start) {
-						if (is_array($main)) {
-							if (!empty($main)) {
+					if (is_array($main)) {
+						if (!empty($main)) {
+							if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start || $main['period_begin'] == $four_current_month_start || $main['period_begin'] == $five_current_month_start || $main['period_begin'] == $six_current_month_start) {
 								$this -> extract_order($type, array($main), $main['id']);
 							}
 						}
@@ -673,7 +672,7 @@ class settings extends MY_Controller {
 		} else if ($type == "drugcode") {
 			$inputs = array("name" => "name", "unit" => "unit", "pack_size" => "pack_size", "category_id" => "category", "arv_drug" => "arv_drug", "n_map" => "n_map", "e_map" => "e_map");
 		} else if ($type == "facilities") {
-			$inputs = array("facilitycode" => "facilitycode", "name" => "name", "type" => "type", "facilitytype" => "facilitytype", "facility_id" => "adt_site", "county" => "county_id", "district" => "district", "supplied_by" => "supplied_by", "supported_by" => "supported_by", "service_art" => "service_art", "service_pep" => "service_pep", "service_pmtct" => "service_pmtct", "parent" => "parent", "map" => "map");
+			$inputs = array("facilitycode" => "facilitycode", "name" => "name", "type" => "type", "facilitytype" => "facilitytype", "adt_site" => "adt_site", "county" => "county_id", "district" => "district", "supplied_by" => "supplied_by", "supported_by" => "supported_by", "service_art" => "service_art", "service_pep" => "service_pep", "service_pmtct" => "service_pmtct", "parent" => "parent", "map" => "map");
 		} else if ($type == "regimen") {
 			$inputs = array("regimen_code" => "regimen_code", "regimen_desc" => "regimen_desc", "category" => "regimen_category", "line" => "line", "type_of_service" => "type_of_service", "n_map" => "n_map", "e_map" => "e_map");
 		} else if ($type == "escm_facility") {
@@ -721,6 +720,11 @@ class settings extends MY_Controller {
 				$save_data[$index] = $this -> input -> post($input);
 			}
 		}
+
+		if ($type == "facilities") {
+			unset($save_data['adt_site']);
+		}
+
 		//insert or update
 		if ($id == null) {
 			$this -> db -> insert($type, $save_data);
@@ -831,7 +835,11 @@ class settings extends MY_Controller {
 				}
 			}
 
-			$this -> db -> insert_batch('cdrr_log', $temp_log);
+			if (is_array($temp_log)) {
+				if (!empty($temp_log)) {
+					$this -> db -> insert_batch('cdrr_log', $temp_log);
+				}
+			}
 
 			//Loop through cdrr_item and add cdrr_id
 			foreach ($cdrr_items as $index => $cdrr_item) {
@@ -845,7 +853,11 @@ class settings extends MY_Controller {
 					}
 				}
 			}
-			$this -> db -> insert_batch('cdrr_item', $temp_items);
+			if (is_array($temp_items)) {
+				if (!empty($temp_items)) {
+					$this -> db -> insert_batch('cdrr_item', $temp_items);
+				}
+			}
 		} else if ($type == "maps") {
 			$maps = array();
 			$temp_items = array();
@@ -877,18 +889,22 @@ class settings extends MY_Controller {
 			$this -> map_order($escm_id, $maps_id, $type);
 
 			//attach maps id to maps_log
-			foreach ($map_log as $index => $my_log) {
+			foreach ($maps_log as $index => $my_log) {
 				foreach ($my_log as $counter => $log) {
 					foreach ($log as $ind => $lg) {
 						if ($ind == "maps_id") {
-							$temp_log[$counter]['maps_id'] = $maps_id;
+							$maps_log[$counter]['maps_id'] = $maps_id;
 						} else {
-							$temp_log[$counter][$ind] = $lg;
+							$maps_log[$counter][$ind] = $lg;
 						}
 					}
 				}
 			}
-			$this -> db -> insert_batch('maps_log', $maps_log);
+			if (is_array($maps_log)) {
+				if (!empty($maps_log)) {
+					$this -> db -> insert_batch('maps_log', $maps_log);
+				}
+			}
 
 			//attach maps id to maps_item
 			foreach ($temp_items as $temp_item) {
@@ -902,7 +918,12 @@ class settings extends MY_Controller {
 					}
 				}
 			}
-			$this -> db -> insert_batch('maps_item', $maps_items);
+
+			if (is_array($maps_items)) {
+				if (!empty($maps_items)) {
+					$this -> db -> insert_batch('maps_item', $maps_items);
+				}
+			}
 		}
 	}
 
