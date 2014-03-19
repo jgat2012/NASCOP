@@ -39,7 +39,7 @@ class Escm_Facility extends Doctrine_Record {
 	}
 
 	public function getAllHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility");
+		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility") -> orderBy("name asc");;
 		$escm_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $escm_facility;
 	}

@@ -1013,7 +1013,6 @@
     <!-- Patient Analysis -->
     <div class="tab-pane nat_dashboard_rep" id="tab2">
     	<div class="row-fluid">
-
 		  <div class="two_block span4" id="patient_by_art_by_pipeline">
     		<h3 class="dashboard_title">Number of Patients on ART By Pipeline<br/> For
 				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span4">
