@@ -14,12 +14,17 @@ class Pharmacist_Management extends MY_Controller {
 		 *Get the unique_id's of those orders
 		 *Check for the top(limit)commodity stocks for those stocks
 		 */
+		$period = date('Y-m', strtotime($end_date . "- 1 month"));
+		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
+		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
+
 		$order_list = array();
 		$dataArray = array();
 		$columns = array();
 		$total_series = array();
 		$series = array();
 		$order_array = Cdrr::getOrders($start_date, $end_date);
+		$resultArraySize = count($order_array);
 		if ($order_array) {
 			foreach ($order_array as $order_id) {
 				array_push($order_list, $order_id -> id);
@@ -41,7 +46,7 @@ class Pharmacist_Management extends MY_Controller {
 		$chart_title = "Top Commodity Orders";
 		$yaxis = "Packs";
 		$container = "chart_expiry";
-		$this -> loadChart($columns, $total_series, $chart_title, $yaxis, $container);
+		$this -> loadChart($columns, $total_series, $chart_title, $yaxis, $container, $resultArraySize);
 	}
 
 	public function getFacilitiesUsing($start_date = "", $end_date = "") {
@@ -50,6 +55,10 @@ class Pharmacist_Management extends MY_Controller {
 		 *Get all facility information about those orders
 		 *Create table for this information
 		 */
+		$period = date('Y-m', strtotime($end_date . "- 1 month"));
+		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
+		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
+
 		$escm_orders = Escm_Orders::getAll();
 		$list = "";
 		$order_list = array();
@@ -82,15 +91,21 @@ class Pharmacist_Management extends MY_Controller {
 		 *Get all Picking Lists made in selected period
 		 *Group by Pipeline and activity status
 		 */
+
+		$period = date('Y-m', strtotime($end_date . "- 1 month"));
+		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
+		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
+
 		$dataArray = array();
 		$columns = array();
 		$total_series = array();
 		$series = array();
-		$start_date = date('U', strtotime($start_date. "-1 day"));
+		$start_date = date('U', strtotime($start_date . "-1 day"));
 		$end_date = date('U', strtotime($end_date));
 		$open_total = 0;
 		$closed_total = 0;
 		$lists = Picking_List_Details::getListGroup($start_date, $end_date);
+		$resultArraySize = count($lists);
 		foreach ($lists as $list) {
 			if ($list -> Status == 0) {
 				$status = "Open Lists";
@@ -110,7 +125,7 @@ class Pharmacist_Management extends MY_Controller {
 		$chart_title = "Picking Lists";
 		$yaxis = "No. of Lists";
 		$container = "chart_appointments";
-		$this -> loadChart($columns, $total_series, $chart_title, $yaxis, $container);
+		$this -> loadChart($columns, $total_series, $chart_title, $yaxis, $container, $resultArraySize);
 	}
 
 	public function getFacilitiesDelay($start_date = "", $end_date = "") {
@@ -120,6 +135,11 @@ class Pharmacist_Management extends MY_Controller {
 		 *Calculate delay by dates
 		 *Create table for this information
 		 */
+
+		$period = date('Y-m', strtotime($end_date . "- 1 month"));
+		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
+		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
+
 		$escm_orders = Escm_Orders::getAll();
 		$list = "";
 		$order_list = array();
@@ -155,10 +175,9 @@ class Pharmacist_Management extends MY_Controller {
 		echo $dyn_table;
 	}
 
-	public function loadChart($columns, $total_series, $chart_title, $yaxis, $container) {
+	public function loadChart($columns, $total_series, $chart_title, $yaxis, $container, $resultArraySize) {
 		$resultArray = json_encode($total_series);
 		$categories = json_encode($columns);
-		$resultArraySize = 0;
 		$data['resultArraySize'] = $resultArraySize;
 		$data['container'] = $container;
 		$data['chartType'] = 'bar';

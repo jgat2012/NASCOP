@@ -37,7 +37,7 @@ class Picking_List extends MY_Controller {
 		$picking_array['created_by'] = $this -> session -> userdata("user_id");
 		$picking_array['status'] = 0;
 		$this -> db -> insert("picking_list_details", $picking_array);
-		$this -> session -> set_flashdata('list_message', "List Created Successfully");
+		$this -> session -> set_flashdata('list_message', "MEMO Created Successfully");
 		redirect("picking_list");
 	}
 
@@ -48,10 +48,10 @@ class Picking_List extends MY_Controller {
 				SET p.status='1'
 				WHERE p.id='$list_id'";
 			$query = $this -> db -> query($sql);
-			$this -> session -> set_flashdata('list_message', "List Closed Successfully");
+			$this -> session -> set_flashdata('list_message', "MEMO Closed Successfully");
 			$this -> session -> set_userdata("order_go_back", "fmaps");
 		} else {
-			$this -> session -> set_flashdata('list_message', "List Closing Failed");
+			$this -> session -> set_flashdata('list_message', "MEMO Closing Failed");
 			$this -> session -> set_userdata("order_go_back", "cdrr");
 		}
 		redirect("picking_list");
@@ -62,7 +62,7 @@ class Picking_List extends MY_Controller {
 				SET p.active='0'
 				WHERE p.id='$list_id'";
 		$query = $this -> db -> query($sql);
-		$this -> session -> set_flashdata('list_message', "List Deleted Successfully");
+		$this -> session -> set_flashdata('list_message', "MEMO Deleted Successfully");
 		redirect("picking_list");
 	}
 

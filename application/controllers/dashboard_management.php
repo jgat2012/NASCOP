@@ -452,8 +452,7 @@ class Dashboard_Management extends MY_Controller {
 			}
 
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
-		} 
-		else if ($type == "CONS") {// Stock consumption
+		} else if ($type == "CONS") {// Stock consumption
 			$period = date('Y-m-01', strtotime($period));
 			$drug_table = '';
 			$facility_table = '';
@@ -467,7 +466,7 @@ class Dashboard_Management extends MY_Controller {
 				$facility_table = 'escm_facility';
 				$results_f = Escm_Facility::getAllHydrated();
 			}
-			
+
 			//Get Facilities
 
 			$sql = "SELECT sd.id as d_id,f.id as facility_id,sd.name as drug_name,CONCAT('(',sd.abbreviation,' ',sd.strength,')') as descr,IF(f.category='standalone',SUM(ci.dispensed_packs),SUM(ci.aggr_consumed)) as tot_consumption FROM $drug_table sd
@@ -528,8 +527,7 @@ class Dashboard_Management extends MY_Controller {
 					GROUP BY sd.name
 					
 					";
-				
-				
+
 				$id = $value['id'];
 				$code = $value['code'];
 				$name = $value['name'];
@@ -577,17 +575,17 @@ class Dashboard_Management extends MY_Controller {
 				$regimen_table = 'sync_regimen';
 				$cols = 'r.id,r.code,r.description';
 				//Check for maps that came from Kemsa
-				$and .=' and m.id NOT IN (SELECT maps_id FROM escm_maps)';
+				$and .= ' and m.id NOT IN (SELECT maps_id FROM escm_maps)';
 				$results_f = Sync_Facility::getAllHydrated();
 			} else if ($pipeline == 'kenya_pharma') {
 				$facility_table = 'escm_facility';
 				$regimen_table = 'escm_regimen';
 				$cols = 'r.id,r.code,r.description';
 				//Check for maps that came from kenya Pharma
-				$and .=' and m.id IN (SELECT maps_id FROM escm_maps)';
+				$and .= ' and m.id IN (SELECT maps_id FROM escm_maps)';
 				$results_f = Escm_Facility::getAllHydrated();
 			}
-			
+
 			//Generate excel start here
 			$period = date('F-Y', strtotime($period));
 			$filename = "Current Patients By ART Sites";
@@ -614,9 +612,7 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('D8', "Site Total ");
 			//Styling
 			$objPHPExcel -> getActiveSheet() -> getStyle('A1:D8') -> getFont() -> setBold(true);
-			
-			
-			
+
 			//start looping through each facility
 			$y = 1;
 			$p = 9;
@@ -627,7 +623,7 @@ class Dashboard_Management extends MY_Controller {
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $p, $y);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $code);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $p, $name);
-				
+
 				//Get regimen list
 				$sql_regimen = "
 								SELECT r.id,r.code, r.old_code, r.name,IFNULL(tabl.total,0) as total  FROM $regimen_table r
@@ -647,42 +643,45 @@ class Dashboard_Management extends MY_Controller {
 								";
 				$query = $this -> db -> query($sql_regimen);
 				$results = $query -> result_array();
-				
+
 				//Get totals for each regimen, for the selected facility and append it to the sheet
-				$x = "E";  
-				$total = 0;//Total for all the regimens for a facility
+				$x = "E";
+				$total = 0;
+				//Total for all the regimens for a facility
 				foreach ($results as $value) {
 					$r_id = $value['id'];
 					$code = $value['code'];
-					$old_code = $value['old_code']; 
+					$old_code = $value['old_code'];
 					$name = $value['name'];
 					$t = $value['total'];
-					$total = $total+$t;
-					
-					if($y==1){ //Append regimen names, old code, new code only once when start looping
-						$objPHPExcel -> getActiveSheet() -> mergeCells($x.'1:'.$x.'5');
+					$total = $total + $t;
+
+					if ($y == 1) {//Append regimen names, old code, new code only once when start looping
+						$objPHPExcel -> getActiveSheet() -> mergeCells($x . '1:' . $x . '5');
 						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '1', $name);
 						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '6', $code);
 						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $old_code);
 					}
-					$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $t);//Total for a  regimen
-					
+					$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $t);
+					//Total for a  regimen
+
 					$x++;
-					
+
 				}
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('D'. $p, $total);//Total for all regimen for a facility
-				
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $p, $total);
+				//Total for all regimen for a facility
+
 				$p++;
 				$y++;
 			}
-			
-			$objPHPExcel -> getActiveSheet() -> getStyle('D1:D'.$p) -> getFont() -> setBold(true);
+
+			$objPHPExcel -> getActiveSheet() -> getStyle('D1:D' . $p) -> getFont() -> setBold(true);
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 
-		} 
-		
+		}
+
 		//Patients By Regimen
-		elseif ($type == 'BYREG_PATIENT') { 
+		elseif ($type == 'BYREG_PATIENT') {
 			$period = date('Y-m-01', strtotime($period));
 			$facility_table = '';
 			$regimen_table = '';
@@ -691,12 +690,12 @@ class Dashboard_Management extends MY_Controller {
 				$regimen_table = 'sync_regimen';
 				$facility_table = 'sync_facility';
 				//Check for maps that came from kemsa
-				$and .=' and m.id NOT IN (SELECT maps_id FROM escm_maps)';
+				$and .= ' and m.id NOT IN (SELECT maps_id FROM escm_maps)';
 			} else if ($pipeline == 'kenya_pharma') {
 				$regimen_table = 'escm_regimen';
 				$facility_table = 'escm_facility';
 				//Check for maps that came from kenya Pharma
-				$and .=' and m.id IN (SELECT maps_id FROM escm_maps)';
+				$and .= ' and m.id IN (SELECT maps_id FROM escm_maps)';
 			}
 
 			$sql_regimen = "
@@ -753,7 +752,7 @@ class Dashboard_Management extends MY_Controller {
 				$code = $value['regimen_code'];
 				$regimen_desc = $value['regimen_name'];
 				$total = $value['total'];
-				
+
 				if ($a == 0) {//Append Regimen Category when looping for the first time
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $x, $cat_name);
 					$objPHPExcel -> getActiveSheet() -> getStyle('B' . $x) -> getFont() -> setBold(true);
@@ -764,8 +763,7 @@ class Dashboard_Management extends MY_Controller {
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $x, $regimen_desc);
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $x, $total);
 					$cat_total += $total;
-				} 
-				elseif ($a > 0) {
+				} elseif ($a > 0) {
 					$prev = $a - 1;
 					if ($results[$prev]['cat_id'] != $results[$a]['cat_id']) {//Check if this regimen is different from the previous one
 						$n = 0;
@@ -774,7 +772,7 @@ class Dashboard_Management extends MY_Controller {
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $x, "Category Total ");
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $x, $cat_total);
 						$cat_total = 0;
-						
+
 						$x++;
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $x, $cat_name);
 						$objPHPExcel -> getActiveSheet() -> getStyle('B' . $x) -> getFont() -> setBold(true);
@@ -785,8 +783,7 @@ class Dashboard_Management extends MY_Controller {
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $x, $regimen_desc);
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $x, $total);
 						$cat_total += $total;
-					} 
-					else {
+					} else {
 						$cat_total += $total;
 						$n++;
 						$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $x, $n);
@@ -800,10 +797,10 @@ class Dashboard_Management extends MY_Controller {
 				$a++;
 			}
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
-		} 
+		}
 
 		//Patients Scale Up
-		elseif ($type == "PATIENT_SCALE") { 
+		elseif ($type == "PATIENT_SCALE") {
 			$period = date('Y-m-01', strtotime($period));
 			$facility_table = '';
 			$regimen_table = '';
@@ -811,11 +808,11 @@ class Dashboard_Management extends MY_Controller {
 			if ($pipeline == 'kemsa') {
 				$regimen_table = 'sync_regimen';
 				$facility_table = 'sync_facility';
-				$where.=' where m.id NOT IN (SELECT maps_id FROM escm_maps)';
+				$where .= ' where m.id NOT IN (SELECT maps_id FROM escm_maps)';
 			} else if ($pipeline == 'kenya_pharma') {
 				$regimen_table = 'escm_regimen';
 				$facility_table = 'escm_facility';
-				$where.=' where m.id IN (SELECT maps_id FROM escm_maps)';
+				$where .= ' where m.id IN (SELECT maps_id FROM escm_maps)';
 			}
 			$sql = "
 			
@@ -834,7 +831,7 @@ class Dashboard_Management extends MY_Controller {
 			GROUP BY  c.name,tabl.period_begin ORDER BY tabl.period_begin,c.name
 			
 			";
-			
+
 			//die($sql);
 			$query = $this -> db -> query($sql);
 			$results = $query -> result_array();
@@ -886,8 +883,8 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('G7', "PMTCT Infants");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('H7', "PMTCT Mothers");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('I7', "Grand Total");
-			$objPHPExcel -> getActiveSheet() -> getStyle('B6') ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); 
-			$objPHPExcel -> getActiveSheet() -> getStyle('E6') ->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER); 
+			$objPHPExcel -> getActiveSheet() -> getStyle('B6') -> getAlignment() -> setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			$objPHPExcel -> getActiveSheet() -> getStyle('E6') -> getAlignment() -> setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 			$objPHPExcel -> getActiveSheet() -> getStyle('A7:I7') -> getFont() -> setBold(true);
 			$x = 0;
 			$y = 8;
@@ -900,28 +897,24 @@ class Dashboard_Management extends MY_Controller {
 			$total = 0;
 			foreach ($results as $value) {
 				$period = date('M-Y', strtotime($value['period_begin']));
-				$cat_name = strtolower($value['name']);//Regimen category
-				
-				$patient_category='';
-				if($cat_name=='adult art first line' || $cat_name=='adult art second line' || $cat_name=='other adult regimen'){
+				$cat_name = strtolower($value['name']);
+				//Regimen category
+
+				$patient_category = '';
+				if ($cat_name == 'adult art first line' || $cat_name == 'adult art second line' || $cat_name == 'other adult regimen') {
 					$patient_category = 'adult art patients';
-				}
-				else if($cat_name=='paediatric first line' || $cat_name=='paediatric second line' || $cat_name=='other paediatric art regimen'){
+				} else if ($cat_name == 'paediatric first line' || $cat_name == 'paediatric second line' || $cat_name == 'other paediatric art regimen') {
 					$patient_category = 'paediatric art patients';
-				}
-				else if($cat_name=='pep adult'){
+				} else if ($cat_name == 'pep adult') {
 					$patient_category = 'pep adults';
-				}
-				else if($cat_name=='pep child'){
+				} else if ($cat_name == 'pep child') {
 					$patient_category = 'pep adults';
-				}
-				else if($cat_name=='pmtct regimens for infants'){
+				} else if ($cat_name == 'pmtct regimens for infants') {
 					$patient_category = 'pmtct infants';
-				}
-				else if($cat_name=='pmtct regimens for pregnant women'){
+				} else if ($cat_name == 'pmtct regimens for pregnant women') {
 					$patient_category = 'pmtct mothers';
 				}
-				
+
 				$total = $value['total'];
 				if ($x == 0) {
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $y, $period);
@@ -983,7 +976,7 @@ class Dashboard_Management extends MY_Controller {
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $z, ($tot_pmtct_mother + $tot_pmtct_infant + $tot_pep_adult + $tot_pep_child + $tot_art_child + $tot_art_adult));
 				};
 			}
-			$objPHPExcel -> getActiveSheet() -> getStyle('I8:I'.$y) -> getFont() -> setBold(true);
+			$objPHPExcel -> getActiveSheet() -> getStyle('I8:I' . $y) -> getFont() -> setBold(true);
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 
 		}
@@ -1077,6 +1070,7 @@ class Dashboard_Management extends MY_Controller {
 
 		echo $this -> showTable($columns, $result, $links, $table_name);
 	}
+
 	public function getPatients($type = "ART_PATIENT", $period = "", $county = "", $facility = "") {
 		if ($period == '') {
 			$current_period = date('Y-m-01', strtotime("-1 month"));
@@ -1221,7 +1215,6 @@ class Dashboard_Management extends MY_Controller {
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
 								GROUP BY mr.code";
-								
 
 					$join1_kp = "SELECT mr.name as regimen_desc,test.total
                                 FROM escm_regimen mr
@@ -1634,9 +1627,10 @@ class Dashboard_Management extends MY_Controller {
 				$first = date('Y-m-01', strtotime($period . "+1 month"));
 				$last_day = date('Y-m-t', strtotime($period . "+1 month"));
 			} else {
-				$tenth = date('Y-m-10');
-				$first = date('Y-m-01');
-				$last_day = date('Y-m-t');
+				$period = date('Y-m-d');
+				$tenth = date('Y-m-10', strtotime($period));
+				$first = date('Y-m-01', strtotime($period));
+				$last_day = date('Y-m-t', strtotime($period));
 			}
 
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
@@ -1673,9 +1667,7 @@ class Dashboard_Management extends MY_Controller {
 			$this -> table -> add_row('', 'Total No of Sites That Have Reported this month', $tot_reportsites, $y . ' %');
 			$table_display = $this -> table -> generate();
 			echo $table_display;
-		} 
-		
-		else if ($type == 'site_reporting') {//Reporting site Analysis
+		} else if ($type == 'site_reporting') {//Reporting site Analysis
 			$data = array();
 			if ($period == '') {
 				$tenth = date('Y-m-10');
@@ -1711,9 +1703,7 @@ class Dashboard_Management extends MY_Controller {
 			$data['chartType'] = 'pie';
 			$data['title'] = 'Reporting Analysis Summary';
 			$this -> load -> view('dashboard/chart_report_site_v', $data);
-		} 
-		
-		else {
+		} else {
 			$data = array();
 			//Total Number of ARV Sites
 			$sql_kemsa = "SELECT COUNT(f.code) as total FROM sync_facility f";
@@ -1775,11 +1765,11 @@ class Dashboard_Management extends MY_Controller {
 		}
 		return $this -> table -> generate();
 	}
-	
-	public function set_tab_session(){
-		$tab_id = $this->input->post("tab_id");
-		$this->session->set_userdata("tab_session",$tab_id);
-		echo "#".$tab_id;
+
+	public function set_tab_session() {
+		$tab_id = $this -> input -> post("tab_id");
+		$this -> session -> set_userdata("tab_session", $tab_id);
+		echo "#" . $tab_id;
 	}
 
 	public function eid($type = "gender", $period = "", $facility = 0, $county = 0) {
@@ -1986,8 +1976,8 @@ class Dashboard_Management extends MY_Controller {
 		$total_data[0]['total'] = $satellite_arv_total;
 		$total_data[0]['rate'] = '-';
 		//get satellites with webADT
-		$sites_with_adt=Facilities::getSatellitesADTTotal();
-		
+		$sites_with_adt = Facilities::getSatellitesADTTotal();
+
 		$total_data[1]['description'] = 'No of Satellite Sites with Web ADT Installed';
 		$total_data[1]['total'] = $sites_with_adt;
 		$total_data[1]['rate'] = '-';

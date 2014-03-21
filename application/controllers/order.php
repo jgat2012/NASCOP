@@ -34,6 +34,7 @@ class Order extends MY_Controller {
 	}
 
 	public function move_order($status, $cdrr_id, $maps_id) {
+		
 		$log = new Cdrr_Log();
 		$log -> description = $status;
 		$log -> created = date('Y-m-d H:i:s');
@@ -45,7 +46,7 @@ class Order extends MY_Controller {
 		$mylog -> description = $status;
 		$mylog -> created = date('Y-m-d H:i:s');
 		$mylog -> user_id = $this -> session -> userdata("user_id");
-		$mylog -> maps_id = $cdrr_id;
+		$mylog -> maps_id = $maps_id;
 		$mylog -> save();
 
 		$sql = "UPDATE cdrr SET status='$status' WHERE id='$cdrr_id'";
@@ -55,6 +56,7 @@ class Order extends MY_Controller {
 
 		$this -> session -> set_flashdata('order_message', "Order " . $status . " Successfully");
 		redirect("order/view_order/" . $cdrr_id . "/" . $maps_id);
+		
 	}
 
 	public function view_order($cdrr_id, $maps_id) {
@@ -432,8 +434,8 @@ class Order extends MY_Controller {
 
 			if (isset($_FILES["file"])) {
 				$fileCount = count($_FILES["file"]["tmp_name"]);
-				for ($i = 0; $i < $fileCount; $i++) {
-					$objPHPExcel = $objReader -> load($_FILES["file"]["tmp_name"][$i]);
+				for ($q = 0; $q < $fileCount; $q++) {
+					$objPHPExcel = $objReader -> load($_FILES["file"]["tmp_name"][$q]);
 					$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
 					$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
 					$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
@@ -457,13 +459,13 @@ class Order extends MY_Controller {
 						$facility_id = $facilities['id'];
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
-							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$q];
 						} else if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
-							$ret[] = "You can only report for current month. Kindly check the period fields !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "You can only report for current month. Kindly check the period fields !-" . $_FILES["file"]["name"][$q];
 						} else if ($file_type == false) {
-							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
-							$ret[] = "An cdrr report already exists for this month !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "An cdrr report already exists for this month !-" . $_FILES["file"]["name"][$q];
 						} else {
 							$fourth_row = 9;
 							$sponsor_gok = trim($arr[$fourth_row]['D']);
@@ -634,11 +636,11 @@ class Order extends MY_Controller {
 							}
 
 							//move the file
-							$file_location = $dir . "/" . $_FILES['file']['name'];
-							move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
+							$file_location = $dir . "/" . $_FILES['file']['name'][$q];
+							move_uploaded_file($_FILES['file']['tmp_name'][$q], $file_location);
 							//send excel file to email
 							$content .= $this -> send_file($file_location);
-							$ret[] = $content . $_FILES["file"]["name"][$i];
+							$ret[] = $content . $_FILES["file"]["name"][$q];
 						}
 
 					} else if ($code == "D-MAPS" || $code == "F-MAPS") {
@@ -659,13 +661,13 @@ class Order extends MY_Controller {
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
 
 						if ($facilities == "") {
-							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$q];
 						} else if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
-							$ret[] = "You can only report for current month. Kindly check the period fields !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "You can only report for current month. Kindly check the period fields !-" . $_FILES["file"]["name"][$q];
 						} else if ($file_type == false) {
-							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
-							$ret[] = "An cdrr report already exists for this month !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "An cdrr report already exists for this month !-" . $_FILES["file"]["name"][$q];
 						} else {
 							$fourth_row = 9;
 							$sponsors = "";
@@ -825,11 +827,11 @@ class Order extends MY_Controller {
 							}
 
 							//move the file
-							$file_location = $dir . "/" . $_FILES['file']['name'];
-							move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
+							$file_location = $dir . "/" . $_FILES['file']['name'][$q];
+							move_uploaded_file($_FILES['file']['tmp_name'][$q], $file_location);
 							//send excel file to email
 							$content .= $this -> send_file($file_location);
-							$ret[] = $content . $_FILES["file"]["name"][$i];
+							$ret[] = $content . $_FILES["file"]["name"][$q];
 						}
 					}
 					//end of maps
@@ -966,7 +968,8 @@ class Order extends MY_Controller {
 			$this -> email -> clear(TRUE);
 			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
 		} else {
-			$error_message = $this -> email -> print_debugger();
+			$error_message='Cannot Connect to Mail Server';
+			//$error_message = $this -> email -> print_debugger();
 		}
 
 		echo $error_message;
