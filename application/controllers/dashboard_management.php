@@ -71,7 +71,7 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($results as $result) {
 			$counties[$result['id']] = $result['county'];
 		}
-		return $counties;
+		return @$counties;
 	}
 
 	public function getEidADTFacility() {
@@ -101,7 +101,7 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($results as $result) {
 			$facilities[$result['facilitycode']] = $result['name'];
 		}
-		return $facilities;
+		return @$facilities;
 	}
 
 	public function getCountyList() {
@@ -169,8 +169,9 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function download($type = "", $period = "", $pipeline = '') {
-		$and_check_maps="AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%'";
-		if ($type == "SOH") {!
+		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' ";
+		$and_check_cdrr = " AND c.status NOT LIKE '%receive%' AND c.status NOT LIKE '%delete%' AND c.status NOT LIKE '%prepare%' ";
+		if ($type == "SOH") {
 			$dir = "Export";
 			$inputFileType = 'Excel5';
 			$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/template/excel.xls';
@@ -458,32 +459,21 @@ class Dashboard_Management extends MY_Controller {
 			$period = date('Y-m-01', strtotime($period));
 			$drug_table = '';
 			$facility_table = '';
+			$and ='';
 			//Get consumption for that period
 			if ($pipeline == 'kemsa') {
 				$drug_table = 'sync_drug';
 				$facility_table = 'sync_facility';
 				$results_f = Sync_Facility::getAllHydrated();
+				$and .=' and c.id NOT IN (SELECT cdrr_id FROM escm_orders)';
 			} else if ($pipeline == 'kenya_pharma') {
 				$drug_table = ' escm_drug';
 				$facility_table = 'escm_facility';
 				$results_f = Escm_Facility::getAllHydrated();
+				$and .=' and c.id IN (SELECT cdrr_id FROM escm_orders)';
 			}
 			
-			//Get Facilities
-
-			$sql = "SELECT sd.id as d_id,f.id as facility_id,sd.name as drug_name,CONCAT('(',sd.abbreviation,' ',sd.strength,')') as descr,IF(f.category='standalone',SUM(ci.dispensed_packs),SUM(ci.aggr_consumed)) as tot_consumption FROM $drug_table sd
-					LEFT JOIN cdrr_item ci ON ci.drug_id=sd.id
-					LEFT JOIN cdrr c ON c.id=ci.cdrr_id
-					LEFT JOIN $facility_table f ON f.id =c.facility_id
-					LEFT JOIN arv_drug ad ON ad.drug_id = sd.id
-					WHERE c.period_begin = '" . $period . "'
-					AND ad.pipeline = '$pipeline'
-					AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
-					GROUP BY sd.name
-					
-					";
-			$query = $this -> db -> query($sql);
-			$results = $query -> result_array();
+			
 			$filename = "Facility Cons by ARV Medicine";
 			$dir = "Export";
 			$objPHPExcel = $this -> generateExcelDefaultStyle($filename);
@@ -507,54 +497,56 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C7', "Drug");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B8', "MFL Code");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C8', "ARV Ordering Point Name");
-
-			$x = "D";
-			foreach ($results as $value) {
-				$drug = $value['drug_name'] . $value['descr'];
-				$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $drug);
-				$x++;
-
-			}
+			
 			$y = 1;
 			$p = 9;
-			foreach ($results_f as $value) {
-				$sql = "SELECT sd.id as d_id,f.id as facility_id,sd.name as drug_name,CONCAT('(',sd.abbreviation,' ',sd.strength,')') as descr,IF(f.category='standalone',SUM(ci.dispensed_packs),SUM(ci.aggr_consumed)) as tot_consumption FROM $drug_table sd
-					LEFT JOIN cdrr_item ci ON ci.drug_id=sd.id
-					LEFT JOIN cdrr c ON c.id=ci.cdrr_id
-					LEFT JOIN $facility_table f ON f.id =c.facility_id
-					LEFT JOIN arv_drug ad ON ad.drug_id = sd.id
-					WHERE c.period_begin = '" . $period . "'
-					AND ad.pipeline = '$pipeline'
-					AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
-					GROUP BY sd.name
-					
-					";
-				
-				
-				$id = $value['id'];
+			foreach ($results_f as $value) {//Loop through each facility
+				$facility_id = $value['id'];
 				$code = $value['code'];
 				$name = $value['name'];
+				
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $p, $y);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $code);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $p, $name);
-
+				
+				// Get drugs details for each facility
+				$sql = "
+						SELECT dc.id, dc.name,dc.abbreviation,dc.strength, dc.formulation,IFNULL(tabl.total,0) as tot_consumption   FROM  $drug_table dc
+							LEFT JOIN 
+							(
+							SELECT c.facility_id,IF(c.code='F-CDRR_packs',ci.dispensed_packs,ci.aggr_consumed) as total, ci.drug_id, dc.id as dr_id FROM cdrr_item ci
+							LEFT JOIN cdrr c ON c.id = ci.cdrr_id
+							LEFT JOIN $drug_table dc ON dc.id = ci.drug_id
+							LEFT JOIN $facility_table f ON f.id = c.facility_id
+							WHERE c.period_begin = '$period'
+							AND c.facility_id = $facility_id
+							$and
+							$and_check_cdrr
+							) tabl ON tabl.dr_id=dc.id
+							GROUP BY dc.id
+							ORDER BY dc.name
+						";
+				//echo $sql;die();
+				$query = $this -> db -> query($sql);
+				$results = $query -> result_array();
+				
+				
 				$x = "D";
 				foreach ($results as $value) {
-					$facility_id = $value['facility_id'];
+					$drug = $value['name'] .'( '. $value['abbreviation'].' ) '.$value['strength'].' '.$value['formulation'];
 					$total_cons = $value['tot_consumption'];
-					if ($facility_id == $id) {//Check if there is data for this facility
-						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $total_cons);
-					} else {
-						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, 0);
+					if($y=='1'){ //Append Drug names for first row only
+						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $drug);
 					}
-
+					$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $total_cons);
 					$x++;
-
+	
 				}
-
 				$p++;
 				$y++;
 			}
+			
+			
 			$objPHPExcel -> getActiveSheet() -> getStyle('D7:' . $x . $p) -> getAlignment() -> setWrapText(true);
 			$objPHPExcel -> getActiveSheet() -> getRowDimension('7') -> setRowHeight(-1);
 			$objPHPExcel -> getActiveSheet() -> freezePane('D8');
@@ -1630,6 +1622,7 @@ class Dashboard_Management extends MY_Controller {
 	public function reportSummary($type = "", $period = '') {
 
 		if ($type == 'table') {//Reporting site summary
+			//echo $period;die();
 			//Total Number of ARV Sites
 			$sql_kemsa = "SELECT COUNT(f.code) as total FROM sync_facility f";
 			$query = $this -> db -> query($sql_kemsa);
@@ -1660,9 +1653,10 @@ class Dashboard_Management extends MY_Controller {
 				$first = date('Y-m-01', strtotime($period . "+1 month"));
 				$last_day = date('Y-m-t', strtotime($period . "+1 month"));
 			} else {
-				$tenth = date('Y-m-10');
-				$first = date('Y-m-01');
-				$last_day = date('Y-m-t');
+				$period = date('F-Y');
+				$tenth = date('Y-m-10', strtotime($period));
+				$first = date('Y-m-01', strtotime($period));
+				$last_day = date('Y-m-t', strtotime($period));
 			}
 
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
