@@ -71,7 +71,7 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($results as $result) {
 			$counties[$result['id']] = $result['county'];
 		}
-		return $counties;
+		return @$counties;
 	}
 
 	public function getEidADTFacility() {
@@ -101,7 +101,7 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($results as $result) {
 			$facilities[$result['facilitycode']] = $result['name'];
 		}
-		return $facilities;
+		return @$facilities;
 	}
 
 	public function getCountyList() {
@@ -169,6 +169,8 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function download($type = "", $period = "", $pipeline = '') {
+		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' ";
+		$and_check_cdrr = " AND c.status NOT LIKE '%receive%' AND c.status NOT LIKE '%delete%' AND c.status NOT LIKE '%prepare%' ";
 		if ($type == "SOH") {
 			$dir = "Export";
 			$inputFileType = 'Excel5';
@@ -456,32 +458,19 @@ class Dashboard_Management extends MY_Controller {
 			$period = date('Y-m-01', strtotime($period));
 			$drug_table = '';
 			$facility_table = '';
+			$and ='';
 			//Get consumption for that period
 			if ($pipeline == 'kemsa') {
 				$drug_table = 'sync_drug';
 				$facility_table = 'sync_facility';
 				$results_f = Sync_Facility::getAllHydrated();
+				$and .=' and c.id NOT IN (SELECT cdrr_id FROM escm_orders)';
 			} else if ($pipeline == 'kenya_pharma') {
 				$drug_table = ' escm_drug';
 				$facility_table = 'escm_facility';
 				$results_f = Escm_Facility::getAllHydrated();
+				$and .=' and c.id IN (SELECT cdrr_id FROM escm_orders)';
 			}
-
-			//Get Facilities
-
-			$sql = "SELECT sd.id as d_id,f.id as facility_id,sd.name as drug_name,CONCAT('(',sd.abbreviation,' ',sd.strength,')') as descr,IF(f.category='standalone',SUM(ci.dispensed_packs),SUM(ci.aggr_consumed)) as tot_consumption FROM $drug_table sd
-					LEFT JOIN cdrr_item ci ON ci.drug_id=sd.id
-					LEFT JOIN cdrr c ON c.id=ci.cdrr_id
-					LEFT JOIN $facility_table f ON f.id =c.facility_id
-					LEFT JOIN arv_drug ad ON ad.drug_id = sd.id
-					WHERE c.period_begin = '" . $period . "'
-					AND ad.pipeline = '$pipeline'
-					AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
-					GROUP BY sd.name
-					
-					";
-			$query = $this -> db -> query($sql);
-			$results = $query -> result_array();
 			$filename = "Facility Cons by ARV Medicine";
 			$dir = "Export";
 			$objPHPExcel = $this -> generateExcelDefaultStyle($filename);
@@ -505,53 +494,56 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C7', "Drug");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B8', "MFL Code");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C8', "ARV Ordering Point Name");
-
-			$x = "D";
-			foreach ($results as $value) {
-				$drug = $value['drug_name'] . $value['descr'];
-				$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $drug);
-				$x++;
-
-			}
+			
 			$y = 1;
 			$p = 9;
-			foreach ($results_f as $value) {
-				$sql = "SELECT sd.id as d_id,f.id as facility_id,sd.name as drug_name,CONCAT('(',sd.abbreviation,' ',sd.strength,')') as descr,IF(f.category='standalone',SUM(ci.dispensed_packs),SUM(ci.aggr_consumed)) as tot_consumption FROM $drug_table sd
-					LEFT JOIN cdrr_item ci ON ci.drug_id=sd.id
-					LEFT JOIN cdrr c ON c.id=ci.cdrr_id
-					LEFT JOIN $facility_table f ON f.id =c.facility_id
-					LEFT JOIN arv_drug ad ON ad.drug_id = sd.id
-					WHERE c.period_begin = '" . $period . "'
-					AND ad.pipeline = '$pipeline'
-					AND (c.code='D-CDRR' OR c.code ='F-CDRR_Packs')
-					GROUP BY sd.name
-					
-					";
-
-				$id = $value['id'];
+			foreach ($results_f as $value) {//Loop through each facility
+				$facility_id = $value['id'];
 				$code = $value['code'];
 				$name = $value['name'];
+				
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $p, $y);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $code);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $p, $name);
-
+				
+				// Get drugs details for each facility
+				$sql = "
+						SELECT dc.id, dc.name,dc.abbreviation,dc.strength, dc.formulation,IFNULL(tabl.total,0) as tot_consumption   FROM  $drug_table dc
+							LEFT JOIN 
+							(
+							SELECT c.facility_id,IF(c.code='F-CDRR_packs',ci.dispensed_packs,ci.aggr_consumed) as total, ci.drug_id, dc.id as dr_id FROM cdrr_item ci
+							LEFT JOIN cdrr c ON c.id = ci.cdrr_id
+							LEFT JOIN $drug_table dc ON dc.id = ci.drug_id
+							LEFT JOIN $facility_table f ON f.id = c.facility_id
+							WHERE c.period_begin = '$period'
+							AND c.facility_id = $facility_id
+							$and
+							$and_check_cdrr
+							) tabl ON tabl.dr_id=dc.id
+							GROUP BY dc.id
+							ORDER BY dc.name
+						";
+				//echo $sql;die();
+				$query = $this -> db -> query($sql);
+				$results = $query -> result_array();
+				
+				
 				$x = "D";
 				foreach ($results as $value) {
-					$facility_id = $value['facility_id'];
+					$drug = $value['name'] .'( '. $value['abbreviation'].' ) '.$value['strength'].' '.$value['formulation'];
 					$total_cons = $value['tot_consumption'];
-					if ($facility_id == $id) {//Check if there is data for this facility
-						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $total_cons);
-					} else {
-						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, 0);
+					if($y=='1'){ //Append Drug names for first row only
+						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $drug);
 					}
-
+					$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $total_cons);
 					$x++;
-
+	
 				}
-
 				$p++;
 				$y++;
 			}
+			
+			
 			$objPHPExcel -> getActiveSheet() -> getStyle('D7:' . $x . $p) -> getAlignment() -> setWrapText(true);
 			$objPHPExcel -> getActiveSheet() -> getRowDimension('7') -> setRowHeight(-1);
 			$objPHPExcel -> getActiveSheet() -> freezePane('D8');
@@ -635,7 +627,7 @@ class Dashboard_Management extends MY_Controller {
 								LEFT JOIN $regimen_table r ON r.id = mi.regimen_id
 								LEFT JOIN $facility_table f ON f.id = m.facility_id
 								WHERE m.period_begin =  '$period_begin'
-								AND m.period_end='$period_end'
+								$and_check_maps
 								AND m.facility_id=$id
 								$and
 								) tabl ON tabl.reg_id=r.id
@@ -708,8 +700,9 @@ class Dashboard_Management extends MY_Controller {
 						LEFT JOIN $regimen_table r ON r.id = mi.regimen_id 
 						LEFT JOIN escm_facility f ON f.id = m.facility_id
 						LEFT JOIN sync_category c ON c.id=r.category_id
-						WHERE m.period_begin = '2013-08-01' 
+						WHERE m.period_begin = '$period' 
 						$and
+						$and_check_maps
 						GROUP BY mi.regimen_id ORDER BY r.code,reg_name ) tabl ON tabl.cat_id=c.id
 						WHERE c.name NOT LIKE '%delete%'
 						";
@@ -745,6 +738,7 @@ class Dashboard_Management extends MY_Controller {
 			$a = 0;
 			$n = 0;
 			$cat_total = 0;
+			$count = count($results);
 			foreach ($results as $value) {
 
 				$cat_id = $results[$a]['cat_id'];
@@ -795,6 +789,12 @@ class Dashboard_Management extends MY_Controller {
 				$objPHPExcel -> getActiveSheet() -> getRowDimension($x) -> setRowHeight(-1);
 				$x++;
 				$a++;
+				if($a==$count){//If last row, display category total for last row
+					$objPHPExcel -> getActiveSheet() -> getStyle('C' . $x) -> getFont() -> setBold(true);
+					$objPHPExcel -> getActiveSheet() -> getStyle('D' . $x) -> getFont() -> setBold(true);
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $x, "Category Total ");
+					$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $x, $cat_total);
+				}
 			}
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 		}
@@ -826,6 +826,7 @@ class Dashboard_Management extends MY_Controller {
 			LEFT JOIN $facility_table f ON f.id = m.facility_id
 			LEFT JOIN sync_category c ON c.id=r.category_id
 			$where
+			$and_check_maps
 			ORDER BY r.code,reg_name ) tabl ON tabl.cat_id=c.id
 			WHERE c.name NOT LIKE '%delete%'
 			GROUP BY  c.name,tabl.period_begin ORDER BY tabl.period_begin,c.name
@@ -886,6 +887,7 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> getStyle('B6') -> getAlignment() -> setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 			$objPHPExcel -> getActiveSheet() -> getStyle('E6') -> getAlignment() -> setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 			$objPHPExcel -> getActiveSheet() -> getStyle('A7:I7') -> getFont() -> setBold(true);
+			$objPHPExcel -> getActiveSheet() -> getStyle('D') -> getFont() -> setBold(true);
 			$x = 0;
 			$y = 8;
 			$tot_art_adult = 0;
@@ -907,9 +909,11 @@ class Dashboard_Management extends MY_Controller {
 					$patient_category = 'paediatric art patients';
 				} else if ($cat_name == 'pep adult') {
 					$patient_category = 'pep adults';
-				} else if ($cat_name == 'pep child') {
-					$patient_category = 'pep adults';
-				} else if ($cat_name == 'pmtct regimens for infants') {
+				}
+				else if($cat_name=='pep child'){
+					$patient_category = 'pep children';
+				}
+				else if($cat_name=='pmtct regimens for infants'){
 					$patient_category = 'pmtct infants';
 				} else if ($cat_name == 'pmtct regimens for pregnant women') {
 					$patient_category = 'pmtct mothers';
@@ -1072,6 +1076,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function getPatients($type = "ART_PATIENT", $period = "", $county = "", $facility = "") {
+		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
 		if ($period == '') {
 			$current_period = date('Y-m-01', strtotime("-1 month"));
 			$join_maps = "INNER JOIN maps m ON m.id=mi.maps_id";
@@ -1097,10 +1102,12 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN escm_regimen er ON er.id = mi.regimen_id
 							LEFT JOIN sync_category sc ON sc.id = er.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
 							AND em.maps_id IS NOT NULL 
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
 							AND sc.name NOT LIKE '%delete%'";
+							
 
 			$sql_paed_kp = "SELECT SUM( mi.total ) AS total_paed_kp
 							FROM maps_item mi
@@ -1109,6 +1116,7 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN escm_regimen er ON er.id = mi.regimen_id
 							LEFT JOIN sync_category sc ON sc.id = er.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
 							AND em.maps_id IS NOT NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
 							AND sc.name NOT LIKE '%delete%'";
@@ -1138,6 +1146,7 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN sync_regimen sr ON sr.id = mi.regimen_id
 							LEFT JOIN sync_category sc ON sc.id = sr.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
 							AND em.maps_id IS NULL 
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
@@ -1150,9 +1159,11 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN sync_regimen sr ON sr.id = mi.regimen_id
 							LEFT JOIN sync_category sc ON sc.id = sr.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
 							AND em.maps_id IS NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
-							AND sc.name NOT LIKE '%delete%'";
+							AND sc.name NOT LIKE '%delete%'
+							";
 
 			$query1 = $this -> db -> query($sql_adult_kem);
 			$query2 = $this -> db -> query($sql_paed_kem);
@@ -1185,7 +1196,6 @@ class Dashboard_Management extends MY_Controller {
 			$table_display = $this -> table -> generate();
 			echo $table_display;
 		} elseif ($type == "ADULT_ART") {
-
 			//Bar Chart
 			$data = array();
 			$list = array();
@@ -1212,6 +1222,7 @@ class Dashboard_Management extends MY_Controller {
 								WHERE(r.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
 								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
 								$and
+								$and_check_maps
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
 								GROUP BY mr.code";
@@ -1226,6 +1237,7 @@ class Dashboard_Management extends MY_Controller {
 								WHERE(r.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
 								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
 								$and
+								$and_check_maps
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
 								GROUP BY mr.code";
@@ -1241,6 +1253,7 @@ class Dashboard_Management extends MY_Controller {
 								WHERE sc.name LIKE '%Other Adult Regimen%'
 								AND mi.maps_id IN(SELECT maps_id FROM escm_maps)
 								$and
+								$and_check_maps
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								LEFT JOIN sync_category sc1 ON sc1.id=test.category_id
 								WHERE sc1.name LIKE '%Other Adult Regimen%'
@@ -1353,6 +1366,7 @@ class Dashboard_Management extends MY_Controller {
 								WHERE(r.code IN ('CF1A',  'CF1B', 'CF1C'  ,'CF2A',  'CF2B','CF2C', 'CF2D' ,'CF3A',  'CF3B')
 								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
 								$and
+								$and_check_maps
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN ('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B')
 								GROUP BY mr.code";
@@ -1367,6 +1381,7 @@ class Dashboard_Management extends MY_Controller {
 								WHERE(r.code IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
 								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
 								$and
+								$and_check_maps
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
 								GROUP BY mr.code";
@@ -1382,6 +1397,7 @@ class Dashboard_Management extends MY_Controller {
 								WHERE sc.name LIKE '%Other Paediatric ART Regimen%'
 								AND mi.maps_id IN(SELECT maps_id FROM escm_maps)
 								$and
+								$and_check_maps
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								LEFT JOIN sync_category sc1 ON sc1.id=test.category_id
 								WHERE sc1.name LIKE '%Other Paediatric ART Regimen%'
@@ -1597,6 +1613,7 @@ class Dashboard_Management extends MY_Controller {
 	public function reportSummary($type = "", $period = '') {
 
 		if ($type == 'table') {//Reporting site summary
+			//echo $period;die();
 			//Total Number of ARV Sites
 			$sql_kemsa = "SELECT COUNT(f.code) as total FROM sync_facility f";
 			$query = $this -> db -> query($sql_kemsa);
@@ -1627,7 +1644,7 @@ class Dashboard_Management extends MY_Controller {
 				$first = date('Y-m-01', strtotime($period . "+1 month"));
 				$last_day = date('Y-m-t', strtotime($period . "+1 month"));
 			} else {
-				$period = date('Y-m-d');
+				$period = date('F-Y');
 				$tenth = date('Y-m-10', strtotime($period));
 				$first = date('Y-m-01', strtotime($period));
 				$last_day = date('Y-m-t', strtotime($period));
@@ -2012,6 +2029,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function adult_patients($period = "", $facility = 0, $county = 0) {
+		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
 		$conditions = "";
 		$regimens = array();
 
@@ -2045,6 +2063,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
 						 AND er.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
 						 $conditions
@@ -2058,8 +2077,9 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
-						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
+						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
 						 $conditions";
 
 		$sql3_kp = "SELECT 'OTHER REGIMENS' as name,SUM(mi.total) as total
@@ -2071,6 +2091,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
 						 AND sr.name LIKE '%Other Adult Regimen%'
 						 $conditions";
@@ -2083,6 +2104,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NULL 
 						 AND er.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
 						 $conditions
@@ -2096,8 +2118,9 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NULL 
-						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
+						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
 						 $conditions";
 
 		$sql3_ke = "SELECT 'OTHER REGIMENS' as name,SUM(mi.total) as total
@@ -2109,6 +2132,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NULL 
 						 AND sr.name LIKE '%Other Adult Regimen%'
 						 $conditions";
@@ -2190,6 +2214,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function paed_patients($period = "", $facility = 0, $county = 0) {
+		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
 		$conditions = "";
 		$regimens = array();
 
@@ -2223,6 +2248,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
 						 AND er.code IN ('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B')
 						 $conditions
@@ -2236,6 +2262,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
 						 AND er.code IN ('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
 						 $conditions";
@@ -2249,6 +2276,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
 						 AND sr.name LIKE '%Other Paediatric ART Regimen%'
 						 $conditions";
@@ -2261,6 +2289,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NULL 
 						 AND er.code IN ('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B')
 						 $conditions
@@ -2274,6 +2303,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NULL 
 						 AND er.code IN ('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
 						 $conditions";
@@ -2287,6 +2317,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN counties c ON c.id=ef.county_id
 						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
+						 $and_check_maps
 						 AND em.maps_id IS NULL 
 						 AND sr.name LIKE '%Other Paediatric ART Regimen%'
 						 $conditions";

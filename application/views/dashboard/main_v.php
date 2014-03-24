@@ -1091,8 +1091,7 @@
 	    	<div class="three_block span4" id="patient_scale_up" style="height:auto;">
 	    		<h3 class="dashboard_title">Patients Scale Up</h3>
 	    		<table class="table table-bordered table-striped tbl_nat_dashboard">
-	    			<thead>
-	    				
+	    			<thead>	
 	    				<tr><th>Pipeline</th><th>Action</th></tr>
 	    			</thead>
 	    			<tbody>
