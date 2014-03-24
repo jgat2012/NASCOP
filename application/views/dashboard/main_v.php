@@ -457,24 +457,6 @@
 			$("#report_summary_table").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
 			var ordering_link="<?php echo base_url().'dashboard_management/reportSummary/table/';?>"+period;
 			$("#report_summary_table").load(ordering_link);
-		}else if(id=="eid_gender_btn"){
-	      var eid_period=$("#gender_eid_period").val();
-		  var eid_county=$("#gender_eid_county").val();
-		  var eid_facility=$("#gender_eid_facility").val();
-		  var chart_area_eid_gender_link="<?php echo base_url().'dashboard_management/eid/gender/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
-	      $("#chart_area_eid_gender").load(chart_area_eid_gender_link);
-		}else if(id=="eid_line_btn"){
-		  var eid_period=$("#line_eid_period").val();
-		  var eid_county=$("#line_eid_county").val();
-		  var eid_facility=$("#line_eid_facility").val();
-		  var chart_area_eid_line_link="<?php echo base_url().'dashboard_management/eid/line/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
-   	      $("#chart_area_eid_line").load(chart_area_eid_line_link);
-		}else if(id=="eid_regimen_btn"){
-		  var eid_period=$("#regimen_eid_period").val();
-		  var eid_county=$("#regimen_eid_county").val();
-		  var eid_facility=$("#regimen_eid_facility").val();
-	  	  var chart_area_eid_regimen_link="<?php echo base_url().'dashboard_management/eid/regimen/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
-          $("#chart_area_eid_regimen").load(chart_area_eid_regimen_link);
 		}else if(id=="eid_source_btn"){
 		  var eid_period=$("#source_eid_period").val();
 		  var eid_county=$("#source_eid_county").val();
@@ -589,17 +571,13 @@
         $("#chart_area_report_analysis").load(chart_area_report_analysis_link);
 	}
 	function eid_analysis(){
-		var chart_area_eid_gender_link="<?php echo base_url().'dashboard_management/eid/gender';?>";
-		var chart_area_eid_line_link="<?php echo base_url().'dashboard_management/eid/line';?>";
-	  	var chart_area_eid_regimen_link="<?php echo base_url().'dashboard_management/eid/regimen';?>";
 	  	var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/source';?>";
 	  	var chart_area_eid_comaprison_link= "<?php echo base_url().'dashboard_management/eid/comparison';?>";
-
-	    $("#chart_area_eid_gender").load(chart_area_eid_gender_link);
-   	    $("#chart_area_eid_line").load(chart_area_eid_line_link);
-        $("#chart_area_eid_regimen").load(chart_area_eid_regimen_link);
+        var chart_area_eid_summary_link="<?php echo base_url().'dashboard_management/eid/summary';?>";
+        
         $("#chart_area_eid_source").load(chart_area_eid_source_link);
         $("#chart_area_eid_comparison").load(chart_area_eid_comaprison_link);
+        $("#eid_summary").load(chart_area_eid_summary_link);
 	}
 </script>
 
@@ -864,92 +842,6 @@
     <!--EID Analysis-->
     <div class="tab-pane nat_dashboard_rep active" id="tab8">
     	<div class="row-fluid">
-    		<div class="three_block span4">
-	    		<h3 class="dashboard_title">EID Gender Analysis:
-	    		 For	
-	    		<select id="gender_eid_period" class="nd_period nd_input_small span4">
-					<?php foreach ($eid_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>
-	    		<span>County</span>
-				<select id="gender_eid_county" class="nd_period nd_input_small span3">
-					<option value="0">All</option>
-					<?php foreach ($eid_county as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="gender_eid_facility" class="nd_period nd_input_small span4">
-					<option value="0">All</option>
-					<?php foreach ($eid_facility as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				
-				<button class="generate btn btn-warning" style="color:black" id="eid_gender_btn">Get</button>
-	    		</h3>
-	    		<div id="chart_area_eid_gender"></div>
-	    	</div>
-	    	<div class="three_block span4">
-	    		<h3 class="dashboard_title">EID Line Analysis:
-                For
-	    		<select id="line_eid_period" class="nd_period nd_input_small span4">
-					<?php foreach ($eid_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>
-	    		<span>County</span>
-				<select id="line_eid_county" class="nd_period nd_input_small span3">
-					<option value="0">All</option>
-					<?php foreach ($eid_county as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="line_eid_facility" class="nd_period nd_input_small span4">
-					<option value="0">All</option>
-					<?php foreach ($eid_facility as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				
-				<button class="generate btn btn-warning" style="color:black" id="eid_line_btn">Get</button>
-				</h3>
-	    		<div id="chart_area_eid_line"></div>
-	    	</div>
-	    	 <div class="three_block span4">
-	    		<h3 class="dashboard_title">EID Regimen Analysis:
-	    			For
-	    		<select id="regimen_eid_period" class="nd_period nd_input_small span4">
-					<?php foreach ($eid_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>
-	    		<span>County</span>
-				<select id="regimen_eid_county" class="nd_period nd_input_small span3">
-					<option value="0">All</option>
-					<?php foreach ($eid_county as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="regimen_eid_facility" class="nd_period nd_input_small span4">
-					<option value="0">All</option>
-					<?php foreach ($eid_facility as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				
-				<button class="generate btn btn-warning" style="color:black" id="eid_regimen_btn">Get</button>	
-	    		</h3>   
-	    		<div id="chart_area_eid_regimen"></div>
-	    	</div>
-    	</div>
-    	<div class="row-fluid">
     		  <div class="two_block span6">
 	    		<h3 class="dashboard_title">EID Source Analysis:
 	    			For
@@ -1007,6 +899,42 @@
 	    			
 	    		</h3>
 	    		<div id="chart_area_eid_comparison"></div>
+	    	</div>
+    	</div>
+    	<div class="row-fluid">
+    		<div class="three_block span12">
+	    		<div class="table-responsive">
+	    			<table class="table table-bordered table-hover table-condensed table-striped">
+	    				<thead style="background: #2B597E;color: #FFF;font-weight:bold;font-size:0.9em;">
+	    					<tr>
+	    						<td rowspan="3">Unit of interest (National, County, or Facility?)</td>
+	    						<td>Period</td>
+	    						<td colspan="2">EID Data</td>
+	    						<td>Service Data DHIS</td>
+	    						<td colspan="4">Actual Patient and Commodity data</td>
+	    					</tr>
+	    					<tr>
+	    						<td rowspan="2">2013</td>
+	    						<td rowspan="2">EID Positives</td>
+	    						<td rowspan="2">EID Enrolled</td>
+	    						<td rowspan="2">Patients Enrolled(via PMTCT)</td>
+	    						<td>Patient Scale Up</td>
+	    						<td>Patient Scale Up</td>
+	    						<td>Commodity Scale Up</td>
+	    						<td>Commodity Scale Up</td>
+	    					</tr>
+	    					<tr>
+	    					<td>All Paeds</td>	
+	    					<td>vs. ABC/NVP peads</td>	
+	    					<td>PMTCT exit NVP</td>	
+	    					<td>Peads Entry: ABC</td>	
+	    					</tr>
+	    				</thead>
+	    				<tbody id="eid_summary">
+	    					
+	    				</tbody>
+	    			</table>
+	    		</div>
 	    	</div>
     	</div>
     </div>

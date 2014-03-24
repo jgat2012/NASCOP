@@ -169,7 +169,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function download($type = "", $period = "", $pipeline = '') {
-		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' ";
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' ";
 		$and_check_cdrr = " AND c.status NOT LIKE '%receive%' AND c.status NOT LIKE '%delete%' AND c.status NOT LIKE '%prepare%' ";
 		if ($type == "SOH") {
 			$dir = "Export";
@@ -458,18 +458,18 @@ class Dashboard_Management extends MY_Controller {
 			$period = date('Y-m-01', strtotime($period));
 			$drug_table = '';
 			$facility_table = '';
-			$and ='';
+			$and = '';
 			//Get consumption for that period
 			if ($pipeline == 'kemsa') {
 				$drug_table = 'sync_drug';
 				$facility_table = 'sync_facility';
 				$results_f = Sync_Facility::getAllHydrated();
-				$and .=' and c.id NOT IN (SELECT cdrr_id FROM escm_orders)';
+				$and .= ' and c.id NOT IN (SELECT cdrr_id FROM escm_orders)';
 			} else if ($pipeline == 'kenya_pharma') {
 				$drug_table = ' escm_drug';
 				$facility_table = 'escm_facility';
 				$results_f = Escm_Facility::getAllHydrated();
-				$and .=' and c.id IN (SELECT cdrr_id FROM escm_orders)';
+				$and .= ' and c.id IN (SELECT cdrr_id FROM escm_orders)';
 			}
 			$filename = "Facility Cons by ARV Medicine";
 			$dir = "Export";
@@ -494,18 +494,18 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C7', "Drug");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('B8', "MFL Code");
 			$objPHPExcel -> getActiveSheet() -> SetCellValue('C8', "ARV Ordering Point Name");
-			
+
 			$y = 1;
 			$p = 9;
 			foreach ($results_f as $value) {//Loop through each facility
 				$facility_id = $value['id'];
 				$code = $value['code'];
 				$name = $value['name'];
-				
+
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $p, $y);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $code);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $p, $name);
-				
+
 				// Get drugs details for each facility
 				$sql = "
 						SELECT dc.id, dc.name,dc.abbreviation,dc.strength, dc.formulation,IFNULL(tabl.total,0) as tot_consumption   FROM  $drug_table dc
@@ -526,24 +526,22 @@ class Dashboard_Management extends MY_Controller {
 				//echo $sql;die();
 				$query = $this -> db -> query($sql);
 				$results = $query -> result_array();
-				
-				
+
 				$x = "D";
 				foreach ($results as $value) {
-					$drug = $value['name'] .'( '. $value['abbreviation'].' ) '.$value['strength'].' '.$value['formulation'];
+					$drug = $value['name'] . '( ' . $value['abbreviation'] . ' ) ' . $value['strength'] . ' ' . $value['formulation'];
 					$total_cons = $value['tot_consumption'];
-					if($y=='1'){ //Append Drug names for first row only
+					if ($y == '1') {//Append Drug names for first row only
 						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $drug);
 					}
 					$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $total_cons);
 					$x++;
-	
+
 				}
 				$p++;
 				$y++;
 			}
-			
-			
+
 			$objPHPExcel -> getActiveSheet() -> getStyle('D7:' . $x . $p) -> getAlignment() -> setWrapText(true);
 			$objPHPExcel -> getActiveSheet() -> getRowDimension('7') -> setRowHeight(-1);
 			$objPHPExcel -> getActiveSheet() -> freezePane('D8');
@@ -789,7 +787,7 @@ class Dashboard_Management extends MY_Controller {
 				$objPHPExcel -> getActiveSheet() -> getRowDimension($x) -> setRowHeight(-1);
 				$x++;
 				$a++;
-				if($a==$count){//If last row, display category total for last row
+				if ($a == $count) {//If last row, display category total for last row
 					$objPHPExcel -> getActiveSheet() -> getStyle('C' . $x) -> getFont() -> setBold(true);
 					$objPHPExcel -> getActiveSheet() -> getStyle('D' . $x) -> getFont() -> setBold(true);
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $x, "Category Total ");
@@ -909,11 +907,9 @@ class Dashboard_Management extends MY_Controller {
 					$patient_category = 'paediatric art patients';
 				} else if ($cat_name == 'pep adult') {
 					$patient_category = 'pep adults';
-				}
-				else if($cat_name=='pep child'){
+				} else if ($cat_name == 'pep child') {
 					$patient_category = 'pep children';
-				}
-				else if($cat_name=='pmtct regimens for infants'){
+				} else if ($cat_name == 'pmtct regimens for infants') {
 					$patient_category = 'pmtct infants';
 				} else if ($cat_name == 'pmtct regimens for pregnant women') {
 					$patient_category = 'pmtct mothers';
@@ -1076,7 +1072,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function getPatients($type = "ART_PATIENT", $period = "", $county = "", $facility = "") {
-		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
 		if ($period == '') {
 			$current_period = date('Y-m-01', strtotime("-1 month"));
 			$join_maps = "INNER JOIN maps m ON m.id=mi.maps_id";
@@ -1107,7 +1103,6 @@ class Dashboard_Management extends MY_Controller {
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
 							AND sc.name NOT LIKE '%delete%'";
-							
 
 			$sql_paed_kp = "SELECT SUM( mi.total ) AS total_paed_kp
 							FROM maps_item mi
@@ -1829,7 +1824,7 @@ class Dashboard_Management extends MY_Controller {
 			$container = "chart_area_eid_source";
 		}
 
-		if ($type != "comparison") {
+		if ($type != "comparison" && $type != "summary") {
 			$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
 					FROM eid_info ei 
 					LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
@@ -1839,6 +1834,24 @@ class Dashboard_Management extends MY_Controller {
 					AND '$period_end'
 					$conditions
 					GROUP BY ei.$column";
+		} else if ($type == "summary") {
+			$tbody = "";
+			$months = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+			$size = count($months);
+			$tbody .= "<tr><td rowspan='$size'>National</td>";
+			foreach ($months as $month) {
+				$tbody .= "<td>$month</td>";
+				$tbody .= "<td>-</td>";
+				$tbody .= "<td>-</td>";
+				$tbody .= "<td>-</td>";
+				$tbody .= "<td>-</td>";
+				$tbody .= "<td>-</td>";
+				$tbody .= "<td>-</td>";
+				$tbody .= "<td>-</td></tr>";
+			}
+			echo $tbody;
+			exit();
+
 		} else {
 			if ($facility != 0) {
 				$conditions_adt .= "AND ei.facility_code='$facility'";
@@ -2029,7 +2042,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function adult_patients($period = "", $facility = 0, $county = 0) {
-		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
 		$conditions = "";
 		$regimens = array();
 
@@ -2214,7 +2227,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function paed_patients($period = "", $facility = 0, $county = 0) {
-		$and_check_maps=" AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
 		$conditions = "";
 		$regimens = array();
 
