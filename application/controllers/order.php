@@ -34,7 +34,7 @@ class Order extends MY_Controller {
 	}
 
 	public function move_order($status, $cdrr_id, $maps_id) {
-		
+
 		$log = new Cdrr_Log();
 		$log -> description = $status;
 		$log -> created = date('Y-m-d H:i:s');
@@ -56,7 +56,7 @@ class Order extends MY_Controller {
 
 		$this -> session -> set_flashdata('order_message', "Order " . $status . " Successfully");
 		redirect("order/view_order/" . $cdrr_id . "/" . $maps_id);
-		
+
 	}
 
 	public function view_order($cdrr_id, $maps_id) {
@@ -412,6 +412,7 @@ class Order extends MY_Controller {
 	}
 
 	public function import_order($type = "") {
+		$this -> load -> helper('file');
 		$ret = array();
 		if ($type == "") {
 			$code = $this -> input -> post("upload_type");
@@ -836,9 +837,20 @@ class Order extends MY_Controller {
 					}
 					//end of maps
 				}//end of loops
+				$log = implode("\r\n", $ret);
 				$ret = implode("<br/>", $ret);
 				$this -> session -> set_flashdata('login_message', $ret);
 			}//end of if check for file
+			$file = "log.txt";
+			$time = date('Y-m-d h:i:s a') . "(" . $code . ")";
+			$hr = "--------------------------------";
+
+			$final = $time . "\r\n";
+			$final .= $hr . "\r\n";
+			$final .= $log . "\r\n";
+
+			$final .= "\r\n" . file_get_contents($file);
+			file_put_contents($file, $final);
 			redirect("dashboard_management");
 
 		} else if ($type == "pipeline_upload") {//Upload Central medical stores and pending orders data
@@ -929,6 +941,23 @@ class Order extends MY_Controller {
 
 	}
 
+	public function show_log() {
+		$file = "log.txt";
+		if (file_exists($file)) {
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename=' . basename($file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+			ob_clean();
+			flush();
+			readfile($file);
+			exit ;
+		}
+	}
+
 	public function send_file($excel_file) {
 		$email_user = stripslashes('webadt.chai@gmail.com');
 		$email_password = stripslashes('WebAdt_052013');
@@ -968,7 +997,7 @@ class Order extends MY_Controller {
 			$this -> email -> clear(TRUE);
 			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
 		} else {
-			$error_message='Cannot Connect to Mail Server';
+			$error_message = 'Cannot Connect to Mail Server';
 			//$error_message = $this -> email -> print_debugger();
 		}
 
