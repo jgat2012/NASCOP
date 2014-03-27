@@ -3,8 +3,12 @@ error_reporting(0);
 class Order extends MY_Controller {
 	function __construct() {
 		parent::__construct();
+		error_reporting(E_ALL);
 	}
-
+	
+	public $objPHPExcel;
+	protected $cellValues;
+	
 	public function index() {
 		$data['content_view'] = "orders/order_v";
 		$data['page_title'] = "my Orders";
@@ -433,6 +437,7 @@ class Order extends MY_Controller {
 			if (isset($_FILES["file"])) {
 				$fileCount = count($_FILES["file"]["tmp_name"]);
 				for ($i = 0; $i < $fileCount; $i++) {
+					$file_name = $_FILES["file"]["tmp_name"][$i];
 					$objPHPExcel = $objReader -> load($_FILES["file"]["tmp_name"][$i]);
 					$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
 					$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
@@ -642,6 +647,7 @@ class Order extends MY_Controller {
 						}
 
 					} else if ($code == "D-MAPS" || $code == "F-MAPS") {
+						
 						$first_row = 4;
 						$facility_name = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
 						$facility_code = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
@@ -665,7 +671,7 @@ class Order extends MY_Controller {
 						} else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$i];
 						} else if ($duplicate == true) {
-							$ret[] = "An cdrr report already exists for this month !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "A MAPS report already exists for this month !-" . $_FILES["file"]["name"][$i];
 						} else {
 							$fourth_row = 9;
 							$sponsors = "";
@@ -761,9 +767,28 @@ class Order extends MY_Controller {
 							$sixth_row = 25;
 							$maps_array = array();
 							$regimen_counter = 0;
-
-							for ($i = $sixth_row; $sixth_row, $i <= 120; $i++) {
-								if ($i != 36 || $i != 43 || $i != 53 || $i != 68 || $i != 75 || $i != 88 || $i != 99 || $i != 105 || $i != 113) {
+							
+							/*
+							 *Check for regimen categories indexes , only return row numbers
+							 */
+							$pmtct_preg_women_cell =(int)substr($this -> getCellByValue("PMTCT Regimens for Pregnant Women", $file_name), 1) ;
+							$pmtct_infant_cell = (int)substr($this -> getCellByValue("PMTCT Regimens for Infants", $file_name), 1) ;
+							$art_adult_first_cell = (int)substr($this -> getCellByValue("ADULT ART First-Line Regimens", $file_name), 1) ;
+							$art_adult_second_cell = (int)substr($this -> getCellByValue("ADULT ART Second-Line Regimens", $file_name), 1) ;
+							$art_adult_other_cell = (int)substr($this -> getCellByValue("Other ADULT ART Regimens", $file_name), 1) ;
+							$paed_first_cell = (int)substr($this -> getCellByValue("PAEDIATRIC ART First-Line Regimens", $file_name), 1) ;
+							$paed_second_cell = (int)substr($this -> getCellByValue("PAEDIATRIC ART Second-Line Regimens", $file_name), 1) ;
+							$paed_other_cell = (int)substr($this -> getCellByValue("Other PAEDIATRIC ART Regimens", $file_name), 1) ;
+							$pep_adult_cell = (int)substr($this -> getCellByValue("Post Exposure Prophylaxis (PEP) for Adults", $file_name), 1) ;
+							$pep_child_cell = (int)substr($this -> getCellByValue("Post Exposure Prophylaxis (PEP) for Children", $file_name), 1) ;
+							
+							$oi_cell = (int)substr($this -> getCellByValue("Opportunistic Infections", $file_name), 1) ;
+							
+							//Get where list of regimens end
+							$end_list = $oi_cell - 2;
+							
+							for ($i = $sixth_row; $sixth_row, $i <= $end_list; $i++) {
+								if ($i != $pmtct_preg_women_cell || $i != $pmtct_infant_cell || $i != $art_adult_first_cell || $i != $art_adult_second_cell || $i != $art_adult_other_cell || $i != $paed_first_cell || $i != $paed_second_cell || $i != $paed_other_cell || $i != $pep_adult_cell || $i != $pep_child_cell) {
 									if ($arr[$i]['E'] != 0 || trim($arr[$i]['A']) != "") {
 										$regimen_code = $arr[$i]['A'];
 										$regimen_desc = $arr[$i]['B'];
@@ -784,22 +809,22 @@ class Order extends MY_Controller {
 							$log_array[0]['id'] = "";
 							$log_array[0]['description'] = "prepared";
 							if ($code == "D-MAPS") {
-								$log_array[0]['created'] = $this -> clean_date(trim($arr[143]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell+21]['E']));
+								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell+19]['B']));
 							} else {
-								$log_array[0]['created'] = $this -> clean_date(trim($arr[139]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[137]['B']));
+								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell+17]['E']));
+								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell+15]['B']));
 							}
 							$log_array[0]['maps_id'] = "";
 
 							$log_array[1]['id'] = "";
 							$log_array[1]['description'] = "approved";
 							if ($code == "D-MAPS") {
-								$log_array[1]['created'] = $this -> clean_date(trim($arr[147]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[145]['B']));
+								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell+25]['E']));
+								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell+23]['B']));
 							} else {
-								$log_array[1]['created'] = $this -> clean_date(trim($arr[143]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[141]['B']));
+								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell+21]['E']));
+								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell+19]['B']));
 							}
 							$log_array[1]['maps_id'] = "";
 
@@ -925,6 +950,47 @@ class Order extends MY_Controller {
 
 		}
 
+	}
+
+	public function getCellValues($filename,$force = false){
+		if ( !is_null($this->cellValues) && $force === false ){
+			return $this->cellValues;
+		}
+		
+		$this->objPHPExcel = PHPExcel_IOFactory::load($filename);
+		$currentIndex = $this->objPHPExcel->getActiveSheetIndex();
+		$this->objPHPExcel->setActiveSheetIndex(0);
+
+
+		$sheet = $this->objPHPExcel->getActiveSheet();
+		$highestColumn = $sheet->getHighestColumn(); //e.g., 'G'
+		$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn); //e.g., 6
+		$highestRow= $sheet->getHighestRow();
+
+		$this->cellValues = array();
+		for ( $i =0 ; $i < $highestColumnIndex; $i++ ){
+			$column = PHPExcel_Cell::stringFromColumnIndex($i);
+			for ( $j = 1; $j <= $highestRow; $j++ ){
+				$this->cellValues[$column . $j] = $sheet->getCellByColumnAndRow($i, $j)->getValue();
+			}
+		}
+		$this->objPHPExcel->setActiveSheetIndex($currentIndex);
+		return $this->cellValues;
+	}
+	
+	/**
+	 * returns cell by value. Be carefull, could be ambigous, only use
+	 * if you really know what you are doing
+	 */
+	public function getCellByValue($search,$filename) {
+		$nonPrintableChars = array("\n", "\r", "\t", "\s");
+		$search = str_replace($nonPrintableChars, '', $search);
+		foreach ( $this->getCellValues($filename) as $cell => $value ){
+			if (stripos(str_replace($nonPrintableChars, '', $value), $search) === 0){
+				return $cell;
+			}
+		}
+		return false;
 	}
 
 	public function send_file($excel_file) {
