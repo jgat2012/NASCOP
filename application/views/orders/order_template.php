@@ -364,6 +364,10 @@
 	  <?php
 		if (!empty($order_array)) {
 		  foreach($order_array as $cdrr){
+		  	$resupply=0;
+			  if($resupply_array[$cdrr['drug_id']]){
+			  	$resupply=$resupply_array[$cdrr['drug_id']];
+			  }
 		  	if($cdrr['non_arv']==1){
 	    ?>
 	    $("#non_arv").val("<?php echo $cdrr['non_arv']; ?>");
@@ -376,10 +380,10 @@
 		  $("#physical_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['count']; ?>");
 		  <?php if($cdrr['code']=="D-CDRR"){?>
 		   $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");	
-		   $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo (($cdrr['dispensed_packs']+$cdrr['aggr_consumed'])*3)-$cdrr['count']; ?>");
+		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $resupply; ?>");
 		  <?php }else{?>
 		  $("#dispensed_in_period_packs_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>");
-		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ($cdrr['dispensed_packs']*3)-$cdrr['count']; ?>");
+		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $resupply; ?>");
 		  <?php }?>
 		  $("#avg_consumption_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['dispensed_packs']/$amc); ?>");
 		  $("#avg_issues_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['received']/$amc); ?>");
