@@ -59,6 +59,8 @@ class Sync_Facility extends Doctrine_Record {
 		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return @$sync_facility[0];
 	}
+	
+	
 
 	public function getCode($facility_id, $status_code = 0) {
 		if ($status_code == 0) {

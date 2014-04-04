@@ -1084,7 +1084,7 @@ class Dashboard_Management extends MY_Controller {
 		}
 
 		$data = array();
-		if ($type == "BYPIPELINE_ART") {//Number of ART Patients BY Pipeline
+		if ($type == "BYPIPELINE_ART") {//Number of Patients on ART By Pipeline
 			$data['container'] = 'report_by_pipeline';
 			$data['title'] = 'Total Patients By Pipeline';
 			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
@@ -1103,6 +1103,7 @@ class Dashboard_Management extends MY_Controller {
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
 							AND sc.name NOT LIKE '%delete%'";
+		//echo $sql_adult_kp;die();
 
 			$sql_paed_kp = "SELECT SUM( mi.total ) AS total_paed_kp
 							FROM maps_item mi
