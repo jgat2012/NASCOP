@@ -55,7 +55,7 @@
 	</div>
 </div>
 <div class="tile" id="appointments-chart">
-	<h3>Pipeline Picking Lists for
+	<h3>Pipeline MEMOs for
 	<input type="text"  class="input-medium" id="reporting_period_3"/>
 	<input type="hidden"  class="input-medium" id="period_start_date_3"/>
 	<input type="hidden"  class="input-medium" id="period_end_date_3"/>

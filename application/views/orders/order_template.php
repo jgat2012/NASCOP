@@ -81,8 +81,9 @@
 			</tbody>
 		</table>
 	</div>
-
-	<div id="commodity-table">
+<div class="row-fluid">
+	<div class="span9">	
+	<div id="commodity-table1">
 			<form method="post" action="<?php echo site_url('order/rationalize_cdrr/'.$cdrr_id."/".$maps_id)?>">	
 		<table class="table table-bordered"  id="generate_order" style="background:#FFF;">
 		<?php
@@ -229,8 +230,9 @@
 		<input type="submit" class="btn btn-info rationalized" id="update_btn" name="update" value="Update"/>
 		</form>
 	</div>
-	
-<table class=" table table-bordered regimen-table  research" style="background:#FFF;" >
+	</div>
+<div class="span3">	
+<table class=" table table-bordered regimen-table1  research" style="background:#FFF;" >
 			<thead>
 				<tr>
 					<th class="col_drug" colspan="2" style="background:#c3d9ff;color:000;"> Regimen </th>
@@ -265,6 +267,8 @@
 			}
 			?>
 	</table>
+	</div>
+	</div>
 	<div>
 			<table style="width:100%;" class="table ">
 		    	<tr ><td colspan="4"  maxlength="255">
