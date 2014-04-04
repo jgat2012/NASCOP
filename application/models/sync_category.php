@@ -15,4 +15,10 @@ class Sync_Category extends Doctrine_Record {
 		$category = $query -> execute();
 		return $category;
 	}
+	
+	public function getId($name="") {
+		$query = Doctrine_Query::create() -> select("id") -> from("sync_category") ->where("name LIKE '%".$name."%'")->limit('1');
+		$category = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $category[0];
+	}
 }

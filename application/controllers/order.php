@@ -1,9 +1,8 @@
 <?php
-error_reporting(0);
+error_reporting(1);
 class Order extends MY_Controller {
 	function __construct() {
 		parent::__construct();
-		error_reporting(E_ALL);
 	}
 	
 	public $objPHPExcel;
@@ -38,6 +37,7 @@ class Order extends MY_Controller {
 	}
 
 	public function move_order($status, $cdrr_id, $maps_id) {
+		
 		$log = new Cdrr_Log();
 		$log -> description = $status;
 		$log -> created = date('Y-m-d H:i:s');
@@ -49,7 +49,7 @@ class Order extends MY_Controller {
 		$mylog -> description = $status;
 		$mylog -> created = date('Y-m-d H:i:s');
 		$mylog -> user_id = $this -> session -> userdata("user_id");
-		$mylog -> maps_id = $cdrr_id;
+		$mylog -> maps_id = $maps_id;
 		$mylog -> save();
 
 		$sql = "UPDATE cdrr SET status='$status' WHERE id='$cdrr_id'";
@@ -59,6 +59,7 @@ class Order extends MY_Controller {
 
 		$this -> session -> set_flashdata('order_message', "Order " . $status . " Successfully");
 		redirect("order/view_order/" . $cdrr_id . "/" . $maps_id);
+		
 	}
 
 	public function view_order($cdrr_id, $maps_id) {
@@ -436,9 +437,9 @@ class Order extends MY_Controller {
 
 			if (isset($_FILES["file"])) {
 				$fileCount = count($_FILES["file"]["tmp_name"]);
-				for ($i = 0; $i < $fileCount; $i++) {
-					$file_name = $_FILES["file"]["tmp_name"][$i];
-					$objPHPExcel = $objReader -> load($_FILES["file"]["tmp_name"][$i]);
+				for ($q = 0; $q < $fileCount; $q++) {
+					$file_name = $_FILES["file"]["tmp_name"][$q];
+					$objPHPExcel = $objReader -> load($_FILES["file"]["tmp_name"][$q]);
 					$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
 					$highestColumm = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestColumn();
 					$highestRow = $objPHPExcel -> setActiveSheetIndex(0) -> getHighestRow();
@@ -462,13 +463,13 @@ class Order extends MY_Controller {
 						$facility_id = $facilities['id'];
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
-							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$i];
-						} else if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
-							$ret[] = "You can only report for current month. Kindly check the period fields !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$q];
+						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
+							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month")).". Kindly check the period fields !-" . $_FILES["file"]["name"][$q];
 						} else if ($file_type == false) {
-							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
-							$ret[] = "An cdrr report already exists for this month !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "A cdrr report already exists for this month !-" . $_FILES["file"]["name"][$q];
 						} else {
 							$fourth_row = 9;
 							$sponsor_gok = trim($arr[$fourth_row]['D']);
@@ -622,7 +623,7 @@ class Order extends MY_Controller {
 
 							$main_array = array($main_array);
 							$this -> prepare_order($type, $main_array);
-							$content = "Order was successfully saved";
+							$content = "Order was successfully saved. ";
 
 							$dir = "Export";
 
@@ -639,11 +640,11 @@ class Order extends MY_Controller {
 							}
 
 							//move the file
-							$file_location = $dir . "/" . $_FILES['file']['name'];
-							move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
+							$file_location = $dir . "/" . $_FILES['file']['name'][$q];
+							move_uploaded_file($_FILES['file']['tmp_name'][$q], $file_location);
 							//send excel file to email
 							$content .= $this -> send_file($file_location);
-							$ret[] = $content . $_FILES["file"]["name"][$i];
+							$ret[] = $content . $_FILES["file"]["name"][$q];
 						}
 
 					} else if ($code == "D-MAPS" || $code == "F-MAPS") {
@@ -651,7 +652,6 @@ class Order extends MY_Controller {
 						$first_row = 4;
 						$facility_name = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
 						$facility_code = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
-
 						$second_row = 5;
 						$province = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
 						$district = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
@@ -665,11 +665,11 @@ class Order extends MY_Controller {
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
 
 						if ($facilities == "") {
-							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$i];
-						} else if ($period_begin != date('Y-m-01', strtotime(date('Y-m-d') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('Y-m-d') . "-1 month"))) {
-							$ret[] = "You can only report for current month. Kindly check the period fields !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$q];
+						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
+							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month"))." . Kindly check the period fields !-" . $_FILES["file"]["name"][$q];
 						} else if ($file_type == false) {
-							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$i];
+							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
 							$ret[] = "A MAPS report already exists for this month !-" . $_FILES["file"]["name"][$i];
 						} else {
@@ -711,19 +711,29 @@ class Order extends MY_Controller {
 							$new_female = $arr[18]["F"];
 							$revisit_male = $arr[18]["E"];
 							$revisit_female = $arr[18]["G"];
-							$new_pmtct = $arr[26]["H"];
-							$revisit_pmtct = $arr[27]["H"];
-							$total_infant = $arr[38]["H"];
-							$pep_adult = $arr[107]["H"];
-							$pep_child = $arr[108]["H"];
-							$total_adult = $arr[124]["E"];
-							$total_child = $arr[124]["G"];
-							$diflucan_adult = $arr[128]["E"];
-							$diflucan_child = $arr[128]["G"];
-							$new_cm = $arr[134]["D"];
-							$revisit_cm = $arr[134]["E"];
-							$new_oc = $arr[134]["F"];
-							$revisit_oc = $arr[134]["G"];
+							//Get cells for PMTCT
+							$pmtcts_cell =(int)substr($this -> getCellByValue("Totals for PMTCT Clients", $file_name), 1) ;
+							$new_pmtct = $arr[$pmtcts_cell+1]["H"];
+							$revisit_pmtct = $arr[$pmtcts_cell+2]["H"];
+							//Get cells for Prophylaxis
+							$prophylaxis_cell =(int)substr($this -> getCellByValue("Total No. of Infants receiving ARV", $file_name), 1) ;
+							$total_infant = $arr[$prophylaxis_cell+1]["H"];
+							//Cells for pep
+							$peps_cell =(int)substr($this -> getCellByValue("Totals for PEP Clients ONLY", $file_name), 1) ;
+							$pep_adult = $arr[$peps_cell+1]["H"];
+							$pep_child = $arr[$peps_cell+2]["H"];
+							//Cotrimo Cells
+							$cotrimos_cell =(int)substr($this -> getCellByValue("Totals for Patients / Clients (ART plus Non-ART)", $file_name), 1) ;
+							$total_adult = $arr[$cotrimos_cell]["E"];
+							$total_child = $arr[$cotrimos_cell]["G"];
+							//Diflucan Cells
+							$diflucans_cell =(int)substr($this -> getCellByValue("Totals for Patients / Clients on Diflucan", $file_name), 1) ;
+							$diflucan_adult = $arr[$diflucans_cell]["E"];
+							$diflucan_child = $arr[$diflucans_cell]["G"];
+							$new_cm = $arr[$diflucans_cell+6]["D"];
+							$revisit_cm = $arr[$diflucans_cell+6]["E"];
+							$new_oc = $arr[$diflucans_cell+6]["F"];
+							$revisit_oc = $arr[$diflucans_cell+6]["G"];
 
 							//Save Import Values
 
@@ -766,6 +776,7 @@ class Order extends MY_Controller {
 							//Insert Maps items
 							$sixth_row = 25;
 							$maps_array = array();
+							$nonstandard_maps_array = array();
 							$regimen_counter = 0;
 							
 							/*
@@ -786,25 +797,95 @@ class Order extends MY_Controller {
 							
 							//Get where list of regimens end
 							$end_list = $oi_cell - 2;
-							
+							$reg_category = "";
 							for ($i = $sixth_row; $sixth_row, $i <= $end_list; $i++) {
+								
+								//Get regimen category names, names are meant to be the same as the ones in the sync_category table
+								
+								if($i == $pmtct_preg_women_cell){
+									$reg_category = "PMTCT Regimens for Pregnant Women";
+								}else if($i == $pmtct_infant_cell){
+									$reg_category = "PMTCT Regimens for Infants";
+								}else if($i == $art_adult_first_cell){
+									$reg_category = "ADULT ART First Line";
+								}else if($i == $art_adult_second_cell){
+									$reg_category = "Adult ART Second Line";
+								}else if($i == $art_adult_other_cell){
+									$reg_category = "Other Adult ART Regimen";
+								}else if($i == $paed_first_cell){
+									$reg_category = "Paediatric First Line";
+								}else if($i == $paed_second_cell){
+									$reg_category = "Paediatric Second Line";
+								}else if($i == $paed_other_cell){
+									$reg_category = "Other Paediatric ART Regimen";
+								}else if($i == $pep_adult_cell){
+									$reg_category = "PEP Adult";
+								}else if($i == $pep_child_cell){
+									$reg_category = "PEP Child";
+								}
+								
 								if ($i != $pmtct_preg_women_cell || $i != $pmtct_infant_cell || $i != $art_adult_first_cell || $i != $art_adult_second_cell || $i != $art_adult_other_cell || $i != $paed_first_cell || $i != $paed_second_cell || $i != $paed_other_cell || $i != $pep_adult_cell || $i != $pep_child_cell) {
 									if ($arr[$i]['E'] != 0 || trim($arr[$i]['A']) != "") {
 										$regimen_code = $arr[$i]['A'];
 										$regimen_desc = $arr[$i]['B'];
-										$regimen_id = $this -> getMappedRegimen($regimen_code, $regimen_desc);
 										$total = $arr[$i]['E'];
+										
+										$regimen_id = $this -> getMappedRegimen($regimen_code, $regimen_desc);
+										
 										if ($regimen_id != null && $total != null) {
 											$maps_array[$regimen_counter]["id"] = "";
 											$maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
 											$maps_array[$regimen_counter]["total"] = $total;
 											$maps_array[$regimen_counter]["maps_id"] = "";
 										}
+										else if($regimen_id == null && $total != null){// If regimen is not found, check in non standard regimens
+											$regimen_id = $this -> getNonStandardRegimen($regimen_code, $regimen_desc);
+											
+											//If regimen exists, insert it in Non standard Maps Item table
+											if($regimen_id!=null){
+												$nonstandard_maps_array[$regimen_counter]["id"] = "";
+												$nonstandard_maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
+												$nonstandard_maps_array[$regimen_counter]["total"] = $total;
+												$nonstandard_maps_array[$regimen_counter]["maps_id"] = "";
+											}
+											else{//Is regimen still not found in non standard regimen, insert it into non standard regimen
+												//Get regimen category
+												
+												$category_id = Sync_category::getId($reg_category);
+												$cat_id = $category_id['id'];
+												$nonstandard_regimen = new Nonstandard_regimen();
+												$nonstandard_regimen ->regimen_code = $regimen_code;
+												$nonstandard_regimen ->regimen_desc = $regimen_desc;
+												$nonstandard_regimen ->category = $cat_id;
+												$nonstandard_regimen ->line = '';
+												$nonstandard_regimen ->type_Of_service = '';
+												$nonstandard_regimen ->active = 1;
+												$nonstandard_regimen ->n_map = '';
+												$nonstandard_regimen ->e_map = '';
+												
+												$nonstandard_regimen ->save();
+												$regimen_id = Nonstandard_regimen::getMaxId();
+												$regimen_id = $regimen_id['max_id'];
+												
+												//Insert into nonstandard maps item
+												$nonstandard_maps_array[$regimen_counter]["id"] = "";
+												$nonstandard_maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
+												$nonstandard_maps_array[$regimen_counter]["total"] = $total;
+												$nonstandard_maps_array[$regimen_counter]["maps_id"] = "";
+												
+											}
+											
+											
+										}
+										
+										
 										$regimen_counter++;
 									}
 								}
 							}
+							//die();
 							$main_array['ownMaps_item'] = $maps_array;
+							$main_array['ownNonStandardMaps_item'] = $nonstandard_maps_array;
 
 							$log_array[0]['id'] = "";
 							$log_array[0]['description'] = "prepared";
@@ -833,7 +914,7 @@ class Order extends MY_Controller {
 
 							$main_array = array($main_array);
 							$this -> prepare_order($type, $main_array);
-							$content = "Order was successfully saved";
+							$content = "Order was successfully saved. ";
 
 							$dir = "Export";
 
@@ -850,11 +931,11 @@ class Order extends MY_Controller {
 							}
 
 							//move the file
-							$file_location = $dir . "/" . $_FILES['file']['name'];
-							move_uploaded_file($_FILES['file']['tmp_name'], $file_location);
+							$file_location = $dir . "/" . $_FILES['file']['name'][$q];
+							move_uploaded_file($_FILES['file']['tmp_name'][$q], $file_location);
 							//send excel file to email
 							$content .= $this -> send_file($file_location);
-							$ret[] = $content . $_FILES["file"]["name"][$i];
+							$ret[] = $content . $_FILES["file"]["name"][$q];
 						}
 					}
 					//end of maps
@@ -1032,7 +1113,8 @@ class Order extends MY_Controller {
 			$this -> email -> clear(TRUE);
 			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
 		} else {
-			$error_message = $this -> email -> print_debugger();
+			$error_message='Cannot Connect to Mail Server';
+			//$error_message = $this -> email -> print_debugger();
 		}
 
 		echo $error_message;
@@ -1092,15 +1174,20 @@ class Order extends MY_Controller {
 		} else if ($type == "maps") {
 			$maps = array();
 			$temp_items = array();
+			$temp_nonstandard_items = array();
 			$temp_log = array();
 			$maps_log = array();
 			$maps_items = array();
+			$nonstandard_maps_items = array();
 			foreach ($responses as $response) {
 				foreach ($response as $index => $main) {
 					if ($index == "ownMaps_item") {
 						$temp_items['maps_item'] = $main;
 					} else if ($index == "ownMaps_log") {
 						$temp_log['maps_log'] = $main;
+					} else if ($index == "ownNonStandardMaps_item"){
+						$temp_nonstandard_items['nonstandard_maps_item'] = $main;
+						
 					} else {
 						$maps[$index] = $main;
 					}
@@ -1136,6 +1223,21 @@ class Order extends MY_Controller {
 				}
 			}
 			$this -> db -> insert_batch('maps_item', $maps_items);
+			
+			//Attach maps id to non standard maps item
+			foreach ($temp_nonstandard_items as $temp_nonstandard_item) {
+				foreach ($temp_nonstandard_item as $counter => $items) {
+					foreach ($items as $ind => $item) {
+						if ($ind == "maps_id") {
+							$nonstandard_maps_items[$counter]['maps_id'] = $maps_id;
+						} else {
+							$nonstandard_maps_items[$counter][$ind] = $item;
+						}
+					}
+				}
+			}
+			//var_dump($nonstandard_maps_items);die();
+			$this -> db -> insert_batch('nonstandard_maps_item', $nonstandard_maps_items);
 		}
 	}
 
@@ -1610,6 +1712,21 @@ class Order extends MY_Controller {
 			}
 		}
 		return null;
+	}
+
+	public function getNonStandardRegimen($regimen_code="",$regimen_desc = ""){
+		$sql = "SELECT r.id
+				    FROM nonstandard_regimen r
+				    WHERE(r.regimen_code='$regimen_code'
+				    AND r.regimen_desc='$regimen_desc')";
+					
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			return $results[0]['id'];
+		} else {
+			return null;
+		}
 	}
 
 	public function getActualCode($code, $type) {
