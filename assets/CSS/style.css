@@ -1643,7 +1643,7 @@ td {
 .nat_dashboard_rep label {
 	font-size:0.9em !important;
 }
-.nat_dashboard_rep .dataTables_info {
+.nat_dashboard_rep .dataTables_info, .center-content .dataTables_info {
 	width: 42%;
 	font-size: 0.7em;
 }

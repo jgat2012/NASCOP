@@ -1103,7 +1103,19 @@ class Dashboard_Management extends MY_Controller {
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
 							AND sc.name NOT LIKE '%delete%'";
-		//echo $sql_adult_kp;die();
+			//Non standard regimens
+			$sql_adult_kp_nr = "SELECT SUM( mi.total ) AS total_adult_kp
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen er ON er.id = mi.regimen_id
+							LEFT JOIN sync_category sc ON sc.id = er.category
+							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
+							AND em.maps_id IS NOT NULL 
+							AND sc.name LIKE  '%adult%'
+							AND sc.name NOT LIKE  '%pep%'
+							AND sc.name NOT LIKE '%delete%'";
 
 			$sql_paed_kp = "SELECT SUM( mi.total ) AS total_paed_kp
 							FROM maps_item mi
@@ -1116,25 +1128,63 @@ class Dashboard_Management extends MY_Controller {
 							AND em.maps_id IS NOT NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
 							AND sc.name NOT LIKE '%delete%'";
+			
+			//Non standard regimens pead
+			$sql_paed_kp_nr = "SELECT SUM( mi.total ) AS total_paed_kp
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen er ON er.id = mi.regimen_id
+							LEFT JOIN sync_category sc ON sc.id = er.category
+							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
+							AND em.maps_id IS NOT NULL 
+							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
+							AND sc.name NOT LIKE '%delete%'";
 
 			$query1 = $this -> db -> query($sql_adult_kp);
 			$query2 = $this -> db -> query($sql_paed_kp);
+			$query3 = $this -> db -> query($sql_adult_kp_nr);
+			$query4 = $this -> db -> query($sql_paed_kp_nr);
 
 			$result1 = $query1 -> result_array();
 			$result2 = $query2 -> result_array();
+			$result3 = $query3 -> result_array();
+			$result4 = $query4 -> result_array();
 
 			$tot_adult_kp = 0;
 			$tot_paed_kp = 0;
 			$total_kp = 0;
 			if (count($result1) > 0) {
 				$tot_adult_kp = (int)$result1[0]['total_adult_kp'];
+				// Check if non standard regimens exist
+				if (count($result3) > 0) {
+					$tot_adult_kp +=(int)$result3[0]['total_adult_kp'];
+				}
 			}
 			if (count($result2) > 0) {
 				$tot_paed_kp = (int)$result2[0]['total_paed_kp'];
+				// Check if non standard regimens exist
+				if (count($result4) > 0) {
+					$tot_paed_kp +=(int)$result4[0]['total_paed_kp'];
+				}
 			}
 			$total_kp = $tot_adult_kp + $tot_paed_kp;
 
 			//kemsa
+			$sql_adult_kem_nr = "SELECT SUM( mi.total ) AS total_adult_kemsa
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen sr ON sr.id = mi.regimen_id
+							LEFT JOIN sync_category sc ON sc.id = sr.category
+							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
+							AND em.maps_id IS NULL 
+							AND sc.name LIKE  '%adult%'
+							AND sc.name NOT LIKE  '%pep%'
+							AND sc.name NOT LIKE '%delete%'";
+			
 			$sql_adult_kem = "SELECT SUM( mi.total ) AS total_adult_kemsa
 							FROM maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
@@ -1147,6 +1197,19 @@ class Dashboard_Management extends MY_Controller {
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
 							AND sc.name NOT LIKE '%delete%'";
+							
+			$sql_paed_kem_nr = "SELECT SUM( mi.total ) AS total_paed_kemsa
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen sr ON sr.id = mi.regimen_id
+							LEFT JOIN sync_category sc ON sc.id = sr.category
+							WHERE m.period_begin =  '" . $current_period . "'
+							$and_check_maps
+							AND em.maps_id IS NULL 
+							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
+							AND sc.name NOT LIKE '%delete%'
+							";
 
 			$sql_paed_kem = "SELECT SUM( mi.total ) AS total_paed_kemsa
 							FROM maps_item mi
@@ -1163,9 +1226,13 @@ class Dashboard_Management extends MY_Controller {
 
 			$query1 = $this -> db -> query($sql_adult_kem);
 			$query2 = $this -> db -> query($sql_paed_kem);
+			$query3 = $this -> db -> query($sql_adult_kem_nr);
+			$query4 = $this -> db -> query($sql_paed_kem_nr);
 
 			$result1 = $query1 -> result_array();
 			$result2 = $query2 -> result_array();
+			$result3 = $query3 -> result_array();
+			$result4 = $query4 -> result_array();
 
 			$tot_adult_kemsa = 0;
 			$tot_paed_kemsa = 0;
@@ -1173,9 +1240,18 @@ class Dashboard_Management extends MY_Controller {
 
 			if (count($result1) > 0) {
 				$tot_adult_kemsa = (int)$result1[0]['total_adult_kemsa'];
+				// Check if non standard regimens exist
+				if (count($result3) > 0) {
+					$tot_adult_kemsa +=(int)$result3[0]['total_adult_kemsa'];
+				}						
+					
 			}
 			if (count($result2) > 0) {
 				$tot_paed_kemsa = (int)$result2[0]['total_paed_kemsa'];
+				// Check if non standard regimens exist
+				if (count($result4) > 0) {
+					$tot_paed_kemsa +=(int)$result4[0]['total_paed_kemsa'];
+				}
 			}
 			$total_kemsa = $tot_adult_kemsa + $tot_paed_kemsa;
 
@@ -1191,7 +1267,7 @@ class Dashboard_Management extends MY_Controller {
 			$this -> table -> add_row('', '<h5>TOTAL</h5>', '<b><center>' . number_format($total_kemsa) . '</center></b>', '<b><center>' . number_format($total_kp) . '</center></b>', '<b><center>' . number_format($grand_total) . '</center></b>');
 			$table_display = $this -> table -> generate();
 			echo $table_display;
-		} elseif ($type == "ADULT_ART") {
+		} elseif ($type == "ADULT_ART") {//Current Adult Patients on ART
 			//Bar Chart
 			$data = array();
 			$list = array();
@@ -1237,7 +1313,7 @@ class Dashboard_Management extends MY_Controller {
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
 								GROUP BY mr.code";
-
+								
 					$join2_kp = "SELECT mr.name as regimen_desc,test.total
                                 FROM escm_regimen mr
                                 LEFT JOIN 
@@ -2410,6 +2486,26 @@ class Dashboard_Management extends MY_Controller {
 		$data['name'] = 'Paediatric Patients';
 		$data['resultArray'] = $resultArray;
 		$this -> load -> view('dashboard/chart_report_bar_v', $data);
+	}
+	
+	public function two_pager(){
+		
+		$files = Two_pager::getAllHydrated();
+		$list = '<table class="table table-bordered table-striped tbl_nat_dashboard" id="TWO_PAGER">
+	    			<thead>
+	    				<tr><th>No</th><th> Period</th><th>Action</th></tr>
+	    			</thead>
+	    			<tbody>';
+	    
+	    				$x=1;
+	    				foreach ($files as $value) {
+							$list.='<tr><td>'.$x.'</td><td>Stock Situation '.$value['period'].'</td><td><a href="'.base_url().$value['link'].'">Download</a></td></tr>';
+							$x++;
+						}
+	    $list.='				
+	    			</tbody>
+			    </table>';
+		echo $list;
 	}
 
 	public function base_params($data) {

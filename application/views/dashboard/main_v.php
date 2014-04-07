@@ -49,6 +49,9 @@
 	 	else if(type=="eid_menu"){//Eid Analysis
 	 		  eid_analysis();
 	 	}
+	 	else if(type=="two_p_menu"){//Two pager
+	 		  two_pager();
+	 	}
 		
 		//When one clicks tab, keep it in session
 		$(".main_menu").live("click",function(){
@@ -90,6 +93,9 @@
 				 	else if(id=="eid_menu"){//Eid Analysis
 	 		              eid_analysis();
 	 	            }
+	 	            else if(id=="two_p_menu"){//Two pager
+	 	            	 two_pager();
+	 	            }
 				}
 			});
 			
@@ -117,10 +123,6 @@
 				"bServerSide" : false,
 		 });
 		 
-       
-       
-       
-	
 		 
 		 //Update breadcrumbs
 		 var active_sub=$(".main_menu.active").find("a").text();
@@ -579,6 +581,23 @@
         $("#chart_area_eid_comparison").load(chart_area_eid_comaprison_link);
         $("#eid_summary").load(chart_area_eid_summary_link);
 	}
+	function two_pager(){
+		$("#two_pager_area").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+	  	var two_pager_link = "<?php echo base_url().'dashboard_management/two_pager';?>";
+        $("#two_pager_area").load(two_pager_link,function(){
+        	$("#TWO_PAGER").dataTable({
+		 		 "bJQueryUI" : true,
+				"sPaginationType" : "full_numbers",
+				"sDom" : '<"H"Tfr>t<"F"ip>',
+				"oTableTools" : {
+					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+					"aButtons" : ["copy", "print", "xls", "pdf"]
+				},
+				"bProcessing" : true,
+				"bServerSide" : false,
+			});
+        });
+	}
 </script>
 
 <div class="tabbable national_dashboard_content" style="margin-top:1%"> <!-- Only required for left/right tabs -->
@@ -588,6 +607,7 @@
     <li id="ca_menu" class="main_menu" ><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
     <li id="eid_menu" class="main_menu" ><a href="#tab8" data-toggle="tab">EID Analysis</a></li>
     <li id="up_menu" class="main_menu" ><a href="#tab7" data-toggle="tab">Upload</a></li>
+    <li id="two_p_menu" class="main_menu" ><a href="#tab6" data-toggle="tab">2 Pager Download</a></li>
     
     <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
     <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
@@ -1075,16 +1095,15 @@
     	
     	
     </div>
-    <!-- Reporting Analysis -->
     
+    <!-- 2  Pager Download -->
     <div class="tab-pane nat_dashboard_rep" id="tab6">
-    	<div class="two_block" id="">
-    		<h3 class="dashboard_title">F-Maps</h3>
-    	</div>
-    	
-    	<div class="two_block" id="">
-    		<h3 class="dashboard_title">Cdrr</h3>
-    	</div>
+    	<div class="container" style="width: 50%">
+  			<div class="row-fluid" style="height:50%;">
+  					<h3 class="dashboard_title">Kenya Anti-Retroviral medicines (ARVs) Stock Situation</h3>
+		    		<div id="two_pager_area"></div>
+  			</div>
+		</div>  	
     </div>
     
     <!-- Facility Analysis -->

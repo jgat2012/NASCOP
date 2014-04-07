@@ -1883,6 +1883,80 @@ class Order extends MY_Controller {
 		$data['page_title'] = 'Pipeline Upload';
 		$this -> base_params($data);
 	}
+	public function twopager_upload($type="",$delete="") {
+		if($type==""){
+			$data['title'] = 'webADT | 2 Pager Upload';
+			$data['banner_text'] = '2 Pager Upload';
+			$data['content_view'] = 'twopager_v';
+			$data['page_title'] = '2 Pager Upload';
+			$data['files']  = Two_pager::getAllHydrated();
+			$this -> base_params($data);
+		}
+		else if($type=="upload"){
+			$period = $this->input->post("period_selected");
+			if ($_FILES['cms_file']['tmp_name']) {
+				//Check if period was selected
+				if($period=='0'){
+					$this -> session -> set_flashdata('order_message', "Please select a period !");
+					$this -> session -> set_flashdata('twopager_upload', 1);
+					redirect("order/twopager_upload");
+				}
+				else{
+					$dir = "uploads/2pager";
+					/*Delete all files in export folder*/
+					if (is_dir($dir)) {
+						
+					} else {
+						mkdir($dir);
+					}
+
+					//move the file
+					$file_name = $_FILES['cms_file']['name'];
+					$ext = pathinfo($file_name, PATHINFO_EXTENSION);
+					$name = $period.'.'.$ext;
+					$file_location = $dir . "/" . $name;
+					try{
+						move_uploaded_file($_FILES['cms_file']['tmp_name'], $file_location);
+						$this -> session -> set_flashdata('order_message', "File successfully uploaded ! ");
+						//Save location to the database
+						$check_if_exist = count(Two_pager::checkIfExist($period));
+						if($check_if_exist==0){
+							$data =array(
+										"period" =>$period,
+										"link" =>$file_location,
+										"uploaded_by" =>$user = $this -> session -> userdata('user_id')
+										);
+							$this -> db -> insert("two_pager",$data);
+						}
+						else{//file already exists, nothing changes in the db
+							$this -> session -> set_flashdata('order_message', "File successfully updated ! ");
+						}
+						
+					}catch(exception $e){
+						$this -> session -> set_flashdata('order_message', "An error occured while uploading the file ! ".$e);
+						printf($e);die();
+					}
+					redirect("order/twopager_upload");
+					
+					
+				}
+			} else {
+				$this -> session -> set_flashdata('order_message', "No file found !");
+				$this -> session -> set_flashdata('twopager_upload', 1);
+				redirect("order/twopager_upload");
+			}
+		}
+		else if($type=="delete"){
+			$id = $delete;
+			$this -> db -> where('id', $id);
+			$this -> db -> delete('two_pager');
+			$this -> session -> set_flashdata('order_message', "File succesfully deleted !");
+			$this -> session -> set_flashdata('twopager_upload', 1);
+			redirect("order/twopager_upload");
+		}
+		
+		
+	}
 
 	public function rationalize_cdrr($cdrr_id, $maps_id) {
 		$commodities = $this -> input -> post('commodity');

@@ -257,7 +257,8 @@ if(isset($reports)|| isset($report_title)){
 			    if($user_is_pharmacist){
 				?>
 				<li><a href="<?php echo base_url().'user_management/update_signature' ?>"><i class="icon-font"></i>Update Signature</a></li>
-				<li><a href="<?php echo base_url().'order/pipeline_upload' ?>"><i class="icon-upload"></i>Pipeline Upload</a></li>			
+				<li><a href="<?php echo base_url().'order/pipeline_upload' ?>"><i class="icon-upload"></i>Pipeline Upload</a></li>
+				<li><a href="<?php echo base_url().'order/twopager_upload' ?>"><i class="icon-upload"></i>2 Pager Upload</a></li>			
 			    <li><a href="<?php echo base_url().'patient_management/addpatient_show' ?>"><i class="icon-eye-open icon-black"></i>View Facilities</a></li>			 
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>User Manual</a></li>	
 				
@@ -268,7 +269,8 @@ if(isset($reports)|| isset($report_title)){
 				if($user_is_facility_administrator){
 				?>
 				<li><a href="<?php echo base_url().'user_management/update_signature' ?>"><i class="icon-font"></i>Update Signature</a></li>
-				<li><a href="<?php echo base_url().'order/pipeline_upload' ?>"><i class="icon-upload"></i>Pipeline Upload</a></li>						       
+				<li><a href="<?php echo base_url().'order/pipeline_upload' ?>"><i class="icon-upload"></i>Pipeline Upload</a></li>
+				<li><a href="<?php echo base_url().'order/twopager_upload' ?>"><i class="icon-upload"></i>2 Pager Upload</a></li>							       
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>User Manual</a></li>	
 				
 				<?php
