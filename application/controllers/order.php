@@ -463,9 +463,9 @@ class Order extends MY_Controller {
 						$facility_id = $facilities['id'];
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
-							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$q];
+							$ret[] = "Your facility Code in '" . $_FILES["file"]["name"][$q]. "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
 						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
-							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month")).". Kindly check the period fields !-" . $_FILES["file"]["name"][$q];
+							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month")).". Kindly check the period fields !-" . $_FILES["file"]["name"][$q].' The format should be dd/mm/yyyy';
 						} else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
@@ -548,40 +548,40 @@ class Order extends MY_Controller {
 										if ($commodity != null) {
 											$cdrr_array[$commodity_counter]['id'] = "";
 											if ($code == "D-CDRR") {
-												$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
-												$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
-												$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@trim($arr[$i]['E']) * @$pack_size);
-												$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['E']);
-												$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['F']);
-												$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['G']);
-												$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['H']);
-												$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['K']);
+												$cdrr_array[$commodity_counter]['balance'] = str_replace(',', '', trim($arr[$i]['C']));
+												$cdrr_array[$commodity_counter]['received'] = str_replace(',', '', trim($arr[$i]['D']));
+												$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
+												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(',', '', trim($arr[$i]['E']));
+												$cdrr_array[$commodity_counter]['losses'] = str_replace(',', '', trim($arr[$i]['F']));
+												$cdrr_array[$commodity_counter]['adjustments'] =  str_replace(',', '', trim($arr[$i]['G']));
+												$cdrr_array[$commodity_counter]['count'] =  str_replace(',', '', trim($arr[$i]['H']));
+												$cdrr_array[$commodity_counter]['expiry_quant'] =  str_replace(',', '', trim($arr[$i]['K']));
 												$expiry_date = trim($arr[$i]['L']);
 												if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
 													$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
 												} else {
 													$cdrr_array[$commodity_counter]['expiry_date'] = "";
 												}
-												$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['M']);
+												$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(',', '', trim($arr[$i]['M']));
 												$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['N']);
-												$cdrr_array[$commodity_counter]['aggr_consumed'] = trim($arr[$i]['I']);
-												$cdrr_array[$commodity_counter]['aggr_on_hand'] = trim($arr[$i]['J']);
+												$cdrr_array[$commodity_counter]['aggr_consumed'] = str_replace(",", "", $arr[$i]['I']);
+												$cdrr_array[$commodity_counter]['aggr_on_hand'] = str_replace(",", "", $arr[$i]['J']);
 											} else if ($code == "F-CDRR_packs") {
-												$cdrr_array[$commodity_counter]['balance'] = trim($arr[$i]['C']);
-												$cdrr_array[$commodity_counter]['received'] = trim($arr[$i]['D']);
-												$cdrr_array[$commodity_counter]['dispensed_units'] = trim($arr[$i]['E']);
-												$cdrr_array[$commodity_counter]['dispensed_packs'] = trim($arr[$i]['F']);
-												$cdrr_array[$commodity_counter]['losses'] = trim($arr[$i]['G']);
-												$cdrr_array[$commodity_counter]['adjustments'] = trim($arr[$i]['H']);
-												$cdrr_array[$commodity_counter]['count'] = trim($arr[$i]['I']);
-												$cdrr_array[$commodity_counter]['expiry_quant'] = trim($arr[$i]['J']);
+												$cdrr_array[$commodity_counter]['balance'] = str_replace(",", "", $arr[$i]['C']); 
+												$cdrr_array[$commodity_counter]['received'] = str_replace(",", "", $arr[$i]['D']);
+												$cdrr_array[$commodity_counter]['dispensed_units'] = str_replace(",", "", $arr[$i]['E']);
+												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(",", "", $arr[$i]['F']);
+												$cdrr_array[$commodity_counter]['losses'] = str_replace(",", "", $arr[$i]['G']);
+												$cdrr_array[$commodity_counter]['adjustments'] = str_replace(",", "", $arr[$i]['H']);
+												$cdrr_array[$commodity_counter]['count'] = str_replace(",", "", $arr[$i]['I']);
+												$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(",", "", $arr[$i]['J']);
 												$expiry_date = trim($arr[$i]['K']);
 												if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
 													$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
 												} else {
 													$cdrr_array[$commodity_counter]['expiry_date'] = "";
 												}
-												$cdrr_array[$commodity_counter]['out_of_stock'] = trim($arr[$i]['L']);
+												$cdrr_array[$commodity_counter]['out_of_stock'] =str_replace(",", "", $arr[$i]['L']);
 												$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['M']);
 												$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
 												$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
@@ -655,7 +655,6 @@ class Order extends MY_Controller {
 						$second_row = 5;
 						$province = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
 						$district = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
-
 						$third_row = 7;
 						$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 						$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
@@ -665,11 +664,11 @@ class Order extends MY_Controller {
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
 
 						if ($facilities == "") {
-							$ret[] = "Empty Facility Id-" . $_FILES["file"]["name"][$q];
+							$ret[] = "Your facility Code  in '" . $_FILES["file"]["name"][$q]. "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
 						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
-							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month"))." . Kindly check the period fields !-" . $_FILES["file"]["name"][$q];
+							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month"))." . Kindly check the period fields !-" . $_FILES["file"]["name"][$q].' The format should be dd/mm/yyyy';
 						} else if ($file_type == false) {
-							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
+							$ret[] = "Incorrect File Selected - " . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
 							$ret[] = "A MAPS report already exists for this month !-" . $_FILES["file"]["name"][$i];
 						} else {
@@ -704,36 +703,36 @@ class Order extends MY_Controller {
 							}
 
 							$services = implode(",", $service);
-
-							$art_adult = $arr[14]["D"];
-							$art_child = $arr[14]["F"];
-							$new_male = $arr[18]["D"];
-							$new_female = $arr[18]["F"];
-							$revisit_male = $arr[18]["E"];
-							$revisit_female = $arr[18]["G"];
+							$art_adult_cell =(int)substr($this -> getCellByValue("Total Number of Patients on ART ONLY", $file_name), 1) ;
+							$art_adult = str_replace(",", "", $arr[$art_adult_cell]["D"]);
+							$art_child = str_replace(",", "", $arr[$art_adult_cell]["F"]);
+							$new_male = str_replace(",", "", $arr[$art_adult_cell+4]["D"]);
+							$new_female = str_replace(",", "", $arr[$art_adult_cell+4]["F"]);
+							$revisit_male = str_replace(",", "", $arr[$art_adult_cell+4]["E"]);
+							$revisit_female = str_replace(",", "", $arr[$art_adult_cell+4]["G"]);
 							//Get cells for PMTCT
 							$pmtcts_cell =(int)substr($this -> getCellByValue("Totals for PMTCT Clients", $file_name), 1) ;
-							$new_pmtct = $arr[$pmtcts_cell+1]["H"];
-							$revisit_pmtct = $arr[$pmtcts_cell+2]["H"];
+							$new_pmtct = str_replace(",", "", $arr[$pmtcts_cell+1]["H"]);
+							$revisit_pmtct = str_replace(",", "", $arr[$pmtcts_cell+2]["H"]);
 							//Get cells for Prophylaxis
 							$prophylaxis_cell =(int)substr($this -> getCellByValue("Total No. of Infants receiving ARV", $file_name), 1) ;
-							$total_infant = $arr[$prophylaxis_cell+1]["H"];
+							$total_infant = str_replace(",", "", $arr[$prophylaxis_cell+1]["H"]);
 							//Cells for pep
 							$peps_cell =(int)substr($this -> getCellByValue("Totals for PEP Clients ONLY", $file_name), 1) ;
-							$pep_adult = $arr[$peps_cell+1]["H"];
-							$pep_child = $arr[$peps_cell+2]["H"];
+							$pep_adult = str_replace(",", "", $arr[$peps_cell+1]["H"]);
+							$pep_child = str_replace(",", "", $arr[$peps_cell+2]["H"]);
 							//Cotrimo Cells
 							$cotrimos_cell =(int)substr($this -> getCellByValue("Totals for Patients / Clients (ART plus Non-ART)", $file_name), 1) ;
-							$total_adult = $arr[$cotrimos_cell]["E"];
-							$total_child = $arr[$cotrimos_cell]["G"];
+							$total_adult = str_replace(",", "", $arr[$cotrimos_cell]["E"]);
+							$total_child = str_replace(",", "", $arr[$cotrimos_cell]["G"]);
 							//Diflucan Cells
 							$diflucans_cell =(int)substr($this -> getCellByValue("Totals for Patients / Clients on Diflucan", $file_name), 1) ;
-							$diflucan_adult = $arr[$diflucans_cell]["E"];
-							$diflucan_child = $arr[$diflucans_cell]["G"];
-							$new_cm = $arr[$diflucans_cell+6]["D"];
-							$revisit_cm = $arr[$diflucans_cell+6]["E"];
-							$new_oc = $arr[$diflucans_cell+6]["F"];
-							$revisit_oc = $arr[$diflucans_cell+6]["G"];
+							$diflucan_adult = str_replace(",", "", $arr[$diflucans_cell]["E"]);
+							$diflucan_child = str_replace(",", "", $arr[$diflucans_cell]["G"]);
+							$new_cm = str_replace(",", "", $arr[$diflucans_cell+6]["D"]);
+							$revisit_cm = str_replace(",", "", $arr[$diflucans_cell+6]["E"]);
+							$new_oc = str_replace(",", "", $arr[$diflucans_cell+6]["F"]);
+							$revisit_oc = str_replace(",", "", $arr[$diflucans_cell+6]["G"]);
 
 							//Save Import Values
 
@@ -831,11 +830,12 @@ class Order extends MY_Controller {
 										$total = $arr[$i]['E'];
 										
 										$regimen_id = $this -> getMappedRegimen($regimen_code, $regimen_desc);
+										//echo $regimen_id.' - '.$regimen_code.' - '.$regimen_desc.'<br>';
 										
 										if ($regimen_id != null && $total != null) {
 											$maps_array[$regimen_counter]["id"] = "";
 											$maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
-											$maps_array[$regimen_counter]["total"] = $total;
+											$maps_array[$regimen_counter]["total"] = str_replace(",", "", $total);
 											$maps_array[$regimen_counter]["maps_id"] = "";
 										}
 										else if($regimen_id == null && $total != null){// If regimen is not found, check in non standard regimens
@@ -845,7 +845,7 @@ class Order extends MY_Controller {
 											if($regimen_id!=null){
 												$nonstandard_maps_array[$regimen_counter]["id"] = "";
 												$nonstandard_maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
-												$nonstandard_maps_array[$regimen_counter]["total"] = $total;
+												$nonstandard_maps_array[$regimen_counter]["total"] = str_replace(",", "", $total);
 												$nonstandard_maps_array[$regimen_counter]["maps_id"] = "";
 											}
 											else{//Is regimen still not found in non standard regimen, insert it into non standard regimen
@@ -870,7 +870,7 @@ class Order extends MY_Controller {
 												//Insert into nonstandard maps item
 												$nonstandard_maps_array[$regimen_counter]["id"] = "";
 												$nonstandard_maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
-												$nonstandard_maps_array[$regimen_counter]["total"] = $total;
+												$nonstandard_maps_array[$regimen_counter]["total"] = str_replace(",", "", $total);
 												$nonstandard_maps_array[$regimen_counter]["maps_id"] = "";
 												
 											}
@@ -1701,10 +1701,10 @@ class Order extends MY_Controller {
 		if ($regimen_code != "") {
 			$sql = "SELECT r.n_map
 				    FROM regimen r
-				    WHERE(r.regimen_code='$regimen_code'
-				    OR r.regimen_desc='$regimen_desc')";
+				    WHERE(r.regimen_code='$regimen_code')";
 			$query = $this -> db -> query($sql);
 			$results = $query -> result_array();
+			
 			if ($results) {
 				return $results[0]['n_map'];
 			} else {

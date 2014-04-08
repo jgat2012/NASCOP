@@ -672,11 +672,13 @@
 							<form id='modal_action' class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php echo base_url()."order/import_order"?>">	
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-											×
+											
 										</button>
 										<h3 id="myModalLabel">Upload Order(<b><span id="modal_header"></span></b>)</h3>
 									</div>
 									<div class="modal-body">
+										<span class="alert-info">Kindly make sure that the file your are uploading is in 1997-2003 excel format(e.g: example.xls)</span>
+										<br>
 										<div class="control-group">
 										  <label class="control-label" for="inputIcon">Upload File <i class="icon-file"></i></label>
 										  <div class="controls">

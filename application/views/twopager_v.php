@@ -81,7 +81,7 @@
 					</select>
 				</p>
 				
-				<input type="file" name="cms_file" id="cms_file" required="" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+				<input type="file" name="cms_file" id="cms_file" required="" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword" />
 				<div class="control-group">
 					<div class="controls">
 						<button type="submit" class="btn btn-primary">

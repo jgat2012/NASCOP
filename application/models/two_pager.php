@@ -11,7 +11,7 @@ class Two_pager extends Doctrine_Record {
 	}
 
 	public static function getAllHydrated() {
-		$query = Doctrine_Query::create() -> select("*") -> from("Two_pager")->orderBy('period asc');
+		$query = Doctrine_Query::create() -> select("id,link,period") -> from("Two_pager")->orderBy('period desc');
 		$menus = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $menus;
 	}
