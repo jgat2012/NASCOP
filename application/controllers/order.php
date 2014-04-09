@@ -648,6 +648,16 @@ class Order extends MY_Controller {
 						}
 
 					} else if ($code == "D-MAPS" || $code == "F-MAPS") {
+						/*
+						$content = "some text here";
+						$link = $_SERVER['REMOTE_ADDR'] . "/NASCOP/uploads/error.txt";
+						echo $link;
+						$fp = fopen($link,"wb");
+						fwrite($fp,$content);
+						fclose($fp);
+						
+						die();
+						 * */
 						
 						$first_row = 4;
 						$facility_name = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
