@@ -101,7 +101,9 @@ $this -> load -> view('sections/head');
     ?>
  <div id="bottom_ribbon">
  	<div id="footer">
- 		<?php $this -> load -> view('footer_v'); ?>
+ 		<div id="footer_text">
+		  Government of Kenya &copy; <?php echo date('Y');?>.All Rights Reserved
+        </div>
  	</div>
  </div> 
 </body>

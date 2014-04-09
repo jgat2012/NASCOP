@@ -1,0 +1,63 @@
+2014-04-09 03:52:44 pm(D-MAPS)
+--------------------------------
+A MAPS report already exists for this month !-
+Order was successfully saved. Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+Order was successfully saved. Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+A MAPS report already exists for this month !-
+
+2014-04-09 03:52:21 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Kendu Bay-D-CDRR for Central Sites and District Stores..xls
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-Mwingi DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:50:24 pm(D-MAPS)
+--------------------------------
+You can only report for March-2014 . Kindly check the period fields !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+
+2014-04-09 03:50:09 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:49:05 pm(D-CDRR)
+--------------------------------
+
+
+2014-04-09 03:47:37 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-MAPS for Central Sites andDistrict Stores-Updated.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Thika DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-09 03:46:04 pm(D-MAPS)
+--------------------------------
+A MAPS report already exists for this month !-
+You can only report for March-2014 . Kindly check the period fields !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+You can only report for March-2014 . Kindly check the period fields !-Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+A MAPS report already exists for this month !-
+
+2014-04-09 03:41:01 pm(D-MAPS)
+--------------------------------
+You can only report for March-2014 . Kindly check the period fields !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+You can only report for March-2014 . Kindly check the period fields !-Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+
+2014-04-09 03:32:49 pm(D-CDRR)
+--------------------------------
+You can only report for March-2014. Kindly check the period fields !-Kendu Bay-D-CDRR for Central Sites and District Stores..xls The format should be dd/mm/yyyy
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:03:08 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-CDRR for Central Sites and District Stores..xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+Your facility Code in 'Mwingi DH-D-CDRR for Central Sites and District Stores.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 02:55:48 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-CDRR for Central Sites and District Stores..xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Mwingi DH-D-CDRR for Central Sites and District Stores.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
