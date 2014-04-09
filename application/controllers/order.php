@@ -109,7 +109,6 @@ class Order extends MY_Controller {
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
-			        AND ci.resupply !='0'
 			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')
 			        $and";
 		$query = $this -> db -> query($sql);
@@ -543,7 +542,7 @@ class Order extends MY_Controller {
 
 							for ($i = $sixth_row; $sixth_row, $i <= 89; $i++) {
 								if ($i != 34 || $i != 57) {
-									if (trim($arr[$i][$resupply]) != 0) {
+									if (trim($arr[$i][$resupply]) >= 0) {
 										$drug_name = trim($arr[$i]['A']);
 										$pack_size = trim($arr[$i]['B']);
 										$commodity = $this -> getMappedDrug($drug_name, $pack_size);

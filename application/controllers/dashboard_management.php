@@ -1684,7 +1684,7 @@ class Dashboard_Management extends MY_Controller {
 
 	public function reportSummary($type = "", $period = '') {
 
-		if ($type == 'table') {//Reporting site summary
+		if ($type == 'table') {//Reporting Ordering Sites Rate Summary
 			//echo $period;die();
 			//Total Number of ARV Sites
 			$sql_kemsa = "SELECT COUNT(f.code) as total FROM sync_facility f";
@@ -1711,6 +1711,7 @@ class Dashboard_Management extends MY_Controller {
 			$tot_adtsites = $results[0]['total'];
 
 			//Sites reported by 10th
+			//echo $period;die();
 			if ($period != "") {
 				$tenth = date('Y-m-10', strtotime($period . "+1 month"));
 				$first = date('Y-m-01', strtotime($period . "+1 month"));
@@ -1723,6 +1724,7 @@ class Dashboard_Management extends MY_Controller {
 			}
 
 			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
+							INNER JOIN maps m ON m.facility_id=c.facility_id
 							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "'";
 			//INNER JOIN maps m ON m.period_begin=c.period_begin
 
@@ -1737,6 +1739,7 @@ class Dashboard_Management extends MY_Controller {
 
 			//Sites that have reported this month
 			$sql_report = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
+							INNER JOIN maps m ON m.facility_id=c.facility_id
 							WHERE c.created BETWEEN '" . $first . "' AND  '" . $last_day . "'";
 			//INNER JOIN maps m ON m.period_begin=c.period_begin
 			$query = $this -> db -> query($sql_report);

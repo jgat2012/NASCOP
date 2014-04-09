@@ -1,0 +1,63 @@
+2014-04-09 04:26:07 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Kendu Bay-D-CDRR for Central Sites and District Stores..xls
+Order was successfully saved. Meru DH-D-CDRR for Central Sites and District Stores.xls
+Your facility Code in 'Mwingi DH-D-CDRR for Central Sites and District Stores.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-09 04:23:54 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-MAPS for Central Sites andDistrict Stores-Updated.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-09 03:24:13 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. Thika DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+
+2014-04-09 03:23:24 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:11:08 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:10:55 pm(D-MAPS)
+--------------------------------
+A MAPS report already exists for this month !-
+
+2014-04-09 03:10:42 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. Thika DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+
+2014-04-09 02:43:16 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+
+2014-04-09 02:42:45 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Meru DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 02:33:30 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 02:20:22 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Meru DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 02:20:05 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Kendu Bay-D-CDRR for Central Sites and District Stores..xls
+
+2014-04-09 02:18:43 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-CDRR for Central Sites and District Stores..xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-09 02:17:26 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+
+2014-04-09 02:15:53 pm(D-MAPS)
+--------------------------------
+You can only report for March-2014 . Kindly check the period fields !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+

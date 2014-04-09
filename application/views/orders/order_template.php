@@ -94,10 +94,12 @@
 						<th class="number" rowspan="3">Unit Pack Size</th>
 						<th class="number">Beginning Balance</th>
 						<th class="number">Quantity <br/>Received in this period</th>
+						<th class="number">Total Qty ISSUED <br>to ARV dispensing sites <br>(Satellite sites plus Central site <br>dispensing point(s) where relevant)</th>
 						<th class="number">End of Month Physical Count</th>
 						<th class="number">Reported Aggregated <br/>Quantity CONSUMED <br/>in the reporting period<br/> (Satellite sites plus <br/>Central site dispensing point where relevant)</th>
-						<th class="number">Average Monthly Consumption</th>
-						<th class="number">Average Monthly Issues</th>
+						<th class="number">Reported Aggregated <br/>Physical Stock on Hand <br/>at end of reporting period <br/>(Satellite sites plus <br/>Central site dispensing point where relevant)</th>
+						<!--<th class="number">Average Monthly Consumption</th>-->
+						<!--<th class="number">Average Monthly Issues</th> -->
 						<th class="number">Quantity required for RESUPPLY</th>
 						<th class="number">Calculated Quantity</th>
 						<th class="number">Rationalized Quantity</th>
@@ -109,6 +111,8 @@
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
+						<!-- <th>In Packs</th> -->
+						<!-- <th>In Packs</th> -->
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
@@ -116,10 +120,12 @@
 					<tr>
 						<th>A</th>
 						<th>B</th>
+						<th>C</th>
 						<th>F</th>
 						<th>G</th>
-						<th></th>
-						<th></th>
+						<th>H</th>
+						<!-- <th></th> -->
+						<!-- <th></th> -->
 						<th>J</th>
 						<th>K</th>
 						<th>L</th>
@@ -134,8 +140,8 @@
 						<th class="number">Quantity <br/>Received in this period</th>
 						<th class="number">Total Quantity Dispensed <br/>this period</th>
 						<th class="number">End of Month Physical Count</th>
-						<th class="number">Average Monthly Consumption</th>
-						<th class="number">Average Monthly Issues</th>
+						<!-- <th class="number">Average Monthly Consumption</th> -->
+						<!-- <th class="number">Average Monthly Issues</th> -->
 						<th class="number">Quantity required for RESUPPLY</th>
 						<th class="number">Calculated Quantity</th>
 						<th class="number">Rationalized Quantity</th>
@@ -145,8 +151,8 @@
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
-						<th>In Packs</th>
-						<th>In Packs</th>
+						<!-- <th>In Packs</th> -->
+						<!-- <th>In Packs</th> -->
 						<th>In Packs</th>
 						<th>In Packs</th>
 						<th>In Packs</th>
@@ -156,8 +162,8 @@
 						<th>B</th>
 						<th>C</th>
 						<th>F</th>
-						<th></th>
-						<th></th>
+						<!-- <th></th> -->
+						<!-- <th></th> -->
 						<th>J</th>
 						<th>K</th>
 						<th>L</th>
@@ -202,14 +208,18 @@
 						<td> <input name="opening_balance[]" id="opening_balance_<?php echo $commodity -> id;?>" type="text" class="opening_balance"/></td>
 						<td> <input name="quantity_received[]" id="received_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_received"/></td>
 						<?php if($order_code=="D-CDRR"){?>
+						<td> <input name="aggregated_issued_qty[]" id="aggregated_issued_qty_<?php echo $commodity -> id;?>" type="text" class="aggregated_issued_qty"/></td>
 						<td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
 						<td> <input tabindex="-1" name="aggregated_qty[]" id="aggregated_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_qty"/></td>
+						<td> <input tabindex="-1" name="aggregated_physical_qty[]" id="aggregated_physical_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_physical_qty"/></td>
 						<?php }else{?>
 							<td> <input tabindex="-1" name="quantity_dispensed_packs[]" id="dispensed_in_period_packs_<?php echo $commodity->id;?>" type="text" class="quantity_dispensed_packs"/></td>	
 						    <td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
 						<?php } ?>	
+						<!-- 
 						<td> <input tabindex="-1" name="avg_consumption[]" id="avg_consumption_<?php echo $commodity->id;?>" type="text" class="avg_consumption"/></td>
 						<td> <input tabindex="-1" name="avg_issues[]" id="avg_issues_<?php echo $commodity->id;?>" type="text" class="avg_issues"/></td>
+						-->
 						<td> 
 							<input tabindex="-1" name="new_resupply[]" id="new_resupply_<?php echo $commodity -> id;?>" type="text" class="resupply"/>
 						</td>
@@ -383,13 +393,15 @@
 		  $("#received_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['received']; ?>");
 		  $("#physical_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['count']; ?>");
 		  <?php if($cdrr['code']=="D-CDRR"){?>
+		  	$("#aggregated_issued_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>");
+		   $("#aggregated_physical_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_on_hand']; ?>");
 		   $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");	
 		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $resupply; ?>");
 		  <?php }else{?>
 		  $("#dispensed_in_period_packs_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>");
 		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $resupply; ?>");
 		  <?php }?>
-		  $("#avg_consumption_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['dispensed_packs']/$amc); ?>");
+		  $("#avg_consumption_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['aggr_consumed']/$amc); ?>");
 		  $("#avg_issues_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['received']/$amc); ?>");
 		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		  <?php if( $cdrr['old_resupply']==''){?>
