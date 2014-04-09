@@ -644,7 +644,7 @@ class Order extends MY_Controller {
 							$file_location = $dir . "/" . $_FILES['file']['name'][$q];
 							move_uploaded_file($_FILES['file']['tmp_name'][$q], $file_location);
 							//send excel file to email
-							$content .= $this -> send_file($file_location);
+							//$content .= $this -> send_file($file_location);
 							$ret[] = $content . $_FILES["file"]["name"][$q];
 						}
 
@@ -681,7 +681,7 @@ class Order extends MY_Controller {
 						} else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected - " . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
-							$ret[] = "A MAPS report already exists for this month !-" . $_FILES["file"]["name"][$i];
+							$ret[] = "A MAPS report already exists for this month !-" . $_FILES["file"]["name"][$q];
 						} else {
 							$fourth_row = 9;
 							$sponsors = "";
@@ -945,7 +945,7 @@ class Order extends MY_Controller {
 							$file_location = $dir . "/" . $_FILES['file']['name'][$q];
 							move_uploaded_file($_FILES['file']['tmp_name'][$q], $file_location);
 							//send excel file to email
-							$content .= $this -> send_file($file_location);
+							//$content .= $this -> send_file($file_location);
 							$ret[] = $content . $_FILES["file"]["name"][$q];
 						}
 					}
@@ -2044,11 +2044,11 @@ class Order extends MY_Controller {
 				$drug_id = $result['drug_id'];
 				$code = trim($result['code']);
 				if ($code == "D-CDRR") {
-					$amc = ($result['dispensed_packs'] + $result['aggr_consumed']) - ($result['aggr_on_hand'] + $result['count']);
+					$amc = ($result['aggr_consumed']*3) - $result['count'];
 				} else if ($code == "F-CDRR_packs") {
-					$amc = $result['dispensed_packs'] - $result['count'];
+					$amc = ($result['dispensed_packs']*3) - $result['count'];
 				} else if ($code == "F-CDRR_units") {
-					$amc = $result['dispensed_units'] - $result['count'];
+					$amc = ($result['dispensed_units']*3) - $result['count'];
 				}
 				$resupply_data[$drug_id] = $amc;
 			}

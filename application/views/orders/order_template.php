@@ -208,7 +208,7 @@
 						<td> <input name="opening_balance[]" id="opening_balance_<?php echo $commodity -> id;?>" type="text" class="opening_balance"/></td>
 						<td> <input name="quantity_received[]" id="received_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_received"/></td>
 						<?php if($order_code=="D-CDRR"){?>
-						<td> <input name="aggregated_issued_qty[]" id="aggregated_issued_qty_<?php echo $commodity -> id;?>" type="text" class="aggregated_issued_qty"/></td>
+						<td> <input tabindex="-1" name="quantity_dispensed[]" id="dispensed_in_period_<?php echo $commodity -> id;?>" type="text" class="quantity_dispensed"/></td>	
 						<td> <input tabindex="-1" name="physical_in_period[]" id="physical_in_period_<?php echo $commodity->id;?>" type="text" class="physical_in_period"/></td>
 						<td> <input tabindex="-1" name="aggregated_qty[]" id="aggregated_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_qty"/></td>
 						<td> <input tabindex="-1" name="aggregated_physical_qty[]" id="aggregated_physical_qty_<?php echo $commodity->id;?>" type="text" class="aggregated_physical_qty"/></td>
@@ -393,13 +393,13 @@
 		  $("#received_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['received']; ?>");
 		  $("#physical_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['count']; ?>");
 		  <?php if($cdrr['code']=="D-CDRR"){?>
-		  	$("#aggregated_issued_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>");
-		   $("#aggregated_physical_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_on_hand']; ?>");
-		   $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");	
-		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $resupply; ?>");
+		  $("#dispensed_in_period_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>"); 	
+		  $("#aggregated_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_consumed']; ?>");
+		  $("#aggregated_physical_qty_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['aggr_on_hand']; ?>");	
+		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo (($cdrr['aggr_consumed']*3)-$cdrr['count']); ?>");
 		  <?php }else{?>
 		  $("#dispensed_in_period_packs_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['dispensed_packs']; ?>");
-		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $resupply; ?>");
+		  $("#calc_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo (($cdrr['dispensed_packs']*3)-$cdrr['count']); ?>");
 		  <?php }?>
 		  $("#avg_consumption_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['aggr_consumed']/$amc); ?>");
 		  $("#avg_issues_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['received']/$amc); ?>");
