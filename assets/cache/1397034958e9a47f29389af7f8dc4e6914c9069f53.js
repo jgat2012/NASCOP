@@ -16209,7 +16209,7 @@ $.extend( $.fn.dataTableExt.oPagination, {
 $(document).ready(function() {
 	setTimeout(function() {
 		$(".message,.alert").fadeOut("2000");
-	}, 6000);
+	}, 30000);
 	//Progress Bar
 	function progress(percent, $element) {
 		var progressBarWidth = percent * $element.width() / 100;

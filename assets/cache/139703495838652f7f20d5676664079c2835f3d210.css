@@ -1324,7 +1324,7 @@ auto}.fullest-content .two_block, .fullest-content
 .two_block{min-height:300px}.fullest-content
 .onehalf_block{width:65%}.national_dashboard_content .dataTables_wrapper, .nat_dashboard_rep select,.nat_dashboard_rep input,
 .nat_dashboard_rep
-label{font-size:0.9em !important}.nat_dashboard_rep
+label{font-size:0.9em !important}.nat_dashboard_rep .dataTables_info, .center-content
 .dataTables_info{width:42%;font-size:0.7em}.nat_dashboard_rep
 .dataTables_paginate{width:55%;font-size:0.7em}.nat_dashboard_rep table tr td:last-child, .nat_dashboard_rep table tr th:last-child{border-right:1px solid #aaa}.nat_dashboard_rep
 select{width:20%}.nat_dashboard_rep
