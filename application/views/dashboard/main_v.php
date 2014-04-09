@@ -644,6 +644,7 @@
   			      	<div class="dropdown" style="display:inline;">
 					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+					  	<li><a tabindex="-1" href='<?php echo base_url()."order/show_log"; ?>'>upload log</a></li>
 					    <li><a tabindex="-1" href='#' class="password">change password</a></li>
 					  </ul>
 					</div>

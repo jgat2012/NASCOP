@@ -92,8 +92,8 @@ class Pharmacist_Management extends MY_Controller {
 		 *Group by Pipeline and activity status
 		 */
 
-		$period = date('Y-m', strtotime($end_date . "- 1 month"));
-		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
+		$period = date('Y-m', strtotime($end_date));
+	    $start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
 		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
 
 		$dataArray = array();
@@ -108,22 +108,22 @@ class Pharmacist_Management extends MY_Controller {
 		$resultArraySize = count($lists);
 		foreach ($lists as $list) {
 			if ($list -> Status == 0) {
-				$status = "Open Lists";
+				$status = "Open MEMOs";
 				$open_total = $list -> total;
 			} else {
-				$status = "Closed Lists";
+				$status = "Closed MEMOs";
 				$closed_total = $list -> total;
 			}
 		}
-		array_push($columns, "Open Lists");
-		array_push($columns, "Closed Lists");
+		array_push($columns, "Open MEMOs");
+		array_push($columns, "Closed MEMOs");
 		$dataArray[] = (int)$open_total;
 		$dataArray[] = (int)$closed_total;
-		$series = array('name' => "Picking Lists", 'data' => $dataArray);
+		$series = array('name' => "MEMOs", 'data' => $dataArray);
 
 		$total_series[] = $series;
-		$chart_title = "Picking Lists";
-		$yaxis = "No. of Lists";
+		$chart_title = "MEMOs";
+		$yaxis = "No. of MEMOs";
 		$container = "chart_appointments";
 		$this -> loadChart($columns, $total_series, $chart_title, $yaxis, $container, $resultArraySize);
 	}

@@ -196,18 +196,18 @@ var chartLink;
                  	 var to_date=$("#period_end_date_2").val();
                  	 var enrollment_link="<?php echo base_url().'pharmacist_management/getFacilitiesUsing/';?>"+from_date+'/'+to_date;
                  	 $('#chart_area2').load(enrollment_link, function() {
-            $("#patient_listing").dataTable({
-		 		 "bJQueryUI" : true,
-				"sPaginationType" : "full_numbers",
-				"sDom" : '<"H"Tfr>t<"F"ip>',
-				"oTableTools" : {
-					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
-					"aButtons" : ["copy", "print", "xls", "pdf"]
-				},
-				"bProcessing" : true,
-				"bServerSide" : false,
-		 });
-       });
+				            $("#patient_listing").dataTable({
+						 		 "bJQueryUI" : true,
+								"sPaginationType" : "full_numbers",
+								"sDom" : '<"H"Tfr>t<"F"ip>',
+								"oTableTools" : {
+									"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+									"aButtons" : ["copy", "print", "xls", "pdf"]
+								},
+								"bProcessing" : true,
+								"bServerSide" : false,
+						    });
+                      });
                  }else if(button_id=="appointment_btn"){
                  	 var from_date=$("#period_start_date_3").val();
                  	 var to_date=$("#period_end_date_3").val();
@@ -218,18 +218,18 @@ var chartLink;
                  	 var to_date=$("#period_end_date_4").val();
                  	 var visits_link="<?php echo base_url().'pharmacist_management/getFacilitiesDelay/';?>"+from_date+'/'+to_date;
                      $('#chart_area4').load(visits_link, function() {
-            $("#facility_listing").dataTable({
-		 		 "bJQueryUI" : true,
-				"sPaginationType" : "full_numbers",
-				"sDom" : '<"H"Tfr>t<"F"ip>',
-				"oTableTools" : {
-					"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
-					"aButtons" : ["copy", "print", "xls", "pdf"]
-				},
-				"bProcessing" : true,
-				"bServerSide" : false,
-		 });
-       });
+				            $("#facility_listing").dataTable({
+						 		 "bJQueryUI" : true,
+								"sPaginationType" : "full_numbers",
+								"sDom" : '<"H"Tfr>t<"F"ip>',
+								"oTableTools" : {
+									"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+									"aButtons" : ["copy", "print", "xls", "pdf"]
+								},
+								"bProcessing" : true,
+								"bServerSide" : false,
+						 });
+				      });
                  } else if(button_id=="usage_btn"){                	
                  	 var from_date=$("#period_start_date_4").val();
                  	 var to_date=$("#period_end_date_4").val();
@@ -243,46 +243,7 @@ var chartLink;
 
 		});
     </script>
-
-<div class="main-content">
-
-	<?php
-
-	if($user_is_pharmacist){
-		
-		?>
-		<div class="center-content">
-		<?php
-		$this->load->view('dashboard/pharmacist');
-		?>
-		</div>
-		<?php
-	 }
-	 
-	elseif($user_is_administrator){
-		?>
-		<div class="center-content">
-		<?php
-	 	 $this->load->view("dashboard/system_admin");
-		 ?>
-		</div>
-		 <?php
-	 }
-	else{
-		?>
-		<div class="fullest-content">
-		<?php
-		$this->load->view("dashboard/main_v");
-		?>
-		</div>
-		<?php
-	}
-	 ?>
-	</div>
-
-</div>
-
-<script type="text/javascript">
+    <script type="text/javascript">
 $(document).ready(function(){
 	var base_url="<?php echo base_url(); ?>";    		      	   
 	        $("#enrollment_start").datepicker({
@@ -424,3 +385,43 @@ $(document).ready(function(){
 			return (new Date((new Date(Year, Month, 1)) - 1)).getDate();
 		}
 </script>
+
+<div class="main-content">
+
+	<?php
+
+	if($user_is_pharmacist){
+		
+		?>
+		<div class="center-content">
+		<?php
+		$this->load->view('dashboard/pharmacist');
+		?>
+		</div>
+		<?php
+	 }
+	 
+	elseif($user_is_administrator){
+		?>
+		<div class="center-content">
+		<?php
+	 	 $this->load->view("dashboard/system_admin");
+		 ?>
+		</div>
+		 <?php
+	 }
+	else{
+		?>
+		<div class="fullest-content">
+		<?php
+		$this->load->view("dashboard/main_v");
+		?>
+		</div>
+		<?php
+	}
+	 ?>
+	</div>
+
+</div>
+
+

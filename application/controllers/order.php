@@ -37,7 +37,7 @@ class Order extends MY_Controller {
 	}
 
 	public function move_order($status, $cdrr_id, $maps_id) {
-		
+
 		$log = new Cdrr_Log();
 		$log -> description = $status;
 		$log -> created = date('Y-m-d H:i:s');
@@ -59,7 +59,7 @@ class Order extends MY_Controller {
 
 		$this -> session -> set_flashdata('order_message', "Order " . $status . " Successfully");
 		redirect("order/view_order/" . $cdrr_id . "/" . $maps_id);
-		
+
 	}
 
 	public function view_order($cdrr_id, $maps_id) {
@@ -80,6 +80,7 @@ class Order extends MY_Controller {
 		$data['order_code'] = $order_array[0]['code'];
 
 		$data['amc'] = $this -> getAMC($order_array[0]['facility_id'], $order_array[0]['code'], $order_array[0]['period_begin']);
+		$data['resupply_array'] = $this -> getResupply($order_array[0]['period_begin'], $order_array[0]['facility_id']);
 
 		if ($order_array[0]['status_name'] == "received" || $order_array[0]['status_name'] == "rationalized") {
 			$data['option_links'] = "<li class='active'><a href='" . site_url("order/view_cdrr/" . $cdrr_id) . "'>view</a></li><li><a href='" . site_url("order/update_cdrr/" . $cdrr_id) . "'>update</a></li><li></li>";
@@ -415,6 +416,7 @@ class Order extends MY_Controller {
 	}
 
 	public function import_order($type = "") {
+		$this -> load -> helper('file');
 		$ret = array();
 		if ($type == "") {
 			$code = $this -> input -> post("upload_type");
@@ -950,9 +952,20 @@ class Order extends MY_Controller {
 					}
 					//end of maps
 				}//end of loops
+				$log = implode("\r\n", $ret);
 				$ret = implode("<br/>", $ret);
 				$this -> session -> set_flashdata('login_message', $ret);
 			}//end of if check for file
+			$file = "log.txt";
+			$time = date('Y-m-d h:i:s a') . "(" . $code . ")";
+			$hr = "--------------------------------";
+
+			$final = $time . "\r\n";
+			$final .= $hr . "\r\n";
+			$final .= $log . "\r\n";
+
+			$final .= "\r\n" . file_get_contents($file);
+			file_put_contents($file, $final);
 			redirect("dashboard_management");
 
 		} else if ($type == "pipeline_upload") {//Upload Central medical stores and pending orders data
@@ -1042,7 +1055,22 @@ class Order extends MY_Controller {
 		}
 
 	}
-
+	public function show_log() {
+		$file = "log.txt";
+		if (file_exists($file)) {
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename=' . basename($file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+			ob_clean();
+			flush();
+			readfile($file);
+			exit ;
+		}
+	}
 	public function getCellValues($filename,$force = false){
 		if ( !is_null($this->cellValues) && $force === false ){
 			return $this->cellValues;
@@ -1123,7 +1151,7 @@ class Order extends MY_Controller {
 			$this -> email -> clear(TRUE);
 			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
 		} else {
-			$error_message='Cannot Connect to Mail Server';
+			$error_message = 'Cannot Connect to Mail Server';
 			//$error_message = $this -> email -> print_debugger();
 		}
 
@@ -1991,6 +2019,42 @@ class Order extends MY_Controller {
 		$this -> session -> set_flashdata('order_message', "Order Updated Successfully");
 		redirect("order/view_order/" . $cdrr_id . "/" . $maps_id);
 
+	}
+
+	public function getResupply($period_begin = "2014-02-01", $facility_id = "29") {
+		$first = date('Y-m-01', strtotime($period_begin . "- 1 month"));
+		$second = date('Y-m-01', strtotime($period_begin . "- 2 month"));
+		$third = date('Y-m-01', strtotime($period_begin . "- 3 month"));
+		$amc = 0;
+		$resupply_data = array();
+
+		$sql = "SELECT SUM(ci.dispensed_packs) as dispensed_packs,SUM(ci.dispensed_units) as dispensed_units,SUM(ci.aggr_consumed) as aggr_consumed,SUM(ci.aggr_on_hand) as aggr_on_hand,SUM(ci.count) as count,c.code,ci.drug_id
+		        FROM cdrr_item ci 
+		        INNER JOIN (SELECT max(id) as id,period_begin,code
+		        FROM cdrr 
+		        WHERE (period_begin='$first' OR period_begin='$second' OR period_begin='$third')
+		        AND facility_id='$facility_id'
+		        AND status NOT LIKE '%prepared%'
+		        AND status NOT LIKE '%deleted%'
+		        GROUP BY period_begin) as c ON ci.cdrr_id=c.id
+		        GROUP BY ci.drug_id";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			foreach ($results as $result) {
+				$drug_id = $result['drug_id'];
+				$code = trim($result['code']);
+				if ($code == "D-CDRR") {
+					$amc = ($result['dispensed_packs'] + $result['aggr_consumed']) - ($result['aggr_on_hand'] + $result['count']);
+				} else if ($code == "F-CDRR_packs") {
+					$amc = $result['dispensed_packs'] - $result['count'];
+				} else if ($code == "F-CDRR_units") {
+					$amc = $result['dispensed_units'] - $result['count'];
+				}
+				$resupply_data[$drug_id] = $amc;
+			}
+		}
+		return $resupply_data;
 	}
 
 	public function base_params($data) {
