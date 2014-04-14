@@ -1,3 +1,27 @@
+2014-04-14 03:25:38 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Kendu Bay-D-CDRR for Central Sites and District Stores..xls
+
+2014-04-14 03:24:43 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Kendu Bay-D-CDRR for Central Sites and District Stores..xls
+
+2014-04-14 02:26:36 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. D-CDRR#979 Meru District Hospital 2014-03-01 to 2014-03-31.xls
+
+2014-04-14 02:22:56 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-D-CDRR#979 Meru District Hospital 2014-03-01 to 2014-03-31.xls
+
+2014-04-14 02:22:18 pm(D-CDRR)
+--------------------------------
+You can only report for March-2014. Kindly check the period fields !-D-CDRR#979 Meru District Hospital 2014-03-01 to 2014-03-31.xls The format should be dd/mm/yyyy
+
+2014-04-14 02:21:37 pm(D-CDRR)
+--------------------------------
+You can only report for March-2014. Kindly check the period fields !-D-CDRR#979 Meru District Hospital 2014-03-01 to 2014-03-31.xls The format should be dd/mm/yyyy
+
 2014-04-09 04:37:41 pm(D-MAPS)
 --------------------------------
 Order was successfully saved. Kendu Bay-D-MAPS for Central Sites andDistrict Stores-Updated.xls
