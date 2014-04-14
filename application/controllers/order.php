@@ -544,7 +544,7 @@ class Order extends MY_Controller {
 								if ($i != 34 || $i != 57) {
 									if (trim($arr[$i][$resupply]) >= 0) {
 										$drug_name = trim($arr[$i]['A']);
-										$pack_size = trim($arr[$i]['B']);
+										$pack_size = str_replace(',', '', trim($arr[$i]['B']));
 										$commodity = $this -> getMappedDrug($drug_name, $pack_size);
 										if ($commodity != null) {
 											$cdrr_array[$commodity_counter]['id'] = "";
