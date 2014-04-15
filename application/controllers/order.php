@@ -462,7 +462,8 @@ class Order extends MY_Controller {
 						$file_type = $this -> checkFileType($code, $text);
 						$facilities = Sync_Facility::getId($facility_code, $status_code);
 						$facility_id = $facilities['id'];
-						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
+						$duplicate = 0;
+						//$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
 							$ret[] = "Your facility Code in '" . $_FILES["file"]["name"][$q] . "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
 						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
@@ -548,7 +549,7 @@ class Order extends MY_Controller {
 										$commodity = $this -> getMappedDrug($drug_name, $pack_size);
 										if ($commodity != null) {
 											$cdrr_array[$commodity_counter]['id'] = "";
-											if ($code == "D-CDRR") {
+																						if ($code == "D-CDRR") {
 												$cdrr_array[$commodity_counter]['balance'] = str_replace(',', '', trim($arr[$i]['C']));
 												$cdrr_array[$commodity_counter]['received'] = str_replace(',', '', trim($arr[$i]['D']));
 												$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
@@ -587,6 +588,7 @@ class Order extends MY_Controller {
 												$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
 												$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
 											}
+											//$objPHPExcel -> getActiveSheet() -> getCell("I" . $i) -> getOldCalculatedValue()						
 											$cdrr_array[$commodity_counter]['publish'] = 0;
 											$cdrr_array[$commodity_counter]['cdrr_id'] = "";
 											$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
@@ -599,23 +601,37 @@ class Order extends MY_Controller {
 
 							$log_array[0]['id'] = "";
 							$log_array[0]['description'] = "prepared";
+							$details = array();
 							if ($code == "D-CDRR") {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[113]['G']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[111]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[113]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[111]['K']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[109]['G']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[107]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[107]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[109]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[107]['K']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[0]['cdrr_id'] = "";
 
 							$log_array[1]['id'] = "";
 							$log_array[1]['description'] = "approved";
+							$details = array();
 							if ($code == "D-CDRR") {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[117]['G']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[115]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[115]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[117]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[115]['K']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[113]['G']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[111]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[113]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[111]['K']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[1]['cdrr_id'] = "";
 
@@ -896,23 +912,37 @@ class Order extends MY_Controller {
 
 							$log_array[0]['id'] = "";
 							$log_array[0]['description'] = "prepared";
+							$details = array();
 							if ($code == "D-MAPS") {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell + 21]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 19]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 19]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 21]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 19]['G']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell + 17]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 15]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 15]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 17]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 15]['G']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[0]['maps_id'] = "";
 
 							$log_array[1]['id'] = "";
 							$log_array[1]['description'] = "approved";
+							$details = array();
 							if ($code == "D-MAPS") {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell + 25]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 23]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 23]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 25]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 23]['G']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell + 21]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 19]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 19]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 21]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 19]['G']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[1]['maps_id'] = "";
 
@@ -1693,12 +1723,14 @@ class Order extends MY_Controller {
 		}
 	}
 
-	public function getUser($name) {
-		$user_id = Sync_User::getId($name);
+	public function getUser($details = array()) {
+		$user_id = Sync_User::getId($details['name']);
 		if ($user_id) {
 			return $user_id['id'];
+		} else {
+			$this -> db -> insert("sync_user", $details);
+			return $this -> db -> insert_id();
 		}
-		return null;
 	}
 
 	public function getMappedDrug($drug_name = "", $packsize = "") {

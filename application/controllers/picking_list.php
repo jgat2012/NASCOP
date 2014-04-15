@@ -67,7 +67,7 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function get_commodities($cdrr_id) {
-		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,ci.resupply
+		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,packsize as pack_size,ci.resupply
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
@@ -153,7 +153,7 @@ class Picking_List extends MY_Controller {
 		$current_user = $this -> session -> userdata('user_id');
 		$user_object = Users::getUserDetail($current_user);
 		//retrieve user so as to get their signature
-		$html_footer = "<div style='width:100%; position:fixed; bottom:0;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='assets/img/" . $user_object -> Image_Link . "'></img></div>";
+		$html_footer = "<div style='width:100%;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='assets/img/" . $user_object -> Image_Link . "'></img></div>";
 		$html_footer .= "<h4 style='text-align:left;'>" . $user_object -> Name . "<br/> Nascop Program Officer<br/> NASCOP's ARV Logistics Management Unit at Kemsa" . "</h4></div>";
 		//echo $html_footer;
 		$this -> load -> library('mpdf');
@@ -168,6 +168,8 @@ class Picking_List extends MY_Controller {
 		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|{PAGENO}|Warehouse Memo');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
+		
+		//echo $data.=$html_footer;die();
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
 		$dir = "Export/";
@@ -230,10 +232,10 @@ class Picking_List extends MY_Controller {
 
 		foreach ($cdrrs as $cdrr) {
 			$data .= '<h5 style="text-align: left">' . $cdrr -> facility_name . ' ' . $cdrr -> cdrr_id . '</h5>';
-			$data .= '<table class="data-table"><thead><tr><th>Commodity</th><th>Quantity for Resupply</th><th>Packs/Bottles/Tins</th></tr></thead><tbody>';
+			$data .= '<table class="data-table"><thead><tr><th>Commodity</th><th>Pack Size</th><th>Quantity for Resupply</th><th>Packs/Bottles/Tins</th></tr></thead><tbody>';
 			$items = $this -> get_commodities($cdrr -> id);
 			foreach ($items as $item) {
-				$data .= '<tr><td>' . $item -> drug . '</td><td>' . $item -> resupply . '</td><td>' . $item -> drug_unit . '</td></tr>';
+				$data .= '<tr><td>' . $item -> drug . '</td><td>' . number_format($item -> pack_size) . '</td><td>' . number_format($item -> resupply) . '</td><td>' . $item -> drug_unit . '</td></tr>';
 			}
 			$data .= '</tbody></table>';
 		}
@@ -327,7 +329,7 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function view_commodities($cdrr_id) {
-		$columns = array('#', 'Commodity', 'Quantity for Resupply', 'Packs/Bottles/Tins');
+		$columns = array('#', 'Commodity', 'Packs/Bottles/Tins', 'Quantity for Resupply');
 		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,ci.resupply
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
