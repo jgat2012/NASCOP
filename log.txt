@@ -1,3 +1,36 @@
+2014-04-15 07:50:07 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. NYAKACH D-MAPS.xls
+
+2014-04-15 07:49:56 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. NYAKACH-D-CDRR.xls
+
+2014-04-15 07:38:35 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. GESUSU-D-CDRR.xls
+Order was successfully saved. GILGIL SDH-D-CDRR.xls
+Order was successfully saved. MATUU-D-CDRR.xls
+Order was successfully saved. MIGORI-D-CDRR.xls
+Order was successfully saved. NJORO HC-D-CDRR.xls
+Order was successfully saved. NYAMACHE SDH-D-CDRR.xls
+Order was successfully saved. NYAMIRA -D-CDRR.xls
+Order was successfully saved. RIRUTA-D-CDRR.xls
+Order was successfully saved. RWAMBWA-D-CDRR.xls
+Order was successfully saved. TIGONI-D-CDRR.xls
+Order was successfully saved. UKWALA-D-CDRR.xls
+
+2014-04-15 07:34:22 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. NJORO HC-D-MAPS.xls
+Your facility Code  in 'NYAKACH D-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. NYAMACHE-D-MAPS.xls
+Order was successfully saved. NYAMIRA DH-D-MAPS.xls
+Order was successfully saved. RIRUTA-D-MAPS.xls
+Order was successfully saved. RWAMBWA HC-D-MAPS.xls
+Order was successfully saved. TIGONI DH-D-MAPS.xls
+Order was successfully saved. UKWALA-D-MAPS.xls
+
 2014-04-15 07:16:10 pm(D-CDRR)
 --------------------------------
 Order was successfully saved. EWASO NGIRO-D-CDRR.xls
