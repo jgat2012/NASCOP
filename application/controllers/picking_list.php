@@ -134,7 +134,7 @@ class Picking_List extends MY_Controller {
 		return $this -> showTable($columns, $results, $links);
 	}
 
-	public function generatePDF($data, $type = 0) {
+	public function generatePDF($data, $type = 0, $list_id) {
 		$current_date = date("M d, Y");
 		$icon = 'assets/img/coat_of_arms-resized.png';
 		$html_title = "<div style='width:100px; height:100px; margin:0 auto;'><img src='" . $icon . "' style='width:96px; height:96px;'></img></div>";
@@ -168,33 +168,37 @@ class Picking_List extends MY_Controller {
 		$this -> mpdf -> SetFooter('Generated on: {DATE d/m/Y}|{PAGENO}|Warehouse Memo');
 		$this -> mpdf -> WriteHTML($html_title);
 		$this -> mpdf -> simpleTables = true;
-		
-		//echo $data.=$html_footer;die();
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
-		$dir = "Export/";
-		$report_name = $dir . "Warehouse Memo.pdf";
-		$html_title . "\n";
-		$data . "\n";
+		$unique_stamp = date('U');
+		$report_name = "MEMO#" . $list_id . "(" . $unique_stamp . ").pdf";
+		$this -> mpdf -> Output($report_name, 'D');
 
-		/*Delete all files in export folder*/
-		if (is_dir($dir)) {
-			$files = scandir($dir);
-			foreach ($files as $object) {
-				if ($object != "." && $object != "..") {
-					unlink($dir . "/" . $object);
-				}
-			}
-		} else {
-			mkdir($dir);
-		}
+		/*
+		 $dir = "Export/";
+		 $report_name = $dir . "Warehouse Memo.pdf";
+		 $html_title . "\n";
+		 $data . "\n";
 
-		$this -> mpdf -> Output($report_name, 'F');
-		if ($type == 0) {
-			redirect($report_name);
-		} else {
-			return $report_name;
-		}
+		 //Delete all files in export folder
+		 if (is_dir($dir)) {
+		 $files = scandir($dir);
+		 foreach ($files as $object) {
+		 if ($object != "." && $object != "..") {
+		 unlink($dir . "/" . $object);
+		 }
+		 }
+		 } else {
+		 mkdir($dir);
+		 }
+
+		 $this -> mpdf -> Output($report_name, 'F');
+		 if ($type == 0) {
+		 redirect($report_name);
+		 } else {
+		 return $report_name;
+		 }
+		 */
 	}
 
 	public function print_list($list_id, $type = 0) {
@@ -240,9 +244,9 @@ class Picking_List extends MY_Controller {
 			$data .= '</tbody></table>';
 		}
 		if ($type == 0) {
-			$this -> generatePDF($data, $type);
+			$this -> generatePDF($data, $type, $list_id);
 		} else {
-			$file_name = $this -> generatePDF($data, $type);
+			$file_name = $this -> generatePDF($data, $type, $list_id);
 			return $file_name;
 		}
 	}
@@ -273,7 +277,7 @@ class Picking_List extends MY_Controller {
 				} else if ($link == "remove order") {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='delete link'>$link</a> | ";
 				} else if ($link == "print memo") {
-					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' target='_blank' class='link'>$link</a> | ";
+					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='link'>$link</a> | ";
 				} else if ($link == "update") {
 					$link_values .= "<a data-toggle='modal' href='#edit_list' class='update' link_id='" . $mydata['id'] . "' link_name='" . $mydata['name'] . "'>$link</a> | ";
 				} else if ($link == "assign orders") {
