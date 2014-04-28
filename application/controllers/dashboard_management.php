@@ -1128,7 +1128,7 @@ class Dashboard_Management extends MY_Controller {
 							AND em.maps_id IS NOT NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
 							AND sc.name NOT LIKE '%delete%'";
-			
+
 			//Non standard regimens pead
 			$sql_paed_kp_nr = "SELECT SUM( mi.total ) AS total_paed_kp
 							FROM nonstandard_maps_item mi
@@ -1159,14 +1159,14 @@ class Dashboard_Management extends MY_Controller {
 				$tot_adult_kp = (int)$result1[0]['total_adult_kp'];
 				// Check if non standard regimens exist
 				if (count($result3) > 0) {
-					$tot_adult_kp +=(int)$result3[0]['total_adult_kp'];
+					$tot_adult_kp += (int)$result3[0]['total_adult_kp'];
 				}
 			}
 			if (count($result2) > 0) {
 				$tot_paed_kp = (int)$result2[0]['total_paed_kp'];
 				// Check if non standard regimens exist
 				if (count($result4) > 0) {
-					$tot_paed_kp +=(int)$result4[0]['total_paed_kp'];
+					$tot_paed_kp += (int)$result4[0]['total_paed_kp'];
 				}
 			}
 			$total_kp = $tot_adult_kp + $tot_paed_kp;
@@ -1184,7 +1184,7 @@ class Dashboard_Management extends MY_Controller {
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
 							AND sc.name NOT LIKE '%delete%'";
-			
+
 			$sql_adult_kem = "SELECT SUM( mi.total ) AS total_adult_kemsa
 							FROM maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
@@ -1197,7 +1197,7 @@ class Dashboard_Management extends MY_Controller {
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
 							AND sc.name NOT LIKE '%delete%'";
-							
+
 			$sql_paed_kem_nr = "SELECT SUM( mi.total ) AS total_paed_kemsa
 							FROM nonstandard_maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
@@ -1242,15 +1242,15 @@ class Dashboard_Management extends MY_Controller {
 				$tot_adult_kemsa = (int)$result1[0]['total_adult_kemsa'];
 				// Check if non standard regimens exist
 				if (count($result3) > 0) {
-					$tot_adult_kemsa +=(int)$result3[0]['total_adult_kemsa'];
-				}						
-					
+					$tot_adult_kemsa += (int)$result3[0]['total_adult_kemsa'];
+				}
+
 			}
 			if (count($result2) > 0) {
 				$tot_paed_kemsa = (int)$result2[0]['total_paed_kemsa'];
 				// Check if non standard regimens exist
 				if (count($result4) > 0) {
-					$tot_paed_kemsa +=(int)$result4[0]['total_paed_kemsa'];
+					$tot_paed_kemsa += (int)$result4[0]['total_paed_kemsa'];
 				}
 			}
 			$total_kemsa = $tot_adult_kemsa + $tot_paed_kemsa;
@@ -1313,7 +1313,7 @@ class Dashboard_Management extends MY_Controller {
 								GROUP BY r.code) as test ON mr.id=test.regimen_id
 								WHERE mr.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
 								GROUP BY mr.code";
-								
+
 					$join2_kp = "SELECT mr.name as regimen_desc,test.total
                                 FROM escm_regimen mr
                                 LEFT JOIN 
@@ -1609,13 +1609,13 @@ class Dashboard_Management extends MY_Controller {
 			$last_day = date('Y-m-t', strtotime($period));
 			$sql = "SELECT (
 							SELECT COUNT(DISTINCT(c.facility_id)) as kemsa FROM cdrr c      
-							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "'
+							WHERE c.created BETWEEN '" . $first . "' AND  '" . $last_day . "'
 							AND(c.code='D-CDRR' OR c.code='F-CDRR_packs')
 							AND (c.id NOT IN(SELECT ec.cdrr_id FROM escm_orders ec))
 							) as kemsa_count,
 							(SELECT COUNT(DISTINCT(c.facility_id)) as kenya_pharma FROM cdrr c
 							INNER JOIN escm_orders ec ON ec.cdrr_id=c.id
-							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "'
+							WHERE c.created BETWEEN '" . $first . "' AND  '" . $last_day . "'
 							AND(c.code='D-CDRR' OR c.code='F-CDRR_packs')) as kenya_pharma_count,
 							(
 							SELECT COUNT(DISTINCT(c.facility_id)) as national_total FROM cdrr c
@@ -2080,44 +2080,31 @@ class Dashboard_Management extends MY_Controller {
 		$sites_with_adt = 0;
 
 		$columns = array("#", "Description", "Total No", "Rate");
+		$expected_total = 0;
+		$actual_total = 0;
+
 		//get total arv satellites
-		$satellite_arv_total = Facilities::getSatellitesTotal();
+		$satellite_summary = Cdrr::getSatelliteSummary($period_begin, $period_end);
+		$expected_total = $satellite_summary['expected_total'];
+		$actual_total = $satellite_summary['actual_total'];
+
 		$total_data[0]['description'] = 'Total No of Satellite ARV Sites';
-		$total_data[0]['total'] = $satellite_arv_total;
+		$total_data[0]['total'] = $expected_total;
 		$total_data[0]['rate'] = '-';
+
 		//get satellites with webADT
 		$sites_with_adt = Facilities::getSatellitesADTTotal();
-
 		$total_data[1]['description'] = 'No of Satellite Sites with Web ADT Installed';
 		$total_data[1]['total'] = $sites_with_adt;
 		$total_data[1]['rate'] = '-';
-
-		$satellites = Facilities::getOrderingSatellites();
-		$satellite_list = array();
-		foreach ($satellites as $satellite) {
-			$satellite_list[] = $satellite['id'];
-		}
-		$satellite_list = implode(",", $satellite_list);
-
-		//get total satellites that reported
-		$sql = "SELECT COUNT(DISTINCT(c.facility_id))as total
-			    FROM cdrr c
-			    WHERE c.created
-			    BETWEEN '$first'
-			    AND '$last_day'
-			    AND c.facility_id IN($satellite_list)
-			    AND c.period_begin='$period_begin'
-			    AND c.period_end='$period_end'";
-		$query = $this -> db -> query($sql);
-		$results = $query -> result_array();
-		if ($results) {
-			$total_sites_reported = $results[0]['total'];
-		}
-
+		//get reported satellites
 		$total_data[3]['description'] = 'Total No of Satellite Sites That Have Reported this month';
-		$total_data[3]['total'] = $total_sites_reported;
-		$total_data[3]['rate'] = number_format(($total_sites_reported / $satellite_arv_total), 2) . "%";
-
+		$total_data[3]['total'] = $actual_total;
+		if($expected_total==0){
+			$total_data[3]['rate'] = "0%";		
+		}else{
+			$total_data[3]['rate'] = number_format(($actual_total / $expected_total), 2) . "%";		
+		}
 		echo $this -> showTable($columns, $total_data, $links = array(), $table_name = "satellites");
 	}
 
@@ -2490,22 +2477,22 @@ class Dashboard_Management extends MY_Controller {
 		$data['resultArray'] = $resultArray;
 		$this -> load -> view('dashboard/chart_report_bar_v', $data);
 	}
-	
-	public function two_pager(){
-		
+
+	public function two_pager() {
+
 		$files = Two_pager::getAllHydrated();
 		$list = '<table class="table table-bordered table-striped tbl_nat_dashboard" id="TWO_PAGER">
 	    			<thead>
 	    				<tr><th>No</th><th> Period</th><th>Action</th></tr>
 	    			</thead>
 	    			<tbody>';
-	    
-	    				$x=1;
-	    				foreach ($files as $value) {
-							$list.='<tr><td>'.$x.'</td><td>Stock Situation '.$value['period'].'</td><td><a href="'.base_url().$value['link'].'">Download</a></td></tr>';
-							$x++;
-						}
-	    $list.='				
+
+		$x = 1;
+		foreach ($files as $value) {
+			$list .= '<tr><td>' . $x . '</td><td>Stock Situation ' . $value['period'] . '</td><td><a href="' . base_url() . $value['link'] . '">Download</a></td></tr>';
+			$x++;
+		}
+		$list .= '				
 	    			</tbody>
 			    </table>';
 		echo $list;

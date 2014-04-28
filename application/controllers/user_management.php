@@ -296,7 +296,7 @@ class User_Management extends MY_Controller {
 					$data['inactive'] = true;
 					$data['title'] = "System Login";
 					$this -> load -> view("login_v", $data);
-				} else if (($today_time - $create_time) > (30 * 24 * 3600)) {
+				} else if (($today_time - $create_time) > (90 * 24 * 3600) && $logged_in -> Access -> Indicator != "nascop_administrator") {
 					$user_id = Users::getUserID($username);
 					$this -> session -> set_userdata('user_id', $user_id);
 					$data['title'] = "System Login";

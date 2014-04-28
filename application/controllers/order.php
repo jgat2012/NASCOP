@@ -463,7 +463,7 @@ class Order extends MY_Controller {
 						$facilities = Sync_Facility::getId($facility_code, $status_code);
 						$facility_id = $facilities['id'];
 						$duplicate = 0;
-						//$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
+						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
 							$ret[] = "Your facility Code in '" . $_FILES["file"]["name"][$q] . "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
 						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
@@ -504,6 +504,15 @@ class Order extends MY_Controller {
 
 							$services = implode(",", $service);
 
+							//reporting rate
+							if ($code == "D-CDRR") {
+								$reports_expected = str_replace(',', '', trim($arr[108]['E']));
+								$reports_actual = str_replace(',', '', trim($arr[108]['H']));
+							} else {
+								$reports_expected = null;
+								$reports_actual = null;
+							}
+
 							$seventh_row = 95;
 
 							$comments = trim($arr[$seventh_row]['A']);
@@ -528,8 +537,8 @@ class Order extends MY_Controller {
 							$main_array['period_begin'] = $period_begin;
 							$main_array['period_end'] = $period_end;
 							$main_array['comments'] = $comments;
-							$main_array['reports_expected'] = null;
-							$main_array['reports_actual'] = null;
+							$main_array['reports_expected'] = $reports_expected;
+							$main_array['reports_actual'] = $reports_actual;
 							$main_array['services'] = $services;
 							$main_array['sponsors'] = $sponsors;
 							$main_array['non_arv'] = 0;
@@ -549,7 +558,7 @@ class Order extends MY_Controller {
 										$commodity = $this -> getMappedDrug($drug_name, $pack_size);
 										if ($commodity != null) {
 											$cdrr_array[$commodity_counter]['id'] = "";
-																						if ($code == "D-CDRR") {
+											if ($code == "D-CDRR") {
 												$cdrr_array[$commodity_counter]['balance'] = str_replace(',', '', trim($arr[$i]['C']));
 												$cdrr_array[$commodity_counter]['received'] = str_replace(',', '', trim($arr[$i]['D']));
 												$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
@@ -588,7 +597,7 @@ class Order extends MY_Controller {
 												$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
 												$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
 											}
-											//$objPHPExcel -> getActiveSheet() -> getCell("I" . $i) -> getOldCalculatedValue()						
+											//$objPHPExcel -> getActiveSheet() -> getCell("I" . $i) -> getOldCalculatedValue()
 											$cdrr_array[$commodity_counter]['publish'] = 0;
 											$cdrr_array[$commodity_counter]['cdrr_id'] = "";
 											$cdrr_array[$commodity_counter]['drug_id'] = $commodity;

@@ -99,7 +99,7 @@ class Cdrr extends Doctrine_Record {
 	}
 
 	public function getOrderPeriods() {
-		$query = Doctrine_Query::create() -> select("c.period_begin") -> from("cdrr c") -> leftJoin('c.map m') -> where("(m.code='D-MAPS') AND (code='D-CDRR' or code='F-CDRR_packs')") -> groupBy("c.period_begin")->orderBy("c.period_begin desc");
+		$query = Doctrine_Query::create() -> select("c.period_begin") -> from("cdrr c") -> leftJoin('c.map m') -> where("(m.code='D-MAPS') AND (code='D-CDRR' or code='F-CDRR_packs')") -> groupBy("c.period_begin") -> orderBy("c.period_begin desc");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
@@ -108,6 +108,12 @@ class Cdrr extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("IF(COUNT(DISTINCT(period_begin))>3,'3',COUNT(DISTINCT(period_begin))) as total") -> from("cdrr") -> where("period_begin between '$earlier_begin' and '$period_begin' and facility_id='$facility_id' and code='$code'") -> groupBy("facility_id");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return @$items[0]['total'];
+	}
+
+	public function getSatelliteSummary($start = "", $end = "") {
+		$query = Doctrine_Query::create() -> select("SUM(reports_expected) as expected_total,SUM(reports_actual) as actual_total") -> from("cdrr") -> where("period_begin='$start' and period_end='$end' and code='D-CDRR'");
+		$cdrrs = $query -> execute();
+		return @$cdrrs[0];
 	}
 
 }
