@@ -1,3 +1,164 @@
+2014-04-28 05:19:16 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+A cdrr report already exists for this month !-GILGIL SDH-D-CDRR.xls
+A cdrr report already exists for this month !-GITHONGO DH-D-CDRR.xls
+A cdrr report already exists for this month !-GUCHA DH-D-CDRR.xls
+A cdrr report already exists for this month !-HAMISI SDH-D-CDRR.xls
+A cdrr report already exists for this month !-IGUHU-D-CDRR.xls
+A cdrr report already exists for this month !-ISIOLO DH-D-CDRR.xls
+A cdrr report already exists for this month !-IYAMBE DH-D-CDRR.xls
+A cdrr report already exists for this month !-KAJAURI LEVEL 4-D-CDRR.xls
+A cdrr report already exists for this month !-KATHIANI DH-D-CDRR.xls
+A cdrr report already exists for this month !-Kendu Bay-D-CDRR.xls
+A cdrr report already exists for this month !-KEROKA LEVEL 4-D-CDRR.xls
+A cdrr report already exists for this month !-KERUGOYA D-CDRR.xls
+A cdrr report already exists for this month !-KIAMBU DH-D-CDRR.xls
+A cdrr report already exists for this month !-KIBWEZI-D-CDRR.xls
+A cdrr report already exists for this month !-KILIFI-D-CDRR.xls
+A cdrr report already exists for this month !-KISUMU DH-D-CDRR.xls
+A cdrr report already exists for this month !-KITUI-D-CDRR.xls
+A cdrr report already exists for this month !-LOITOKITOK-D-CDRR.xls
+A cdrr report already exists for this month !-MAKADARA-D-CDRR.xls
+A cdrr report already exists for this month !-MANGA-D-CDRR.xls
+A cdrr report already exists for this month !-MARAGUA-D-CDRR.xls
+A cdrr report already exists for this month !-MARANI-D-CDRR.xls
+A cdrr report already exists for this month !-MATHARE NORTH SDH-D-CDRR.xls
+A cdrr report already exists for this month !-MATUNGU DH-D-CDRR.xls
+A cdrr report already exists for this month !-MATUU-D-CDRR.xls
+A cdrr report already exists for this month !-MBITA DH-D-CDRR.xls
+A cdrr report already exists for this month !-Meru DH-D-CDRR.xls
+A cdrr report already exists for this month !-MIATHENE-D-CDRR.xls
+A cdrr report already exists for this month !-MIGORI-D-CDRR.xls
+A cdrr report already exists for this month !-MIGWANI SDH-D-CDRR.xls
+A cdrr report already exists for this month !-MOI VOI DH-D-CDRR.xls
+A cdrr report already exists for this month !-MOLO DH-D-CDRR.xls
+A cdrr report already exists for this month !-MSABWENI-D-CDRR.xls
+A cdrr report already exists for this month !-Mwingi DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-NAIVASHA DH-D-CDRR.xls
+A cdrr report already exists for this month !-NAKURU-D-CDRR.xls
+A cdrr report already exists for this month !-NAVAKHALO -D-CDRR.xls
+A cdrr report already exists for this month !-NGONG DH-D-CDRR.xls
+A cdrr report already exists for this month !-NJORO HC-D-CDRR.xls
+A cdrr report already exists for this month !-NYAHURURU DH-D-CDRR.xls
+A cdrr report already exists for this month !-NYAKACH-D-CDRR.xls
+A cdrr report already exists for this month !-NYAMACHE SDH-D-CDRR.xls
+A cdrr report already exists for this month !-NYAMIRA -D-CDRR.xls
+A cdrr report already exists for this month !-OLKALAU-D-CDRR.xls
+A cdrr report already exists for this month !-RIRUTA-D-CDRR.xls
+A cdrr report already exists for this month !-RUNYEJES-D-CDRR.xls
+A cdrr report already exists for this month !-RWAMBWA-D-CDRR.xls
+A cdrr report already exists for this month !-SABATIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-SIAYA-D-CDRR.xls
+A cdrr report already exists for this month !-SUBA DH-D-CDRR.xls
+A cdrr report already exists for this month !-TAVETA DH-D-CDRR.xls
+A cdrr report already exists for this month !-Thika DH-D-CDRR..xls
+A cdrr report already exists for this month !-TIGONI-D-CDRR.xls
+A cdrr report already exists for this month !-UKWALA-D-CDRR.xls
+A cdrr report already exists for this month !-USIGU DH-D-CDRR.xls
+A cdrr report already exists for this month !-VIHIGA-D-CDRR.xls
+A cdrr report already exists for this month !-YALA SCH-D-CDRR.xls
+
+2014-04-28 05:14:01 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+
+2014-04-28 05:11:08 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+
+2014-04-28 05:08:13 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+
+2014-04-28 05:05:13 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+
+2014-04-28 05:04:04 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+
+2014-04-28 05:01:03 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+
 2014-04-25 02:14:45 pm(D-CDRR)
 --------------------------------
 Order was successfully saved. ATHI RIVER HC-D-CDRR.xls

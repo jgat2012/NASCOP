@@ -459,6 +459,15 @@ class Order extends MY_Controller {
 						$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 						$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
+						//reporting rate
+						if ($code == "D-CDRR") {
+							$reports_expected = str_replace(',', '', trim($arr[108]['E']));
+							$reports_actual = str_replace(',', '', trim($arr[108]['H']));
+						} else {
+							$reports_expected = null;
+							$reports_actual = null;
+						}
+
 						$file_type = $this -> checkFileType($code, $text);
 						$facilities = Sync_Facility::getId($facility_code, $status_code);
 						$facility_id = $facilities['id'];
@@ -471,6 +480,7 @@ class Order extends MY_Controller {
 						} else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
+							$this -> fix_bug($code, $period_begin, $period_end, $facility_id, $reports_expected, $reports_actual);
 							$ret[] = "A cdrr report already exists for this month !-" . $_FILES["file"]["name"][$q];
 						} else {
 							$fourth_row = 9;
@@ -503,15 +513,6 @@ class Order extends MY_Controller {
 							}
 
 							$services = implode(",", $service);
-
-							//reporting rate
-							if ($code == "D-CDRR") {
-								$reports_expected = str_replace(',', '', trim($arr[108]['E']));
-								$reports_actual = str_replace(',', '', trim($arr[108]['H']));
-							} else {
-								$reports_expected = null;
-								$reports_actual = null;
-							}
 
 							$seventh_row = 95;
 
@@ -1629,9 +1630,19 @@ class Order extends MY_Controller {
 		if ($results) {
 			$response = true;
 			$this -> session -> set_flashdata('order_message', strtoupper($table) . ' report already exists for this month !');
-
 		}
 		return $response;
+	}
+
+	public function fix_bug($code, $period_start, $period_end, $facility, $reports_expected, $reports_actual, $table = "cdrr") {
+		$sql = "select * from $table where period_begin='$period_start' and period_end='$period_end' and code='$code' and facility_id='$facility'";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			$cdrr_id = $results[0]['id'];
+			$sql = "UPDATE $table SET reports_expected='$reports_expected',reports_actual='$reports_actual' WHERE id='$cdrr_id'";
+			$query = $this -> db -> query($sql);
+		}
 	}
 
 	public function check_original($type, $original_id) {
