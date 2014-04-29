@@ -134,7 +134,7 @@ class Picking_List extends MY_Controller {
 		return $this -> showTable($columns, $results, $links);
 	}
 
-	public function generatePDF($data, $type = 0, $list_id) {
+	public function generatePDF($data, $type = 0, $list_id, $email = "") {
 		$current_date = date("M d, Y");
 		$icon = 'assets/img/coat_of_arms-resized.png';
 		$html_title = "<div style='width:100px; height:100px; margin:0 auto;'><img src='" . $icon . "' style='width:96px; height:96px;'></img></div>";
@@ -172,33 +172,34 @@ class Picking_List extends MY_Controller {
 		$this -> mpdf -> WriteHTML($html_footer);
 		$unique_stamp = date('U');
 		$report_name = "MEMO#" . $list_id . "(" . $unique_stamp . ").pdf";
-		$this -> mpdf -> Output($report_name, 'D');
 
-		/*
-		 $dir = "Export/";
-		 $report_name = $dir . "Warehouse Memo.pdf";
-		 $html_title . "\n";
-		 $data . "\n";
+		if ($email == "") {
+			$this -> mpdf -> Output($report_name, 'D');
+		} else {
+			$dir = "Export/";
+			$report_name = $dir . $report_name;
+			$html_title . "\n";
+			$data . "\n";
 
-		 //Delete all files in export folder
-		 if (is_dir($dir)) {
-		 $files = scandir($dir);
-		 foreach ($files as $object) {
-		 if ($object != "." && $object != "..") {
-		 unlink($dir . "/" . $object);
-		 }
-		 }
-		 } else {
-		 mkdir($dir);
-		 }
+			//Delete all files in export folder
+			if (is_dir($dir)) {
+				$files = scandir($dir);
+				foreach ($files as $object) {
+					if ($object != "." && $object != "..") {
+						unlink($dir . "/" . $object);
+					}
+				}
+			} else {
+				mkdir($dir);
+			}
 
-		 $this -> mpdf -> Output($report_name, 'F');
-		 if ($type == 0) {
-		 redirect($report_name);
-		 } else {
-		 return $report_name;
-		 }
-		 */
+			$this -> mpdf -> Output($report_name, 'F');
+			if ($type == 0) {
+				redirect($report_name);
+			} else {
+				return $report_name;
+			}
+		}
 	}
 
 	public function print_list($list_id, $type = 0) {
@@ -246,7 +247,7 @@ class Picking_List extends MY_Controller {
 		if ($type == 0) {
 			$this -> generatePDF($data, $type, $list_id);
 		} else {
-			$file_name = $this -> generatePDF($data, $type, $list_id);
+			$file_name = $this -> generatePDF($data, $type, $list_id, 1);
 			return $file_name;
 		}
 	}
@@ -340,7 +341,6 @@ class Picking_List extends MY_Controller {
 			        WHERE ci.cdrr_id='$cdrr_id'
 			        AND resupply !='0'
 			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')";
-		//include resupply >0
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		echo $this -> showTable($columns, $results);

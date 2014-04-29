@@ -33,7 +33,7 @@
 								?>
 								<span>Welcome <b style="font-weight: bolder;font-size: 20px;"><?php echo $this -> session -> userdata('full_name');?></b>. <a id="logout_btn" href="<?php echo base_url().'user_management/logout/2' ?>"><i class="icon-off"></i>Logout</a></span>
 								<br>
-								<span class="date"><?php echo date('l, jS \of F Y')
+								<span class="date"><?php echo date('l, jS F Y')
 									?></span>
 								<input type="hidden" id="facility_hidden" />
 								<br/>
@@ -43,7 +43,7 @@
 								?>
 								<span>Welcome <b style="font-weight: bolder;font-size: 20px;">National User</b>. <a id="logout_btn" href="<?php echo base_url().'user_management/login' ?>"><i class="icon-off"></i>Login</a></span>
 								<br>
-								<span class="date"><?php echo date('l, jS \of F Y')
+								<span class="date"><?php echo date('l, jS F Y')
 									?></span>
 								<input type="hidden" id="facility_hidden" />
 								<br/>

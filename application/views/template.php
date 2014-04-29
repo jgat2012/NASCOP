@@ -210,7 +210,7 @@ $counter++;
 <div class="welcome_msg" style="clear:none;margin-top:40px;">
 	<span>Welcome <b style="font-weight: bolder;font-size: 20px;"><?php echo $this -> session -> userdata('full_name');?></b>. <a id="logout_btn" href="<?php echo base_url().'user_management/logout/2' ?>"><i class="icon-off"></i>Logout</a></span>
 	<br>
-	<span class="date"><?php echo date('l, jS \of F Y') ?></span>
+	<span class="date"><?php echo date('l, jS F Y') ?></span>
 	<input type="hidden" id="facility_hidden" />
 	<input type="hidden" id="base_url" value="<?php echo base_url();?>"/>
 	<br/>

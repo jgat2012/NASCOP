@@ -1667,7 +1667,7 @@ class Dashboard_Management extends MY_Controller {
 			$categories[$x] = $period;
 			$x++;
 		}
-		$resultArray = array( array('name' => 'Kemsa/LMU - Reporting timeliness (By 10th)', 'data' => $kemsaArray), array('name' => 'Kenya Pharma - Reporting timeliness (By 10th)', 'data' => $kpArray), array('name' => 'National Reporting Rate', 'data' => $nationalArray));
+		$resultArray = array( array('name' => 'Kemsa/LMU - Reporting timeliness', 'data' => $kemsaArray), array('name' => 'Kenya Pharma - Reporting timeliness', 'data' => $kpArray), array('name' => 'National Reporting Rate', 'data' => $nationalArray));
 		//echo var_dump($resultArray);die();
 		$resultArray = json_encode($resultArray);
 		$categories = json_encode($categories);

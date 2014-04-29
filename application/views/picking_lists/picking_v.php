@@ -12,9 +12,19 @@
 	<div class="tab-content">
 		<?php
 		if ($this -> session -> flashdata('order_delete')) {
-			echo '<p class="message error">' . $this -> session -> flashdata('order_delete') . '</p>';
+		 ?>
+	     <div class="alert alert-error">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			 <?php echo $this -> session -> flashdata('order_delete');  ?>
+		 </div> 
+		 <?php	
 		} else if ($this -> session -> flashdata('list_message')) {
-			echo '<p class="message info">' . $this -> session -> flashdata('list_message') . '</p>';
+		 ?>
+		   <div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			 <?php echo $this -> session -> flashdata('list_message');  ?>
+		   </div> 
+		<?php
 		}
 		?>
 		<div id="open_lists" class="tab-pane active">
