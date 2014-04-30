@@ -218,7 +218,7 @@ class Order extends MY_Controller {
 			if ($code == 0) {
 				$and = "";
 			} else {
-				$and = "AND ci.resupply !='0'";
+				$and = "";
 			}
 			if ($cdrr_array['options'] == "update") {
 				$supplier = Facilities::getSupplier($facility);
@@ -553,57 +553,54 @@ class Order extends MY_Controller {
 
 							for ($i = $sixth_row; $sixth_row, $i <= 89; $i++) {
 								if ($i != 34 || $i != 57) {
-									if (trim($arr[$i][$resupply]) >= 0) {
-										$drug_name = trim($arr[$i]['A']);
-										$pack_size = str_replace(',', '', trim($arr[$i]['B']));
-										$commodity = $this -> getMappedDrug($drug_name, $pack_size);
-										if ($commodity != null) {
-											$cdrr_array[$commodity_counter]['id'] = "";
-											if ($code == "D-CDRR") {
-												$cdrr_array[$commodity_counter]['balance'] = str_replace(',', '', trim($arr[$i]['C']));
-												$cdrr_array[$commodity_counter]['received'] = str_replace(',', '', trim($arr[$i]['D']));
-												$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
-												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(',', '', trim($arr[$i]['E']));
-												$cdrr_array[$commodity_counter]['losses'] = str_replace(',', '', trim($arr[$i]['F']));
-												$cdrr_array[$commodity_counter]['adjustments'] = str_replace(',', '', trim($arr[$i]['G']));
-												$cdrr_array[$commodity_counter]['count'] = str_replace(',', '', trim($arr[$i]['H']));
-												$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(',', '', trim($arr[$i]['K']));
-												$expiry_date = trim($arr[$i]['L']);
-												if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
-													$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
-												} else {
-													$cdrr_array[$commodity_counter]['expiry_date'] = "";
-												}
-												$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(',', '', trim($arr[$i]['M']));
-												$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['N']);
-												$cdrr_array[$commodity_counter]['aggr_consumed'] = str_replace(",", "", $arr[$i]['I']);
-												$cdrr_array[$commodity_counter]['aggr_on_hand'] = str_replace(",", "", $arr[$i]['J']);
-											} else if ($code == "F-CDRR_packs") {
-												$cdrr_array[$commodity_counter]['balance'] = str_replace(",", "", $arr[$i]['C']);
-												$cdrr_array[$commodity_counter]['received'] = str_replace(",", "", $arr[$i]['D']);
-												$cdrr_array[$commodity_counter]['dispensed_units'] = str_replace(",", "", $arr[$i]['E']);
-												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(",", "", $arr[$i]['F']);
-												$cdrr_array[$commodity_counter]['losses'] = str_replace(",", "", $arr[$i]['G']);
-												$cdrr_array[$commodity_counter]['adjustments'] = str_replace(",", "", $arr[$i]['H']);
-												$cdrr_array[$commodity_counter]['count'] = str_replace(",", "", $arr[$i]['I']);
-												$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(",", "", $arr[$i]['J']);
-												$expiry_date = trim($arr[$i]['K']);
-												if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
-													$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
-												} else {
-													$cdrr_array[$commodity_counter]['expiry_date'] = "";
-												}
-												$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(",", "", $arr[$i]['L']);
-												$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['M']);
-												$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
-												$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
+									$drug_name = trim($arr[$i]['A']);
+									$pack_size = str_replace(',', '', trim($arr[$i]['B']));
+									$commodity = $this -> getMappedDrug($drug_name, $pack_size);
+									if ($commodity != null) {
+										$cdrr_array[$commodity_counter]['id'] = "";
+										if ($code == "D-CDRR") {
+											$cdrr_array[$commodity_counter]['balance'] = str_replace(',', '', trim($arr[$i]['C']));
+											$cdrr_array[$commodity_counter]['received'] = str_replace(',', '', trim($arr[$i]['D']));
+											$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
+											$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(',', '', trim($arr[$i]['E']));
+											$cdrr_array[$commodity_counter]['losses'] = str_replace(',', '', trim($arr[$i]['F']));
+											$cdrr_array[$commodity_counter]['adjustments'] = str_replace(',', '', trim($arr[$i]['G']));
+											$cdrr_array[$commodity_counter]['count'] = str_replace(',', '', trim($arr[$i]['H']));
+											$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(',', '', trim($arr[$i]['K']));
+											$expiry_date = trim($arr[$i]['L']);
+											if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+												$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+											} else {
+												$cdrr_array[$commodity_counter]['expiry_date'] = "";
 											}
-											//$objPHPExcel -> getActiveSheet() -> getCell("I" . $i) -> getOldCalculatedValue()
-											$cdrr_array[$commodity_counter]['publish'] = 0;
-											$cdrr_array[$commodity_counter]['cdrr_id'] = "";
-											$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
-											$commodity_counter++;
+											$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(',', '', trim($arr[$i]['M']));
+											$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['N']);
+											$cdrr_array[$commodity_counter]['aggr_consumed'] = str_replace(",", "", $arr[$i]['I']);
+											$cdrr_array[$commodity_counter]['aggr_on_hand'] = str_replace(",", "", $arr[$i]['J']);
+										} else if ($code == "F-CDRR_packs") {
+											$cdrr_array[$commodity_counter]['balance'] = str_replace(",", "", $arr[$i]['C']);
+											$cdrr_array[$commodity_counter]['received'] = str_replace(",", "", $arr[$i]['D']);
+											$cdrr_array[$commodity_counter]['dispensed_units'] = str_replace(",", "", $arr[$i]['E']);
+											$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(",", "", $arr[$i]['F']);
+											$cdrr_array[$commodity_counter]['losses'] = str_replace(",", "", $arr[$i]['G']);
+											$cdrr_array[$commodity_counter]['adjustments'] = str_replace(",", "", $arr[$i]['H']);
+											$cdrr_array[$commodity_counter]['count'] = str_replace(",", "", $arr[$i]['I']);
+											$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(",", "", $arr[$i]['J']);
+											$expiry_date = trim($arr[$i]['K']);
+											if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+												$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+											} else {
+												$cdrr_array[$commodity_counter]['expiry_date'] = "";
+											}
+											$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(",", "", $arr[$i]['L']);
+											$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['M']);
+											$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
+											$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
 										}
+										$cdrr_array[$commodity_counter]['publish'] = 0;
+										$cdrr_array[$commodity_counter]['cdrr_id'] = "";
+										$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
+										$commodity_counter++;
 									}
 								}
 							}
