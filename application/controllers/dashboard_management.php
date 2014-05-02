@@ -16,15 +16,15 @@ class Dashboard_Management extends MY_Controller {
 		$data['banner_text'] = "National Dashboard";
 		$data['title'] = "webADT | National Dashboard";
 		$data['supporter'] = Supporter::getThemAll();
-		$data['report_period'] = cdrr::getOrderPeriods();
+		$data['report_period'] = $this -> fix_bug(cdrr::getOrderPeriods());
 		//Includes facilities that reported for both maps and cdrrs
-		$data['maps_report_period'] = maps::getReportPeriods();
+		$data['maps_report_period'] = $this -> fix_bug(maps::getReportPeriods());
 		$data['county_period'] = $this -> getCountyList();
 		$data['facility_period'] = $this -> getFacilityList();
-		$data['eid_period'] = $this -> getEidPeriod();
+		$data['eid_period'] = $this -> fix_bug($this -> getEidPeriod());
 		$data['eid_county'] = $this -> getEidCounty();
 		$data['eid_facility'] = $this -> getEidFacility();
-		$data['eid_adt_period'] = $this -> getEidADTPeriod();
+		$data['eid_adt_period'] = $this -> fix_bug($this -> getEidADTPeriod());
 		$data['eid_adt_county'] = $this -> getEidADTCounty();
 		$data['eid_adt_facility'] = $this -> getEidADTFacility();
 		$this -> base_params($data);
@@ -2100,10 +2100,10 @@ class Dashboard_Management extends MY_Controller {
 		//get reported satellites
 		$total_data[3]['description'] = 'Total No of Satellite Sites That Have Reported this month';
 		$total_data[3]['total'] = $actual_total;
-		if($expected_total==0){
-			$total_data[3]['rate'] = "0%";		
-		}else{
-			$total_data[3]['rate'] = number_format(($actual_total / $expected_total), 2) . "%";		
+		if ($expected_total == 0) {
+			$total_data[3]['rate'] = "0%";
+		} else {
+			$total_data[3]['rate'] = number_format(($actual_total / $expected_total), 2) . "%";
 		}
 		echo $this -> showTable($columns, $total_data, $links = array(), $table_name = "satellites");
 	}
@@ -2496,6 +2496,21 @@ class Dashboard_Management extends MY_Controller {
 	    			</tbody>
 			    </table>';
 		echo $list;
+	}
+
+	public function fix_bug($periods = array()) {
+		$current_selection = date('Y-m-01', strtotime("-1 month"));
+		$count = 0;
+		foreach ($periods as $period) {
+			if (in_array($current_selection, $period)) {
+				$count++;
+			}
+		}
+		//if count is equal to zero then no current selection period exists and should be added
+		if ($count == 0) {
+			array_unshift($periods, array('id' => $current_selection, 'period_begin' => $current_selection));
+		}
+		return $periods;
 	}
 
 	public function base_params($data) {
