@@ -136,7 +136,7 @@ class Picking_List extends MY_Controller {
 
 	public function generatePDF($data, $type = 0) {
 		$current_date = date("M d, Y");
-		$icon = site_url() . 'assets/img/coat_of_arms-resized.png';
+		$icon = 'assets/img/coat_of_arms-resized.png';
 		$html_title = "<div style='width:100px; height:100px; margin:0 auto;'><img src='" . $icon . "' style='width:96px; height:96px;'></img></div>";
 		$html_title .= "<h3 style='text-align:center;'>MINISTRY OF HEALTH</h3>";
 		$html_title .= "<span style='text-align:left;'>Kenyatta Hospital Grounds, AIDS/TB/Leprosy Division</span><br/>";
@@ -153,8 +153,8 @@ class Picking_List extends MY_Controller {
 		$current_user = $this -> session -> userdata('user_id');
 		$user_object = Users::getUserDetail($current_user);
 		//retrieve user so as to get their signature
-		$html_footer = "<div style='width:100%; position:fixed; bottom:0;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='" . base_url() . "assets/img/" . $user_object -> Image_Link . "'></img></div>";
-		$html_footer .= "<h4 style='text-align:left;'>" . $user_object -> Name . "<br/>" . $user_object -> Access -> Level_Name . "<br/> NASCOP's ARV Logistics Management Unit at Kemsa" . "</h4></div>";
+		$html_footer = "<div style='width:100%; position:fixed; bottom:0;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='assets/img/" . $user_object -> Image_Link . "'></img></div>";
+		$html_footer .= "<h4 style='text-align:left;'>" . $user_object -> Name . "<br/> Nascop Program Officer<br/> NASCOP's ARV Logistics Management Unit at Kemsa" . "</h4></div>";
 		//echo $html_footer;
 		$this -> load -> library('mpdf');
 		$this -> mpdf = new mPDF('c', 'A4');

@@ -2430,7 +2430,7 @@ class Dashboard_Management extends MY_Controller {
 		if ($results2) {
 			foreach ($results2 as $value) {
 				$label = strtoupper(str_replace(" ", "", $value['name']));
-				$regimens[$label] = $regimens[$label] + $value['total'];
+				$regimens[$label] = @$regimens[$label] + $value['total'];
 			}
 		}
 

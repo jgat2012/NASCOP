@@ -4,10 +4,10 @@ class Order extends MY_Controller {
 	function __construct() {
 		parent::__construct();
 	}
-	
+
 	public $objPHPExcel;
 	protected $cellValues;
-	
+
 	public function index() {
 		$data['content_view'] = "orders/order_v";
 		$data['page_title'] = "my Orders";
@@ -464,9 +464,9 @@ class Order extends MY_Controller {
 						$facility_id = $facilities['id'];
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
-							$ret[] = "Your facility Code in '" . $_FILES["file"]["name"][$q]. "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
+							$ret[] = "Your facility Code in '" . $_FILES["file"]["name"][$q] . "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
 						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
-							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month")).". Kindly check the period fields !-" . $_FILES["file"]["name"][$q].' The format should be dd/mm/yyyy';
+							$ret[] = "You can only report for " . date('F-Y', strtotime(date('F-Y') . "-1 month")) . ". Kindly check the period fields !-" . $_FILES["file"]["name"][$q] . ' The format should be dd/mm/yyyy';
 						} else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
@@ -554,9 +554,9 @@ class Order extends MY_Controller {
 												$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
 												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(',', '', trim($arr[$i]['E']));
 												$cdrr_array[$commodity_counter]['losses'] = str_replace(',', '', trim($arr[$i]['F']));
-												$cdrr_array[$commodity_counter]['adjustments'] =  str_replace(',', '', trim($arr[$i]['G']));
-												$cdrr_array[$commodity_counter]['count'] =  str_replace(',', '', trim($arr[$i]['H']));
-												$cdrr_array[$commodity_counter]['expiry_quant'] =  str_replace(',', '', trim($arr[$i]['K']));
+												$cdrr_array[$commodity_counter]['adjustments'] = str_replace(',', '', trim($arr[$i]['G']));
+												$cdrr_array[$commodity_counter]['count'] = str_replace(',', '', trim($arr[$i]['H']));
+												$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(',', '', trim($arr[$i]['K']));
 												$expiry_date = trim($arr[$i]['L']);
 												if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
 													$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
@@ -568,7 +568,7 @@ class Order extends MY_Controller {
 												$cdrr_array[$commodity_counter]['aggr_consumed'] = str_replace(",", "", $arr[$i]['I']);
 												$cdrr_array[$commodity_counter]['aggr_on_hand'] = str_replace(",", "", $arr[$i]['J']);
 											} else if ($code == "F-CDRR_packs") {
-												$cdrr_array[$commodity_counter]['balance'] = str_replace(",", "", $arr[$i]['C']); 
+												$cdrr_array[$commodity_counter]['balance'] = str_replace(",", "", $arr[$i]['C']);
 												$cdrr_array[$commodity_counter]['received'] = str_replace(",", "", $arr[$i]['D']);
 												$cdrr_array[$commodity_counter]['dispensed_units'] = str_replace(",", "", $arr[$i]['E']);
 												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(",", "", $arr[$i]['F']);
@@ -582,7 +582,7 @@ class Order extends MY_Controller {
 												} else {
 													$cdrr_array[$commodity_counter]['expiry_date'] = "";
 												}
-												$cdrr_array[$commodity_counter]['out_of_stock'] =str_replace(",", "", $arr[$i]['L']);
+												$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(",", "", $arr[$i]['L']);
 												$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['M']);
 												$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
 												$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
@@ -650,16 +650,16 @@ class Order extends MY_Controller {
 
 					} else if ($code == "D-MAPS" || $code == "F-MAPS") {
 						/*
-						$content = "some text here";
-						$link = $_SERVER['REMOTE_ADDR'] . "/NASCOP/uploads/error.txt";
-						echo $link;
-						$fp = fopen($link,"wb");
-						fwrite($fp,$content);
-						fclose($fp);
-						
-						die();
+						 $content = "some text here";
+						 $link = $_SERVER['REMOTE_ADDR'] . "/NASCOP/uploads/error.txt";
+						 echo $link;
+						 $fp = fopen($link,"wb");
+						 fwrite($fp,$content);
+						 fclose($fp);
+
+						 die();
 						 * */
-						
+
 						$first_row = 4;
 						$facility_name = trim($arr[$first_row]['B'] . $arr[$first_row]['C'] . $arr[$first_row]['D']);
 						$facility_code = trim($arr[$first_row]['F'] . $arr[$first_row]['G'] . $arr[$first_row]['H']);
@@ -675,9 +675,9 @@ class Order extends MY_Controller {
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id, "maps");
 
 						if ($facilities == "") {
-							$ret[] = "Your facility Code  in '" . $_FILES["file"]["name"][$q]. "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
+							$ret[] = "Your facility Code  in '" . $_FILES["file"]["name"][$q] . "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
 						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
-							$ret[] = "You can only report for ".date('F-Y', strtotime(date('F-Y') . "-1 month"))." . Kindly check the period fields !-" . $_FILES["file"]["name"][$q].' The format should be dd/mm/yyyy';
+							$ret[] = "You can only report for " . date('F-Y', strtotime(date('F-Y') . "-1 month")) . " . Kindly check the period fields !-" . $_FILES["file"]["name"][$q] . ' The format should be dd/mm/yyyy';
 						} else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected - " . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
@@ -714,36 +714,36 @@ class Order extends MY_Controller {
 							}
 
 							$services = implode(",", $service);
-							$art_adult_cell =(int)substr($this -> getCellByValue("Total Number of Patients on ART ONLY", $file_name), 1) ;
+							$art_adult_cell = (int)substr($this -> getCellByValue("Total Number of Patients on ART ONLY", $file_name), 1);
 							$art_adult = str_replace(",", "", $arr[$art_adult_cell]["D"]);
 							$art_child = str_replace(",", "", $arr[$art_adult_cell]["F"]);
-							$new_male = str_replace(",", "", $arr[$art_adult_cell+4]["D"]);
-							$new_female = str_replace(",", "", $arr[$art_adult_cell+4]["F"]);
-							$revisit_male = str_replace(",", "", $arr[$art_adult_cell+4]["E"]);
-							$revisit_female = str_replace(",", "", $arr[$art_adult_cell+4]["G"]);
+							$new_male = str_replace(",", "", $arr[$art_adult_cell + 4]["D"]);
+							$new_female = str_replace(",", "", $arr[$art_adult_cell + 4]["F"]);
+							$revisit_male = str_replace(",", "", $arr[$art_adult_cell + 4]["E"]);
+							$revisit_female = str_replace(",", "", $arr[$art_adult_cell + 4]["G"]);
 							//Get cells for PMTCT
-							$pmtcts_cell =(int)substr($this -> getCellByValue("Totals for PMTCT Clients", $file_name), 1) ;
-							$new_pmtct = str_replace(",", "", $arr[$pmtcts_cell+1]["H"]);
-							$revisit_pmtct = str_replace(",", "", $arr[$pmtcts_cell+2]["H"]);
+							$pmtcts_cell = (int)substr($this -> getCellByValue("Totals for PMTCT Clients", $file_name), 1);
+							$new_pmtct = str_replace(",", "", $arr[$pmtcts_cell + 1]["H"]);
+							$revisit_pmtct = str_replace(",", "", $arr[$pmtcts_cell + 2]["H"]);
 							//Get cells for Prophylaxis
-							$prophylaxis_cell =(int)substr($this -> getCellByValue("Total No. of Infants receiving ARV", $file_name), 1) ;
-							$total_infant = str_replace(",", "", $arr[$prophylaxis_cell+1]["H"]);
+							$prophylaxis_cell = (int)substr($this -> getCellByValue("Total No. of Infants receiving ARV", $file_name), 1);
+							$total_infant = str_replace(",", "", $arr[$prophylaxis_cell + 1]["H"]);
 							//Cells for pep
-							$peps_cell =(int)substr($this -> getCellByValue("Totals for PEP Clients ONLY", $file_name), 1) ;
-							$pep_adult = str_replace(",", "", $arr[$peps_cell+1]["H"]);
-							$pep_child = str_replace(",", "", $arr[$peps_cell+2]["H"]);
+							$peps_cell = (int)substr($this -> getCellByValue("Totals for PEP Clients ONLY", $file_name), 1);
+							$pep_adult = str_replace(",", "", $arr[$peps_cell + 1]["H"]);
+							$pep_child = str_replace(",", "", $arr[$peps_cell + 2]["H"]);
 							//Cotrimo Cells
-							$cotrimos_cell =(int)substr($this -> getCellByValue("Totals for Patients / Clients (ART plus Non-ART)", $file_name), 1) ;
+							$cotrimos_cell = (int)substr($this -> getCellByValue("Totals for Patients / Clients (ART plus Non-ART)", $file_name), 1);
 							$total_adult = str_replace(",", "", $arr[$cotrimos_cell]["E"]);
 							$total_child = str_replace(",", "", $arr[$cotrimos_cell]["G"]);
 							//Diflucan Cells
-							$diflucans_cell =(int)substr($this -> getCellByValue("Totals for Patients / Clients on Diflucan", $file_name), 1) ;
+							$diflucans_cell = (int)substr($this -> getCellByValue("Totals for Patients / Clients on Diflucan", $file_name), 1);
 							$diflucan_adult = str_replace(",", "", $arr[$diflucans_cell]["E"]);
 							$diflucan_child = str_replace(",", "", $arr[$diflucans_cell]["G"]);
-							$new_cm = str_replace(",", "", $arr[$diflucans_cell+6]["D"]);
-							$revisit_cm = str_replace(",", "", $arr[$diflucans_cell+6]["E"]);
-							$new_oc = str_replace(",", "", $arr[$diflucans_cell+6]["F"]);
-							$revisit_oc = str_replace(",", "", $arr[$diflucans_cell+6]["G"]);
+							$new_cm = str_replace(",", "", $arr[$diflucans_cell + 6]["D"]);
+							$revisit_cm = str_replace(",", "", $arr[$diflucans_cell + 6]["E"]);
+							$new_oc = str_replace(",", "", $arr[$diflucans_cell + 6]["F"]);
+							$revisit_oc = str_replace(",", "", $arr[$diflucans_cell + 6]["G"]);
 
 							//Save Import Values
 
@@ -788,108 +788,104 @@ class Order extends MY_Controller {
 							$maps_array = array();
 							$nonstandard_maps_array = array();
 							$regimen_counter = 0;
-							
+
 							/*
 							 *Check for regimen categories indexes , only return row numbers
 							 */
-							$pmtct_preg_women_cell =(int)substr($this -> getCellByValue("PMTCT Regimens for Pregnant Women", $file_name), 1) ;
-							$pmtct_infant_cell = (int)substr($this -> getCellByValue("PMTCT Regimens for Infants", $file_name), 1) ;
-							$art_adult_first_cell = (int)substr($this -> getCellByValue("ADULT ART First-Line Regimens", $file_name), 1) ;
-							$art_adult_second_cell = (int)substr($this -> getCellByValue("ADULT ART Second-Line Regimens", $file_name), 1) ;
-							$art_adult_other_cell = (int)substr($this -> getCellByValue("Other ADULT ART Regimens", $file_name), 1) ;
-							$paed_first_cell = (int)substr($this -> getCellByValue("PAEDIATRIC ART First-Line Regimens", $file_name), 1) ;
-							$paed_second_cell = (int)substr($this -> getCellByValue("PAEDIATRIC ART Second-Line Regimens", $file_name), 1) ;
-							$paed_other_cell = (int)substr($this -> getCellByValue("Other PAEDIATRIC ART Regimens", $file_name), 1) ;
-							$pep_adult_cell = (int)substr($this -> getCellByValue("Post Exposure Prophylaxis (PEP) for Adults", $file_name), 1) ;
-							$pep_child_cell = (int)substr($this -> getCellByValue("Post Exposure Prophylaxis (PEP) for Children", $file_name), 1) ;
-							
-							$oi_cell = (int)substr($this -> getCellByValue("Opportunistic Infections", $file_name), 1) ;
-							
+							$pmtct_preg_women_cell = (int)substr($this -> getCellByValue("PMTCT Regimens for Pregnant Women", $file_name), 1);
+							$pmtct_infant_cell = (int)substr($this -> getCellByValue("PMTCT Regimens for Infants", $file_name), 1);
+							$art_adult_first_cell = (int)substr($this -> getCellByValue("ADULT ART First-Line Regimens", $file_name), 1);
+							$art_adult_second_cell = (int)substr($this -> getCellByValue("ADULT ART Second-Line Regimens", $file_name), 1);
+							$art_adult_other_cell = (int)substr($this -> getCellByValue("Other ADULT ART Regimens", $file_name), 1);
+							$paed_first_cell = (int)substr($this -> getCellByValue("PAEDIATRIC ART First-Line Regimens", $file_name), 1);
+							$paed_second_cell = (int)substr($this -> getCellByValue("PAEDIATRIC ART Second-Line Regimens", $file_name), 1);
+							$paed_other_cell = (int)substr($this -> getCellByValue("Other PAEDIATRIC ART Regimens", $file_name), 1);
+							$pep_adult_cell = (int)substr($this -> getCellByValue("Post Exposure Prophylaxis (PEP) for Adults", $file_name), 1);
+							$pep_child_cell = (int)substr($this -> getCellByValue("Post Exposure Prophylaxis (PEP) for Children", $file_name), 1);
+
+							$oi_cell = (int)substr($this -> getCellByValue("Opportunistic Infections", $file_name), 1);
+
 							//Get where list of regimens end
 							$end_list = $oi_cell - 2;
 							$reg_category = "";
 							for ($i = $sixth_row; $sixth_row, $i <= $end_list; $i++) {
-								
+
 								//Get regimen category names, names are meant to be the same as the ones in the sync_category table
-								
-								if($i == $pmtct_preg_women_cell){
+
+								if ($i == $pmtct_preg_women_cell) {
 									$reg_category = "PMTCT Regimens for Pregnant Women";
-								}else if($i == $pmtct_infant_cell){
+								} else if ($i == $pmtct_infant_cell) {
 									$reg_category = "PMTCT Regimens for Infants";
-								}else if($i == $art_adult_first_cell){
+								} else if ($i == $art_adult_first_cell) {
 									$reg_category = "ADULT ART First Line";
-								}else if($i == $art_adult_second_cell){
+								} else if ($i == $art_adult_second_cell) {
 									$reg_category = "Adult ART Second Line";
-								}else if($i == $art_adult_other_cell){
+								} else if ($i == $art_adult_other_cell) {
 									$reg_category = "Other Adult ART Regimen";
-								}else if($i == $paed_first_cell){
+								} else if ($i == $paed_first_cell) {
 									$reg_category = "Paediatric First Line";
-								}else if($i == $paed_second_cell){
+								} else if ($i == $paed_second_cell) {
 									$reg_category = "Paediatric Second Line";
-								}else if($i == $paed_other_cell){
+								} else if ($i == $paed_other_cell) {
 									$reg_category = "Other Paediatric ART Regimen";
-								}else if($i == $pep_adult_cell){
+								} else if ($i == $pep_adult_cell) {
 									$reg_category = "PEP Adult";
-								}else if($i == $pep_child_cell){
+								} else if ($i == $pep_child_cell) {
 									$reg_category = "PEP Child";
 								}
-								
+
 								if ($i != $pmtct_preg_women_cell || $i != $pmtct_infant_cell || $i != $art_adult_first_cell || $i != $art_adult_second_cell || $i != $art_adult_other_cell || $i != $paed_first_cell || $i != $paed_second_cell || $i != $paed_other_cell || $i != $pep_adult_cell || $i != $pep_child_cell) {
 									if ($arr[$i]['E'] != 0 || trim($arr[$i]['A']) != "") {
 										$regimen_code = $arr[$i]['A'];
 										$regimen_desc = $arr[$i]['B'];
 										$total = $arr[$i]['E'];
-										
+
 										$regimen_id = $this -> getMappedRegimen($regimen_code, $regimen_desc);
 										//echo $regimen_id.' - '.$regimen_code.' - '.$regimen_desc.'<br>';
-										
+
 										if ($regimen_id != null && $total != null) {
 											$maps_array[$regimen_counter]["id"] = "";
 											$maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
 											$maps_array[$regimen_counter]["total"] = str_replace(",", "", $total);
 											$maps_array[$regimen_counter]["maps_id"] = "";
-										}
-										else if($regimen_id == null && $total != null){// If regimen is not found, check in non standard regimens
+										} else if ($regimen_id == null && $total != null) {// If regimen is not found, check in non standard regimens
 											$regimen_id = $this -> getNonStandardRegimen($regimen_code, $regimen_desc);
-											
+
 											//If regimen exists, insert it in Non standard Maps Item table
-											if($regimen_id!=null){
+											if ($regimen_id != null) {
 												$nonstandard_maps_array[$regimen_counter]["id"] = "";
 												$nonstandard_maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
 												$nonstandard_maps_array[$regimen_counter]["total"] = str_replace(",", "", $total);
 												$nonstandard_maps_array[$regimen_counter]["maps_id"] = "";
-											}
-											else{//Is regimen still not found in non standard regimen, insert it into non standard regimen
+											} else {//Is regimen still not found in non standard regimen, insert it into non standard regimen
 												//Get regimen category
-												
+
 												$category_id = Sync_category::getId($reg_category);
 												$cat_id = $category_id['id'];
 												$nonstandard_regimen = new Nonstandard_regimen();
-												$nonstandard_regimen ->regimen_code = $regimen_code;
-												$nonstandard_regimen ->regimen_desc = $regimen_desc;
-												$nonstandard_regimen ->category = $cat_id;
-												$nonstandard_regimen ->line = '';
-												$nonstandard_regimen ->type_Of_service = '';
-												$nonstandard_regimen ->active = 1;
-												$nonstandard_regimen ->n_map = '';
-												$nonstandard_regimen ->e_map = '';
-												
-												$nonstandard_regimen ->save();
+												$nonstandard_regimen -> regimen_code = $regimen_code;
+												$nonstandard_regimen -> regimen_desc = $regimen_desc;
+												$nonstandard_regimen -> category = $cat_id;
+												$nonstandard_regimen -> line = '';
+												$nonstandard_regimen -> type_Of_service = '';
+												$nonstandard_regimen -> active = 1;
+												$nonstandard_regimen -> n_map = '';
+												$nonstandard_regimen -> e_map = '';
+
+												$nonstandard_regimen -> save();
 												$regimen_id = Nonstandard_regimen::getMaxId();
 												$regimen_id = $regimen_id['max_id'];
-												
+
 												//Insert into nonstandard maps item
 												$nonstandard_maps_array[$regimen_counter]["id"] = "";
 												$nonstandard_maps_array[$regimen_counter]["regimen_id"] = $regimen_id;
 												$nonstandard_maps_array[$regimen_counter]["total"] = str_replace(",", "", $total);
 												$nonstandard_maps_array[$regimen_counter]["maps_id"] = "";
-												
+
 											}
-											
-											
+
 										}
-										
-										
+
 										$regimen_counter++;
 									}
 								}
@@ -901,22 +897,22 @@ class Order extends MY_Controller {
 							$log_array[0]['id'] = "";
 							$log_array[0]['description'] = "prepared";
 							if ($code == "D-MAPS") {
-								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell+21]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell+19]['B']));
+								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell + 21]['E']));
+								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 19]['B']));
 							} else {
-								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell+17]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell+15]['B']));
+								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell + 17]['E']));
+								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 15]['B']));
 							}
 							$log_array[0]['maps_id'] = "";
 
 							$log_array[1]['id'] = "";
 							$log_array[1]['description'] = "approved";
 							if ($code == "D-MAPS") {
-								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell+25]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell+23]['B']));
+								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell + 25]['E']));
+								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 23]['B']));
 							} else {
-								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell+21]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell+19]['B']));
+								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell + 21]['E']));
+								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 19]['B']));
 							}
 							$log_array[1]['maps_id'] = "";
 
@@ -1054,6 +1050,7 @@ class Order extends MY_Controller {
 		}
 
 	}
+
 	public function show_log() {
 		$file = "log.txt";
 		if (file_exists($file)) {
@@ -1070,41 +1067,43 @@ class Order extends MY_Controller {
 			exit ;
 		}
 	}
-	public function getCellValues($filename,$force = false){
-		if ( !is_null($this->cellValues) && $force === false ){
-			return $this->cellValues;
+
+	public function getCellValues($filename, $force = false) {
+		if (!is_null($this -> cellValues) && $force === false) {
+			return $this -> cellValues;
 		}
-		
-		$this->objPHPExcel = PHPExcel_IOFactory::load($filename);
-		$currentIndex = $this->objPHPExcel->getActiveSheetIndex();
-		$this->objPHPExcel->setActiveSheetIndex(0);
 
+		$this -> objPHPExcel = PHPExcel_IOFactory::load($filename);
+		$currentIndex = $this -> objPHPExcel -> getActiveSheetIndex();
+		$this -> objPHPExcel -> setActiveSheetIndex(0);
 
-		$sheet = $this->objPHPExcel->getActiveSheet();
-		$highestColumn = $sheet->getHighestColumn(); //e.g., 'G'
-		$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn); //e.g., 6
-		$highestRow= $sheet->getHighestRow();
+		$sheet = $this -> objPHPExcel -> getActiveSheet();
+		$highestColumn = $sheet -> getHighestColumn();
+		//e.g., 'G'
+		$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+		//e.g., 6
+		$highestRow = $sheet -> getHighestRow();
 
-		$this->cellValues = array();
-		for ( $i =0 ; $i < $highestColumnIndex; $i++ ){
+		$this -> cellValues = array();
+		for ($i = 0; $i < $highestColumnIndex; $i++) {
 			$column = PHPExcel_Cell::stringFromColumnIndex($i);
-			for ( $j = 1; $j <= $highestRow; $j++ ){
-				$this->cellValues[$column . $j] = $sheet->getCellByColumnAndRow($i, $j)->getValue();
+			for ($j = 1; $j <= $highestRow; $j++) {
+				$this -> cellValues[$column . $j] = $sheet -> getCellByColumnAndRow($i, $j) -> getValue();
 			}
 		}
-		$this->objPHPExcel->setActiveSheetIndex($currentIndex);
-		return $this->cellValues;
+		$this -> objPHPExcel -> setActiveSheetIndex($currentIndex);
+		return $this -> cellValues;
 	}
-	
+
 	/**
 	 * returns cell by value. Be carefull, could be ambigous, only use
 	 * if you really know what you are doing
 	 */
-	public function getCellByValue($search,$filename) {
+	public function getCellByValue($search, $filename) {
 		$nonPrintableChars = array("\n", "\r", "\t", "\s");
 		$search = str_replace($nonPrintableChars, '', $search);
-		foreach ( $this->getCellValues($filename) as $cell => $value ){
-			if (stripos(str_replace($nonPrintableChars, '', $value), $search) === 0){
+		foreach ($this->getCellValues($filename) as $cell => $value) {
+			if (stripos(str_replace($nonPrintableChars, '', $value), $search) === 0) {
 				return $cell;
 			}
 		}
@@ -1222,9 +1221,9 @@ class Order extends MY_Controller {
 						$temp_items['maps_item'] = $main;
 					} else if ($index == "ownMaps_log") {
 						$temp_log['maps_log'] = $main;
-					} else if ($index == "ownNonStandardMaps_item"){
+					} else if ($index == "ownNonStandardMaps_item") {
 						$temp_nonstandard_items['nonstandard_maps_item'] = $main;
-						
+
 					} else {
 						$maps[$index] = $main;
 					}
@@ -1260,7 +1259,7 @@ class Order extends MY_Controller {
 				}
 			}
 			$this -> db -> insert_batch('maps_item', $maps_items);
-			
+
 			//Attach maps id to non standard maps item
 			foreach ($temp_nonstandard_items as $temp_nonstandard_item) {
 				foreach ($temp_nonstandard_item as $counter => $items) {
@@ -1709,13 +1708,15 @@ class Order extends MY_Controller {
 			
 			$drug_list = array();
 			foreach ($drugs as $drug) {
+				$drug = str_ireplace(array("(", ")"), array("", ""), $drug);
 				if ($drug != null) {
 					$sql = "SELECT sd.id 
 		      FROM sync_drug sd
 		      WHERE (sd.name like '%$drug%'
 		      OR sd.abbreviation like '%$drug%'
 		      OR sd.strength = '$drug'
-		      OR sd.formulation = '$drug')
+		      OR sd.formulation = '$drug'
+		      OR sd.unit='$drug')
 		      AND sd.packsize='$packsize'";
 					$query = $this -> db -> query($sql);
 					$results = $query -> result_array();
@@ -1743,7 +1744,7 @@ class Order extends MY_Controller {
 				    WHERE(r.regimen_code='$regimen_code')";
 			$query = $this -> db -> query($sql);
 			$results = $query -> result_array();
-			
+
 			if ($results) {
 				return $results[0]['n_map'];
 			} else {
@@ -1753,12 +1754,12 @@ class Order extends MY_Controller {
 		return null;
 	}
 
-	public function getNonStandardRegimen($regimen_code="",$regimen_desc = ""){
+	public function getNonStandardRegimen($regimen_code = "", $regimen_desc = "") {
 		$sql = "SELECT r.id
 				    FROM nonstandard_regimen r
 				    WHERE(r.regimen_code='$regimen_code'
 				    AND r.regimen_desc='$regimen_desc')";
-					
+
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		if ($results) {
@@ -1922,29 +1923,28 @@ class Order extends MY_Controller {
 		$data['page_title'] = 'Pipeline Upload';
 		$this -> base_params($data);
 	}
-	public function twopager_upload($type="",$delete="") {
-		if($type==""){
+
+	public function twopager_upload($type = "", $delete = "") {
+		if ($type == "") {
 			$data['title'] = 'webADT | 2 Pager Upload';
 			$data['banner_text'] = '2 Pager Upload';
 			$data['content_view'] = 'twopager_v';
 			$data['page_title'] = '2 Pager Upload';
-			$data['files']  = Two_pager::getAllHydrated();
+			$data['files'] = Two_pager::getAllHydrated();
 			$this -> base_params($data);
-		}
-		else if($type=="upload"){
-			$period = $this->input->post("period_selected");
+		} else if ($type == "upload") {
+			$period = $this -> input -> post("period_selected");
 			if ($_FILES['cms_file']['tmp_name']) {
 				//Check if period was selected
-				if($period=='0'){
+				if ($period == '0') {
 					$this -> session -> set_flashdata('order_message', "Please select a period !");
 					$this -> session -> set_flashdata('twopager_upload', 1);
 					redirect("order/twopager_upload");
-				}
-				else{
+				} else {
 					$dir = "uploads/2pager";
 					/*Delete all files in export folder*/
 					if (is_dir($dir)) {
-						
+
 					} else {
 						mkdir($dir);
 					}
@@ -1952,40 +1952,34 @@ class Order extends MY_Controller {
 					//move the file
 					$file_name = $_FILES['cms_file']['name'];
 					$ext = pathinfo($file_name, PATHINFO_EXTENSION);
-					$name = $period.'.'.$ext;
+					$name = $period . '.' . $ext;
 					$file_location = $dir . "/" . $name;
-					try{
+					try {
 						move_uploaded_file($_FILES['cms_file']['tmp_name'], $file_location);
 						$this -> session -> set_flashdata('order_message', "File successfully uploaded ! ");
 						//Save location to the database
 						$check_if_exist = count(Two_pager::checkIfExist($period));
-						if($check_if_exist==0){
-							$data =array(
-										"period" =>$period,
-										"link" =>$file_location,
-										"uploaded_by" =>$user = $this -> session -> userdata('user_id')
-										);
-							$this -> db -> insert("two_pager",$data);
-						}
-						else{//file already exists, nothing changes in the db
+						if ($check_if_exist == 0) {
+							$data = array("period" => $period, "link" => $file_location, "uploaded_by" => $user = $this -> session -> userdata('user_id'));
+							$this -> db -> insert("two_pager", $data);
+						} else {//file already exists, nothing changes in the db
 							$this -> session -> set_flashdata('order_message', "File successfully updated ! ");
 						}
-						
-					}catch(exception $e){
-						$this -> session -> set_flashdata('order_message', "An error occured while uploading the file ! ".$e);
-						printf($e);die();
+
+					} catch(exception $e) {
+						$this -> session -> set_flashdata('order_message', "An error occured while uploading the file ! " . $e);
+						printf($e);
+						die();
 					}
 					redirect("order/twopager_upload");
-					
-					
+
 				}
 			} else {
 				$this -> session -> set_flashdata('order_message', "No file found !");
 				$this -> session -> set_flashdata('twopager_upload', 1);
 				redirect("order/twopager_upload");
 			}
-		}
-		else if($type=="delete"){
+		} else if ($type == "delete") {
 			$id = $delete;
 			$this -> db -> where('id', $id);
 			$this -> db -> delete('two_pager');
@@ -1993,8 +1987,7 @@ class Order extends MY_Controller {
 			$this -> session -> set_flashdata('twopager_upload', 1);
 			redirect("order/twopager_upload");
 		}
-		
-		
+
 	}
 
 	public function rationalize_cdrr($cdrr_id, $maps_id) {
@@ -2046,11 +2039,11 @@ class Order extends MY_Controller {
 				$drug_id = $result['drug_id'];
 				$code = trim($result['code']);
 				if ($code == "D-CDRR") {
-					$amc = ($result['aggr_consumed']*3) - $result['count'];
+					$amc = ($result['aggr_consumed'] * 3) - $result['count'];
 				} else if ($code == "F-CDRR_packs") {
-					$amc = ($result['dispensed_packs']*3) - $result['count'];
+					$amc = ($result['dispensed_packs'] * 3) - $result['count'];
 				} else if ($code == "F-CDRR_units") {
-					$amc = ($result['dispensed_units']*3) - $result['count'];
+					$amc = ($result['dispensed_units'] * 3) - $result['count'];
 				}
 				$resupply_data[$drug_id] = $amc;
 			}
