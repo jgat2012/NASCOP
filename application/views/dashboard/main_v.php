@@ -489,7 +489,7 @@
 	    var art_adult_patient_link="<?php echo base_url().'dashboard_management/adult_patients';?>";
 	    var art_paed_patient_link="<?php echo base_url().'dashboard_management/paed_patients';?>";
 		$("#ART_PATIENT_grid").load(art_patient_link, function() {
-            $("#ART_PATIENT_listing").dataTable({
+            var oTable1=$("#ART_PATIENT_listing").dataTable({
 		 		 "bJQueryUI" : true,
 				"sPaginationType" : "full_numbers",
 				"sDom" : '<"H"Tfr>t<"F"ip>',
@@ -500,9 +500,10 @@
 				"bProcessing" : true,
 				"bServerSide" : false,
 			});
+			oTable1.fnSort([[0,'desc']]);
 		});
 		$("#BYREG_PATIENT_grid").load(byregimen_patient_link, function() {
-            $("#BYREG_PATIENT_listing").dataTable({
+            var oTable2=$("#BYREG_PATIENT_listing").dataTable({
 			 		 "bJQueryUI" : true,
 					"sPaginationType" : "full_numbers",
 					"sDom" : '<"H"Tfr>t<"F"ip>',
@@ -513,6 +514,7 @@
 					"bProcessing" : true,
 					"bServerSide" : false,
 			});
+			oTable2.fnSort([[0,'desc']]);
        });
        $("#ART_PATIENT_PIPELINE_graph").load(art_bypipeline_link);
        $("#ART_ADULT_PATIENT_graph").load(art_adult_patient_link);
@@ -528,7 +530,7 @@
 		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
 		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
 		  $("#SOH_grid").load(soh_link, function() {
-	            $("#SOH_listing").dataTable({
+	           var oTable1= $("#SOH_listing").dataTable({
 			 		 "bJQueryUI" : true,
 					"sPaginationType" : "full_numbers",
 					"sDom" : '<"H"Tfr>t<"F"ip>',
@@ -538,12 +540,13 @@
 					},
 					"bProcessing" : true,
 					"bServerSide" : false,
-			 });
+			    });
+			    oTable1.fnSort([[0,'desc']]);
 	       });
 	       
 	       $("#CONS_grid").load(cons_link, function() {
-	            $("#CONS_listing").dataTable({
-			 		 "bJQueryUI" : true,
+	            var oTable2=$("#CONS_listing").dataTable({
+			 		"bJQueryUI" : true,
 					"sPaginationType" : "full_numbers",
 					"sDom" : '<"H"Tfr>t<"F"ip>',
 					"oTableTools" : {
@@ -552,7 +555,8 @@
 					},
 					"bProcessing" : true,
 					"bServerSide" : false,
-			 });
+			   });
+			    oTable2.fnSort([[0,'desc']]);
 	       });
 	       
 	       
