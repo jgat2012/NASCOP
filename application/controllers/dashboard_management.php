@@ -1711,7 +1711,7 @@ class Dashboard_Management extends MY_Controller {
 			$tot_adtsites = $results[0]['total'];
 
 			//Sites reported by 10th
-			//echo $period;die();
+
 			if ($period != "") {
 				$tenth = date('Y-m-10', strtotime($period . "+1 month"));
 				$first = date('Y-m-01', strtotime($period . "+1 month"));
@@ -1722,11 +1722,19 @@ class Dashboard_Management extends MY_Controller {
 				$first = date('Y-m-01', strtotime($period));
 				$last_day = date('Y-m-t', strtotime($period));
 			}
+			$period_begin= date('Y-m-01', strtotime($period));
+			$period_end= date('Y-m-t', strtotime($period));
 
-			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
-							INNER JOIN maps m ON m.facility_id=c.facility_id
-							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "'";
-			//INNER JOIN maps m ON m.period_begin=c.period_begin
+			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total 
+			              FROM cdrr c
+						  INNER JOIN maps m ON m.facility_id=c.facility_id
+						  WHERE c.created 
+						  BETWEEN '$first' 
+						  AND '$tenth'
+						  AND c.period_begin='$period_begin'
+						  AND m.period_begin='$period_begin'
+						  AND c.period_end='$period_end'
+						  AND m.period_end='$period_end'";
 
 			$query = $this -> db -> query($sql_tenth);
 			$results = $query -> result_array();
@@ -1740,8 +1748,13 @@ class Dashboard_Management extends MY_Controller {
 			//Sites that have reported this month
 			$sql_report = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							INNER JOIN maps m ON m.facility_id=c.facility_id
-							WHERE c.created BETWEEN '" . $first . "' AND  '" . $last_day . "'";
-			//INNER JOIN maps m ON m.period_begin=c.period_begin
+							WHERE c.created 
+							BETWEEN '$first' 
+							AND  '$last_day'
+							AND c.period_begin='$period_begin'
+						    AND m.period_begin='$period_begin'
+						    AND c.period_end='$period_end'
+						    AND m.period_end='$period_end'";
 			$query = $this -> db -> query($sql_report);
 			$results = $query -> result_array();
 			$tot_reportsites = $results[0]['total'];

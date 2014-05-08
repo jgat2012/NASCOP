@@ -471,13 +471,14 @@ class Order extends MY_Controller {
 						$file_type = $this -> checkFileType($code, $text);
 						$facilities = Sync_Facility::getId($facility_code, $status_code);
 						$facility_id = $facilities['id'];
+						
 						$duplicate = 0;
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
 							$ret[] = "Your facility Code in '" . $_FILES["file"]["name"][$q] . "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
-						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
+						}/* else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
 							$ret[] = "You can only report for " . date('F-Y', strtotime(date('F-Y') . "-1 month")) . ". Kindly check the period fields !-" . $_FILES["file"]["name"][$q] . ' The format should be dd/mm/yyyy';
-						} else if ($file_type == false) {
+						}*/ else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
 							$this -> fix_bug($code, $period_begin, $period_end, $facility_id, $reports_expected, $reports_actual);
@@ -699,9 +700,9 @@ class Order extends MY_Controller {
 
 						if ($facilities == "") {
 							$ret[] = "Your facility Code  in '" . $_FILES["file"]["name"][$q] . "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
-						} else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
+						} /*else if ($period_begin != date('Y-m-01', strtotime(date('F-Y') . "-1 month")) || $period_end != date('Y-m-t', strtotime(date('F-Y') . "-1 month"))) {
 							$ret[] = "You can only report for " . date('F-Y', strtotime(date('F-Y') . "-1 month")) . " . Kindly check the period fields !-" . $_FILES["file"]["name"][$q] . ' The format should be dd/mm/yyyy';
-						} else if ($file_type == false) {
+						}*/ else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected - " . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
 							$ret[] = "A MAPS report already exists for this month !-" . $_FILES["file"]["name"][$q];

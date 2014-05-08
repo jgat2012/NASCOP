@@ -1,3 +1,59 @@
+2014-05-08 09:53:18 am(F-MAPS)
+--------------------------------
+Order was successfully saved. NARUMORU CATHOLIC DISP-F-MAPS.xls
+
+2014-05-08 09:53:06 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. NARUMORU CATHOLIC-F-CDRR.xls
+
+2014-05-08 09:46:45 am(F-CDRR_packs)
+--------------------------------
+Your facility Code in 'NARUMORU CATHOLIC-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-08 09:41:16 am(F-MAPS)
+--------------------------------
+Order was successfully saved. DANDORA II -F-MAPS.xls
+Order was successfully saved. JERICHO HC-F-MAPS.xls
+Order was successfully saved. JOCHAM H-F-MAPS.xls
+Order was successfully saved. KAPLONG MISSION H-F-MAPS.xls
+Order was successfully saved. KARIOBANGI HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. KODIAGA HC-F-MAPS.xls
+Order was successfully saved. MARY HELP THE SICK MISSION-F-MAPS.xls
+Order was successfully saved. MUGUNDA CATHOLIC DISP-F-MAPS.xls
+Order was successfully saved. MWATATE SDH-F-MAPS.xls
+Your facility Code  in 'NARUMORU CATHOLIC DISP-F-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-08 09:40:51 am(D-MAPS)
+--------------------------------
+Order was successfully saved. ATHI RIVER-D-MAPS.xls
+Order was successfully saved. KAKAMEGA PGH-D-MAPS.xls
+Order was successfully saved. NDURU DH-D-MAPS.xls
+Order was successfully saved. TUDOR DH-D-MAPS.xls
+
+2014-05-08 09:40:24 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. DANDORA II HEAITH CENTRE-F-CDRR.xls
+Order was successfully saved. JERICHO HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KAPLONG MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. KARIOBANGI NORTH-F-CDRR.xls
+Order was successfully saved. KODIEGA HEATH C-F-CDRR.xls
+Order was successfully saved. MARY HELP OF THE SICKF-CDRR.xls
+Order was successfully saved. MUGUNDA MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. MWATATE SDH-F-CDRR.xls
+Your facility Code in 'NARUMORU CATHOLIC-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-08 09:40:02 am(D-CDRR)
+--------------------------------
+Order was successfully saved. KAKAMEGA PGH-D-CDRR.xls
+Order was successfully saved. NDURU DH-D-CDRR.xls
+Order was successfully saved. TUDOR DH-D-CDRR.xls
+
+2014-05-06 07:45:16 pm(D-CDRR)
+--------------------------------
+You can only report for April-2014. Kindly check the period fields !-KAKAMEGA PGH-D-CDRR.xls The format should be dd/mm/yyyy
+You can only report for April-2014. Kindly check the period fields !-NDURU DH-D-CDRR.xls The format should be dd/mm/yyyy
+You can only report for April-2014. Kindly check the period fields !-TUDOR DH-D-CDRR.xls The format should be dd/mm/yyyy
+
 2014-04-28 05:19:16 pm(D-CDRR)
 --------------------------------
 A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
