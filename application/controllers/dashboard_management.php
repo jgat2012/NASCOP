@@ -31,13 +31,13 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function getEidADTPeriod() {
-		$sql = "SELECT dateinitiatedontreatment as period_begin FROM eid_master WHERE dateinitiatedontreatment!='' AND dateinitiatedontreatment<=CURDATE() AND dateinitiatedontreatment !='1970-01-01' GROUP BY YEAR(dateinitiatedontreatment),MONTH(dateinitiatedontreatment) ORDER BY dateinitiatedontreatment desc";
+		$sql = "SELECT LAST_DAY(dateinitiatedontreatment) as period_begin FROM eid_master WHERE dateinitiatedontreatment!='' AND dateinitiatedontreatment<=CURDATE() AND LAST_DAY( dateinitiatedontreatment ) IS NOT NULL  AND dateinitiatedontreatment !='1970-01-01' GROUP BY YEAR(dateinitiatedontreatment),MONTH(dateinitiatedontreatment) ORDER BY dateinitiatedontreatment desc";
 		$query = $this -> db -> query($sql);
 		return $results = $query -> result_array();
 	}
 
 	public function getEidPeriod() {
-		$sql = "SELECT enrollment_date as period_begin FROM eid_info GROUP BY YEAR(enrollment_date),MONTH(enrollment_date) ORDER BY enrollment_date desc";
+		$sql = "SELECT LAST_DAY(enrollment_date) as period_begin FROM eid_info WHERE enrollment_date !='1970-01-01' AND LAST_DAY( enrollment_date ) IS NOT NULL  GROUP BY YEAR(enrollment_date),MONTH(enrollment_date) ORDER BY enrollment_date desc";
 		$query = $this -> db -> query($sql);
 		return $results = $query -> result_array();
 	}
@@ -1721,6 +1721,7 @@ class Dashboard_Management extends MY_Controller {
 				$tenth = date('Y-m-10', strtotime($period));
 				$first = date('Y-m-01', strtotime($period));
 				$last_day = date('Y-m-t', strtotime($period));
+				$period.="-1 month";
 			}
 			$period_begin= date('Y-m-01', strtotime($period));
 			$period_end= date('Y-m-t', strtotime($period));
@@ -2513,9 +2514,13 @@ class Dashboard_Management extends MY_Controller {
 
 	public function fix_bug($periods = array()) {
 		$current_selection = date('Y-m-01', strtotime("-1 month"));
+		$end_selection = date('Y-m-t', strtotime("-1 month"));
 		$count = 0;
 		foreach ($periods as $period) {
 			if (in_array($current_selection, $period)) {
+				$count++;
+			}
+			if (in_array($end_selection, $period)) {
 				$count++;
 			}
 		}

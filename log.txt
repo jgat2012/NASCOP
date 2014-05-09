@@ -1,3 +1,38 @@
+2014-05-09 09:27:53 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. THIKA DH-D-MAPS.xls
+
+2014-05-09 09:25:08 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. BAHATI DH-D-MAPS.xls
+Order was successfully saved. CHUKA DH-D-MAPS.xls
+Order was successfully saved. EMBU PGH-D-MAPS.xls
+Order was successfully saved. IGUHU DH-D-MAPS.xls
+Order was successfully saved. KENDU BAY SDH-D-MAPS.xls
+Order was successfully saved. MIATHENE DH-D-MAPS.xls
+Order was successfully saved. NGAO DH-D-MAPS.xls
+Your facility Code  in 'OLOLULUNGA DH-D-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. RWAMBWA HEALTH CENTRE-D-MAPS.xls
+Your facility Code  in 'THIKA DH-D-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-09 09:24:35 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. BAHATI DH-D-CDRR.xls
+Order was successfully saved. CHUKA DH-D-CDRR.xls
+Order was successfully saved. EMBU PGH-D-CDRR.xls
+Order was successfully saved. IGUHU DH-D-CDRR.xls
+Order was successfully saved. KENDU BAY DH-D-CDRR.xls
+Order was successfully saved. MIATHENE DH-D-CDRR.xls
+Order was successfully saved. NGAO DH-D-CDRR.xls
+Your facility Code in 'OLOLULUNGA DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. RWAMBWA HC-D-CDRR.xls
+Order was successfully saved. THIKA DH-D-CDRR.xls
+
+2014-05-08 01:01:22 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. BAHATI HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. MAGONGO (MCM) DISPENSARY F-CDRR.xls
+
 2014-05-08 09:53:18 am(F-MAPS)
 --------------------------------
 Order was successfully saved. NARUMORU CATHOLIC DISP-F-MAPS.xls
