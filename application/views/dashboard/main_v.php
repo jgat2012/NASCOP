@@ -471,6 +471,12 @@
 		  var eid_facility=$("#comparison_eid_facility").val();
 	  	  var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/comparison/';?>"+eid_period+"/"+eid_facility+"/"+eid_county;
           $("#chart_area_eid_comparison").load(chart_area_eid_source_link);
+		}else if(id=="eid_retention_btn"){
+		  var eid_period=$("#retention_eid_period").val();
+		  var eid_range=$("#cretention_eid_range").val();
+		  var eid_facility=$("#comparison_eid_facility").val();
+	  	  var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/retention/';?>"+eid_period+"/"+eid_facility+"/"+eid_range;
+          $("#chart_area_eid_retention").load(chart_area_eid_source_link);
 		}
 		
 		
@@ -580,9 +586,11 @@
 	  	var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/source';?>";
 	  	var chart_area_eid_comaprison_link= "<?php echo base_url().'dashboard_management/eid/comparison';?>";
         var chart_area_eid_summary_link="<?php echo base_url().'dashboard_management/eid/summary';?>";
+        var chart_area_eid_retention_link="<?php echo base_url().'dashboard_management/eid/retention';?>";
         
         $("#chart_area_eid_source").load(chart_area_eid_source_link);
         $("#chart_area_eid_comparison").load(chart_area_eid_comaprison_link);
+        $("#chart_area_eid_retention").load(chart_area_eid_retention_link);
         $("#eid_summary").load(chart_area_eid_summary_link);
 	}
 	function two_pager(){
@@ -869,8 +877,8 @@
     <!--EID Analysis-->
     <div class="tab-pane nat_dashboard_rep active" id="tab8">
     	<div class="row-fluid">
-    		  <div class="two_block span6">
-	    		<h3 class="dashboard_title">EID Source Analysis:
+    		  <div class="two_block span4">
+	    		<h3 class="dashboard_title">EID Source:
 	    			For
 	    		<select id="source_eid_period" class="nd_period nd_input_small span4">
 					<?php foreach ($eid_period as $value) {
@@ -898,8 +906,8 @@
 	    		<div id="chart_area_eid_source"></div>
 	    	</div>
 
-	    	<div class="two_block span6">
-	    		<h3 class="dashboard_title">WebADT/EID Comparison Analysis:
+	    	<div class="two_block span4">
+	    		<h3 class="dashboard_title">WebADT/EID Comparison:
 	    		For
 	    		<select id="comparison_eid_period" class="nd_period nd_input_small span4">
 					<?php foreach ($eid_adt_period as $value) {
@@ -926,6 +934,32 @@
 	    			
 	    		</h3>
 	    		<div id="chart_area_eid_comparison"></div>
+	    	</div>
+	    	<div class="two_block span4">
+				<h3 class="dashboard_title">EID Retention:For
+	    		<select id="retention_eid_period" class="nd_period nd_input_small span4">
+					<?php foreach ($eid_adt_period as $value) {
+						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+					}?>
+				</select>
+				<br/>	
+				<span>Facility</span>
+				<select id="retention_eid_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($eid_adt_facility as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Period</span>
+				<select id="retention_eid_range" class="nd_period nd_input_small span3">
+					<option value="90">3 Months</option>
+					<option value="180">6 Months</option>
+					<option value="360">1 Year</option>
+				</select>
+				
+				<button class="generate btn btn-warning" style="color:black" id="eid_retention_btn">Get</button>
+				</h3>
+				<div id="chart_area_eid_retention"></div>
 	    	</div>
     	</div>
     	<div class="row-fluid">

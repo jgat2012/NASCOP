@@ -403,7 +403,7 @@
 		  <?php }?>
 		  $("#avg_consumption_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['aggr_consumed']/$amc); ?>");
 		  $("#avg_issues_<?php echo $cdrr['drug_id']; ?>").val("<?php echo ceil($cdrr['received']/$amc); ?>");
-		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
+		  $("#resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php if($cdrr['resupply']<0){ echo 0;}else{ echo $cdrr['resupply']; }?>");
 		  <?php if( $cdrr['old_resupply']==''){?>
 		  $("#new_resupply_<?php echo $cdrr['drug_id']; ?>").val("<?php echo $cdrr['resupply']; ?>");
 		  <?php }else{?>

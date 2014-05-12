@@ -1901,7 +1901,9 @@ class Dashboard_Management extends MY_Controller {
 			$conditions .= "AND em.facilitycode='$facility'";
 		}
 		if ($county != 0) {
-			$conditions .= "AND c.id='$county'";
+			if ($type != "retention") {
+			   $conditions .= "AND c.id='$county'";
+			}
 		}
 
 		if ($type == "gender") {
@@ -1916,18 +1918,36 @@ class Dashboard_Management extends MY_Controller {
 		} else if ($type == "source") {
 			$column = "source";
 			$container = "chart_area_eid_source";
+		}else if ($type == "retention") {
+			$column = "status";
+			$container = "chart_area_eid_retention";
 		}
 
 		if ($type != "comparison" && $type != "summary") {
-			$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
-					FROM eid_info ei 
-					LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
-					LEFT JOIN counties c ON c.id=f.county
-					WHERE ei.enrollment_date
-					BETWEEN '$period_start'
-					AND '$period_end'
-					$conditions
-					GROUP BY ei.$column";
+				 if ($type == "retention") {
+				 	if($county==0){
+				 		$county=90;
+				 	}
+					$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
+							FROM eid_info ei 
+							LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+							WHERE ei.enrollment_date
+							BETWEEN '$period_start'
+							AND '$period_end'
+							AND DATEDIFF(CURDATE(),ei.enrollment_date)>=$county
+							$conditions
+							GROUP BY ei.$column";
+				}else{
+					$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
+							FROM eid_info ei 
+							LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+							LEFT JOIN counties c ON c.id=f.county
+							WHERE ei.enrollment_date
+							BETWEEN '$period_start'
+							AND '$period_end'
+							$conditions
+							GROUP BY ei.$column";
+						}
 		} else if ($type == "summary") {
 			$tbody = "";
 			$months = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
@@ -1946,7 +1966,7 @@ class Dashboard_Management extends MY_Controller {
 			echo $tbody;
 			exit();
 
-		} else {
+		}  else {
 			if ($facility != 0) {
 				$conditions_adt .= "AND ei.facility_code='$facility'";
 				$conditions_eid .= "AND em.facilitycode='$facility'";
