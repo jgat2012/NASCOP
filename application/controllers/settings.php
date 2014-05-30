@@ -658,7 +658,7 @@ class settings extends MY_Controller {
 		$close_div = "</div>";
 
 		if ($type == "sync_drug") {
-			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight");
+			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight","category_id" => "Category");
 		} else if ($type == "sync_facility") {
 			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district_id" => "district_id", "ordering" => "ordering", "service_point" => "service_point", "county_id" => "county_id");
 		} else if ($type == "sync_regimen") {

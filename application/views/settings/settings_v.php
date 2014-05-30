@@ -139,7 +139,7 @@
 			$("#create_setting").text("add drug");
 			$("#modal_header").text("Add Drug");
 		} else if(type == "sync_facility") {
-			$("#add_btn").hide();
+			$("#create_setting").text("add facility");
 			$("#modal_header").text("Add Facility");
 		} else if(type == "sync_regimen") {
 			$("#create_setting").text("add regimen");
@@ -204,7 +204,7 @@
 				$("#create_setting").text("add drug");
 				$("#modal_header").text("Add Drug");
 			} else if(type == "sync_facility") {
-				$("#add_btn").hide();
+				$("#create_setting").text("add facility");
 				$("#modal_header").text("Add Facility");
 			} else if(type == "sync_regimen") {
 				$("#create_setting").text("add regimen");
