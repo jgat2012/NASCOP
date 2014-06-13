@@ -34,7 +34,7 @@ class settings extends MY_Controller {
 		$curl = new Curl();
 		$url = $this -> esm_url;
 
-		$username = "kevinmarete";
+		$username = "kmarete";
 		$password = "poltergeist";
 		$curl -> setBasicAuthentication($username, $password);
 		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
@@ -77,7 +77,7 @@ class settings extends MY_Controller {
 			$links[] = "facility/" . $facility_id . "/cdrr";
 			$links[] = "facility/" . $facility_id . "/maps";
 		}
-		$username = "kevinmarete";
+		$username = "kmarete";
 		$password = "poltergeist";
 		$curl -> setBasicAuthentication($username, $password);
 		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
