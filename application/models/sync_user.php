@@ -45,5 +45,11 @@ class Sync_User extends Doctrine_Record {
 		return $sync_user[0]['password'];
 	}
 
+	public function authenticateUser($email,$password) {
+		$query = Doctrine_Query::create() -> select("*") -> from("sync_user") -> where("email ='$email' and password = md5($password)");
+		$sync_user = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $sync_user[0];
+	}
+
 }
 ?>

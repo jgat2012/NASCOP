@@ -5,6 +5,9 @@
 	#tab2 .three_block{
 		height:50%;
 	}
+	.nat_dashboard_rep h3{
+		font-size:0.8em;
+	}
 </style>
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -473,8 +476,11 @@
           $("#chart_area_eid_comparison").load(chart_area_eid_source_link);
 		}else if(id=="eid_retention_btn"){
 		  var eid_period=$("#retention_eid_period").val();
-		  var eid_range=$("#cretention_eid_range").val();
+		  var eid_range=$("#retention_eid_range").val();
 		  var eid_facility=$("#comparison_eid_facility").val();
+		  if(eid_facility==""){
+		  	eid_facility=0;
+		  }
 	  	  var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/retention/';?>"+eid_period+"/"+eid_facility+"/"+eid_range;
           $("#chart_area_eid_retention").load(chart_area_eid_source_link);
 		}
@@ -618,12 +624,8 @@
   	<li id="pa_menu" class="main_menu" ><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
     <li id="ca_menu" class="main_menu" ><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
     <li id="eid_menu" class="main_menu" ><a href="#tab8" data-toggle="tab">EID Analysis</a></li>
-    <li id="up_menu" class="main_menu" ><a href="#tab7" data-toggle="tab">Upload</a></li>
+    <li id="up_menu" class="main_menu" ><a href="#tab7" data-toggle="tab">Ordering Upload</a></li>
     <li id="two_p_menu" class="main_menu" ><a href="#tab6" data-toggle="tab">2 Pager Download</a></li>
-    
-    <!-- <li id="fa_menu" class="main_menu"><a href="#tab3" data-toggle="tab">Facility Analysis</a></li> -->
-    <!-- <li id="oa_menu" class="order_analysis_menus main_menu"><a href="#tab4" data-toggle="tab">Order Analysis</a></li>-->
-    
   </ul>
   <div>
   	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
@@ -633,612 +635,526 @@
 	</ol>
   </div>
 
-  <div class="tab-content nat_dashboard_rep" style="clear:left">
-  	<!--Ordering-->
-  	<div class="tab-pane" id="tab7">
-  		<div class="container">
-  			<div class="row-fluid" style="height:50%;">
-  			<?php 
-  			 if($this->session->userdata("upload_valid") !=""){
-  			?>
-  			<div id="order_frm">
-  				<div class="row-fluid">
-  					<div class="span6">
-  						<?php if($this -> session -> flashdata('login_message') !=""){?>
-                		  	<div class="alert alert-info">
-							    <button type='button' class='close' data-dismiss='alert'>&times;</button>
-							     <?php echo $this -> session -> flashdata('login_message');?>
-							</div>
-							<?php }?>
-  					</div>
-  				 <div class="span6">
-  			      	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
-  			      	<div class="dropdown" style="display:inline;">
-					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
-					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-					  	<li><a tabindex="-1" href='<?php echo base_url()."order/show_log"; ?>'>upload log</a></li>
-					    <li><a tabindex="-1" href='#' class="password">change password</a></li>
-					  </ul>
-					</div>
-					<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
-					</label>			
-                 </div>
-                 </div>
-                <div class="row-fluid">
-  				<div class="span6">
-  	                   		<h3>CDRR Upload</h3>
-						      <div class="accordion-inner">
-						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="D-CDRR"><i class="icon-upload"></i> D-CDRR for Central Sites</a>
-						      </div>
-						      <div class="accordion-inner">
-						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="F-CDRR_packs"> <i class="icon-upload"></i> F-CDRR for Stand-alone Sites</a>
-						      </div>
-						        <h3>MAPS Upload</h3>
-						      <div class="accordion-inner">
-						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="D-MAPS"><i class="icon-upload"></i> D-MAPS for Central Sites</a>
-						      </div>
-						      <div class="accordion-inner">
-						        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="F-MAPS"><i class="icon-upload"></i> F-MAPS for Stand-alone Sites</a>
-						      </div>
-						     <!-- Modal -->
-							<div id="modal_template" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-							<form id='modal_action' class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php echo base_url()."order/import_order"?>">	
-									<div class="modal-header">
-										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-											
-										</button>
-										<h3 id="myModalLabel">Upload Order(<b><span id="modal_header"></span></b>)</h3>
-									</div>
-									<div class="modal-body">
-										<span class="alert-info">Kindly make sure that the file your are uploading is in 1997-2003 excel format(e.g: example.xls)</span>
-										<br>
-										<div class="control-group">
-										  <label class="control-label" for="inputIcon">Upload File <i class="icon-file"></i></label>
-										  <div class="controls">
-										      <input type="hidden"  name="upload_type" id="upload_type" />
-				                              <input type="file"  name="file[]" multiple="multiple" size="30" id="inputIcon"  required="required" accept="application/vnd.ms-excel"/>
-										  </div>
-										</div>
-									</div>
-									<div class="modal-footer">
-										<button class="btn" data-dismiss="modal" aria-hidden="true">
-											Close
-										</button>
-										<button class="btn btn-primary">
-											Upload
-										</button>
-									</div>
-								</form>
-							</div>
-  				</div>
-  			    <div class="span6" style="height:50%;">
-						      <h3>CDRR Templates <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
-						      <div class="accordion-inner">
-						        <a href="<?php echo base_url().'downloads/D-CDRR for Central Sites and District Stores.xls' ;?>"><i class="icon-download-alt"></i> D-CDRR for Central Sites.xls</a>
-						      </div>
-						      <div class="accordion-inner">
-						        <a href="<?php echo base_url().'downloads/F-CDRR for Standalone Sites.xls' ;?>"> <i class="icon-download-alt"></i> F-CDRR for Stand-alone Sites.xls</a>
-						      </div>
-						        <h3>MAPS Templates <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
-						      <div class="accordion-inner">
-						        <a href="<?php echo base_url().'downloads/D-MAPS for Central Sites and District Stores.xls' ;?>"><i class="icon-download-alt"></i> D-MAPS for Central Sites.xls</a>
-						      </div>
-						      <div class="accordion-inner">
-						        <a href="<?php echo base_url().'downloads/F-MAPS for Standalone Sites.xls' ;?>"><i class="icon-download-alt"></i> F-MAPS for Stand-alone Sites.xls</a>
-						      </div>
-  			    </div><!--End of second Span-->
-  			    </div>
-  			    </div>
-  			    <div id="change_frm" style="display:none;">
-  				<div class="row-fluid">
-  				 <div class="span12">
-  			      	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
-  			      	<div class="dropdown" style="display:inline;">
-					  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
-					  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-					    <li><a tabindex="-1" href='#' class="password">change password</a></li>
-					  </ul>
-					</div>
-					<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
-					</label>			
-                 </div>
-                 </div>
-                <div class="row-fluid">
-                	<div class="span6">
-							<?php echo form_open('order/upload_password');?>
-							<?php echo form_fieldset('', array('id' => 'login_legend'));?>
-							<legend id="login_legend">
-								<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Change Password
-							</legend>
-							<?php echo $this -> session -> flashdata('error_message');?>
-								<div class="item">
-								<?php echo form_error('current_password', '<div class="error_message">', '</div>');?>
-								<?php echo form_label('Current Password:', 'current_password');?>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-key"></i></span>
-									<?php echo form_password(array('name' => 'current_password', 'required' => 'required', 'id' => 'current_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
-								</div>
-			                    </div>
-							   	<div class="item">
-								<?php echo form_error('new_password', '<div class="error_message">', '</div>');?>
-								<?php echo form_label('New Password:', 'new_password');?>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-key"></i></span>
-									<?php echo form_password(array('name' => 'new_password', 'required' => 'required', 'id' => 'new_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
-								</div>
-			                    </div>
-			                    <div class="item">
-								<?php echo form_error('confirm_password', '<div class="error_message">', '</div>');?>
-								<?php echo form_label('Confirm Password:', 'confirm_password');?>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-key"></i></span>
-									<?php echo form_password(array('name' => 'confirm_password', 'required' => 'required', 'id' => 'confirm_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
-								</div>
-			                    </div>
-	                        	<div style="margin-top:1em;">
-	                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
-								    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:20%;'), 'Save');?> 
-								    <?php echo form_fieldset_close();?>
-	                        	</div>
-	                        </form>
-                	</div>
-                </div>
-                </div>
-  			    <?php }else{?>
-  			       <div class="span4" id="login_frm">
-  			                <?php if($this -> session -> flashdata('login_message') !=""){?>
-  			       			<div class="alert alert-info">
-							    <button type='button' class='close' data-dismiss='alert'>&times;</button>
-							     <?php echo $this -> session -> flashdata('login_message');?>
-							</div>
-							<?php } echo form_open('order/upload_authenticate');?>
-							<?php echo form_fieldset('', array('id' => 'login_legend'));?>
-							<legend id="login_legend">
-								<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Log In
-							</legend>
-							<?php echo $this -> session -> flashdata('error_message');?>
-							    <div class="item">
-								<?php echo form_error('email', '<div class="error_message">', '</div>');?>
-								<?php echo form_label('Email Address:', 'username');?>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<?php echo form_input(array('type' => 'email', 'name' => 'email', 'required' => 'required', 'id' => 'email', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => 'mail@yourmail.com'));?>
-								</div>
-			                    </div>
-			                    <div class="item">
-								<?php echo form_error('password', '<div class="error_message">', '</div>');?>
-								<?php echo form_label('Password:', 'password');?>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-key"></i></span>
-									<?php echo form_password(array('name' => 'password', 'required' => 'required', 'id' => 'password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
-								</div>
-			                    </div>
-			                    <div class="item">
-			                    	<div class="input-group">
-			                    	<strong><a href="#" class="forgot" >Forgot Password?</a></strong>
-			                        </div>
-			                    </div>
-	                        	<div style="margin-top:1em;">
-	                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
-								    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:20%;'), 'Go');?> 
-								    <?php echo form_fieldset_close();?>
-	                        	</div>
-	                        </form>
-		           </div>
-		           <div class="span4" id="forgot_frm" style="display:none;">
-							<?php echo form_open('order/Upload_forgot');?>
-							<?php echo form_fieldset('', array('id' => 'login_legend'));?>
-							<legend id="login_legend">
-								<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Forgot Password
-							</legend>
-							<?php echo $this -> session -> flashdata('error_message');?>
-							    <div class="item">
-								<?php echo form_error('email', '<div class="error_message">', '</div>');?>
-								<?php echo form_label('Email Address:', 'username');?>
-								<div class="input-group">
-									<span class="input-group-addon"><i class="fa fa-user"></i></span>
-									<?php echo form_input(array('type' => 'email', 'name' => 'email', 'required' => 'required', 'id' => 'email', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => 'mail@yourmail.com'));?>
-								</div>
-			                    </div>
-			                    <div class="item">
-			                    	<div class="input-group">
-			                    	<strong><a href="#" class="login">Back to Login</a></strong></strong>
-			                        </div>
-			                    </div>
-	                        	<div style="margin-top:1em;">
-	                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
-								    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:30%;'), 'Submit');?> 
-								    <?php echo form_fieldset_close();?>
-	                        	</div>
-	                        </form>
-		           </div>
-  		       <?php }?>
-  		   </div>
-  		</div>
-  		<!--
-      <div class="two_block" id="s_consumption">
-			<h3 class="dashboard_title">Order Upload</h3>
-	  </div>-->
-    </div>
-  	<!-- Commodity Analysis -->
-    <div class="tab-pane" id="tab1">
-		<div class="row-fluid">
-			<div class="two_block span6" id="s_consumption">
-				<h3 class="dashboard_title">Stock Consumption</h3>
-				<div id="CONS_grid"></div>
-		    </div>
-		    <div class="two_block span6" id="s_consumption">
-				<h3 class="dashboard_title">Stock Status</h3>
-				<div id="SOH_grid"></div>
-		    </div>
-		</div>
-      
-    </div>
-    <!--EID Analysis-->
-    <div class="tab-pane nat_dashboard_rep active" id="tab8">
-    	<div class="row-fluid">
-    		  <div class="two_block span4">
-	    		<h3 class="dashboard_title">EID Source:
-	    			For
-	    		<select id="source_eid_period" class="nd_period nd_input_small span4">
-					<?php foreach ($eid_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>
-	    		<span>County</span>
-				<select id="source_eid_county" class="nd_period nd_input_small span3">
-					<option value="0">All</option>
-					<?php foreach ($eid_county as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="source_eid_facility" class="nd_period nd_input_small span4">
-					<option value="0">All</option>
-					<?php foreach ($eid_facility as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				
-				<button class="generate btn btn-warning" style="color:black" id="eid_source_btn">Get</button>	
-	    		</h3>   
-	    		<div id="chart_area_eid_source"></div>
+    <div class="tab-content nat_dashboard_rep" style="clear:left">
+	    <!-- Reporting Analysis -->
+	    <div class="tab-pane nat_dashboard_rep active" id="tab5">
+	    	<div class="row-fluid">
+	    		<div class="two_block span6" id="">
+		    		<h3 class="dashboard_title">ARV Sites</h3>
+		    		
+		    		<div id="chart_area_report_summary"></div>
+		    	</div>
+		    	<div class="two_block span6" id="">
+		    		<h3 class="dashboard_title">Reporting Site Rates</h3>
+		    		<div id="chart_area_report"></div>
+		    	</div>
 	    	</div>
-
-	    	<div class="two_block span4">
-	    		<h3 class="dashboard_title">WebADT/EID Comparison:
-	    		For
-	    		<select id="comparison_eid_period" class="nd_period nd_input_small span4">
-					<?php foreach ($eid_adt_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>	
-	    		<span>County</span>
-				<select id="comparison_eid_county" class="nd_period nd_input_small span3">
-					<option value="">All</option>
-					<?php foreach ($eid_adt_county as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="comparison_eid_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
-					<?php foreach ($eid_adt_facility as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				
-				<button class="generate btn btn-warning" style="color:black" id="eid_comparison_btn">Get</button>	
-	    			
-	    		</h3>
-	    		<div id="chart_area_eid_comparison"></div>
-	    	</div>
-	    	<div class="two_block span4">
-				<h3 class="dashboard_title">EID Retention:For
-	    		<select id="retention_eid_period" class="nd_period nd_input_small span4">
-					<?php foreach ($eid_adt_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>	
-				<span>Facility</span>
-				<select id="retention_eid_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
-					<?php foreach ($eid_adt_facility as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Period</span>
-				<select id="retention_eid_range" class="nd_period nd_input_small span3">
-					<option value="90">3 Months</option>
-					<option value="180">6 Months</option>
-					<option value="360">1 Year</option>
-				</select>
-				
-				<button class="generate btn btn-warning" style="color:black" id="eid_retention_btn">Get</button>
-				</h3>
-				<div id="chart_area_eid_retention"></div>
-	    	</div>
-    	</div>
-    	<div class="row-fluid">
-    		<div class="three_block span12">
-	    		<div class="table-responsive">
-	    			<table class="table table-bordered table-hover table-condensed table-striped">
-	    				<thead style="background: #2B597E;color: #FFF;font-weight:bold;font-size:0.9em;">
-	    					<tr>
-	    						<td rowspan="3">
-	    						 Unit of interest <br/>
-	    						 <span>County</span>
-				<select id="comparison_eid_county" class="nd_period nd_input_small span3">
-					<option value="">All</option>
-					<?php foreach ($eid_adt_county as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="comparison_eid_facility" class="nd_period nd_input_small span4">
-					<option value="">All</option>
-					<?php foreach ($eid_adt_facility as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<button class="generate btn btn-warning" style="color:black" id="eid_comparison_btn">Get</button>	
-	    						</td>
-	    						<td>Period</td>
-	    						<td colspan="2">EID Data</td>
-	    						<td>Service Data DHIS</td>
-	    						<td colspan="4">Actual Patient and Commodity data</td>
-	    					</tr>
-	    					<tr>
-	    						<td rowspan="2">2013</td>
-	    						<td rowspan="2">EID Positives</td>
-	    						<td rowspan="2">EID Enrolled</td>
-	    						<td rowspan="2">Patients Enrolled(via PMTCT)</td>
-	    						<td>Patient Scale Up</td>
-	    						<td>Patient Scale Up</td>
-	    						<td>Commodity Scale Up</td>
-	    						<td>Commodity Scale Up</td>
-	    					</tr>
-	    					<tr>
-	    					<td>All Paeds</td>	
-	    					<td>vs. ABC/NVP peads</td>	
-	    					<td>PMTCT exit NVP</td>	
-	    					<td>Peads Entry: ABC</td>	
-	    					</tr>
-	    				</thead>
-	    				<tbody id="eid_summary">
-	    					
-	    				</tbody>
-	    			</table>
-	    		</div>
-	    	</div>
-    	</div>
-    </div>
-    <!-- Patient Analysis -->
-    <div class="tab-pane nat_dashboard_rep" id="tab2">
-    	<div class="row-fluid">
-		  <div class="two_block span4" id="patient_by_art_by_pipeline">
-    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline<br/> For
-				<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span4">
-					<?php foreach ($maps_report_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>	
-				<button class="generate btn btn-warning" style="color:black" id="pa_bypipeline_btn">Get</button>
-				</h3>
-			<hr size="2"><p></p>
-    		<div id="ART_PATIENT_PIPELINE_graph"></div>
-    	  </div>
-    	  <div class="three_block span4" id="adult_patient_on_art">
-    		<h3 class="dashboard_title">Current Adult Patients on ART as of 
-				<select id="nd_adult_art_period" class="nd_period nd_input_small span4">
-					<?php foreach ($maps_report_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>
-				<span>County</span>
-				<select id="nd_adult_art_county" class="nd_period nd_input_small span3">
-					<option value="0">All</option>
-					<?php foreach ($county_period as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
-					<option value="0">All</option>
-					<?php foreach ($facility_period as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				
-				<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
-			</h3>
-    		<div id="ART_ADULT_PATIENT_graph"></div>
-    	  </div>
-    	  <div class="three_block span4" id="paed_patient_on_art">
-    		<h3 class="dashboard_title">Current Paedriatic Patients on ART as of 
-				<select id="nd_paed_art_period" class="nd_period nd_input_small span4">
-					<?php foreach ($maps_report_period as $value) {
-						echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
-					}?>
-				</select>
-				<br/>
-				<span>County</span>
-				<select id="nd_paed_art_county" class="nd_period nd_input_small span3">
-					<option value="0">All</option>
-					<?php foreach ($county_period as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<span>Facility</span>
-				<select id="nd_paed_art_facility" class="nd_period nd_input_small span4">
-					<option value="0">All</option>
-					<?php foreach ($facility_period as $index=>$value) {
-						echo "<option value='".$index."'>".$value."</option>";
-					}?>
-				</select>
-				<button class="generate btn btn-warning" style="color:black" id="paed_art_btn">Get</button>
-			</h3>
-    		<div id="ART_PAED_PATIENT_graph"></div>
-    	  </div>
-		</div>
-		<div class="row-fluid">
-			<div class="three_block span4" id="patient_by_art" style="height:auto;">
-	    		<h3 class="dashboard_title">Current Patients By ART Sites</h3>
-	    		<div id="ART_PATIENT_grid"></div>
-	    	</div>
-	    	<div class="three_block span4" id="patient_by_regimen" style="height:auto;">
-	    		<h3 class="dashboard_title">Patients By Regimen</h3>
-	    		<div id="BYREG_PATIENT_grid"></div>
-	    	</div>
-	    	<div class="three_block span4" id="patient_scale_up" style="height:auto;">
-	    		<h3 class="dashboard_title">Patients Scale Up</h3>
-	    		<table class="table table-bordered table-striped tbl_nat_dashboard">
-	    			<thead>	
-	    				<tr><th>Pipeline</th><th>Action</th></tr>
-	    			</thead>
-	    			<tbody>
-	    				<tr><td>Kemsa</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kemsa','<i class="icon-download-alt"></i>Download');?></td></tr>
-	    				<tr><td>Kenya Pharma</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kenya_pharma','<i class="icon-download-alt"></i>Download');?></td></tr>
-	    			</tbody>
-	    		</table>
-	    		
-	    	</div>
-		</div>
-    	
-    </div>
-    <!-- Reporting Analysis -->
-    <div class="tab-pane nat_dashboard_rep active" id="tab5">
-    	<div class="row-fluid">
-    		<div class="two_block span6" id="">
-	    		<h3 class="dashboard_title">ARV Sites</h3>
-	    		
-	    		<div id="chart_area_report_summary"></div>
-	    	</div>
-	    	<div class="two_block span6" id="">
-	    		<h3 class="dashboard_title">Reporting Site Rates</h3>
-	    		<div id="chart_area_report"></div>
-	    	</div>
-    	</div>
-    	<div class="row-fluid">
-    		<div class="two_block span6" id="">
-	    		<h3 class="dashboard_title">Reporting Satellite Sites Summary for 
-						<select id="satellite_period" class="nd_period nd_input_small span3">
-							<?php foreach ($report_period as $value) {
-								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".strtoupper(date('F-Y',strtotime($value['period_begin'])))."</option>";
-							}?>
-						</select>
-						<button class="generate btn btn-warning" style="color:black" id="rs_satellite_btn">Get</button>
+	    	<div class="row-fluid">
+	    		<div class="two_block span6" id="">
+		    		<h3 class="dashboard_title">Reporting Satellite Sites Summary for 
+							<select id="satellite_period" class="nd_period nd_input_small span3">
+								<?php foreach ($report_period as $value) {
+									echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".strtoupper(date('F-Y',strtotime($value['period_begin'])))."</option>";
+								}?>
+							</select>
+							<button class="generate btn btn-warning" style="color:black" id="rs_satellite_btn">Get</button>
+						</h3>
+						<hr size="2">
+		    		<div id="chart_area_report_analysis"></div>
+		    	</div>
+		    	<div class="two_block span6" id="">
+		    		<h3 class="dashboard_title">Reporting Ordering Sites Rate Summary for 
+							<select id="ordering_period" class="nd_period nd_input_small span3">
+								<?php foreach ($report_period as $value) {
+									echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".strtoupper(date('F-Y',strtotime($value['period_begin'])))."</option>";
+								}?>
+							</select>
+							
+							<button class="generate btn btn-warning" style="color:black" id="rs_ordering_btn">Get</button>
 					</h3>
 					<hr size="2">
-	    		<div id="chart_area_report_analysis"></div>
+		    		<div id="report_summary_table"></div>
+		    	</div>
 	    	</div>
-	    	<div class="two_block span6" id="">
-	    		<h3 class="dashboard_title">Reporting Ordering Sites Rate Summary for 
-						<select id="ordering_period" class="nd_period nd_input_small span3">
-							<?php foreach ($report_period as $value) {
-								echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".strtoupper(date('F-Y',strtotime($value['period_begin'])))."</option>";
-							}?>
-						</select>
-						
-						<button class="generate btn btn-warning" style="color:black" id="rs_ordering_btn">Get</button>
+	    </div>
+	    <!-- Patient Analysis -->
+	    <div class="tab-pane nat_dashboard_rep" id="tab2">
+	    	<div class="row-fluid">
+			  <div class="two_block span4" id="patient_by_art_by_pipeline">
+	    		<h3 class="dashboard_title">Number of Patients on ART By Pipeline<br/> For
+					<select id="nd_pa_bypipeline_period" class="nd_period nd_input_small span4">
+						<?php foreach ($maps_report_period as $value) {
+							echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+						}?>
+					</select>	
+					<button class="generate btn btn-warning" style="color:black" id="pa_bypipeline_btn">Get</button>
+					</h3>
+				<hr size="2"><p></p>
+	    		<div id="ART_PATIENT_PIPELINE_graph"></div>
+	    	  </div>
+	    	  <div class="three_block span4" id="adult_patient_on_art">
+	    		<h3 class="dashboard_title">Current Adult Patients on ART as of 
+					<select id="nd_adult_art_period" class="nd_period nd_input_small span4">
+						<?php foreach ($maps_report_period as $value) {
+							echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+						}?>
+					</select>
+					<br/>
+					<span>County</span>
+					<select id="nd_adult_art_county" class="nd_period nd_input_small span3">
+						<option value="0">All</option>
+						<?php foreach ($county_period as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<span>Facility</span>
+					<select id="nd_adult_art_facility" class="nd_period nd_input_small span4">
+						<option value="0">All</option>
+						<?php foreach ($facility_period as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					
+					<button class="generate btn btn-warning" style="color:black" id="adult_art_btn">Get</button>
 				</h3>
-				<hr size="2">
-	    		<div id="report_summary_table"></div>
-	    	</div>
-    	</div>
-    	
-    	
-    </div>
-    
-    <!-- 2  Pager Download -->
-    <div class="tab-pane nat_dashboard_rep" id="tab6">
-    	<div class="container" style="width: 50%">
-  			<div class="row-fluid" style="height:50%;">
-  					<h3 class="dashboard_title">Kenya Anti-Retroviral medicines (ARVs) Stock Situation</h3>
-		    		<div id="two_pager_area"></div>
-  			</div>
-		</div>  	
-    </div>
-    
-    <!-- Facility Analysis -->
-    <div class="tab-pane" id="tab3">
-      <div class="navbar" style="width:100%">
-		  <div class="navbar-inner">
-		    <ul class="nav">
-		      <li id="ordering_site_list_menu" class="active facility_analysis_menus"><a href="#">Ordering Sites List</a></li>
-		      <!--<li id="ordering_site_sum_menu" class="facility_analysis_menus"><a  href="#">Ordering Sites Summary</a></li>-->
-		      <li id="service_point_list_menu" class="facility_analysis_menus"><a  href="#">Service Points List</a></li>
-		     <!-- <li id="service_point_sum_menu" class="facility_analysis_menus"><a  href="#">Service Points Summary</a></li>-->
-		    </ul>
-		  </div>
-	  </div>
-      <div class="row-fluid">
-		  <div class="span12">
-		  		<div id="fa_menus" class="nd_menus">
-							<h3 class="font_responsive">
-								<select id="nd_fa_month" class="nd_month nd_input_small span3">
-									
-								</select>
-								<select id="nd_fa_year" class="nd_year nd_input_small">
-								</select> 
-								
-								<select id="nd_fa_pipeline" class="nd_pipeline nd_input_medium">
-									<?php //Load list of pipelines
-										foreach ($supporter as $value) {
-									?>
-									<option value="<?php echo $value['id']?>"><?php echo $value['Name']?></option>
-									<?php	
-										} 
-									?>
-								</select>
-								<button class="generate btn btn-warning facility_analysis_btn" style="color:black" id="orderingsite_l_btn">Get</button>
-							</h3>
-				</div>
-				<div class="row-fluid">
-					<div id="chart_area_fa" class="span6 os"></div>
-					<div id="chart_area_fa_sum" class="span6 os"></div>
-		  		</div>
-		  </div>
+	    		<div id="ART_ADULT_PATIENT_graph"></div>
+	    	  </div>
+	    	  <div class="three_block span4" id="paed_patient_on_art">
+	    		<h3 class="dashboard_title">Current Paedriatic Patients on ART as of 
+					<select id="nd_paed_art_period" class="nd_period nd_input_small span4">
+						<?php foreach ($maps_report_period as $value) {
+							echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+						}?>
+					</select>
+					<br/>
+					<span>County</span>
+					<select id="nd_paed_art_county" class="nd_period nd_input_small span3">
+						<option value="0">All</option>
+						<?php foreach ($county_period as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<span>Facility</span>
+					<select id="nd_paed_art_facility" class="nd_period nd_input_small span4">
+						<option value="0">All</option>
+						<?php foreach ($facility_period as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<button class="generate btn btn-warning" style="color:black" id="paed_art_btn">Get</button>
+				</h3>
+	    		<div id="ART_PAED_PATIENT_graph"></div>
+	    	  </div>
+			</div>
+			<div class="row-fluid">
+				<div class="three_block span4" id="patient_by_art" style="height:auto;">
+		    		<h3 class="dashboard_title">Current Patients By ART Sites</h3>
+		    		<div id="ART_PATIENT_grid"></div>
+		    	</div>
+		    	<div class="three_block span4" id="patient_by_regimen" style="height:auto;">
+		    		<h3 class="dashboard_title">Patients By Regimen</h3>
+		    		<div id="BYREG_PATIENT_grid"></div>
+		    	</div>
+		    	<div class="three_block span4" id="patient_scale_up" style="height:auto;">
+		    		<h3 class="dashboard_title">Patients Scale Up</h3>
+		    		<table class="table table-bordered table-striped tbl_nat_dashboard">
+		    			<thead>	
+		    				<tr><th>Pipeline</th><th>Action</th></tr>
+		    			</thead>
+		    			<tbody>
+		    				<tr><td>Kemsa</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kemsa','<i class="icon-download-alt"></i>Download');?></td></tr>
+		    				<tr><td>Kenya Pharma</td><td><?php echo anchor('dashboard_management/download/PATIENT_SCALE/1/kenya_pharma','<i class="icon-download-alt"></i>Download');?></td></tr>
+		    			</tbody>
+		    		</table>
+		    		
+		    	</div>
+			</div>
+	    </div>
+	    <!-- Commodity Analysis -->
+	    <div class="tab-pane" id="tab1">
+			<div class="row-fluid">
+				<div class="two_block span6" id="s_consumption">
+					<h3 class="dashboard_title">Stock Consumption</h3>
+					<div id="CONS_grid"></div>
+			    </div>
+			    <div class="two_block span6" id="s_consumption">
+					<h3 class="dashboard_title">Stock Status</h3>
+					<div id="SOH_grid"></div>
+			    </div>
+			</div>
 		</div>
+		<!--EID Analysis-->
+	    <div class="tab-pane nat_dashboard_rep active" id="tab8">
+	    	<div class="row-fluid">
+	    		  <div class="two_block span4">
+		    		<h3 class="dashboard_title">EID Source:
+		    			Period
+		    		<select id="source_eid_period" class="nd_period nd_input_small span4">
+						<?php foreach ($eid_period as $value) {
+							echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+						}?>
+					</select>
+					<br/>
+		    		<span>County</span>
+					<select id="source_eid_county" class="nd_period nd_input_small span3">
+						<option value="0">All</option>
+						<?php foreach ($eid_county as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<span>Facility</span>
+					<select id="source_eid_facility" class="nd_period nd_input_small span4">
+						<option value="0">All</option>
+						<?php foreach ($eid_facility as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					
+					<button class="generate btn btn-warning" style="color:black" id="eid_source_btn">Get</button>	
+		    		</h3>   
+		    		<div id="chart_area_eid_source"></div>
+		    	</div>
+
+		    	<div class="two_block span4">
+		    		<h3 class="dashboard_title">WebADT/EID Comparison:
+		    		Period
+		    		<select id="comparison_eid_period" class="nd_period nd_input_small span4">
+						<?php foreach ($eid_adt_period as $value) {
+							echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+						}?>
+					</select>
+					<br/>	
+		    		<span>County</span>
+					<select id="comparison_eid_county" class="nd_period nd_input_small span3">
+						<option value="">All</option>
+						<?php foreach ($eid_adt_county as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<span>Facility</span>
+					<select id="comparison_eid_facility" class="nd_period nd_input_small span4">
+						<option value="">All</option>
+						<?php foreach ($eid_adt_facility as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					
+					<button class="generate btn btn-warning" style="color:black" id="eid_comparison_btn">Get</button>	
+		    			
+		    		</h3>
+		    		<div id="chart_area_eid_comparison"></div>
+		    	</div>
+		    	<div class="two_block span4">
+					<h3 class="dashboard_title">EID Retention:Period
+		    		<select id="retention_eid_period" class="nd_period nd_input_small span4">
+						<?php foreach ($eid_adt_period as $value) {
+							echo "<option value='".date('F-Y',strtotime($value['period_begin']))."'>".date('F-Y',strtotime($value['period_begin']))."</option>";
+						}?>
+					</select>
+					<br/>	
+					<span>Facility</span>
+					<select id="retention_eid_facility" class="nd_period nd_input_small span4">
+						<option value="">All</option>
+						<?php foreach ($eid_adt_facility as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<span>Period</span>
+					<select id="retention_eid_range" class="nd_period nd_input_small span3">
+						<option value="90">3 Months</option>
+						<option value="180">6 Months</option>
+						<option value="360">1 Year</option>
+					</select>
+					
+					<button class="generate btn btn-warning" style="color:black" id="eid_retention_btn">Get</button>
+					</h3>
+					<div id="chart_area_eid_retention"></div>
+		    	</div>
+	    	</div>
+	    	<div class="row-fluid">
+	    		<div class="three_block span12">
+		    		<div class="table-responsive">
+		    			<table class="table table-bordered table-hover table-condensed table-striped">
+		    				<thead style="background: #2B597E;color: #FFF;font-weight:bold;font-size:0.8em;">
+		    					<tr>
+		    						<td rowspan="3">
+		    						 Unit of interest <br/>
+		    						 <span>County</span>
+					<select id="comparison_eid_county" class="nd_period nd_input_small span3">
+						<option value="">All</option>
+						<?php foreach ($eid_adt_county as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<span>Facility</span>
+					<select id="comparison_eid_facility" class="nd_period nd_input_small span4">
+						<option value="">All</option>
+						<?php foreach ($eid_adt_facility as $index=>$value) {
+							echo "<option value='".$index."'>".$value."</option>";
+						}?>
+					</select>
+					<button class="generate btn btn-warning" style="color:black" id="eid_comparison_btn">Get</button>	
+		    						</td>
+		    						<td>Period</td>
+		    						<td colspan="2">EID Data</td>
+		    						<td>Service Data DHIS</td>
+		    						<td colspan="4">Actual Patient and Commodity data</td>
+		    					</tr>
+		    					<tr>
+		    						<td rowspan="2">2013</td>
+		    						<td rowspan="2">EID Positives</td>
+		    						<td rowspan="2">EID Enrolled</td>
+		    						<td rowspan="2">Patients Enrolled(via PMTCT)</td>
+		    						<td>Patient Scale Up</td>
+		    						<td>Patient Scale Up</td>
+		    						<td>Commodity Scale Up</td>
+		    						<td>Commodity Scale Up</td>
+		    					</tr>
+		    					<tr>
+		    					<td>All Paeds</td>	
+		    					<td>vs. ABC/NVP peads</td>	
+		    					<td>PMTCT exit NVP</td>	
+		    					<td>Peads Entry: ABC</td>	
+		    					</tr>
+		    				</thead>
+		    				<tbody id="eid_summary">
+		    					
+		    				</tbody>
+		    			</table>
+		    		</div>
+		    	</div>
+	    	</div>
+	    </div>
+	  	<!--Ordering Upload-->
+	  	<div class="tab-pane" id="tab7">
+	  		<div class="container">
+	  			<div class="row-fluid" style="height:50%;">
+	  			<?php 
+	  			 if($this->session->userdata("upload_valid") !=""){
+	  			?>
+	  			<div id="order_frm">
+	  				<div class="row-fluid">
+	  					<div class="span6">
+	  						<?php if($this -> session -> flashdata('login_message') !=""){?>
+	                		  	<div class="alert alert-info">
+								    <button type='button' class='close' data-dismiss='alert'>&times;</button>
+								     <?php echo $this -> session -> flashdata('login_message');?>
+								</div>
+								<?php }?>
+	  					</div>
+	  				 <div class="span6">
+	  			      	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
+	  			      	<div class="dropdown" style="display:inline;">
+						  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
+						  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+						  	<li><a tabindex="-1" href='<?php echo base_url()."order/show_log"; ?>'>upload log</a></li>
+						    <li><a tabindex="-1" href='#' class="password">change password</a></li>
+						  </ul>
+						</div>
+						<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
+						</label>			
+	                 </div>
+	                 </div>
+	                <div class="row-fluid">
+	  				<div class="span6">
+	  	                   		<h3>CDRR Upload</h3>
+							      <div class="accordion-inner">
+							        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="D-CDRR"><i class="icon-upload"></i> D-CDRR for Central Sites</a>
+							      </div>
+							      <div class="accordion-inner">
+							        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="F-CDRR_packs"> <i class="icon-upload"></i> F-CDRR for Stand-alone Sites</a>
+							      </div>
+							        <h3>MAPS Upload</h3>
+							      <div class="accordion-inner">
+							        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="D-MAPS"><i class="icon-upload"></i> D-MAPS for Central Sites</a>
+							      </div>
+							      <div class="accordion-inner">
+							        <a href="#modal_template" role="button" data-toggle="modal" class="order_link" order_type="F-MAPS"><i class="icon-upload"></i> F-MAPS for Stand-alone Sites</a>
+							      </div>
+							     <!-- Modal -->
+								<div id="modal_template" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+								<form id='modal_action' class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php echo base_url()."order/import_order"?>">	
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+												
+											</button>
+											<h3 id="myModalLabel">Upload Order(<b><span id="modal_header"></span></b>)</h3>
+										</div>
+										<div class="modal-body">
+											<span class="alert-info">Kindly make sure that the file your are uploading is in 1997-2003 excel format(e.g: example.xls)</span>
+											<br>
+											<div class="control-group">
+											  <label class="control-label" for="inputIcon">Upload File <i class="icon-file"></i></label>
+											  <div class="controls">
+											      <input type="hidden"  name="upload_type" id="upload_type" />
+					                              <input type="file"  name="file[]" multiple="multiple" size="30" id="inputIcon"  required="required" accept="application/vnd.ms-excel"/>
+											  </div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button class="btn" data-dismiss="modal" aria-hidden="true">
+												Close
+											</button>
+											<button class="btn btn-primary">
+												Upload
+											</button>
+										</div>
+									</form>
+								</div>
+	  				</div>
+	  			    <div class="span6" style="height:50%;">
+							      <h3>CDRR Templates <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
+							      <div class="accordion-inner">
+							        <a href="<?php echo base_url().'downloads/D-CDRR for Central Sites and District Stores.xls' ;?>"><i class="icon-download-alt"></i> D-CDRR for Central Sites.xls</a>
+							      </div>
+							      <div class="accordion-inner">
+							        <a href="<?php echo base_url().'downloads/F-CDRR for Standalone Sites.xls' ;?>"> <i class="icon-download-alt"></i> F-CDRR for Stand-alone Sites.xls</a>
+							      </div>
+							        <h3>MAPS Templates <i><img class="img-rounded" style="height:30px;" src="<?php echo base_url().'assets/img/excel.gif';?>"/> </i></h3>
+							      <div class="accordion-inner">
+							        <a href="<?php echo base_url().'downloads/D-MAPS for Central Sites and District Stores.xls' ;?>"><i class="icon-download-alt"></i> D-MAPS for Central Sites.xls</a>
+							      </div>
+							      <div class="accordion-inner">
+							        <a href="<?php echo base_url().'downloads/F-MAPS for Standalone Sites.xls' ;?>"><i class="icon-download-alt"></i> F-MAPS for Stand-alone Sites.xls</a>
+							      </div>
+	  			    </div><!--End of second Span-->
+	  			    </div>
+	  			    </div>
+	  			    <div id="change_frm" style="display:none;">
+	  				<div class="row-fluid">
+	  				 <div class="span12">
+	  			      	<label style="float:right;border 1px solid #000;">Welcome <b class='home'><?php echo $this->session->userdata("order_user"); ?></b>
+	  			      	<div class="dropdown" style="display:inline;">
+						  <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-wrench"></i></a>
+						  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+						    <li><a tabindex="-1" href='#' class="password">change password</a></li>
+						  </ul>
+						</div>
+						<a href='<?php echo site_url("order/upload_logout"); ?>'>logout</a>
+						</label>			
+	                 </div>
+	                 </div>
+	                <div class="row-fluid">
+	                	<div class="span6">
+								<?php echo form_open('order/upload_password');?>
+								<?php echo form_fieldset('', array('id' => 'login_legend'));?>
+								<legend id="login_legend">
+									<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Change Password
+								</legend>
+								<?php echo $this -> session -> flashdata('error_message');?>
+									<div class="item">
+									<?php echo form_error('current_password', '<div class="error_message">', '</div>');?>
+									<?php echo form_label('Current Password:', 'current_password');?>
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-key"></i></span>
+										<?php echo form_password(array('name' => 'current_password', 'required' => 'required', 'id' => 'current_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
+									</div>
+				                    </div>
+								   	<div class="item">
+									<?php echo form_error('new_password', '<div class="error_message">', '</div>');?>
+									<?php echo form_label('New Password:', 'new_password');?>
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-key"></i></span>
+										<?php echo form_password(array('name' => 'new_password', 'required' => 'required', 'id' => 'new_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
+									</div>
+				                    </div>
+				                    <div class="item">
+									<?php echo form_error('confirm_password', '<div class="error_message">', '</div>');?>
+									<?php echo form_label('Confirm Password:', 'confirm_password');?>
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-key"></i></span>
+										<?php echo form_password(array('name' => 'confirm_password', 'required' => 'required', 'id' => 'confirm_password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
+									</div>
+				                    </div>
+		                        	<div style="margin-top:1em;">
+		                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
+									    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:20%;'), 'Save');?> 
+									    <?php echo form_fieldset_close();?>
+		                        	</div>
+		                        </form>
+	                	</div>
+	                </div>
+	                </div>
+	  			    <?php }else{?>
+	  			       <div class="span4" id="login_frm">
+	  			                <?php if($this -> session -> flashdata('login_message') !=""){?>
+	  			       			<div class="alert alert-info">
+								    <button type='button' class='close' data-dismiss='alert'>&times;</button>
+								     <?php echo $this -> session -> flashdata('login_message');?>
+								</div>
+								<?php } echo form_open('order/upload_authenticate');?>
+								<?php echo form_fieldset('', array('id' => 'login_legend'));?>
+								<legend id="login_legend">
+									<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Log In
+								</legend>
+								<?php echo $this -> session -> flashdata('error_message');?>
+								    <div class="item">
+									<?php echo form_error('email', '<div class="error_message">', '</div>');?>
+									<?php echo form_label('Email Address:', 'username');?>
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-user"></i></span>
+										<?php echo form_input(array('type' => 'email', 'name' => 'email', 'required' => 'required', 'id' => 'email', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => 'mail@yourmail.com'));?>
+									</div>
+				                    </div>
+				                    <div class="item">
+									<?php echo form_error('password', '<div class="error_message">', '</div>');?>
+									<?php echo form_label('Password:', 'password');?>
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-key"></i></span>
+										<?php echo form_password(array('name' => 'password', 'required' => 'required', 'id' => 'password', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => '********'));?>
+									</div>
+				                    </div>
+				                    <div class="item">
+				                    	<div class="input-group">
+				                    	<strong><a href="#" class="forgot" >Forgot Password?</a></strong>
+				                        </div>
+				                    </div>
+		                        	<div style="margin-top:1em;">
+		                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
+									    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:20%;'), 'Go');?> 
+									    <?php echo form_fieldset_close();?>
+		                        	</div>
+		                        </form>
+			           </div>
+			           <div class="span4" id="forgot_frm" style="display:none;">
+								<?php echo form_open('order/Upload_forgot');?>
+								<?php echo form_fieldset('', array('id' => 'login_legend'));?>
+								<legend id="login_legend">
+									<i class="fa fa-info-circle" style="padding-right:5px"></i>Upload Forgot Password
+								</legend>
+								<?php echo $this -> session -> flashdata('error_message');?>
+								    <div class="item">
+									<?php echo form_error('email', '<div class="error_message">', '</div>');?>
+									<?php echo form_label('Email Address:', 'username');?>
+									<div class="input-group">
+										<span class="input-group-addon"><i class="fa fa-user"></i></span>
+										<?php echo form_input(array('type' => 'email', 'name' => 'email', 'required' => 'required', 'id' => 'email', 'size' => '24', 'class' => 'textfield form-control', 'placeholder' => 'mail@yourmail.com'));?>
+									</div>
+				                    </div>
+				                    <div class="item">
+				                    	<div class="input-group">
+				                    	<strong><a href="#" class="login">Back to Login</a></strong></strong>
+				                        </div>
+				                    </div>
+		                        	<div style="margin-top:1em;">
+		                        		<?php echo form_fieldset('', array('class' => 'tblFooters'));?>
+									    <?php echo form_submit(array("name"=>'input_go',"class"=>'btn',"style"=>'width:30%;'), 'Submit');?> 
+									    <?php echo form_fieldset_close();?>
+		                        	</div>
+		                        </form>
+			           </div>
+	  		       <?php }?>
+	  		   </div>
+	  		</div>
+	    </div>
+	    <!-- 2 Pager Download -->
+	    <div class="tab-pane nat_dashboard_rep" id="tab6">
+	    	<div class="container" style="width: 50%">
+	  			<div class="row-fluid" style="height:50%;">
+	  					<h3 class="dashboard_title">Kenya Anti-Retroviral medicines (ARVs) Stock Situation</h3>
+			    		<div id="two_pager_area"></div>
+	  			</div>
+			</div>  	
+	    </div> 
     </div>
-    
-    
-    <div class="tab-pane nat_dashboard_rep" id="tab5">
-    	<div class="three_block" id="patient_by_art">
-    		<h3 class="dashboard_title">Current Patients By ART</h3>
-    		<table class="table table-bordered table-striped tbl_nat_dashboard">
-    			<thead>
-    				<tr><th>No</th><th>Reporting Period</th><th>Pipeline</th><th>Action</th></tr>
-    			</thead>
-    			<tbody>
-    				<tr><td>1</td><td>February - 2010</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>February - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>March - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>March - 2013</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>June - 2013</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>August - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>September - 2013</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2012</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>January - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>December - 2012</td><td>Kemsa</td><td><a href="">Download</a></td></tr>
-    				<tr><td>1</td><td>January - 2013</td><td>Kenya Pharma</td><td><a href="">Download</a></td></tr>
-    			</tbody>
-    		</table>
-    	</div>
-    	<div class="three_block" id="patient_by_regimen">
-    		<h3 class="dashboard_title">Patients By Regimen</h3>
-    		
-    	</div>
-    	<div class="three_block" id="patient_scale_up">
-    		<h3 class="dashboard_title">Patients Scale Up</h3>
-    		
-    	</div>
-    </div>
-  </div>
 </div>

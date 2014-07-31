@@ -1,10 +1,13 @@
 <style type="text/css">
 	.full-content {
 		width: 95%;
-		zoom: 100%;
+		zoom: 95%;
 	}
 	#facilities_map{
 		width:200px;
+	}
+	#settings_list{
+		font-size:0.8em;
 	}
 </style>
 <div class="container-fluid full-content">
@@ -46,6 +49,9 @@
 				</li>
 				<li>
 					<a href="#" class="api_sync" id="eid_sync">EID/HEI Sync</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="eid_mail">EID Mailing Lists</a>
 				</li>
 				<li class="divider"></li>
 				<li class="nav-header">

@@ -145,7 +145,7 @@ class settings extends MY_Controller {
 		$links['eid_master'] = "heiapi.php";
 
 		$curl = new Curl();
-		$url = $this -> eid_url;
+	    $url = $this -> eid_url;
 
 		foreach ($links as $table => $link) {
 			$target_url = $url . $link;

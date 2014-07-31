@@ -364,16 +364,7 @@
 				$research.find("tr").eq(0).show();
 				$('#accordion_collapse').val("+");
 			}
-	  });
-	  
-	     $(".delivery").click(function(){
-	     	/*
-         	  var del_value=$("#delivery_note").val();
-         	  if(del_value==""){
-         	  	alert("Delivery Note is Blank");
-         	  	return false;
-         	  }*/
-         });
+	    });
 	  
 	  <?php
 		if (!empty($order_array)) {
