@@ -1924,7 +1924,7 @@ class Dashboard_Management extends MY_Controller {
 		}
 
 		if ($type != "comparison" && $type != "summary") {
-				 if ($type == "retention") {
+				if ($type == "retention") {
 				 	if($county==0){
 				 		$county=90;
 				 	}
