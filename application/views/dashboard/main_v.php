@@ -477,10 +477,7 @@
 		}else if(id=="eid_retention_btn"){
 		  var eid_period=$("#retention_eid_period").val();
 		  var eid_range=$("#retention_eid_range").val();
-		  var eid_facility=$("#comparison_eid_facility").val();
-		  if(eid_facility==""){
-		  	eid_facility=0;
-		  }
+		  var eid_facility=$("#retention_eid_facility").val();
 	  	  var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/retention/';?>"+eid_period+"/"+eid_facility+"/"+eid_range;
           $("#chart_area_eid_retention").load(chart_area_eid_source_link);
 		}

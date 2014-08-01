@@ -1169,48 +1169,107 @@ class settings extends MY_Controller {
 	}
 
 	public function monthly_eid_update(){
-        $first_day=date('Y-m-01');
-        $today=date('Y-m-d');
-        $last_day=date('Y-m-t');
-
+		$period=3;
+        $period_days=$period*30;
+		$today=date('Y-m-d');
+        $last_day_of_month=date('Y-m-t');
+        $first_day=date('Y-m-01',strtotime("-".$period."months"));
+        $last_day=date('Y-m-t',strtotime("-".$period."months"));
+        $facility_emails=array();
+        $response="";
+ 
         //check if last day of month
-        if($today==$last_day){
+        if($today != $last_day_of_month){
             //get eid facility list emails
             $sql="SELECT em.email,em.facility
                   FROM eid_mail em
-                  LEFT JOIN eid_master e ON em.facility=em.facilitycode
-                  WHERE em.active='1'";
+                  LEFT JOIN eid_master e ON em.facility=e.facilitycode
+                  WHERE em.active='1'
+                  GROUP BY em.email,em.facility";
             $query = $this -> db -> query($sql);
 		    $results = $query -> result_array();
 		    if($results){
-               foreach($results as $result){
-                     
-               }
+	            foreach($results as $result){
+	                $facility=$result['facility'];
+	               	$email=$result['email'];
+	                $facility_emails[$facility][]=$email;
+	            }
 		    }
 
-		    $sql="SELECT ei.status as label,COUNT(ei.status) AS total 
-		          FROM eid_info ei 
-		          LEFT JOIN facilities f ON f.facilitycode=ei.facility_code 
-		          WHERE ei.enrollment_date 
-		          BETWEEN '$first_day' 
-		          AND '$last_day' 
-		          AND DATEDIFF(CURDATE(),ei.enrollment_date)>=90 
-		          GROUP BY ei.status";
+		    foreach($facility_emails as $facility_code=>$emails){
+		        $sql="SELECT ei.status as label,COUNT(ei.status) AS total,f.name
+			          FROM eid_info ei 
+			          LEFT JOIN facilities f ON f.facilitycode=ei.facility_code 
+			          WHERE ei.enrollment_date 
+			          BETWEEN '$first_day' 
+			          AND '$last_day' 
+			          AND ei.facility_code='$facility_code' 
+			          AND DATEDIFF(CURDATE(),ei.enrollment_date)>=$period_days
+			          GROUP BY ei.status";
+				$query = $this -> db -> query($sql);
+			    $results = $query -> result_array();
+			    $table="<table border='1' width='50%' cellspacing='0.5' cellpadding='2'><caption>".strtoupper(@$results[0]['name'])."</caption>";
+			    $table.="<thead><tr><th>Retention Status</th><th>Total</th></tr></thead><tbody>";
+			    if($results){
+		            foreach($results as $result){
+                      $table.="<tr>";
+                      $table.="<td>".strtoupper($result['label'])."</td>";
+                      $table.="<td>".$result['total']."</td>";
+                      $table.="</tr>";
+		            }
+			    }else{
+			    	  $table.="<tr>";
+                      $table.="<td colspan='2'>no data available!</td>";
+                      $table.="</tr>";
+			    }
+			    $table.="</tbody></table>";
+			    $email_list=implode(",", $emails);
+
+			    $message = "Hello, <br/><br/>
+                This is the monthly EID Summary for ".@$results[0]['name'].".<br/>
+                The data is for patients enrolled in the period between ".date('d-M-Y',strtotime($first_day))." and ".date('d-M-Y',strtotime($last_day))." reporting on retention for  a period of ".$period." months.<br/>
+				Find the summary in the table below:<br/><br/>".
+				$table."<br/>Regards,<br/>NASCOP SYSTEM team.";
+			    $response.=$this->send_notification($email_list,$message);
+            }  
         }
+        echo $response;
+	}
+
+	public function send_notification($email_address,$message){
+		$email_user = stripslashes('webadt.chai@gmail.com');
+		$email_password = stripslashes('WebAdt_052013');
+		$subject = "EID Monthly Retention Summary";
+		$email_sender_title = "NASCOP SYSTEM";
+
+		$config['mailtype'] = "html";
+		$config['protocol'] = 'smtp';
+		$config['smtp_host'] = 'ssl://smtp.googlemail.com';
+		$config['smtp_port'] = 465;
+		$config['smtp_user'] = $email_user;
+		$config['smtp_pass'] = $email_password;
+		ini_set("SMTP", "ssl://smtp.gmail.com");
+		ini_set("smtp_port", "465");
+
+		$this -> load -> library('email', $config);
+		$this -> email -> set_newline("\r\n");
+		$this -> email -> from('webadt.chai@gmail.com', $email_sender_title);
+		$this -> email -> to("$email_address");
+		$this -> email -> subject($subject);
+		$this -> email -> message($message);
+
+		if ($this -> email -> send()) {
+			$this -> email -> clear(TRUE);
+			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
+		} else {
+			$error_message = $this -> email -> print_debugger();
+		}
+
+		return $error_message;
 	}
 
 	public function auto_script(){
-		//eid_sync to get eid data
-		//$this -> eid_sync();
-		//monthly_eid_update
-		//$this -> monthly_eid_update();
-	    //get_updates to get escm orders
-		//$this -> get_updates();
-
-		$data['content_view'] = "auto_script_v";
-		$data['title'] = "webADT | Auto Script";
-		$data['banner_text'] = "Auto Script";
-		$this -> load -> view('template', $data);
+		$this -> load -> view('auto_script_v');
 	}
 
 	public function base_params($data) {

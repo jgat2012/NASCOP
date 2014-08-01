@@ -1898,7 +1898,11 @@ class Dashboard_Management extends MY_Controller {
 		}
 
 		if ($facility != 0) {
-			$conditions .= "AND em.facilitycode='$facility'";
+			if ($type == "retention") {
+               $conditions .= "AND ei.facility_code='$facility'";
+			}else{
+               $conditions .= "AND em.facilitycode='$facility'";
+			}	 
 		}
 		if ($county != 0) {
 			if ($type != "retention") {
