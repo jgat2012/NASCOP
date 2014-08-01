@@ -19,228 +19,6 @@ class settings extends MY_Controller {
 		$this -> base_params($data);
 	}
 
-	public function api_sync() {
-		$log = "";
-		$info_class = "<div class='alert alert-info'>";
-		$error_class = "<div class='alert alert-error'>";
-		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
-		$close_div = "</div>";
-
-		//Link array
-		$links = array();
-		$links['escm_drug'] = "drugs";
-		$links['escm_regimen'] = "regimen";
-
-		$curl = new Curl();
-		$url = $this -> esm_url;
-
-		$username = "kmarete";
-		$password = "poltergeist";
-		$curl -> setBasicAuthentication($username, $password);
-		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
-		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
-
-		foreach ($links as $table => $link) {
-			$target_url = $url . $link;
-			$curl -> get($target_url);
-			if ($curl -> error) {
-				$curl -> error_code;
-				$log .= "Error " . $curl -> error_code . " ! Sync Failed<br/>";
-			} else {
-				$main_array = json_decode($curl -> response, TRUE);
-				$this -> db -> query("TRUNCATE $table");
-				$this -> db -> insert_batch($table, $main_array);
-				$log .= "Sync " . $table . "! Synched Succesful<br/>";
-			}
-		}
-		$content = $info_class;
-		$content .= $close_btn_div;
-		$content .= $log;
-		$content .= $close_div;
-		$this -> session -> set_flashdata('alert_message', $content);
-	}
-
-	public function get_updates() {
-		ini_set("max_execution_time", "1000000");
-		$log = "";
-		$info_class = "<div class='alert alert-info'>";
-		$error_class = "<div class='alert alert-error'>";
-		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
-		$close_div = "</div>";
-
-		$curl = new Curl();
-		$url = $this -> esm_url;
-
-		$lists = Escm_Facility::getAllNotHydrated();
-		foreach ($lists as $list) {
-			$facility_id = $list -> id;
-			$links[] = "facility/" . $facility_id . "/cdrr";
-			$links[] = "facility/" . $facility_id . "/maps";
-		}
-		$username = "kmarete";
-		$password = "poltergeist";
-		$curl -> setBasicAuthentication($username, $password);
-		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
-		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
-
-		foreach ($links as $link) {
-			$target_url = $url . $link;
-			$curl -> get($target_url);
-			if ($curl -> error) {
-				$curl -> error_code;
-				$log = "Error: " . $curl -> error_code . "<br/>";
-			} else {
-				$main_array = json_decode($curl -> response, TRUE);
-				$clean_data = array();
-
-				$current_month_start = date('Y-m-01');
-				$current_month_end = date('Y-m-t');
-
-				$one_current_month_start = date('Y-m-d', strtotime($current_month_start . "-1 month"));
-				$one_current_month_end = date('Y-m-d', strtotime($current_month_end . "-1 month"));
-
-				$two_current_month_start = date('Y-m-d', strtotime($current_month_start . "-2 months"));
-				$two_current_month_end = date('Y-m-d', strtotime($current_month_end . "-2 months"));
-
-				$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
-				$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
-
-				$four_current_month_start = date('Y-m-d', strtotime($current_month_start . "-4 months"));
-				$five_current_month_start = date('Y-m-d', strtotime($current_month_start . "-5 months"));
-				$six_current_month_start = date('Y-m-d', strtotime($current_month_start . "-6 months"));
-
-				foreach ($main_array as $main) {
-					if ($main['code'] == "D-CDRR" || $main['code'] == "F-CDRR_units" || $main['code'] == "F-CDRR_packs") {
-						$type = "cdrr";
-					} else {
-						$type = "maps";
-					}
-					if (is_array($main)) {
-						if (!empty($main)) {
-							if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start || $main['period_begin'] == $four_current_month_start || $main['period_begin'] == $five_current_month_start || $main['period_begin'] == $six_current_month_start) {
-								$this -> extract_order($type, array($main), $main['id']);
-							}
-						}
-					}
-				}
-				$log = "Sync Complete";
-			}
-		}
-		$content = $info_class;
-		$content .= $close_btn_div;
-		$content .= $log;
-		$content .= $close_div;
-		$this -> session -> set_flashdata('alert_message', $content);
-	}
-
-	public function eid_sync() {
-		$log = "";
-		$info_class = "<div class='alert alert-info'>";
-		$error_class = "<div class='alert alert-error'>";
-		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
-		$close_div = "</div>";
-
-		//Link array
-		$links = array();
-		$links['eid_master'] = "heiapi.php";
-
-		$curl = new Curl();
-		$url = $this -> eid_url;
-
-		foreach ($links as $table => $link) {
-			$target_url = $url . $link;
-			$curl -> get($target_url);
-			if ($curl -> error) {
-				$curl -> error_code;
-				$log .= "Error " . $curl -> error_code . " ! Sync Failed<br/>";
-			} else {
-				$main_array = json_decode($curl -> response, TRUE);
-				//clear table
-				$this -> db -> query("TRUNCATE $table");
-
-				foreach ($main_array as $main) {
-					foreach ($main as $post) {
-						$this -> db -> insert($table, $post['post']);
-					}
-				}
-				$log .= "Sync " . $table . "! Synched Succesful<br/>";
-			}
-		}
-		$content = $info_class;
-		$content .= $close_btn_div;
-		$content .= $log;
-		$content .= $close_div;
-		$this -> session -> set_flashdata('alert_message', $content);
-	}
-
-	public function enable($type = "sync_drug", $id = null) {
-		$info_class = "<div class='alert alert-info'>";
-		$error_class = "<div class='alert alert-error'>";
-		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
-
-		if ($id != null) {
-			if ($type == "sync_drug") {
-				$columns = array("category_id" => 0);
-			} else if ($type == "sync_regimen") {
-				$columns = array("category_id" => 0);
-			} else if ($type == "sync_user") {
-				$columns = array("status" => "A");
-			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen") {
-				$columns = array("active" => "1");
-			}
-			$this -> db -> where('id', $id);
-			$this -> db -> update($type, $columns);
-			$message = "<b>Enabled " . $type . "!</b> You successfully enabled.";
-			$content = $info_class;
-			$content .= $close_btn_div;
-			$content .= $message;
-			$content .= $close_div;
-		} else {
-			$message = "<b>Failed " . $type . "!</b> You failed to enable.";
-			$content = $error_class;
-			$content .= $close_btn_div;
-			$content .= $message;
-			$content .= $close_div;
-		}
-		$this -> session -> set_flashdata("alert_message", $content);
-		$this -> session -> set_userdata("nav_link", $type);
-		redirect("settings");
-	}
-
-	public function delete($type = "sync_drug", $id = null) {
-		$info_class = "<div class='alert alert-info'>";
-		$error_class = "<div class='alert alert-error'>";
-		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
-
-		if ($id != null) {
-			if ($type == "sync_drug") {
-				$columns = array("category_id" => 14);
-			} else if ($type == "sync_regimen") {
-				$columns = array("category_id" => 15);
-			} else if ($type == "sync_user") {
-				$columns = array("status" => "N");
-			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen") {
-				$columns = array("active" => "0");
-			}
-			$this -> db -> where('id', $id);
-			$this -> db -> update($type, $columns);
-			$message = "<b>Deleted " . $type . "!</b> You successfully deleted.";
-			$content = $error_class;
-			$content .= $close_btn_div;
-			$content .= $message;
-			$content .= $close_div;
-		} else {
-			$message = "<b>Failed " . $type . "!</b> You failed to delete.";
-			$content = $info_class;
-			$content .= $close_btn_div;
-			$content .= $message;
-			$content .= $close_div;
-		}
-		$this -> session -> set_flashdata("alert_message", $content);
-		$this -> session -> set_userdata("nav_link", $type);
-		redirect("settings");
-	}
-
 	public function get($type = "sync_drug") {
 		//Column definitions
 		if ($type == "sync_drug") {
@@ -266,6 +44,8 @@ class settings extends MY_Controller {
 			$hash = $this -> github_updater -> get_hash();
 		} else if ($type == "escm_facility") {
 			$columns = array("id", "code", "name", "category", "sponsors", "services", "district_id", "ordering", "service_point", "county_id");
+		} else if ($type == "eid_mail") {
+			$columns = array("s.id", "s.email as email_address", "f.name as facility","s.facility as code", "s.active");
 		}
 
 		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
@@ -327,6 +107,8 @@ class settings extends MY_Controller {
 			$this -> db -> join("regimen_category r", "r.id=s.category", "left");
 		} else if ($type == "gitlog") {
 			$this -> db -> join("facilities f", "f.facilitycode=s.facility_code", "left");
+		} else if ($type == "eid_mail") {
+			$this -> db -> join("facilities f", "f.facilitycode=s.facility", "left");
 		}
 		$rResult = $this -> db -> get();
 		// Data set length after filtering
@@ -344,11 +126,14 @@ class settings extends MY_Controller {
 			$action_link = "delete";
 			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id" && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
+				if ($i != "id" && $i != "code" && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
 					$myrow[] = $v;
 				} else {
 					if ($i == "id") {
 						$id = $v;
+					}
+					if($type == "eid_mail" && $i=="facility"){
+						$myrow[] = $v;
 					}
 				}
 				//Delete/enable actions
@@ -385,6 +170,9 @@ class settings extends MY_Controller {
 						$status = "<div class='alert-error'>need to update</div>";
 					}
 					$myrow[] = $status;
+				} else if ($type == "eid_mail" && $i == "active" && $v == 0) {
+					$action_link = "enable";
+					$action_icon = "<i class='icon-ok'></i>";
 				}
 			}
 
@@ -399,6 +187,11 @@ class settings extends MY_Controller {
 			}
 			$links = "";
 			if ($action_link == "delete") {
+				//for eid_mail replace facility name with code for edit function
+				if ($type == "eid_mail") {
+                   $row['facility']=$row['code'];
+                   unset($row['code']);
+				}
 				$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
 				$links .= "  ";
 				if ($type != "sync_facility" || $type != "gitlog") {
@@ -440,6 +233,8 @@ class settings extends MY_Controller {
 			$inputs = array("code" => "regimen_code", "name" => "regimen_desc", "category" => "regimen_category", "Line" => "line", "service" => "type_of_service", "nascop regimen" => "n_map", "escm regimen" => "e_map");
 		} else if ($type == "escm_facility") {
 			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district" => "district_id", "is ordering point?" => "ordering", " is service point?" => "service_point", "county" => "county_id");
+		} else if ($type == "eid_mail") {
+			$inputs = array("email address" => "email_address", "facility" => "facility");
 		}
 
 		foreach ($inputs as $text => $input) {
@@ -537,7 +332,7 @@ class settings extends MY_Controller {
 					$textfield .= "<option value='" . $ftype['id'] . "'>" . $ftype['Name'] . "</option>";
 				}
 				$textfield .= "</select>";
-			} else if ($input == "parent" && $type == "facilities") {
+			} else if (($input == "parent" || $input=="facility") && ($type == "facilities" || $type=="eid_mail")) {
 				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "' class='span8'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
 				$facilities = Facilities::getActive();
@@ -677,7 +472,9 @@ class settings extends MY_Controller {
 			$inputs = array("regimen_code" => "regimen_code", "regimen_desc" => "regimen_desc", "category" => "regimen_category", "line" => "line", "type_of_service" => "type_of_service", "n_map" => "n_map", "e_map" => "e_map");
 		} else if ($type == "escm_facility") {
 			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district_id" => "district_id", "ordering" => "ordering", "service_point" => "service_point", "county_id" => "county_id");
-		}
+		} else if ($type == "eid_mail") {
+			$inputs = array("email" => "email_address", "facility" => "facility");
+		} 
 
 		foreach ($inputs as $index => $input) {
 			if ($index == "facility_list") {
@@ -693,7 +490,7 @@ class settings extends MY_Controller {
 					$mail_list = $this -> input -> post($input);
 					$mail_list = explode(",", $mail_list);
 				}
-			} else if ($index == "email" && $id == null) {
+			} else if ($index == "email" && $type=="sync_user" && $id == null) {
 				$password = "";
 				$characters = strtoupper("abcdefghijklmnopqrstuvwxyz");
 				$characters = $characters . 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -772,6 +569,227 @@ class settings extends MY_Controller {
 		$this -> session -> set_userdata("nav_link", $type);
 		redirect("settings");
 
+	}
+	public function enable($type = "sync_drug", $id = null) {
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+
+		if ($id != null) {
+			if ($type == "sync_drug") {
+				$columns = array("category_id" => 0);
+			} else if ($type == "sync_regimen") {
+				$columns = array("category_id" => 0);
+			} else if ($type == "sync_user") {
+				$columns = array("status" => "A");
+			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen" || $type == "eid_mail") {
+				$columns = array("active" => "1");
+			}
+			$this -> db -> where('id', $id);
+			$this -> db -> update($type, $columns);
+			$message = "<b>Enabled " . $type . "!</b> You successfully enabled.";
+			$content = $info_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		} else {
+			$message = "<b>Failed " . $type . "!</b> You failed to enable.";
+			$content = $error_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		}
+		$this -> session -> set_flashdata("alert_message", $content);
+		$this -> session -> set_userdata("nav_link", $type);
+		redirect("settings");
+	}
+
+	public function delete($type = "sync_drug", $id = null) {
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+
+		if ($id != null) {
+			if ($type == "sync_drug") {
+				$columns = array("category_id" => 14);
+			} else if ($type == "sync_regimen") {
+				$columns = array("category_id" => 15);
+			} else if ($type == "sync_user") {
+				$columns = array("status" => "N");
+			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen" || $type == "eid_mail") {
+				$columns = array("active" => "0");
+			}
+			$this -> db -> where('id', $id);
+			$this -> db -> update($type, $columns);
+			$message = "<b>Deleted " . $type . "!</b> You successfully deleted.";
+			$content = $error_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		} else {
+			$message = "<b>Failed " . $type . "!</b> You failed to delete.";
+			$content = $info_class;
+			$content .= $close_btn_div;
+			$content .= $message;
+			$content .= $close_div;
+		}
+		$this -> session -> set_flashdata("alert_message", $content);
+		$this -> session -> set_userdata("nav_link", $type);
+		redirect("settings");
+	}
+
+	public function api_sync() {
+		$log = "";
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		$close_div = "</div>";
+
+		//Link array
+		$links = array();
+		$links['escm_drug'] = "drugs";
+		$links['escm_regimen'] = "regimen";
+
+		$curl = new Curl();
+		$url = $this -> esm_url;
+
+		$username = "kmarete";
+		$password = "poltergeist";
+		$curl -> setBasicAuthentication($username, $password);
+		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
+		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
+
+		foreach ($links as $table => $link) {
+			$target_url = $url . $link;
+			$curl -> get($target_url);
+			if ($curl -> error) {
+				$curl -> error_code;
+				$log .= "Error " . $curl -> error_code . " ! Sync Failed<br/>";
+			} else {
+				$main_array = json_decode($curl -> response, TRUE);
+				$this -> db -> query("TRUNCATE $table");
+				$this -> db -> insert_batch($table, $main_array);
+				$log .= "Sync " . $table . "! Synched Succesful<br/>";
+			}
+		}
+		$content = $info_class;
+		$content .= $close_btn_div;
+		$content .= $log;
+		$content .= $close_div;
+		$this -> session -> set_flashdata('alert_message', $content);
+	}
+
+	public function get_updates() {
+		ini_set("max_execution_time", "1000000");
+		$log = "";
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		$close_div = "</div>";
+
+		$curl = new Curl();
+		$url = $this -> esm_url;
+
+		$lists = Escm_Facility::getAllNotHydrated();
+		foreach ($lists as $list) {
+			$facility_id = $list -> id;
+			$links[] = "facility/" . $facility_id . "/cdrr";
+			$links[] = "facility/" . $facility_id . "/maps";
+		}
+		$username = "kmarete";
+		$password = "poltergeist";
+		$curl -> setBasicAuthentication($username, $password);
+		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
+		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
+
+		foreach ($links as $link) {
+			$target_url = $url . $link;
+			$curl -> get($target_url);
+			if ($curl -> error) {
+				$curl -> error_code;
+				$log = "Error: " . $curl -> error_code . "<br/>";
+			} else {
+				$main_array = json_decode($curl -> response, TRUE);
+				$clean_data = array();
+
+				$current_month_start = date('Y-m-01');
+				$current_month_end = date('Y-m-t');
+
+				$one_current_month_start = date('Y-m-d', strtotime($current_month_start . "-1 month"));
+				$one_current_month_end = date('Y-m-d', strtotime($current_month_end . "-1 month"));
+
+				$two_current_month_start = date('Y-m-d', strtotime($current_month_start . "-2 months"));
+				$two_current_month_end = date('Y-m-d', strtotime($current_month_end . "-2 months"));
+
+				$three_current_month_start = date('Y-m-d', strtotime($current_month_start . "-3 months"));
+				$three_current_month_end = date('Y-m-d', strtotime($current_month_end . "-3 months"));
+
+				$four_current_month_start = date('Y-m-d', strtotime($current_month_start . "-4 months"));
+				$five_current_month_start = date('Y-m-d', strtotime($current_month_start . "-5 months"));
+				$six_current_month_start = date('Y-m-d', strtotime($current_month_start . "-6 months"));
+
+				foreach ($main_array as $main) {
+					if ($main['code'] == "D-CDRR" || $main['code'] == "F-CDRR_units" || $main['code'] == "F-CDRR_packs") {
+						$type = "cdrr";
+					} else {
+						$type = "maps";
+					}
+					if (is_array($main)) {
+						if (!empty($main)) {
+							if ($main['period_begin'] == $current_month_start || $main['period_begin'] == $one_current_month_start || $main['period_begin'] == $two_current_month_start || $main['period_begin'] == $three_current_month_start || $main['period_begin'] == $four_current_month_start || $main['period_begin'] == $five_current_month_start || $main['period_begin'] == $six_current_month_start) {
+								$this -> extract_order($type, array($main), $main['id']);
+							}
+						}
+					}
+				}
+				$log = "Sync Complete";
+			}
+		}
+		$content = $info_class;
+		$content .= $close_btn_div;
+		$content .= $log;
+		$content .= $close_div;
+		$this -> session -> set_flashdata('alert_message', $content);
+	}
+
+	public function eid_sync() {
+		$log = "";
+		$info_class = "<div class='alert alert-info'>";
+		$error_class = "<div class='alert alert-error'>";
+		$close_btn_div = "<button type='button' class='close' data-dismiss='alert'>&times;</button>";
+		$close_div = "</div>";
+
+		//Link array
+		$links = array();
+		$links['eid_master'] = "heiapi.php";
+
+		$curl = new Curl();
+	    $url = $this -> eid_url;
+
+		foreach ($links as $table => $link) {
+			$target_url = $url . $link;
+			$curl -> get($target_url);
+			if ($curl -> error) {
+				$curl -> error_code;
+				$log .= "Error " . $curl -> error_code . " ! Sync Failed<br/>";
+			} else {
+				$main_array = json_decode($curl -> response, TRUE);
+				//clear table
+				$this -> db -> query("TRUNCATE $table");
+
+				foreach ($main_array as $main) {
+					foreach ($main as $post) {
+						$this -> db -> insert($table, $post['post']);
+					}
+				}
+				$log .= "Sync " . $table . "! Synched Succesful<br/>";
+			}
+		}
+		$content = $info_class;
+		$content .= $close_btn_div;
+		$content .= $log;
+		$content .= $close_div;
+		$this -> session -> set_flashdata('alert_message', $content);
 	}
 
 	public function extract_order($type = "cdrr", $responses = array(), $id = "") {
@@ -1074,7 +1092,6 @@ class settings extends MY_Controller {
 		$order -> save();
 
 	}
-
 	public function delete_order($type = "cdrr", $id, $mission = 0) {
 		$sql = "SELECT status FROM $type WHERE id='$id'";
 		$query = $this -> db -> query($sql);
@@ -1149,6 +1166,110 @@ class settings extends MY_Controller {
 		}
 
 		return $error_message;
+	}
+
+	public function monthly_eid_update(){
+		$period=3;
+        $period_days=$period*30;
+		$today=date('Y-m-d');
+        $last_day_of_month=date('Y-m-t');
+        $first_day=date('Y-m-01',strtotime("-".$period."months"));
+        $last_day=date('Y-m-t',strtotime("-".$period."months"));
+        $facility_emails=array();
+        $response="";
+ 
+        //check if last day of month
+        if($today != $last_day_of_month){
+            //get eid facility list emails
+            $sql="SELECT em.email,em.facility
+                  FROM eid_mail em
+                  LEFT JOIN eid_master e ON em.facility=e.facilitycode
+                  WHERE em.active='1'
+                  GROUP BY em.email,em.facility";
+            $query = $this -> db -> query($sql);
+		    $results = $query -> result_array();
+		    if($results){
+	            foreach($results as $result){
+	                $facility=$result['facility'];
+	               	$email=$result['email'];
+	                $facility_emails[$facility][]=$email;
+	            }
+		    }
+
+		    foreach($facility_emails as $facility_code=>$emails){
+		        $sql="SELECT ei.status as label,COUNT(ei.status) AS total,f.name
+			          FROM eid_info ei 
+			          LEFT JOIN facilities f ON f.facilitycode=ei.facility_code 
+			          WHERE ei.enrollment_date 
+			          BETWEEN '$first_day' 
+			          AND '$last_day' 
+			          AND ei.facility_code='$facility_code' 
+			          AND DATEDIFF(CURDATE(),ei.enrollment_date)>=$period_days
+			          GROUP BY ei.status";
+				$query = $this -> db -> query($sql);
+			    $results = $query -> result_array();
+			    $table="<table border='1' width='50%' cellspacing='0.5' cellpadding='2'><caption>".strtoupper(@$results[0]['name'])."</caption>";
+			    $table.="<thead><tr><th>Retention Status</th><th>Total</th></tr></thead><tbody>";
+			    if($results){
+		            foreach($results as $result){
+                      $table.="<tr>";
+                      $table.="<td>".strtoupper($result['label'])."</td>";
+                      $table.="<td>".$result['total']."</td>";
+                      $table.="</tr>";
+		            }
+			    }else{
+			    	  $table.="<tr>";
+                      $table.="<td colspan='2'>no data available!</td>";
+                      $table.="</tr>";
+			    }
+			    $table.="</tbody></table>";
+			    $email_list=implode(",", $emails);
+
+			    $message = "Hello, <br/><br/>
+                This is the monthly EID Summary for ".@$results[0]['name'].".<br/>
+                The data is for patients enrolled in the period between ".date('d-M-Y',strtotime($first_day))." and ".date('d-M-Y',strtotime($last_day))." reporting on retention for  a period of ".$period." months.<br/>
+				Find the summary in the table below:<br/><br/>".
+				$table."<br/>Regards,<br/>NASCOP SYSTEM team.";
+			    $response.=$this->send_notification($email_list,$message);
+            }  
+        }
+        echo $response;
+	}
+
+	public function send_notification($email_address,$message){
+		$email_user = stripslashes('webadt.chai@gmail.com');
+		$email_password = stripslashes('WebAdt_052013');
+		$subject = "EID Monthly Retention Summary";
+		$email_sender_title = "NASCOP SYSTEM";
+
+		$config['mailtype'] = "html";
+		$config['protocol'] = 'smtp';
+		$config['smtp_host'] = 'ssl://smtp.googlemail.com';
+		$config['smtp_port'] = 465;
+		$config['smtp_user'] = $email_user;
+		$config['smtp_pass'] = $email_password;
+		ini_set("SMTP", "ssl://smtp.gmail.com");
+		ini_set("smtp_port", "465");
+
+		$this -> load -> library('email', $config);
+		$this -> email -> set_newline("\r\n");
+		$this -> email -> from('webadt.chai@gmail.com', $email_sender_title);
+		$this -> email -> to("$email_address");
+		$this -> email -> subject($subject);
+		$this -> email -> message($message);
+
+		if ($this -> email -> send()) {
+			$this -> email -> clear(TRUE);
+			$error_message = 'Email was sent to <b>' . $email_address . '</b> <br/>';
+		} else {
+			$error_message = $this -> email -> print_debugger();
+		}
+
+		return $error_message;
+	}
+
+	public function auto_script(){
+		$this -> load -> view('auto_script_v');
 	}
 
 	public function base_params($data) {

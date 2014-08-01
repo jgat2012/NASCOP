@@ -8,10 +8,10 @@ class Sync extends MY_Controller {
 		parent::__construct();
 	}
 
-	public function user($email = "") {
-		$email = urldecode($email);
-		$email = "kevomarete@gmail.com";
-		$users = Sync_User::getUser($email);
+	public function user() {
+		$email = $this->input->post("email",TRUE);
+		$password = $this->input->post("password",TRUE);
+		$users = Sync_User::authenticateUser($email,$password);
 		$users = array($users);
 		if ($users) {
 			foreach ($users as $user) {
@@ -23,7 +23,6 @@ class Sync extends MY_Controller {
 			}
 		}
 		echo json_encode($user);
-
 	}
 
 	public function drugs() {
@@ -44,10 +43,7 @@ class Sync extends MY_Controller {
 	public function facility($facility_id, $type, $period_begin = "") {
 		$total_array = array();
 		if ($type == "cdrr") {
-			$cdrrs = Cdrr::getFacilityCdrr($facility_id);
-			if ($period_begin != "") {
-				$cdrrs = Cdrr::getFacilityCdrr($facility_id, $period_begin);
-			}
+			$cdrrs = Cdrr::getFacilityCdrr($facility_id, $period_begin);
 			foreach ($cdrrs as $cdrr) {
 				$id = $cdrr['id'];
 				$items = Cdrr_Item::getItems($id);
@@ -57,21 +53,17 @@ class Sync extends MY_Controller {
 				$main_array["ownCdrr_log"] = $logs;
 				$total_array[] = $main_array;
 			}
-
 		} else if ($type == "maps") {
-			$maps = Maps::getFacilityMap($facility_id);
-			if ($period_begin != "") {
-				$maps = Maps::getFacilityMap($facility_id, $period_begin);
-			}
+			$maps = Maps::getFacilityMap($facility_id, $period_begin);
 			foreach ($maps as $map) {
 				$id = $map['id'];
 				$items = Maps_Item::getItems($id);
 				$logs = Maps_Log::getLogs($id);
+				$main_array = $map;
 				$main_array["ownMaps_item"] = $items;
 				$main_array["ownMaps_log"] = $logs;
 				$total_array[] = $main_array;
 			}
-
 		}
 		echo json_encode($total_array, JSON_PRETTY_PRINT);
 	}

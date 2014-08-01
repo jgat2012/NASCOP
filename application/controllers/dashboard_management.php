@@ -1898,7 +1898,11 @@ class Dashboard_Management extends MY_Controller {
 		}
 
 		if ($facility != 0) {
-			$conditions .= "AND em.facilitycode='$facility'";
+			if ($type == "retention") {
+               $conditions .= "AND ei.facility_code='$facility'";
+			}else{
+               $conditions .= "AND em.facilitycode='$facility'";
+			}	 
 		}
 		if ($county != 0) {
 			if ($type != "retention") {
@@ -1924,7 +1928,7 @@ class Dashboard_Management extends MY_Controller {
 		}
 
 		if ($type != "comparison" && $type != "summary") {
-				 if ($type == "retention") {
+				if ($type == "retention") {
 				 	if($county==0){
 				 		$county=90;
 				 	}
