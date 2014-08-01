@@ -1,3 +1,83 @@
+2014-07-14 12:46:00 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. AKALA DH-D-CDRR.xls
+Order was successfully saved. BAHATI DH-D-CDRR.xls
+Order was successfully saved. EMBU PGH-D-CDRR.xls
+Order was successfully saved. KATHITUNI HEALTH CARE CLINIC-D-CDRR.xls
+Order was successfully saved. LOITOKITOK SDH-D-CDRR.xls
+Order was successfully saved. MACHAKOS GENERAL HOSPITAL-D-CDRR.xls
+Order was successfully saved. MAKADARA HEALTH CENTRE-D-CDRR.xls
+Order was successfully saved. MASONGO SDH-D-CDRR.xls
+Order was successfully saved. MERU DISTRICT HOSPITAL-D-CDRR.xls
+Order was successfully saved. NGAO DH-D-CDRR.xls
+Order was successfully saved. NYAMACHE DH-D-CDRR.xls
+Order was successfully saved. RWAMBWA HEALTH CENTRE-D-CDRR.xls
+Order was successfully saved. THIKA DISTRICT HOSPITAL-D-CDRR.xls
+
+2014-07-14 12:42:12 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. AKALA DH-D-MAPS.xls
+Order was successfully saved. BAHATI DH-D-MAPS.xls
+Order was successfully saved. EMBU PGH-D-MAPS.xls
+Order was successfully saved. KATHITUNI HEALTH CARE CLINIC-D-MAPS.xls
+Order was successfully saved. LOITOKITOK DH-D-MAPS.xls
+Order was successfully saved. MACHAKOS DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. MAKADARA HEALTH CENTRE-D-MAPS.xls
+Order was successfully saved. MASONGO SDH-D-MAPS.xls
+Order was successfully saved. MERU DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. NGAO DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. NYAMACHE DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. RWAMBWA HEALTH CENTRE-D-MAPS.xls
+Order was successfully saved. THIKA DISTRICT HOSPITAL-D-MAPS.xls
+
+2014-07-14 12:41:33 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. ALUPE SUB DISTRICT HOSPITAL-F-CDRR.xls
+Order was successfully saved. CHEMELILI SUGAR HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. CONSOLATA MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. COTTOLENGO MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. FAMILY HEALTH OPTIONS-F-CDRR.xls
+Order was successfully saved. GOT AGULU SUB DISTRICT HOSPITAL-F-CDRR.xls
+Order was successfully saved. JKUAT CCC-F-CDRR.xls
+Order was successfully saved. KAMITI PRISON HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KANDIEGE SDH-F-CDRR.xls
+Order was successfully saved. KASARANI HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KENYA PORTS AUTHORITY-F-CDRR.xls
+Order was successfully saved. LIKONI SDH-F-CDRR.xls
+Order was successfully saved. MEWA HOSPITAL JUNE REPORT-F-CDRR.xls
+Order was successfully saved. MEWA HOSPITAL-F-CDRR.xls
+Order was successfully saved. NAIROBI REMAND HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. OGONGO SDH-F-CDRR.xls
+Order was successfully saved. SHIMO LA TEWA HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. ST MARYS MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. ST MATHIAS MULUMBA-F-CDRR.xls
+
+2014-07-14 12:38:03 pm(F-MAPS)
+--------------------------------
+Order was successfully saved. ST MARY'S MISSION HOSPITAL-F-MAPS.xls
+
+2014-07-14 12:35:03 pm(F-MAPS)
+--------------------------------
+Order was successfully saved. ALUPE SDH-F-MAPS.xls
+Order was successfully saved. CHEMELIL SUGAR HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. CONSOLATA MISSION HOSPITAL-F-MAPS.xls
+Order was successfully saved. COTTELENGO MISSION HOSPITAL-F-MAPS.xls
+Order was successfully saved. FAMILY HEALTH OPTIONS-F-MAPS.xls
+Order was successfully saved. GOT AGULU SDH-F-MAPS.xls
+Order was successfully saved. JKUATT CCC-F-MAPS.xls
+Order was successfully saved. KAMITI PRISONS HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. KANDIEGE SDH-F-MAPS.xls
+Order was successfully saved. KASARANI HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. KENYA PORTS AUTHORITY-F-MAPS.xls
+Order was successfully saved. LIKONI DH-F-MAPS.xls
+Order was successfully saved. MEWA HOSPITAL JUNE REPORT-F-MAPS.xls
+Order was successfully saved. MEWA HOSPITAL-F-MAPS.xls
+Order was successfully saved. NAIROBI REMAND PRISON HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. OGONGO SDH-F-MAPS.xls
+Order was successfully saved. SHIMO LA TEWA PRISON HEALTH CENTRE-F-MAPS.xls
+Your facility Code  in 'ST MARY'S MISSION HOSPITAL-F-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. ST MULUMBA MISSION HOSPITAL-F-MAPS.xls
+
 2014-05-09 09:27:53 pm(D-MAPS)
 --------------------------------
 Order was successfully saved. THIKA DH-D-MAPS.xls
