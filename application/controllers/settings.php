@@ -1179,7 +1179,7 @@ class settings extends MY_Controller {
         $response="";
  
         //check if last day of month
-        if($today != $last_day_of_month){
+        if($today == $last_day_of_month){
             //get eid facility list emails
             $sql="SELECT em.email,em.facility
                   FROM eid_mail em
