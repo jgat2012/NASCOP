@@ -75,6 +75,14 @@ class Sync_Facility extends Doctrine_Record {
 		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return @$sync_facility[0];
 	}
+	
+	public function getFacilityId($mfl_code) {
+		$sql = "SELECT id FROM sync_facility WHERE code ='$mfl_code'";
+		$query = $this ->db ->query($sql);
+		$result = $query ->result_array();
+		$facility_id = $result[0]['id'];
+		return $facility_id;
+	}
 
 }
 ?>

@@ -1,5 +1,5 @@
 <div class="full-content" style="width:98%;">
-	<div>
+	<div style="margin-top:1%">
 		<ul class="breadcrumb">
 			<li>
 				<a href="<?php echo site_url().'order' ?>">Orders</a><span class="divider">/</span>
@@ -201,7 +201,7 @@
 						 
 			?>
 			<tr class="ordered_drugs" drug_id="<?php echo $commodity -> id;?>">
-						<td class="col_drug" style="font-size:15px;"><?php echo strtoupper($commodity -> Drug);?>
+						<td class="col_drug" style="font-size:15px;"><?php if($commodity->Unit_Name !=""){ echo strtoupper($commodity -> Drug." [".$commodity->Unit_Name."]");}else{ echo strtoupper($commodity -> Drug);}?>
 							<input type="hidden" name="pack_size[]" id="pack_size_<?php echo $commodity -> id;?>" value="<?php echo $commodity ->Pack_Size;?>"/>
 						</td>
 						<td class="number calc_count"><?php echo $commodity ->Pack_Size;?></td>

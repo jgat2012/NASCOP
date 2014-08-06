@@ -49,6 +49,12 @@ class Escm_Facility extends Doctrine_Record {
 		$escm_facility = $query -> execute();
 		return $escm_facility[0];
 	}
+	
+	public function getFacilityId($facility_name) {
+		$query = Doctrine_Query::create() -> select("id") -> from("escm_facility") -> where("name LIKE  '%$facility_name%'");
+		$escm_facility = $query -> execute();
+		return $escm_facility[0];
+	}
 
 }
 ?>

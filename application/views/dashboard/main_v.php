@@ -600,7 +600,7 @@
 	}
 </script>
 
-<div class="tabbable national_dashboard_content" style="margin-top:1%"> <!-- Only required for left/right tabs -->
+<div class="tabbable national_dashboard_content" style="margin-top:2%"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs " style="width:60%; float: left">
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
   	<li id="pa_menu" class="main_menu" ><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
@@ -930,7 +930,24 @@
 	    			<table class="table table-bordered table-hover table-condensed table-striped">
 	    				<thead style="background: #2B597E;color: #FFF;font-weight:bold;font-size:0.9em;">
 	    					<tr>
-	    						<td rowspan="3">Unit of interest (National, County, or Facility?)</td>
+	    						<td rowspan="3">
+	    						 Unit of interest <br/>
+	    						 <span>County</span>
+				<select id="comparison_eid_county" class="nd_period nd_input_small span3">
+					<option value="">All</option>
+					<?php foreach ($eid_adt_county as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<span>Facility</span>
+				<select id="comparison_eid_facility" class="nd_period nd_input_small span4">
+					<option value="">All</option>
+					<?php foreach ($eid_adt_facility as $index=>$value) {
+						echo "<option value='".$index."'>".$value."</option>";
+					}?>
+				</select>
+				<button class="generate btn btn-warning" style="color:black" id="eid_comparison_btn">Get</button>	
+	    						</td>
 	    						<td>Period</td>
 	    						<td colspan="2">EID Data</td>
 	    						<td>Service Data DHIS</td>

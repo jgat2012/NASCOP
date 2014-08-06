@@ -67,7 +67,7 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function get_commodities($cdrr_id) {
-		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,ci.resupply
+		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,packsize as pack_size,ci.resupply
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
@@ -134,7 +134,7 @@ class Picking_List extends MY_Controller {
 		return $this -> showTable($columns, $results, $links);
 	}
 
-	public function generatePDF($data, $type = 0) {
+	public function generatePDF($data, $type = 0, $list_id, $email = "") {
 		$current_date = date("M d, Y");
 		$icon = 'assets/img/coat_of_arms-resized.png';
 		$html_title = "<div style='width:100px; height:100px; margin:0 auto;'><img src='" . $icon . "' style='width:96px; height:96px;'></img></div>";
@@ -153,7 +153,7 @@ class Picking_List extends MY_Controller {
 		$current_user = $this -> session -> userdata('user_id');
 		$user_object = Users::getUserDetail($current_user);
 		//retrieve user so as to get their signature
-		$html_footer = "<div style='width:100%; position:fixed; bottom:0;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='assets/img/" . $user_object -> Image_Link . "'></img></div>";
+		$html_footer = "<div style='width:100%;'><h4 style='text-align:left;'>Yours Faithfully,</h4><div style='width:160px; height:100px; margin:20px; auto 0 auto;'><img src='assets/img/" . $user_object -> Image_Link . "'></img></div>";
 		$html_footer .= "<h4 style='text-align:left;'>" . $user_object -> Name . "<br/> Nascop Program Officer<br/> NASCOP's ARV Logistics Management Unit at Kemsa" . "</h4></div>";
 		//echo $html_footer;
 		$this -> load -> library('mpdf');
@@ -170,28 +170,35 @@ class Picking_List extends MY_Controller {
 		$this -> mpdf -> simpleTables = true;
 		$this -> mpdf -> WriteHTML($data);
 		$this -> mpdf -> WriteHTML($html_footer);
-		$dir = "Export/";
-		$report_name = $dir . "Warehouse Memo.pdf";
-		$html_title . "\n";
-		$data . "\n";
+		$unique_stamp = date('U');
+		$report_name = "MEMO#" . $list_id . "(" . $unique_stamp . ").pdf";
 
-		/*Delete all files in export folder*/
-		if (is_dir($dir)) {
-			$files = scandir($dir);
-			foreach ($files as $object) {
-				if ($object != "." && $object != "..") {
-					unlink($dir . "/" . $object);
+		if ($email == "") {
+			$this -> mpdf -> Output($report_name, 'D');
+		} else {
+			$dir = "Export/";
+			$report_name = $dir . $report_name;
+			$html_title . "\n";
+			$data . "\n";
+
+			//Delete all files in export folder
+			if (is_dir($dir)) {
+				$files = scandir($dir);
+				foreach ($files as $object) {
+					if ($object != "." && $object != "..") {
+						unlink($dir . "/" . $object);
+					}
 				}
+			} else {
+				mkdir($dir);
 			}
-		} else {
-			mkdir($dir);
-		}
 
-		$this -> mpdf -> Output($report_name, 'F');
-		if ($type == 0) {
-			redirect($report_name);
-		} else {
-			return $report_name;
+			$this -> mpdf -> Output($report_name, 'F');
+			if ($type == 0) {
+				redirect($report_name);
+			} else {
+				return $report_name;
+			}
 		}
 	}
 
@@ -230,17 +237,17 @@ class Picking_List extends MY_Controller {
 
 		foreach ($cdrrs as $cdrr) {
 			$data .= '<h5 style="text-align: left">' . $cdrr -> facility_name . ' ' . $cdrr -> cdrr_id . '</h5>';
-			$data .= '<table class="data-table"><thead><tr><th>Commodity</th><th>Quantity for Resupply</th><th>Packs/Bottles/Tins</th></tr></thead><tbody>';
+			$data .= '<table class="data-table"><thead><tr><th>Commodity</th><th>Pack Size</th><th>Quantity for Resupply</th><th>Packs/Bottles/Tins</th></tr></thead><tbody>';
 			$items = $this -> get_commodities($cdrr -> id);
 			foreach ($items as $item) {
-				$data .= '<tr><td>' . $item -> drug . '</td><td>' . $item -> resupply . '</td><td>' . $item -> drug_unit . '</td></tr>';
+				$data .= '<tr><td>' . $item -> drug . '</td><td>' . number_format($item -> pack_size) . '</td><td>' . number_format($item -> resupply) . '</td><td>' . $item -> drug_unit . '</td></tr>';
 			}
 			$data .= '</tbody></table>';
 		}
 		if ($type == 0) {
-			$this -> generatePDF($data, $type);
+			$this -> generatePDF($data, $type, $list_id);
 		} else {
-			$file_name = $this -> generatePDF($data, $type);
+			$file_name = $this -> generatePDF($data, $type, $list_id, 1);
 			return $file_name;
 		}
 	}
@@ -271,7 +278,7 @@ class Picking_List extends MY_Controller {
 				} else if ($link == "remove order") {
 					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='delete link'>$link</a> | ";
 				} else if ($link == "print memo") {
-					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' target='_blank' class='link'>$link</a> | ";
+					$link_values .= "<a href='" . site_url($i . '/' . $mydata['id']) . "' class='link'>$link</a> | ";
 				} else if ($link == "update") {
 					$link_values .= "<a data-toggle='modal' href='#edit_list' class='update' link_id='" . $mydata['id'] . "' link_name='" . $mydata['name'] . "'>$link</a> | ";
 				} else if ($link == "assign orders") {
@@ -327,14 +334,13 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function view_commodities($cdrr_id) {
-		$columns = array('#', 'Commodity', 'Quantity for Resupply', 'Packs/Bottles/Tins');
+		$columns = array('#', 'Commodity', 'Packs/Bottles/Tins', 'Quantity for Resupply');
 		$sql = "SELECT sd.id,CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as drug,unit as drug_unit,ci.resupply
 			        FROM cdrr_item ci
 			        LEFT JOIN sync_drug sd ON sd.id=ci.drug_id
 			        WHERE ci.cdrr_id='$cdrr_id'
 			        AND resupply !='0'
 			        AND(sd.category_id='1' OR sd.category_id='2' OR sd.category_id='3')";
-		//include resupply >0
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		echo $this -> showTable($columns, $results);

@@ -1,5 +1,5 @@
 <?php
-error_reporting(1);
+error_reporting(0);
 class Order extends MY_Controller {
 	function __construct() {
 		parent::__construct();
@@ -218,7 +218,7 @@ class Order extends MY_Controller {
 			if ($code == 0) {
 				$and = "";
 			} else {
-				$and = "AND ci.resupply !='0'";
+				$and = "";
 			}
 			if ($cdrr_array['options'] == "update") {
 				$supplier = Facilities::getSupplier($facility);
@@ -459,9 +459,19 @@ class Order extends MY_Controller {
 						$period_begin = $this -> clean_date(trim($arr[$third_row]['D'] . $arr[$third_row]['E']));
 						$period_end = $this -> clean_date(trim($arr[$third_row]['G'] . $arr[$third_row]['H']));
 
+						//reporting rate
+						if ($code == "D-CDRR") {
+							$reports_expected = str_replace(',', '', trim($arr[108]['E']));
+							$reports_actual = str_replace(',', '', trim($arr[108]['H']));
+						} else {
+							$reports_expected = null;
+							$reports_actual = null;
+						}
+
 						$file_type = $this -> checkFileType($code, $text);
 						$facilities = Sync_Facility::getId($facility_code, $status_code);
 						$facility_id = $facilities['id'];
+						$duplicate = 0;
 						$duplicate = $this -> check_duplicate($code, $period_begin, $period_end, $facility_id);
 						if ($facilities == "") {
 							$ret[] = "Your facility Code in '" . $_FILES["file"]["name"][$q] . "' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.";
@@ -470,6 +480,7 @@ class Order extends MY_Controller {
 						} else if ($file_type == false) {
 							$ret[] = "Incorrect File Selected-" . $_FILES["file"]["name"][$q];
 						} else if ($duplicate == true) {
+							$this -> fix_bug($code, $period_begin, $period_end, $facility_id, $reports_expected, $reports_actual);
 							$ret[] = "A cdrr report already exists for this month !-" . $_FILES["file"]["name"][$q];
 						} else {
 							$fourth_row = 9;
@@ -527,8 +538,8 @@ class Order extends MY_Controller {
 							$main_array['period_begin'] = $period_begin;
 							$main_array['period_end'] = $period_end;
 							$main_array['comments'] = $comments;
-							$main_array['reports_expected'] = null;
-							$main_array['reports_actual'] = null;
+							$main_array['reports_expected'] = $reports_expected;
+							$main_array['reports_actual'] = $reports_actual;
 							$main_array['services'] = $services;
 							$main_array['sponsors'] = $sponsors;
 							$main_array['non_arv'] = 0;
@@ -542,56 +553,54 @@ class Order extends MY_Controller {
 
 							for ($i = $sixth_row; $sixth_row, $i <= 89; $i++) {
 								if ($i != 34 || $i != 57) {
-									if (trim($arr[$i][$resupply]) >= 0) {
-										$drug_name = trim($arr[$i]['A']);
-										$pack_size = str_replace(',', '', trim($arr[$i]['B']));
-										$commodity = $this -> getMappedDrug($drug_name, $pack_size);
-										if ($commodity != null) {
-											$cdrr_array[$commodity_counter]['id'] = "";
-											if ($code == "D-CDRR") {
-												$cdrr_array[$commodity_counter]['balance'] = str_replace(',', '', trim($arr[$i]['C']));
-												$cdrr_array[$commodity_counter]['received'] = str_replace(',', '', trim($arr[$i]['D']));
-												$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
-												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(',', '', trim($arr[$i]['E']));
-												$cdrr_array[$commodity_counter]['losses'] = str_replace(',', '', trim($arr[$i]['F']));
-												$cdrr_array[$commodity_counter]['adjustments'] = str_replace(',', '', trim($arr[$i]['G']));
-												$cdrr_array[$commodity_counter]['count'] = str_replace(',', '', trim($arr[$i]['H']));
-												$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(',', '', trim($arr[$i]['K']));
-												$expiry_date = trim($arr[$i]['L']);
-												if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
-													$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
-												} else {
-													$cdrr_array[$commodity_counter]['expiry_date'] = "";
-												}
-												$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(',', '', trim($arr[$i]['M']));
-												$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['N']);
-												$cdrr_array[$commodity_counter]['aggr_consumed'] = str_replace(",", "", $arr[$i]['I']);
-												$cdrr_array[$commodity_counter]['aggr_on_hand'] = str_replace(",", "", $arr[$i]['J']);
-											} else if ($code == "F-CDRR_packs") {
-												$cdrr_array[$commodity_counter]['balance'] = str_replace(",", "", $arr[$i]['C']);
-												$cdrr_array[$commodity_counter]['received'] = str_replace(",", "", $arr[$i]['D']);
-												$cdrr_array[$commodity_counter]['dispensed_units'] = str_replace(",", "", $arr[$i]['E']);
-												$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(",", "", $arr[$i]['F']);
-												$cdrr_array[$commodity_counter]['losses'] = str_replace(",", "", $arr[$i]['G']);
-												$cdrr_array[$commodity_counter]['adjustments'] = str_replace(",", "", $arr[$i]['H']);
-												$cdrr_array[$commodity_counter]['count'] = str_replace(",", "", $arr[$i]['I']);
-												$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(",", "", $arr[$i]['J']);
-												$expiry_date = trim($arr[$i]['K']);
-												if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
-													$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
-												} else {
-													$cdrr_array[$commodity_counter]['expiry_date'] = "";
-												}
-												$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(",", "", $arr[$i]['L']);
-												$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['M']);
-												$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
-												$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
+									$drug_name = trim($arr[$i]['A']);
+									$pack_size = str_replace(',', '', trim($arr[$i]['B']));
+									$commodity = $this -> getMappedDrug($drug_name, $pack_size);
+									if ($commodity != null) {
+										$cdrr_array[$commodity_counter]['id'] = "";
+										if ($code == "D-CDRR") {
+											$cdrr_array[$commodity_counter]['balance'] = str_replace(',', '', trim($arr[$i]['C']));
+											$cdrr_array[$commodity_counter]['received'] = str_replace(',', '', trim($arr[$i]['D']));
+											$cdrr_array[$commodity_counter]['dispensed_units'] = ceil(@str_replace(',', '', trim($arr[$i]['E'])) * @$pack_size);
+											$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(',', '', trim($arr[$i]['E']));
+											$cdrr_array[$commodity_counter]['losses'] = str_replace(',', '', trim($arr[$i]['F']));
+											$cdrr_array[$commodity_counter]['adjustments'] = str_replace(',', '', trim($arr[$i]['G']));
+											$cdrr_array[$commodity_counter]['count'] = str_replace(',', '', trim($arr[$i]['H']));
+											$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(',', '', trim($arr[$i]['K']));
+											$expiry_date = trim($arr[$i]['L']);
+											if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+												$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+											} else {
+												$cdrr_array[$commodity_counter]['expiry_date'] = "";
 											}
-											$cdrr_array[$commodity_counter]['publish'] = 0;
-											$cdrr_array[$commodity_counter]['cdrr_id'] = "";
-											$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
-											$commodity_counter++;
+											$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(',', '', trim($arr[$i]['M']));
+											$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['N']);
+											$cdrr_array[$commodity_counter]['aggr_consumed'] = str_replace(",", "", $arr[$i]['I']);
+											$cdrr_array[$commodity_counter]['aggr_on_hand'] = str_replace(",", "", $arr[$i]['J']);
+										} else if ($code == "F-CDRR_packs") {
+											$cdrr_array[$commodity_counter]['balance'] = str_replace(",", "", $arr[$i]['C']);
+											$cdrr_array[$commodity_counter]['received'] = str_replace(",", "", $arr[$i]['D']);
+											$cdrr_array[$commodity_counter]['dispensed_units'] = str_replace(",", "", $arr[$i]['E']);
+											$cdrr_array[$commodity_counter]['dispensed_packs'] = str_replace(",", "", $arr[$i]['F']);
+											$cdrr_array[$commodity_counter]['losses'] = str_replace(",", "", $arr[$i]['G']);
+											$cdrr_array[$commodity_counter]['adjustments'] = str_replace(",", "", $arr[$i]['H']);
+											$cdrr_array[$commodity_counter]['count'] = str_replace(",", "", $arr[$i]['I']);
+											$cdrr_array[$commodity_counter]['expiry_quant'] = str_replace(",", "", $arr[$i]['J']);
+											$expiry_date = trim($arr[$i]['K']);
+											if ($expiry_date != "-" || $expiry_date != "" || $expiry_date != null) {
+												$cdrr_array[$commodity_counter]['expiry_date'] = $this -> clean_date($expiry_date);
+											} else {
+												$cdrr_array[$commodity_counter]['expiry_date'] = "";
+											}
+											$cdrr_array[$commodity_counter]['out_of_stock'] = str_replace(",", "", $arr[$i]['L']);
+											$cdrr_array[$commodity_counter]['resupply'] = str_replace(",", "", $arr[$i]['M']);
+											$cdrr_array[$commodity_counter]['aggr_consumed'] = null;
+											$cdrr_array[$commodity_counter]['aggr_on_hand'] = null;
 										}
+										$cdrr_array[$commodity_counter]['publish'] = 0;
+										$cdrr_array[$commodity_counter]['cdrr_id'] = "";
+										$cdrr_array[$commodity_counter]['drug_id'] = $commodity;
+										$commodity_counter++;
 									}
 								}
 							}
@@ -599,23 +608,37 @@ class Order extends MY_Controller {
 
 							$log_array[0]['id'] = "";
 							$log_array[0]['description'] = "prepared";
+							$details = array();
 							if ($code == "D-CDRR") {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[113]['G']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[111]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[113]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[111]['K']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[109]['G']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[107]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[107]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[109]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[107]['K']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[0]['cdrr_id'] = "";
 
 							$log_array[1]['id'] = "";
 							$log_array[1]['description'] = "approved";
+							$details = array();
 							if ($code == "D-CDRR") {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[117]['G']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[115]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[115]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[117]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[115]['K']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[113]['G']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[111]['C']));
+								$details['name'] = str_replace("'", "", trim($arr[111]['C']));
+								$details['username'] = str_replace("'", "", trim($arr[113]['C']));
+								$details['role'] = str_replace("'", "", trim($arr[111]['K']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[1]['cdrr_id'] = "";
 
@@ -896,23 +919,37 @@ class Order extends MY_Controller {
 
 							$log_array[0]['id'] = "";
 							$log_array[0]['description'] = "prepared";
+							$details = array();
 							if ($code == "D-MAPS") {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell + 21]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 19]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 19]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 21]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 19]['G']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[0]['created'] = $this -> clean_date(trim($arr[$oi_cell + 17]['E']));
-								$log_array[0]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 15]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 15]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 17]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 15]['G']));
+								$log_array[0]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[0]['maps_id'] = "";
 
 							$log_array[1]['id'] = "";
 							$log_array[1]['description'] = "approved";
+							$details = array();
 							if ($code == "D-MAPS") {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell + 25]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 23]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 23]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 25]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 23]['G']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							} else {
 								$log_array[1]['created'] = $this -> clean_date(trim($arr[$oi_cell + 21]['E']));
-								$log_array[1]['user_id'] = $this -> getUser(trim($arr[$oi_cell + 19]['B']));
+								$details['name'] = str_replace("'", "", trim($arr[$oi_cell + 19]['B']));
+								$details['username'] = str_replace("'", "", trim($arr[$oi_cell + 21]['B']));
+								$details['role'] = str_replace("'", "", trim($arr[$oi_cell + 19]['G']));
+								$log_array[1]['user_id'] = $this -> getUser($details);
 							}
 							$log_array[1]['maps_id'] = "";
 
@@ -1068,14 +1105,13 @@ class Order extends MY_Controller {
 		}
 	}
 
-	public function getCellValues($filename, $force = false) {
+	public function getCellValues($filename, $force = false,$currentIndex=0) {
 		if (!is_null($this -> cellValues) && $force === false) {
 			return $this -> cellValues;
 		}
 
 		$this -> objPHPExcel = PHPExcel_IOFactory::load($filename);
-		$currentIndex = $this -> objPHPExcel -> getActiveSheetIndex();
-		$this -> objPHPExcel -> setActiveSheetIndex(0);
+		$this -> objPHPExcel -> setActiveSheetIndex($currentIndex);
 
 		$sheet = $this -> objPHPExcel -> getActiveSheet();
 		$highestColumn = $sheet -> getHighestColumn();
@@ -1099,10 +1135,10 @@ class Order extends MY_Controller {
 	 * returns cell by value. Be carefull, could be ambigous, only use
 	 * if you really know what you are doing
 	 */
-	public function getCellByValue($search, $filename) {
+	public function getCellByValue($search, $filename,$index=0) {
 		$nonPrintableChars = array("\n", "\r", "\t", "\s");
 		$search = str_replace($nonPrintableChars, '', $search);
-		foreach ($this->getCellValues($filename) as $cell => $value) {
+		foreach ($this->getCellValues($filename,false,$index) as $cell => $value) {
 			if (stripos(str_replace($nonPrintableChars, '', $value), $search) === 0) {
 				return $cell;
 			}
@@ -1590,9 +1626,19 @@ class Order extends MY_Controller {
 		if ($results) {
 			$response = true;
 			$this -> session -> set_flashdata('order_message', strtoupper($table) . ' report already exists for this month !');
-
 		}
 		return $response;
+	}
+
+	public function fix_bug($code, $period_start, $period_end, $facility, $reports_expected, $reports_actual, $table = "cdrr") {
+		$sql = "select * from $table where period_begin='$period_start' and period_end='$period_end' and code='$code' and facility_id='$facility'";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			$cdrr_id = $results[0]['id'];
+			$sql = "UPDATE $table SET reports_expected='$reports_expected',reports_actual='$reports_actual' WHERE id='$cdrr_id'";
+			$query = $this -> db -> query($sql);
+		}
 	}
 
 	public function check_original($type, $original_id) {
@@ -1693,12 +1739,14 @@ class Order extends MY_Controller {
 		}
 	}
 
-	public function getUser($name) {
-		$user_id = Sync_User::getId($name);
+	public function getUser($details = array()) {
+		$user_id = Sync_User::getId($details['name']);
 		if ($user_id) {
 			return $user_id['id'];
+		} else {
+			$this -> db -> insert("sync_user", $details);
+			return $this -> db -> insert_id();
 		}
-		return null;
 	}
 
 	public function getMappedDrug($drug_name = "", $packsize = "") {
@@ -1737,11 +1785,30 @@ class Order extends MY_Controller {
 		return null;
 	}
 
-	public function getMappedRegimen($regimen_code = "", $regimen_desc = "") {
+	public function getMappedRegimen($regimen_code = "", $regimen_desc = "",$column='r.n_map') {
 		if ($regimen_code != "") {
-			$sql = "SELECT r.n_map
+			$sql = "SELECT $column
 				    FROM regimen r
 				    WHERE(r.regimen_code='$regimen_code')";
+			$query = $this -> db -> query($sql);
+			$results = $query -> result_array();
+
+			if ($results) {
+				return $results[0]['n_map'];
+			} else {
+				return $this ->getMappedRegimenDesc($regimen_desc,$column); // To be confirmed with Marete
+			}
+		}elseif($regimen_desc != ""){
+			$this ->getMappedRegimenDesc($regimen_desc,$column);
+		}
+		return null;
+	}
+	
+	public function getMappedRegimenDesc($regimen_desc = "",$column='r.n_map') {
+		if($regimen_desc != ""){
+			$sql = "SELECT $column
+				    FROM regimen r
+				    WHERE(r.regimen_desc='$regimen_desc')";
 			$query = $this -> db -> query($sql);
 			$results = $query -> result_array();
 
@@ -1988,6 +2055,208 @@ class Order extends MY_Controller {
 			redirect("order/twopager_upload");
 		}
 
+	}
+
+	public function historical_upload(){//Historical reports upload
+		$this -> load -> helper('file');
+		$this -> load -> library('PHPExcel');
+		$objReader = new PHPExcel_Reader_Excel5();
+		$error_data = array();
+		$error_count = 0;
+		
+		if (isset($_FILES["file"])) {//Check if workbooks were selected
+			try {
+				
+			    //Count number of workbooks being uploaded
+				$fileCount = count($_FILES["file"]["tmp_name"]);
+				$pipeline  = $this -> input -> post('report_pipeline');
+				$period = '';
+				for ($q = 0; $q < $fileCount; $q++) {//Loop through each workbook
+					$file_name = $_FILES["file"]["tmp_name"][$q];
+					$objPHPExcel = $objReader -> load($file_name);
+					$sheets = $objReader->listWorksheetNames($file_name);//Get list of sheet names
+					
+					/*Upload MAPS
+					 * 
+					 */
+					
+					$patients_by_art = 'Current patients by ART site';
+					$patients_by_art = strtolower($patients_by_art);
+					$index = array_search ($patients_by_art ,array_map('strtolower', $sheets));
+					$objPHPExcel -> setActiveSheetIndex($index);
+					$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
+					$index1 = '';
+					
+					if($pipeline=='kemsa'){
+						$period = $arr[3]['A'];
+						$period = str_ireplace('period', '', $period);
+						$period = str_ireplace(',', ' ', $period);
+						
+					}elseif($pipeline=='kenya_pharma'){
+						$period = $arr[4]['A'];
+					}
+					else{
+						$error_data[$error_count] = 'Error [ '.date('Y-m-d H:i:s').'] : Pipeline selection error! Please select Kenya Pharma or Kemsa';
+						$error_count++;
+					}
+					
+					$period = trim($period);
+					$period = date('F-Y',strtotime($period));// November - YYYY
+					$period_begin = date('Y-m-01',strtotime($period));
+					$period_end = date('Y-m-t',strtotime($period));
+					
+					
+					$highestColumm = $objPHPExcel -> setActiveSheetIndex($index) -> getHighestColumn();
+					$highestRow = $objPHPExcel -> setActiveSheetIndex($index) -> getHighestRow();
+					
+					
+					
+					$row_index = $this ->searchForId('site name', $arr);
+					
+					//Get facility details
+					$facility_counter = (int)$row_index+1;
+					
+					for($counter = $facility_counter;$counter<=$highestRow;$counter++){//Loop through each facility
+						
+						
+					
+						$mfl_code = '';
+						$facility_name = $arr[$counter]['B'];
+						$created = date('Y-m-d H:i:s');
+						
+						if(trim($facility_name)==''){//Check where list of facilities ends
+							break;
+						}
+						$facility_name = str_replace("'", "\'", $facility_name);
+						$facility_name = str_ireplace("sub district", "sub-district", $facility_name);
+						
+						
+						
+						//Get MFL Code and facilities Ids
+						$check_report = 0;
+						if($pipeline=='kemsa'){
+							$mfl_code = $arr[$counter]['A'];
+							$facility_id = Sync_facility::getFacilityId($mfl_code);
+							//Maps Items
+							$index1 = $this ->searchForId('new code', $arr);// Get row index where regimens are
+							
+							//Check if reports already exist for this facility
+							$sql = "SELECT m.id FROM maps m
+									LEFT JOIN escm_maps em on em.maps_id = m.id 
+									WHERE m.facility_id ='$facility_id' AND m.period_begin='$period_begin' 
+									AND m.id NOT IN (SELECT maps_id FROM escm_maps) ";
+							
+						}
+						else if($pipeline=='kenya_pharma'){//Still to be worked on
+							$facility_id = Escm_facility::getFacilityId($facility_name);
+							//Maps Items
+							$index1 = $this ->searchForId('new code:', $arr);// Get row index where regimens are
+							//Check if reports already exist for this facility
+							$sql = "SELECT m.id FROM maps m
+									LEFT JOIN escm_maps em on em.maps_id = m.id 
+									WHERE m.facility_id ='$facility_id' AND m.period_begin='$period_begin' 
+									AND m.id IN (SELECT maps_id FROM escm_maps) ";
+						}
+						
+						//echo $sql;
+						//Before proceeding, check if reports for that period already exist for that facility
+						$query = $this ->db ->query($sql);
+						$result = $query ->result_array();
+						$check_report = count($result);
+						if($check_report>0){//Proceed to next facility
+							$error_data[$error_count] = 'Info[REPORT_EXIST] ('.date('Y-m-d H:m:s').') : MAPS already exists for '.$facility_name.' for this period.';
+							$error_count++;
+							continue;
+						}
+						
+						if(trim($facility_id)==''){
+							$error_data[$error_count] = 'Error[MFL_CODE_NOT_FOUND] ('.date('Y-m-d H:m:s').') : The MFL Code for '.$facility_name.' did not match any facility!';
+							$error_count++;
+						}
+						
+						//Start getting the data
+						$maps_array = array(
+							'status' => 'approved',
+							'created' => $created,
+							'code' => 'D-MAPS',
+							'period_begin' => $period_begin,
+							'period_end' => $period_end,
+							'facility_id' => $facility_id
+						);
+						
+						$this->db->insert('maps', $maps_array); 
+						$this->db->select_max('id', 'max_id');
+						$query = $this->db->get('maps');
+						$result = $query ->result_array();
+						$maps_id = $result[0]['max_id'];
+						//----------------------Loop through each regimen to get regimens id
+						$x = 'F';
+						for($regimen_counter = 'E';$regimen_counter<=$x;$regimen_counter++){//Still to be worked on
+							$regimen_code = $arr[$index1][$regimen_counter];
+							$regimen_id = '';
+							$total = $arr[$counter][$regimen_counter]; //Regimen total
+							
+							if($pipeline=='kemsa'){
+								$regimen_id = $this ->getMappedRegimen($regimen_code,'','r.n_map');
+								//If last regimen in the table, exit the loop
+								if(trim($regimen_code)==''){
+									break;
+								}
+							}elseif($pipeline=='kenya_pharma'){
+								//Check if last regimen in the table
+								$index2 = (int)$index1-1;
+								$regimen_desc = $arr[$index2][$regimen_counter];
+								$regimen_id = $this ->getMappedRegimen($regimen_code,'','r.e_map');
+								if(trim($regimen_code)=='' && trim($regimen_desc)==''){//If regimen name and regimen code are blank, end of loop
+									break;
+								}
+							}
+							
+							if($x==$highestColumm){//break;
+							}
+							else{$x++;//If not yet the maximum column, keep looping
+							}
+							
+							//echo $facility_name.' : '.$regimen_code.'.| Total : '.$total.'<br>';
+							
+							//Insert data into maps item
+							$maps_item = array(
+												'maps_id' => $maps_id,
+												'regimen_id' => $regimen_id,
+												'total' =>$total
+												);
+							
+							$this->db->insert('maps_item', $maps_item); 
+							
+						}
+						
+							
+						
+					}
+
+					echo '<em>'.print_r($error_data).'</em>';
+					
+					
+					
+					
+				}	
+					
+			} catch (Exception $e) {
+			    echo "Error : ".$e->getMessage()."<br />\n";
+			}
+
+			
+		}
+		
+	}
+
+	function search_multidimensional($search,$array){
+		foreach ($array as $key => $val) {
+	       if ($val['uid'] == $search) {
+	           return $key;
+	       }
+	   }
+	   return null;
 	}
 
 	public function rationalize_cdrr($cdrr_id, $maps_id) {

@@ -165,7 +165,7 @@
 		}else if(type == "gitlog") {
 			$("#add_btn").hide();
 			$("#modal_header").text("Add Log");
-		}  else if(type == "escm_facility") {
+		}else if(type == "escm_facility") {
 			$("#add_btn").hide();
 			$("#modal_header").text("Add Facility");
 		}
@@ -230,7 +230,10 @@
 			}else if(type == "escm_facility") {
 				$("#add_btn").hide();
 				$("#modal_header").text("Add Facility");
-			} 
+			}else if(type == "gitlog") {
+			$("#add_btn").hide();
+			$("#modal_header").text("Add Log");
+		    }
 			var link = my_url + "settings/modal/" + type
 			$(".modal_btn").attr("href", link);
 			$(".modal-body").load(link);
