@@ -1,5 +1,5 @@
 <?php
-error_reporting(1);
+error_reporting(0);
 class Order extends MY_Controller {
 	function __construct() {
 		parent::__construct();
@@ -1106,14 +1106,13 @@ class Order extends MY_Controller {
 		}
 	}
 
-	public function getCellValues($filename, $force = false) {
+	public function getCellValues($filename, $force = false,$currentIndex=0) {
 		if (!is_null($this -> cellValues) && $force === false) {
 			return $this -> cellValues;
 		}
 
 		$this -> objPHPExcel = PHPExcel_IOFactory::load($filename);
-		$currentIndex = $this -> objPHPExcel -> getActiveSheetIndex();
-		$this -> objPHPExcel -> setActiveSheetIndex(0);
+		$this -> objPHPExcel -> setActiveSheetIndex($currentIndex);
 
 		$sheet = $this -> objPHPExcel -> getActiveSheet();
 		$highestColumn = $sheet -> getHighestColumn();
@@ -1137,10 +1136,10 @@ class Order extends MY_Controller {
 	 * returns cell by value. Be carefull, could be ambigous, only use
 	 * if you really know what you are doing
 	 */
-	public function getCellByValue($search, $filename) {
+	public function getCellByValue($search, $filename,$index=0) {
 		$nonPrintableChars = array("\n", "\r", "\t", "\s");
 		$search = str_replace($nonPrintableChars, '', $search);
-		foreach ($this->getCellValues($filename) as $cell => $value) {
+		foreach ($this->getCellValues($filename,false,$index) as $cell => $value) {
 			if (stripos(str_replace($nonPrintableChars, '', $value), $search) === 0) {
 				return $cell;
 			}
@@ -1754,6 +1753,8 @@ class Order extends MY_Controller {
 	public function getMappedDrug($drug_name = "", $packsize = "") {
 		if ($drug_name != "") {
 			$drugs = explode(" ", trim($drug_name));
+			//Count number of elements
+			
 			$drug_list = array();
 			foreach ($drugs as $drug) {
 				$drug = str_ireplace(array("(", ")"), array("", ""), $drug);
@@ -1785,11 +1786,30 @@ class Order extends MY_Controller {
 		return null;
 	}
 
-	public function getMappedRegimen($regimen_code = "", $regimen_desc = "") {
+	public function getMappedRegimen($regimen_code = "", $regimen_desc = "",$column='r.n_map') {
 		if ($regimen_code != "") {
-			$sql = "SELECT r.n_map
+			$sql = "SELECT $column
 				    FROM regimen r
 				    WHERE(r.regimen_code='$regimen_code')";
+			$query = $this -> db -> query($sql);
+			$results = $query -> result_array();
+
+			if ($results) {
+				return $results[0]['n_map'];
+			} else {
+				return $this ->getMappedRegimenDesc($regimen_desc,$column); // To be confirmed with Marete
+			}
+		}elseif($regimen_desc != ""){
+			$this ->getMappedRegimenDesc($regimen_desc,$column);
+		}
+		return null;
+	}
+	
+	public function getMappedRegimenDesc($regimen_desc = "",$column='r.n_map') {
+		if($regimen_desc != ""){
+			$sql = "SELECT $column
+				    FROM regimen r
+				    WHERE(r.regimen_desc='$regimen_desc')";
 			$query = $this -> db -> query($sql);
 			$results = $query -> result_array();
 
@@ -2036,6 +2056,208 @@ class Order extends MY_Controller {
 			redirect("order/twopager_upload");
 		}
 
+	}
+
+	public function historical_upload(){//Historical reports upload
+		$this -> load -> helper('file');
+		$this -> load -> library('PHPExcel');
+		$objReader = new PHPExcel_Reader_Excel5();
+		$error_data = array();
+		$error_count = 0;
+		
+		if (isset($_FILES["file"])) {//Check if workbooks were selected
+			try {
+				
+			    //Count number of workbooks being uploaded
+				$fileCount = count($_FILES["file"]["tmp_name"]);
+				$pipeline  = $this -> input -> post('report_pipeline');
+				$period = '';
+				for ($q = 0; $q < $fileCount; $q++) {//Loop through each workbook
+					$file_name = $_FILES["file"]["tmp_name"][$q];
+					$objPHPExcel = $objReader -> load($file_name);
+					$sheets = $objReader->listWorksheetNames($file_name);//Get list of sheet names
+					
+					/*Upload MAPS
+					 * 
+					 */
+					
+					$patients_by_art = 'Current patients by ART site';
+					$patients_by_art = strtolower($patients_by_art);
+					$index = array_search ($patients_by_art ,array_map('strtolower', $sheets));
+					$objPHPExcel -> setActiveSheetIndex($index);
+					$arr = $objPHPExcel -> getActiveSheet() -> toArray(null, true, true, true);
+					$index1 = '';
+					
+					if($pipeline=='kemsa'){
+						$period = $arr[3]['A'];
+						$period = str_ireplace('period', '', $period);
+						$period = str_ireplace(',', ' ', $period);
+						
+					}elseif($pipeline=='kenya_pharma'){
+						$period = $arr[4]['A'];
+					}
+					else{
+						$error_data[$error_count] = 'Error [ '.date('Y-m-d H:i:s').'] : Pipeline selection error! Please select Kenya Pharma or Kemsa';
+						$error_count++;
+					}
+					
+					$period = trim($period);
+					$period = date('F-Y',strtotime($period));// November - YYYY
+					$period_begin = date('Y-m-01',strtotime($period));
+					$period_end = date('Y-m-t',strtotime($period));
+					
+					
+					$highestColumm = $objPHPExcel -> setActiveSheetIndex($index) -> getHighestColumn();
+					$highestRow = $objPHPExcel -> setActiveSheetIndex($index) -> getHighestRow();
+					
+					
+					
+					$row_index = $this ->searchForId('site name', $arr);
+					
+					//Get facility details
+					$facility_counter = (int)$row_index+1;
+					
+					for($counter = $facility_counter;$counter<=$highestRow;$counter++){//Loop through each facility
+						
+						
+					
+						$mfl_code = '';
+						$facility_name = $arr[$counter]['B'];
+						$created = date('Y-m-d H:i:s');
+						
+						if(trim($facility_name)==''){//Check where list of facilities ends
+							break;
+						}
+						$facility_name = str_replace("'", "\'", $facility_name);
+						$facility_name = str_ireplace("sub district", "sub-district", $facility_name);
+						
+						
+						
+						//Get MFL Code and facilities Ids
+						$check_report = 0;
+						if($pipeline=='kemsa'){
+							$mfl_code = $arr[$counter]['A'];
+							$facility_id = Sync_facility::getFacilityId($mfl_code);
+							//Maps Items
+							$index1 = $this ->searchForId('new code', $arr);// Get row index where regimens are
+							
+							//Check if reports already exist for this facility
+							$sql = "SELECT m.id FROM maps m
+									LEFT JOIN escm_maps em on em.maps_id = m.id 
+									WHERE m.facility_id ='$facility_id' AND m.period_begin='$period_begin' 
+									AND m.id NOT IN (SELECT maps_id FROM escm_maps) ";
+							
+						}
+						else if($pipeline=='kenya_pharma'){//Still to be worked on
+							$facility_id = Escm_facility::getFacilityId($facility_name);
+							//Maps Items
+							$index1 = $this ->searchForId('new code:', $arr);// Get row index where regimens are
+							//Check if reports already exist for this facility
+							$sql = "SELECT m.id FROM maps m
+									LEFT JOIN escm_maps em on em.maps_id = m.id 
+									WHERE m.facility_id ='$facility_id' AND m.period_begin='$period_begin' 
+									AND m.id IN (SELECT maps_id FROM escm_maps) ";
+						}
+						
+						//echo $sql;
+						//Before proceeding, check if reports for that period already exist for that facility
+						$query = $this ->db ->query($sql);
+						$result = $query ->result_array();
+						$check_report = count($result);
+						if($check_report>0){//Proceed to next facility
+							$error_data[$error_count] = 'Info[REPORT_EXIST] ('.date('Y-m-d H:m:s').') : MAPS already exists for '.$facility_name.' for this period.';
+							$error_count++;
+							continue;
+						}
+						
+						if(trim($facility_id)==''){
+							$error_data[$error_count] = 'Error[MFL_CODE_NOT_FOUND] ('.date('Y-m-d H:m:s').') : The MFL Code for '.$facility_name.' did not match any facility!';
+							$error_count++;
+						}
+						
+						//Start getting the data
+						$maps_array = array(
+							'status' => 'approved',
+							'created' => $created,
+							'code' => 'D-MAPS',
+							'period_begin' => $period_begin,
+							'period_end' => $period_end,
+							'facility_id' => $facility_id
+						);
+						
+						$this->db->insert('maps', $maps_array); 
+						$this->db->select_max('id', 'max_id');
+						$query = $this->db->get('maps');
+						$result = $query ->result_array();
+						$maps_id = $result[0]['max_id'];
+						//----------------------Loop through each regimen to get regimens id
+						$x = 'F';
+						for($regimen_counter = 'E';$regimen_counter<=$x;$regimen_counter++){//Still to be worked on
+							$regimen_code = $arr[$index1][$regimen_counter];
+							$regimen_id = '';
+							$total = $arr[$counter][$regimen_counter]; //Regimen total
+							
+							if($pipeline=='kemsa'){
+								$regimen_id = $this ->getMappedRegimen($regimen_code,'','r.n_map');
+								//If last regimen in the table, exit the loop
+								if(trim($regimen_code)==''){
+									break;
+								}
+							}elseif($pipeline=='kenya_pharma'){
+								//Check if last regimen in the table
+								$index2 = (int)$index1-1;
+								$regimen_desc = $arr[$index2][$regimen_counter];
+								$regimen_id = $this ->getMappedRegimen($regimen_code,'','r.e_map');
+								if(trim($regimen_code)=='' && trim($regimen_desc)==''){//If regimen name and regimen code are blank, end of loop
+									break;
+								}
+							}
+							
+							if($x==$highestColumm){//break;
+							}
+							else{$x++;//If not yet the maximum column, keep looping
+							}
+							
+							//echo $facility_name.' : '.$regimen_code.'.| Total : '.$total.'<br>';
+							
+							//Insert data into maps item
+							$maps_item = array(
+												'maps_id' => $maps_id,
+												'regimen_id' => $regimen_id,
+												'total' =>$total
+												);
+							
+							$this->db->insert('maps_item', $maps_item); 
+							
+						}
+						
+							
+						
+					}
+
+					echo '<em>'.print_r($error_data).'</em>';
+					
+					
+					
+					
+				}	
+					
+			} catch (Exception $e) {
+			    echo "Error : ".$e->getMessage()."<br />\n";
+			}
+
+			
+		}
+		
+	}
+
+	function search_multidimensional($search,$array){
+		foreach ($array as $key => $val) {
+	       if ($val['uid'] == $search) {
+	           return $key;
+	       }
+	   }
+	   return null;
 	}
 
 	public function rationalize_cdrr($cdrr_id, $maps_id) {

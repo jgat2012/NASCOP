@@ -1012,7 +1012,6 @@ class Dashboard_Management extends MY_Controller {
 		header("Cache-Control: no-store, no-cache, must-revalidate");
 		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
-		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 		header('Content-Disposition: attachment;filename=' . $filename);
 		$filename = $dir . '/' . $filename . '.xls';
 		$objWriter = new PHPExcel_Writer_Excel5($objPHPExcel);

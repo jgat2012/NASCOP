@@ -91,4 +91,36 @@
 </div>
 <!-- Modal edit change password end-->
 
+<!-- Modal Historical Reports upload password-->
+<div id="historical_upload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<form action="<?php echo base_url().'order/historical_upload' ?>" method="post" enctype="multipart/form-data">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+				×
+			</button>
+			<h3 id="myModalLabel">Historical Reports Uploads</h3>
+		</div>
+		<div class="modal-body">
+			<div class="form-group">
+			     <label for="report_pipeline">Please Select a Pipeline</label>
+			     <select name="report_pipeline" id="report_pipeline" required="required">
+			     	<option value="kemsa">Kemsa</option>
+			     	<option value="kenya_pharma">Kenya Pharma</option>
+			     </select>
+			</div>
+		    <div class="form-group">
+		      <label class="alert alert-info" >Please Select workbook(s) to upload. Kindly make sure that the file(s) your are uploading is in 1997-2003 excel format(e.g: example.xls)</label>
+		      <input type="file"  name="file[]" size="30" multiple="multiple"  required="required" accept="application/vnd.ms-excel"/>
+		    </div>
+			  
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">
+				Cancel
+			</button>
+			<input type="submit" class="btn btn-primary" name="btn_submit_change_pass" id="btn_submit_change_pass" value="Save ">
+		</div>
+	</form>
+</div>
+<!-- Modal Historical Reports upload end-->
 

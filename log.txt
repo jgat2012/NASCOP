@@ -967,5 +967,3 @@ A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites 
 --------------------------------
 Your facility Code in 'Kendu Bay-D-CDRR for Central Sites and District Stores..xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
 Your facility Code in 'Mwingi DH-D-CDRR for Central Sites and District Stores.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
->>>>>>> 6c60b0e6d99b2e24447562080afad9602ac19358
-
