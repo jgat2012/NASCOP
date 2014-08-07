@@ -152,7 +152,8 @@ class Sync extends MY_Controller {
 				$this -> db -> insert('adt_sites', $data_facility);
 			}
 
-		} else {
+		} 
+		if ($link == "nascop"){
 			$pipeline = 'kemsa';
 			$my_array = array();
 			if ($type == "cdrr") {
@@ -181,15 +182,12 @@ class Sync extends MY_Controller {
 				$cdrr_id = $this -> db -> insert_id();
 
 				//Loop through cdrr_log and add cdrr_id
-				foreach ($cdrr_log as $index => $logs) {
-					foreach ($logs as $counter => $log) {
-						foreach ($log as $ind => $lg) {
-							if ($ind == "cdrr_id") {
-								$temp_log[$counter]['cdrr_id'] = $cdrr_id;
-							} else {
-								$temp_log[$counter][$index] = $lg;
-							}
+				foreach ($cdrr_log as $index => $log) {
+					foreach ($log as $ind => $lg) {
+						if ($ind == "cdrr_id") {
+							$lg['cdrr_id'] = $cdrr_id;
 						}
+						$temp_log[] = $lg;
 					}
 				}
 				$this -> db -> insert_batch('cdrr_log', $temp_log);
@@ -218,9 +216,9 @@ class Sync extends MY_Controller {
 				foreach ($responses as $response) {
 					foreach ($response as $index => $main) {
 						if ($index == "ownMaps_item") {
-							$temp_items['maps_item'] = $main;
+							$temp_items[$index] = $main;
 						} else if ($index == "ownMaps_log") {
-							$temp_log['maps_log'] = $main;
+							$temp_log[$index] = $main;
 						} else {
 							$maps[$index] = $main;
 							//Get facility id
@@ -235,17 +233,15 @@ class Sync extends MY_Controller {
 
 				//attach maps id to maps_log
 				foreach ($temp_log as $logs) {
-					foreach ($logs as $counter => $log) {
-						foreach ($log as $index => $lg) {
-							if ($index == "maps_id") {
-								$maps_log[$counter]["maps_id"] = $maps_id;
-							} else {
-								$maps_log[$counter][$index] = $lg;
-							}
+					foreach ($logs as $index => $log) {
+						if ($index == "maps_id") {
+							$log["maps_id"] = $maps_id;
 						}
+						$maps_log[] = $log;
 					}
 				}
-				$this -> db -> insert_batch('maps_log', $maps_log);
+
+	     		$this -> db -> insert_batch('maps_log', $maps_log);
 
 				//attach maps id to maps_item
 				foreach ($temp_items as $temp_item) {
@@ -266,12 +262,13 @@ class Sync extends MY_Controller {
 			$sql = "SELECT * FROM adt_sites WHERE facility_id='$facility_id' AND pipeline='$pipeline'";
 			$query = $this -> db -> query($sql);
 			$result = $query -> result_array($query);
-			$count = count($result);
-			if ($count == 0 && $facility_id != '') {//If facility not found
-				$data_facility = array("facility_id " => $facility_id, "pipeline" => $pipeline);
-				$this -> db -> insert('adt_sites', $data_facility);
+			if($result){
+				$count = count($result);
+				if ($count == 0 && $facility_id != '') {//If facility not found
+					$data_facility = array("facility_id " => $facility_id, "pipeline" => $pipeline);
+					$this -> db -> insert('adt_sites', $data_facility);
+				}
 			}
-
 			echo json_encode($my_array);
 		}
 	}
@@ -292,19 +289,8 @@ class Sync extends MY_Controller {
 	}
 
 	public function delete($type = "cdrr", $id) {
-		$sql_array = array();
-		if ($type == "cdrr") {
-			$sql_array[] = "DELETE FROM cdrr where id='$id'";
-			$sql_array[] = "DELETE FROM cdrr_item where cdrr_id='$id'";
-			$sql_array[] = "DELETE FROM cdrr_log where cdrr_id='$id'";
-		} else if ($type == "maps") {
-			$sql_array[] = "DELETE FROM maps where id='$id'";
-			$sql_array[] = "DELETE FROM maps_item where maps_id='$id'";
-			$sql_array[] = "DELETE FROM maps_log where maps_id='$id'";
-		}
-		foreach ($sql_array as $sql) {
-			$query = $this -> db -> query($sql);
-		}
+		$sql="DELETE FROM $type where id='$id'";
+		$query = $this -> db -> query($sql);
 	}
 
 }
