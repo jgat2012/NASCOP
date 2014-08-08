@@ -126,8 +126,12 @@ class settings extends MY_Controller {
 			$action_link = "delete";
 			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id" && $i != "code" && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
-					$myrow[] = $v;
+				if ($i != "id"  && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
+					if($type == "eid_mail" && $i =="code"){
+					     //null
+					}else{
+						 $myrow[] = $v;
+					}
 				} else {
 					if ($i == "id") {
 						$id = $v;
