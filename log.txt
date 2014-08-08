@@ -1,0 +1,999 @@
+2014-08-06 12:28:53 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. AIC KAPSOWAR-F-CDRR.xls
+Order was successfully saved. ALUPE SUB DISTRICT HOSPITAL-F-CDRR.xls
+Order was successfully saved. CHEMELILI SUGAR HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. CONSOLATA MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. COTTOLENGO MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. FAMILY HEALTH OPTIONS-F-CDRR.xls
+Order was successfully saved. GOT AGULU SUB DISTRICT HOSPITAL-F-CDRR.xls
+Order was successfully saved. JKUAT CCC-F-CDRR.xls
+Order was successfully saved. KAMITI PRISON HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KANDIEGE SDH-F-CDRR.xls
+Order was successfully saved. KASARANI HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KENYA PORTS AUTHORITY-F-CDRR.xls
+Order was successfully saved. LIKONI CATHOLIC DISPENSARY-F-CDRR.xls
+Order was successfully saved. LIKONI SDH-F-CDRR.xls
+Order was successfully saved. MEWA HOSPITAL JUNE REPORT-F-CDRR.xls
+Order was successfully saved. MEWA HOSPITAL-F-CDRR.xls
+Order was successfully saved. MUTHALE MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. NAIROBI REMAND HEALTH CENTRE-F-CDRR.xls
+Your facility Code in 'NYANZA PROVINCIAL HOSPITAL-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. OGONGO SDH-F-CDRR.xls
+
+2014-08-06 12:27:57 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'AKALA DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. BAHATI DH-D-CDRR.xls
+Order was successfully saved. BONDO DH-D-CDRR.xls
+Your facility Code in 'BUNGOMA DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. EMBU PGH-D-CDRR.xls
+Your facility Code in 'EMUHAYA SDH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'ENDEBESS DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. GATUNDU DH-D-CDRR.xls
+Order was successfully saved. GESUSU SDH-D-CDRR.xls
+Order was successfully saved. GILGIL DH-D-CDRR.xls
+Order was successfully saved. IYABE DH-D-CDRR.xls
+Order was successfully saved. KANYAKINE DH-D-CDRR.xls
+Your facility Code in 'KATHITUNI HEALTH CARE CLINIC-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. KILIFI DH-D-CDRR.xls
+Your facility Code in 'KISUMU DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. KITUI DH-D-CDRR.xls
+Your facility Code in 'KURIA DISTRICT HOSPITAL-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. LOITOKITOK SDH-D-CDRR.xls
+Order was successfully saved. MACHAKOS GENERAL HOSPITAL-D-CDRR.xls
+Order was successfully saved. MAKADARA HEALTH CENTRE-D-CDRR.xls
+
+2014-08-06 12:17:50 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. AIC KAPSOWAR HOSPITAL-F-CDRR.xls
+Order was successfully saved. ALUPE SUB COUNTY-F-CDRR.xls
+Order was successfully saved. CHEMELIL SUGAR HC -F-CDRR.xls
+Order was successfully saved. CONSOLATA MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. COTTOLENGO MISSION-F-CDRR.xls
+Order was successfully saved. ELBURGON SDH-F-CDRR.xls
+Order was successfully saved. GOT AGULU SDH-F-CDRR.xls
+Your facility Code in 'JARAMOGI OGINGA ODINGA-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. JKUAT HOSPITAL-F-CDRR.xls
+Order was successfully saved. KABONDO SUB COUNTY HOSPITAL-F-CDRR.xls
+Order was successfully saved. KAMITI PRISON HC-F-CDRR.xls
+Order was successfully saved. KANDIEGE SDH-F-CDRR.xls
+Your facility Code in 'KATHITUNI HEALTH CENTRE-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. KENYA PORTS AUTHORITY HOSPITAL-F-CDRR.xls
+Order was successfully saved. LIKONI DH-F-CDRR.xls
+Your facility Code in 'LUNGALUNGA HC-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. NAIROBI HC-F-CDRR.xls
+Order was successfully saved. OGONGO DH-F-CDRR.xls
+Order was successfully saved. PORT FLORENCE-F-CDRR.xls
+Order was successfully saved. SHIMO LA TEWA-F-CDRR.xls
+
+2014-08-06 12:15:42 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'AHERO SDH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. AMBIRA SDH-D-CDRR.xls
+Your facility Code in 'AWENDO DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. BONDO DH-D-CDRR.xls
+Your facility Code in 'BUNGOMA DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. BUSIA DH-D-CDRR.xls
+Order was successfully saved. BUTERE DH-D-CDRR.xls
+Your facility Code in 'COPTIC HOPE CENTRE-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. EMBU PGH-D-CDRR.xls
+Your facility Code in 'ENDEBESS DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. EWASO NGIRO HC-D-CDRR.xls
+Order was successfully saved. GESUSU SDH-D-CDRR.xls
+Order was successfully saved. GILGIL DH-D-CDRR.xls
+Order was successfully saved. GUCHA DH-D-CDRR.xls
+Your facility Code in 'HAMISI SDH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'IGUHU DH-D-CDRR ..xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. ISIOLO DH-D-CDRR.xls
+Order was successfully saved. IYAMBE DISTRICT HOSPITAL-D-CDRR.xls
+Your facility Code in 'kajiado district hospital-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. KANYAKINE DH-D-CDRR.xls
+
+
+2014-07-14 12:46:00 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. AKALA DH-D-CDRR.xls
+Order was successfully saved. BAHATI DH-D-CDRR.xls
+Order was successfully saved. EMBU PGH-D-CDRR.xls
+Order was successfully saved. KATHITUNI HEALTH CARE CLINIC-D-CDRR.xls
+Order was successfully saved. LOITOKITOK SDH-D-CDRR.xls
+Order was successfully saved. MACHAKOS GENERAL HOSPITAL-D-CDRR.xls
+Order was successfully saved. MAKADARA HEALTH CENTRE-D-CDRR.xls
+Order was successfully saved. MASONGO SDH-D-CDRR.xls
+Order was successfully saved. MERU DISTRICT HOSPITAL-D-CDRR.xls
+Order was successfully saved. NGAO DH-D-CDRR.xls
+Order was successfully saved. NYAMACHE DH-D-CDRR.xls
+Order was successfully saved. RWAMBWA HEALTH CENTRE-D-CDRR.xls
+Order was successfully saved. THIKA DISTRICT HOSPITAL-D-CDRR.xls
+
+2014-07-14 12:42:12 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. AKALA DH-D-MAPS.xls
+Order was successfully saved. BAHATI DH-D-MAPS.xls
+Order was successfully saved. EMBU PGH-D-MAPS.xls
+Order was successfully saved. KATHITUNI HEALTH CARE CLINIC-D-MAPS.xls
+Order was successfully saved. LOITOKITOK DH-D-MAPS.xls
+Order was successfully saved. MACHAKOS DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. MAKADARA HEALTH CENTRE-D-MAPS.xls
+Order was successfully saved. MASONGO SDH-D-MAPS.xls
+Order was successfully saved. MERU DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. NGAO DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. NYAMACHE DISTRICT HOSPITAL-D-MAPS.xls
+Order was successfully saved. RWAMBWA HEALTH CENTRE-D-MAPS.xls
+Order was successfully saved. THIKA DISTRICT HOSPITAL-D-MAPS.xls
+
+2014-07-14 12:41:33 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. ALUPE SUB DISTRICT HOSPITAL-F-CDRR.xls
+Order was successfully saved. CHEMELILI SUGAR HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. CONSOLATA MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. COTTOLENGO MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. FAMILY HEALTH OPTIONS-F-CDRR.xls
+Order was successfully saved. GOT AGULU SUB DISTRICT HOSPITAL-F-CDRR.xls
+Order was successfully saved. JKUAT CCC-F-CDRR.xls
+Order was successfully saved. KAMITI PRISON HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KANDIEGE SDH-F-CDRR.xls
+Order was successfully saved. KASARANI HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KENYA PORTS AUTHORITY-F-CDRR.xls
+Order was successfully saved. LIKONI SDH-F-CDRR.xls
+Order was successfully saved. MEWA HOSPITAL JUNE REPORT-F-CDRR.xls
+Order was successfully saved. MEWA HOSPITAL-F-CDRR.xls
+Order was successfully saved. NAIROBI REMAND HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. OGONGO SDH-F-CDRR.xls
+Order was successfully saved. SHIMO LA TEWA HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. ST MARYS MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. ST MATHIAS MULUMBA-F-CDRR.xls
+
+2014-07-14 12:38:03 pm(F-MAPS)
+--------------------------------
+Order was successfully saved. ST MARY'S MISSION HOSPITAL-F-MAPS.xls
+
+2014-07-14 12:35:03 pm(F-MAPS)
+--------------------------------
+Order was successfully saved. ALUPE SDH-F-MAPS.xls
+Order was successfully saved. CHEMELIL SUGAR HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. CONSOLATA MISSION HOSPITAL-F-MAPS.xls
+Order was successfully saved. COTTELENGO MISSION HOSPITAL-F-MAPS.xls
+Order was successfully saved. FAMILY HEALTH OPTIONS-F-MAPS.xls
+Order was successfully saved. GOT AGULU SDH-F-MAPS.xls
+Order was successfully saved. JKUATT CCC-F-MAPS.xls
+Order was successfully saved. KAMITI PRISONS HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. KANDIEGE SDH-F-MAPS.xls
+Order was successfully saved. KASARANI HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. KENYA PORTS AUTHORITY-F-MAPS.xls
+Order was successfully saved. LIKONI DH-F-MAPS.xls
+Order was successfully saved. MEWA HOSPITAL JUNE REPORT-F-MAPS.xls
+Order was successfully saved. MEWA HOSPITAL-F-MAPS.xls
+Order was successfully saved. NAIROBI REMAND PRISON HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. OGONGO SDH-F-MAPS.xls
+Order was successfully saved. SHIMO LA TEWA PRISON HEALTH CENTRE-F-MAPS.xls
+Your facility Code  in 'ST MARY'S MISSION HOSPITAL-F-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. ST MULUMBA MISSION HOSPITAL-F-MAPS.xls
+
+2014-05-09 09:27:53 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. THIKA DH-D-MAPS.xls
+
+2014-05-09 09:25:08 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. BAHATI DH-D-MAPS.xls
+Order was successfully saved. CHUKA DH-D-MAPS.xls
+Order was successfully saved. EMBU PGH-D-MAPS.xls
+Order was successfully saved. IGUHU DH-D-MAPS.xls
+Order was successfully saved. KENDU BAY SDH-D-MAPS.xls
+Order was successfully saved. MIATHENE DH-D-MAPS.xls
+Order was successfully saved. NGAO DH-D-MAPS.xls
+Your facility Code  in 'OLOLULUNGA DH-D-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. RWAMBWA HEALTH CENTRE-D-MAPS.xls
+Your facility Code  in 'THIKA DH-D-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-09 09:24:35 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. BAHATI DH-D-CDRR.xls
+Order was successfully saved. CHUKA DH-D-CDRR.xls
+Order was successfully saved. EMBU PGH-D-CDRR.xls
+Order was successfully saved. IGUHU DH-D-CDRR.xls
+Order was successfully saved. KENDU BAY DH-D-CDRR.xls
+Order was successfully saved. MIATHENE DH-D-CDRR.xls
+Order was successfully saved. NGAO DH-D-CDRR.xls
+Your facility Code in 'OLOLULUNGA DH-D-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. RWAMBWA HC-D-CDRR.xls
+Order was successfully saved. THIKA DH-D-CDRR.xls
+
+2014-05-08 01:01:22 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. BAHATI HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. MAGONGO (MCM) DISPENSARY F-CDRR.xls
+
+2014-05-08 09:53:18 am(F-MAPS)
+--------------------------------
+Order was successfully saved. NARUMORU CATHOLIC DISP-F-MAPS.xls
+
+2014-05-08 09:53:06 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. NARUMORU CATHOLIC-F-CDRR.xls
+
+2014-05-08 09:46:45 am(F-CDRR_packs)
+--------------------------------
+Your facility Code in 'NARUMORU CATHOLIC-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-08 09:41:16 am(F-MAPS)
+--------------------------------
+Order was successfully saved. DANDORA II -F-MAPS.xls
+Order was successfully saved. JERICHO HC-F-MAPS.xls
+Order was successfully saved. JOCHAM H-F-MAPS.xls
+Order was successfully saved. KAPLONG MISSION H-F-MAPS.xls
+Order was successfully saved. KARIOBANGI HEALTH CENTRE-F-MAPS.xls
+Order was successfully saved. KODIAGA HC-F-MAPS.xls
+Order was successfully saved. MARY HELP THE SICK MISSION-F-MAPS.xls
+Order was successfully saved. MUGUNDA CATHOLIC DISP-F-MAPS.xls
+Order was successfully saved. MWATATE SDH-F-MAPS.xls
+Your facility Code  in 'NARUMORU CATHOLIC DISP-F-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-08 09:40:51 am(D-MAPS)
+--------------------------------
+Order was successfully saved. ATHI RIVER-D-MAPS.xls
+Order was successfully saved. KAKAMEGA PGH-D-MAPS.xls
+Order was successfully saved. NDURU DH-D-MAPS.xls
+Order was successfully saved. TUDOR DH-D-MAPS.xls
+
+2014-05-08 09:40:24 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. DANDORA II HEAITH CENTRE-F-CDRR.xls
+Order was successfully saved. JERICHO HEALTH CENTRE-F-CDRR.xls
+Order was successfully saved. KAPLONG MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. KARIOBANGI NORTH-F-CDRR.xls
+Order was successfully saved. KODIEGA HEATH C-F-CDRR.xls
+Order was successfully saved. MARY HELP OF THE SICKF-CDRR.xls
+Order was successfully saved. MUGUNDA MISSION HOSPITAL-F-CDRR.xls
+Order was successfully saved. MWATATE SDH-F-CDRR.xls
+Your facility Code in 'NARUMORU CATHOLIC-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-05-08 09:40:02 am(D-CDRR)
+--------------------------------
+Order was successfully saved. KAKAMEGA PGH-D-CDRR.xls
+Order was successfully saved. NDURU DH-D-CDRR.xls
+Order was successfully saved. TUDOR DH-D-CDRR.xls
+
+2014-05-06 07:45:16 pm(D-CDRR)
+--------------------------------
+You can only report for April-2014. Kindly check the period fields !-KAKAMEGA PGH-D-CDRR.xls The format should be dd/mm/yyyy
+You can only report for April-2014. Kindly check the period fields !-NDURU DH-D-CDRR.xls The format should be dd/mm/yyyy
+You can only report for April-2014. Kindly check the period fields !-TUDOR DH-D-CDRR.xls The format should be dd/mm/yyyy
+
+2014-04-28 05:19:16 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+A cdrr report already exists for this month !-GILGIL SDH-D-CDRR.xls
+A cdrr report already exists for this month !-GITHONGO DH-D-CDRR.xls
+A cdrr report already exists for this month !-GUCHA DH-D-CDRR.xls
+A cdrr report already exists for this month !-HAMISI SDH-D-CDRR.xls
+A cdrr report already exists for this month !-IGUHU-D-CDRR.xls
+A cdrr report already exists for this month !-ISIOLO DH-D-CDRR.xls
+A cdrr report already exists for this month !-IYAMBE DH-D-CDRR.xls
+A cdrr report already exists for this month !-KAJAURI LEVEL 4-D-CDRR.xls
+A cdrr report already exists for this month !-KATHIANI DH-D-CDRR.xls
+A cdrr report already exists for this month !-Kendu Bay-D-CDRR.xls
+A cdrr report already exists for this month !-KEROKA LEVEL 4-D-CDRR.xls
+A cdrr report already exists for this month !-KERUGOYA D-CDRR.xls
+A cdrr report already exists for this month !-KIAMBU DH-D-CDRR.xls
+A cdrr report already exists for this month !-KIBWEZI-D-CDRR.xls
+A cdrr report already exists for this month !-KILIFI-D-CDRR.xls
+A cdrr report already exists for this month !-KISUMU DH-D-CDRR.xls
+A cdrr report already exists for this month !-KITUI-D-CDRR.xls
+A cdrr report already exists for this month !-LOITOKITOK-D-CDRR.xls
+A cdrr report already exists for this month !-MAKADARA-D-CDRR.xls
+A cdrr report already exists for this month !-MANGA-D-CDRR.xls
+A cdrr report already exists for this month !-MARAGUA-D-CDRR.xls
+A cdrr report already exists for this month !-MARANI-D-CDRR.xls
+A cdrr report already exists for this month !-MATHARE NORTH SDH-D-CDRR.xls
+A cdrr report already exists for this month !-MATUNGU DH-D-CDRR.xls
+A cdrr report already exists for this month !-MATUU-D-CDRR.xls
+A cdrr report already exists for this month !-MBITA DH-D-CDRR.xls
+A cdrr report already exists for this month !-Meru DH-D-CDRR.xls
+A cdrr report already exists for this month !-MIATHENE-D-CDRR.xls
+A cdrr report already exists for this month !-MIGORI-D-CDRR.xls
+A cdrr report already exists for this month !-MIGWANI SDH-D-CDRR.xls
+A cdrr report already exists for this month !-MOI VOI DH-D-CDRR.xls
+A cdrr report already exists for this month !-MOLO DH-D-CDRR.xls
+A cdrr report already exists for this month !-MSABWENI-D-CDRR.xls
+A cdrr report already exists for this month !-Mwingi DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-NAIVASHA DH-D-CDRR.xls
+A cdrr report already exists for this month !-NAKURU-D-CDRR.xls
+A cdrr report already exists for this month !-NAVAKHALO -D-CDRR.xls
+A cdrr report already exists for this month !-NGONG DH-D-CDRR.xls
+A cdrr report already exists for this month !-NJORO HC-D-CDRR.xls
+A cdrr report already exists for this month !-NYAHURURU DH-D-CDRR.xls
+A cdrr report already exists for this month !-NYAKACH-D-CDRR.xls
+A cdrr report already exists for this month !-NYAMACHE SDH-D-CDRR.xls
+A cdrr report already exists for this month !-NYAMIRA -D-CDRR.xls
+A cdrr report already exists for this month !-OLKALAU-D-CDRR.xls
+A cdrr report already exists for this month !-RIRUTA-D-CDRR.xls
+A cdrr report already exists for this month !-RUNYEJES-D-CDRR.xls
+A cdrr report already exists for this month !-RWAMBWA-D-CDRR.xls
+A cdrr report already exists for this month !-SABATIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-SIAYA-D-CDRR.xls
+A cdrr report already exists for this month !-SUBA DH-D-CDRR.xls
+A cdrr report already exists for this month !-TAVETA DH-D-CDRR.xls
+A cdrr report already exists for this month !-Thika DH-D-CDRR..xls
+A cdrr report already exists for this month !-TIGONI-D-CDRR.xls
+A cdrr report already exists for this month !-UKWALA-D-CDRR.xls
+A cdrr report already exists for this month !-USIGU DH-D-CDRR.xls
+A cdrr report already exists for this month !-VIHIGA-D-CDRR.xls
+A cdrr report already exists for this month !-YALA SCH-D-CDRR.xls
+
+2014-04-28 05:14:01 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+
+2014-04-28 05:11:08 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+
+2014-04-28 05:08:13 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AHERO SDH-D-CDRR.xls
+A cdrr report already exists for this month !-AKALA DH-D-CDRR.xls
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+A cdrr report already exists for this month !-ATHI RIVER HC-D-CDRR.xls
+A cdrr report already exists for this month !-AWENDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-Bahati DH-D-CDRR.xls
+A cdrr report already exists for this month !-BONDO DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUNGOMA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUSIA DH-D-CDRR.xls
+A cdrr report already exists for this month !-BUTERE DH-D-CDRR.xls
+A cdrr report already exists for this month !-CHUKA DH-D-CDRR.xls
+A cdrr report already exists for this month !-COPTIC D-CDRR.xls
+A cdrr report already exists for this month !-EKERENYO-D-CDRR.xls
+A cdrr report already exists for this month !-ELDAMA RAVINE DH-D-CDRR.xls
+A cdrr report already exists for this month !-Embu pgh-D-CDRR.xls
+A cdrr report already exists for this month !-EMUHAYA SDH-D-CDRR.xls
+A cdrr report already exists for this month !-ENDEBESS DH-D-CDRR.xls
+A cdrr report already exists for this month !-EWASO NGIRO-D-CDRR.xls
+A cdrr report already exists for this month !-Gatundu-D-CDRR.xls
+A cdrr report already exists for this month !-GESUSU-D-CDRR.xls
+
+2014-04-28 05:05:13 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+
+2014-04-28 05:04:04 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+
+2014-04-28 05:01:03 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-AMBIRA DH-D-CDRR.xls
+
+2014-04-25 02:14:45 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. ATHI RIVER HC-D-CDRR.xls
+
+2014-04-25 02:14:33 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. MOI VOI DH-D-MAPS.xls
+
+2014-04-23 03:26:42 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. ELDAMA RAVINE DH-D-MAPS.xls
+
+2014-04-23 03:26:23 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. ELDAMA RAVINE DH-D-CDRR.xls
+
+2014-04-22 07:49:17 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. GUCHA DH-D-CDRR.xls
+Order was successfully saved. MOI VOI DH-D-CDRR.xls
+
+2014-04-22 07:48:55 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. GUCHA DH-D-MAPS.xls
+Order was successfully saved. KATHIANI DH-D-MAPS.xls
+Order was successfully saved. KEROKA LEVEL 4 DH-D-MAPS.xls
+Order was successfully saved. MATHARE NORTH-D-MAPS.xls
+Order was successfully saved. MATUNGU DH-D-MAPS.xls
+Order was successfully saved. MBITA DH-D-MAPS.xls
+Order was successfully saved. MOLO DH-D-MAPS.xls
+Order was successfully saved. NYAHURURUD-MAPS.xls
+Order was successfully saved. SABATIA DH-D-MAPS.xls
+Order was successfully saved. Taveta dh-D-MAPS.xls
+Order was successfully saved. YALA DH-D-MAPS.xls
+
+2014-04-22 07:45:54 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. KABONDO SCH-F-CDRR.xls
+Order was successfully saved. LUNGA LUNGA-F-CDRR.xls
+Order was successfully saved. MBAGATHI DH-F-CDRR.xls
+Order was successfully saved. PUMWANI HC-F-CDRR.xls
+Order was successfully saved. SHIMO LA TEWA HC-F-CDRR.xls
+Order was successfully saved. SOS MEDICAL-F-CDRR.xls
+
+2014-04-22 07:44:55 pm(F-MAPS)
+--------------------------------
+Order was successfully saved. CHEMELILI HC-F-MAPS.xls
+Order was successfully saved. KABONDO SCH-F-MAPS.xls
+Order was successfully saved. LUNGA LUNGA HC-F-MAPS.xls
+Order was successfully saved. MBAGATHI-F-MAPS.xls
+Order was successfully saved. PUMWANI MAJENGO-F-MAPS.xls
+Order was successfully saved. SHIMO LA TEWA HC-F-MAPS.xls
+Order was successfully saved. SOS MEDICAL-F-MAPS.xls
+
+2014-04-21 09:26:37 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. BONDO DH-D-MAPS.xls
+Order was successfully saved. BUNGOMA DH-D-MAPS.xls
+Order was successfully saved. BUSIA DH-D-MAPS.xls
+Order was successfully saved. BUTERE DH-D-MAPS.xls
+
+2014-04-21 09:25:50 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. BONDO DH-D-CDRR.xls
+Order was successfully saved. BUNGOMA DH-D-CDRR.xls
+Order was successfully saved. BUSIA DH-D-CDRR.xls
+Order was successfully saved. BUTERE DH-D-CDRR.xls
+Order was successfully saved. KATHIANI DH-D-CDRR.xls
+Order was successfully saved. KEROKA LEVEL 4-D-CDRR.xls
+Order was successfully saved. MATHARE NORTH SDH-D-CDRR.xls
+Order was successfully saved. MATUNGU DH-D-CDRR.xls
+Order was successfully saved. MBITA DH-D-CDRR.xls
+Order was successfully saved. MOLO DH-D-CDRR.xls
+Order was successfully saved. NYAHURURU DH-D-CDRR.xls
+Order was successfully saved. SABATIA DH-D-CDRR.xls
+Order was successfully saved. TAVETA DH-D-CDRR.xls
+Order was successfully saved. YALA SCH-D-CDRR.xls
+
+2014-04-18 08:24:05 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. LOITOKITOK DH-D-MAPS.xls
+Order was successfully saved. SIAYA DH-D-MAPS.xls
+
+2014-04-18 08:23:01 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. KIJAURI LEVEL 4-D-MAPS.xls
+Order was successfully saved. KILIFI DH-D-MAPS.xls
+You can only report for March-2014 . Kindly check the period fields !-LOITOKITOK DH-D-MAPS.xls The format should be dd/mm/yyyy
+Order was successfully saved. MANGA DH-D-MAPS.xls
+Order was successfully saved. MARANI DH-D-MAPS.xls
+Order was successfully saved. MIGWANI SDH-D-MAPS.xls
+Order was successfully saved. MSABWENI DH-D-MAPS.xls
+Order was successfully saved. NAVAKHOLO-D-MAPS.xls
+Order was successfully saved. NGONG SDH-D-MAPS.xls
+Order was successfully saved. OLKALOU CENTRE-D-MAPS.xls
+Order was successfully saved. RUNYENJES DH-D-MAPS.xls
+You can only report for March-2014 . Kindly check the period fields !-SIAYA DH-D-MAPS.xls The format should be dd/mm/yyyy
+Order was successfully saved. SUBA DH-D-MAPS.xls
+Order was successfully saved. USIGU DH-D-MAPS.xls
+
+2014-04-17 10:43:40 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. KAJAURI LEVEL 4-D-CDRR.xls
+Order was successfully saved. KILIFI-D-CDRR.xls
+Order was successfully saved. LOITOKITOK-D-CDRR.xls
+Order was successfully saved. MANGA-D-CDRR.xls
+Order was successfully saved. MARANI-D-CDRR.xls
+Order was successfully saved. MIGWANI SDH-D-CDRR.xls
+Order was successfully saved. MSABWENI-D-CDRR.xls
+Order was successfully saved. NAVAKHALO -D-CDRR.xls
+Order was successfully saved. NGONG DH-D-CDRR.xls
+Order was successfully saved. OLKALAU-D-CDRR.xls
+Order was successfully saved. RUNYEJES-D-CDRR.xls
+Order was successfully saved. SIAYA-D-CDRR.xls
+Order was successfully saved. SUBA DH-D-CDRR.xls
+Order was successfully saved. USIGU DH-D-CDRR.xls
+
+2014-04-17 10:42:40 pm(F-MAPS)
+--------------------------------
+Order was successfully saved. KAMITI-F-MAPS.xls
+Order was successfully saved. KASARANI-F-MAPS.xls
+Order was successfully saved. MUTHALE MISSION H-F-MAPS.xls
+
+2014-04-16 07:09:07 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. AHERO SDH-D-MAPS.xls
+Order was successfully saved. CHUKA DH-D-MAPS.xls
+Order was successfully saved. EMUHAYA-D-MAPS.xls
+Order was successfully saved. HAMISI-D-MAPS.xls
+Order was successfully saved. IYAMBE-D-MAPS.xls
+Order was successfully saved. KIAMBU DH-D-MAPS.xls
+Order was successfully saved. KIBWEZI-D-MAPS.xls
+A MAPS report already exists for this month !-UKWALA-D-MAPS.xls
+Order was successfully saved. VIHIGA DH-D-MAPS.xls
+
+2014-04-16 07:08:25 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. KAMITI PRISONS-F-CDRR.xls
+Order was successfully saved. KASARANI-F-CDRR.xls
+Order was successfully saved. MUTHALE MISSION H-F-CDRR.xls
+
+2014-04-16 07:07:20 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. AHERO SDH-D-CDRR.xls
+Order was successfully saved. CHUKA DH-D-CDRR.xls
+Order was successfully saved. EMUHAYA SDH-D-CDRR.xls
+Order was successfully saved. HAMISI SDH-D-CDRR.xls
+Order was successfully saved. IYAMBE DH-D-CDRR.xls
+Order was successfully saved. KIAMBU DH-D-CDRR.xls
+Order was successfully saved. KIBWEZI-D-CDRR.xls
+Order was successfully saved. UKWALA-D-CDRR.xls
+Order was successfully saved. VIHIGA-D-CDRR.xls
+
+2014-04-15 07:50:07 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. NYAKACH D-MAPS.xls
+
+2014-04-15 07:49:56 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. NYAKACH-D-CDRR.xls
+
+2014-04-15 07:38:35 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. GESUSU-D-CDRR.xls
+Order was successfully saved. GILGIL SDH-D-CDRR.xls
+Order was successfully saved. MATUU-D-CDRR.xls
+Order was successfully saved. MIGORI-D-CDRR.xls
+Order was successfully saved. NJORO HC-D-CDRR.xls
+Order was successfully saved. NYAMACHE SDH-D-CDRR.xls
+Order was successfully saved. NYAMIRA -D-CDRR.xls
+Order was successfully saved. RIRUTA-D-CDRR.xls
+Order was successfully saved. RWAMBWA-D-CDRR.xls
+Order was successfully saved. TIGONI-D-CDRR.xls
+Order was successfully saved. UKWALA-D-CDRR.xls
+
+2014-04-15 07:34:22 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. NJORO HC-D-MAPS.xls
+Your facility Code  in 'NYAKACH D-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. NYAMACHE-D-MAPS.xls
+Order was successfully saved. NYAMIRA DH-D-MAPS.xls
+Order was successfully saved. RIRUTA-D-MAPS.xls
+Order was successfully saved. RWAMBWA HC-D-MAPS.xls
+Order was successfully saved. TIGONI DH-D-MAPS.xls
+Order was successfully saved. UKWALA-D-MAPS.xls
+
+2014-04-15 07:16:10 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. EWASO NGIRO-D-CDRR.xls
+
+2014-04-15 07:08:29 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. MIGORI-D-CDRR.xls
+
+2014-04-15 01:14:40 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Migori.xls
+
+2014-04-15 10:18:18 am(F-MAPS)
+--------------------------------
+Order was successfully saved. Jaramogi oginga odinga-F-MAPS for Standalone Sites-Updated.xls
+
+2014-04-15 10:17:42 am(F-MAPS)
+--------------------------------
+You can only report for March-2014 . Kindly check the period fields !-Jaramogi oginga odinga-F-MAPS for Standalone Sites-Updated.xls The format should be dd/mm/yyyy
+
+2014-04-15 10:17:29 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. Jaramogi Oginga Odinga F-CDRR for Standalone Sites.xls
+
+2014-04-14 09:50:44 pm(F-MAPS)
+--------------------------------
+Order was successfully saved. Alupe DH-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Cottolengo-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Elburgon SDH-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. FAMILY HEALTH-F-MAPS for Standalone Sites.xls
+Order was successfully saved. Got Agulu-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. JKUAT-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Kandiege-F-MAPS.xls
+Order was successfully saved. Kenya Ports Authority-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Likoni DH-F-MAPS.xls
+Order was successfully saved. Mewa-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Nairobi Remand-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Port Florence clinic-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. ST MARYS MISSION-F-MAPS.xls
+
+2014-04-14 09:50:15 pm(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. Alupe DH-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Chemelil Sugar-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Contolengo-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Elburgon CDH-F-CDRR for Standalone Sites.xls
+Order was successfully saved. FAMILY HEALTH-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Got Agulu-F-CDRR for Standalone Sites.xls
+Order was successfully saved. JKUAT-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Kandiege-F-CDRR.xls
+Order was successfully saved. Kenya Ports Authority-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Likoni DH-F-CDRR.xls
+Order was successfully saved. MEWA-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Nairobi Remand-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Port Florence Clinic-F-CDRR for Standalone Sites.xls
+Order was successfully saved. ST MARYS MISSION-F-CDRR.xls
+
+2014-04-14 09:49:24 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. MARAGUA-D-MAPS.xls
+Order was successfully saved. MATUU-D-MAPS.xls
+Order was successfully saved. Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+Order was successfully saved. MIATHENE-D-MAPS.xls
+Order was successfully saved. MIGORI-D-MAPS.xls
+Order was successfully saved. Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+Order was successfully saved. NAIVASHA-D-MAPS.xls
+Order was successfully saved. NAKURU-D-MAPS.xls
+Order was successfully saved. Thika DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+
+2014-04-14 09:48:46 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. AKALA DH-D-MAPS.xls
+Order was successfully saved. AMBIRA DH-D-MAPS.xls
+Order was successfully saved. AWENDO DH-D-MAPS.xls
+Order was successfully saved. BAHATI DH-D-MAPS.xls
+Order was successfully saved. COPTIC -D-MAPS.xls
+Order was successfully saved. Ekerenyo dhD-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+Order was successfully saved. EMBU PGH-D-MAPS.xls
+Order was successfully saved. ENDEBESS DH-D-MAPS.xls
+Order was successfully saved. EWASO NGIRO-D-MAPS.xls
+Order was successfully saved. Gatundu DH-D-MAPS.xls
+Order was successfully saved. Gesusu-D-MAPS.xls
+Order was successfully saved. GILGIL SDH-D-MAPS.xls
+Order was successfully saved. GITHONGO DH-D-MAPS.xls
+Order was successfully saved. IGUHU-D-MAPS.xls
+Order was successfully saved. ISIOLO DH-D-MAPS.xls
+Order was successfully saved. Kendu Bay-D-MAPS for Central Sites andDistrict Stores-Updated.xls
+Order was successfully saved. KERUGOYA-D-MAPS.xls
+Order was successfully saved. KISUMU-D-MAPS.xls
+Order was successfully saved. KITUI-D-MAPS.xls
+Order was successfully saved. MAKADARA-D-MAPS.xls
+
+2014-04-14 09:47:47 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. MARAGUA-D-CDRR.xls
+Order was successfully saved. MATUU-D-CDRR.xls
+Order was successfully saved. Meru DH-D-CDRR.xls
+Order was successfully saved. MIATHENE-D-CDRR.xls
+Order was successfully saved. MIGORI-D-CDRR.xls
+Order was successfully saved. Mwingi DH-D-CDRR for Central Sites and District Stores.xls
+Order was successfully saved. NAIVASHA DH-D-CDRR.xls
+Order was successfully saved. NAKURU-D-CDRR.xls
+Order was successfully saved. Thika DH-D-CDRR..xls
+
+2014-04-14 09:46:32 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. AKALA DH-D-CDRR.xls
+Order was successfully saved. AMBIRA DH-D-CDRR.xls
+Order was successfully saved. AWENDO DH-D-CDRR.xls
+Order was successfully saved. Bahati DH-D-CDRR.xls
+Order was successfully saved. COPTIC D-CDRR.xls
+Order was successfully saved. EKERENYO-D-CDRR.xls
+Order was successfully saved. Embu pgh-D-CDRR.xls
+Order was successfully saved. ENDEBESS DH-D-CDRR.xls
+Order was successfully saved. EWASO NGIRO-D-CDRR.xls
+Order was successfully saved. Gatundu-D-CDRR.xls
+Order was successfully saved. GESUSU-D-CDRR.xls
+Order was successfully saved. GILGIL SDH-D-CDRR.xls
+Order was successfully saved. GITHONGO DH-D-CDRR.xls
+Order was successfully saved. IGUHU-D-CDRR.xls
+Order was successfully saved. ISIOLO DH-D-CDRR.xls
+Order was successfully saved. Kendu Bay-D-CDRR.xls
+Order was successfully saved. KERUGOYA D-CDRR.xls
+Order was successfully saved. KISUMU DH-D-CDRR.xls
+Order was successfully saved. KITUI-D-CDRR.xls
+Order was successfully saved. MAKADARA-D-CDRR.xls
+
+2014-04-14 09:39:21 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. MATUU-D-MAPS.xls
+Order was successfully saved. MIATHENE-D-MAPS.xls
+Order was successfully saved. MIGORI-D-MAPS.xls
+Order was successfully saved. NAIVASHA-D-MAPS.xls
+Order was successfully saved. NAKURU-D-MAPS.xls
+
+2014-04-14 09:38:57 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. MATUU-D-CDRR.xls
+Order was successfully saved. MIATHENE-D-CDRR.xls
+Order was successfully saved. MIGORI-D-CDRR.xls
+Order was successfully saved. NAIVASHA DH-D-CDRR.xls
+Order was successfully saved. NAKURU-D-CDRR.xls
+
+2014-04-14 02:41:26 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'NAIVASHA.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-14 02:41:06 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. Mwingi DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-14 02:39:21 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. KERUGOYA-D-MAPS.xls
+
+2014-04-14 02:38:18 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. KITUI-D-MAPS.xls
+
+2014-04-14 02:36:26 pm(D-MAPS)
+--------------------------------
+You can only report for March-2014 . Kindly check the period fields !-KERUGOYA-D-MAPS.xls The format should be dd/mm/yyyy
+Order was successfully saved. KISUMU-D-MAPS.xls
+You can only report for March-2014 . Kindly check the period fields !-KITUI-D-MAPS.xls The format should be dd/mm/yyyy
+Order was successfully saved. MAKADARA-D-MAPS.xls
+Order was successfully saved. MARAGUA-D-MAPS.xls
+
+2014-04-14 02:36:10 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. KERUGOYA D-CDRR.xls
+Order was successfully saved. KISUMU DH-D-CDRR.xls
+Order was successfully saved. KITUI-D-CDRR.xls
+Order was successfully saved. MAKADARA-D-CDRR.xls
+Order was successfully saved. MARAGUA-D-CDRR.xls
+
+2014-04-11 06:49:42 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. GITHONGO DH-D-MAPS.xls
+
+2014-04-11 06:49:08 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. AKALA DH-D-MAPS.xls
+Order was successfully saved. AMBIRA DH-D-MAPS.xls
+Order was successfully saved. AWENDO DH-D-MAPS.xls
+Order was successfully saved. BAHATI DH-D-MAPS.xls
+Order was successfully saved. COPTIC -D-MAPS.xls
+Order was successfully saved. ENDEBESS DH-D-MAPS.xls
+Order was successfully saved. EWASO NGIRO-D-MAPS.xls
+Order was successfully saved. GILGIL SDH-D-MAPS.xls
+You can only report for March-2014 . Kindly check the period fields !-GITHONGO DH-D-MAPS.xls The format should be dd/mm/yyyy
+Order was successfully saved. ISIOLO DH-D-MAPS.xls
+
+2014-04-11 06:48:37 pm(D-CDRR)
+--------------------------------
+Order was successfully saved. AKALA DH-D-CDRR.xls
+Order was successfully saved. AMBIRA DH-D-CDRR.xls
+Order was successfully saved. AWENDO DH-D-CDRR.xls
+Order was successfully saved. Bahati DH-D-CDRR.xls
+Order was successfully saved. COPTIC D-CDRR.xls
+Order was successfully saved. ENDEBESS DH-D-CDRR.xls
+Order was successfully saved. EWASO NGIRO-D-CDRR.xls
+Order was successfully saved. GILGIL SDH-D-CDRR.xls
+Order was successfully saved. GITHONGO DH-D-CDRR.xls
+Order was successfully saved. ISIOLO DH-D-CDRR.xls
+
+2014-04-11 11:02:15 am(F-MAPS)
+--------------------------------
+Order was successfully saved. JKUAT-F-MAPS for Standalone Sites-Updated.xls
+
+2014-04-11 11:02:04 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. JKUAT-F-CDRR for Standalone Sites.xls
+
+2014-04-11 10:51:23 am(D-MAPS)
+--------------------------------
+Order was successfully saved. EMBU PGH-D-MAPS.xls
+
+2014-04-11 10:51:12 am(D-CDRR)
+--------------------------------
+Order was successfully saved. Embu pgh-D-CDRR.xls
+
+2014-04-11 10:40:03 am(D-CDRR)
+--------------------------------
+Order was successfully saved. Updated-EKERENYO-D-CDRR.xls
+
+2014-04-11 10:38:14 am(F-MAPS)
+--------------------------------
+Order was successfully saved. FAMILY HEALTH-F-MAPS for Standalone Sites.xls
+Order was successfully saved. Port Florence clinic-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. ST MARYS MISSION-F-MAPS.xls
+
+2014-04-11 10:37:54 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. Chemelil Sugar-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Contolengo-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Port Florence Clinic-F-CDRR for Standalone Sites.xls
+Order was successfully saved. ST MARYS MISSION-F-CDRR.xls
+
+2014-04-11 10:28:14 am(F-MAPS)
+--------------------------------
+A MAPS report already exists for this month !-Alupe DH-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Cottolengo-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Elburgon SDH-F-MAPS for Standalone Sites-Updated.xls
+You can only report for March-2014 . Kindly check the period fields !-FAMILY HEALTH-F-MAPS for Standalone Sites.xls The format should be dd/mm/yyyy
+Order was successfully saved. Got Agulu-F-MAPS for Standalone Sites-Updated.xls
+Your facility Code  in 'Jaramogi oginga odinga-F-MAPS for Standalone Sites-Updated.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code  in 'JKUAT-F-MAPS for Standalone Sites-Updated.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. Kandiege-F-MAPS.xls
+Order was successfully saved. Kenya Ports Authority-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Likoni DH-F-MAPS.xls
+Order was successfully saved. Mewa-F-MAPS for Standalone Sites-Updated.xls
+Order was successfully saved. Nairobi Remand-F-MAPS for Standalone Sites-Updated.xls
+Your facility Code  in 'Port Florence clinic-F-MAPS for Standalone Sites-Updated.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code  in 'ST MARYS MISSION-F-MAPS.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-11 10:26:13 am(F-CDRR_packs)
+--------------------------------
+A cdrr report already exists for this month !-Alupe DH-F-CDRR for Standalone Sites.xls
+You can only report for March-2014. Kindly check the period fields !-Chemelil Sugar-F-CDRR for Standalone Sites.xls The format should be dd/mm/yyyy
+You can only report for March-2014. Kindly check the period fields !-Contolengo-F-CDRR for Standalone Sites.xls The format should be dd/mm/yyyy
+Order was successfully saved. Elburgon CDH-F-CDRR for Standalone Sites.xls
+Order was successfully saved. FAMILY HEALTH-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Got Agulu-F-CDRR for Standalone Sites.xls
+Your facility Code in 'Jaramogi Oginga Odinga F-CDRR for Standalone Sites.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'JKUAT-F-CDRR for Standalone Sites.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Order was successfully saved. Kandiege-F-CDRR.xls
+Order was successfully saved. Kenya Ports Authority-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Likoni DH-F-CDRR.xls
+Order was successfully saved. MEWA-F-CDRR for Standalone Sites.xls
+Order was successfully saved. Nairobi Remand-F-CDRR for Standalone Sites.xls
+Your facility Code in 'Port Florence Clinic-F-CDRR for Standalone Sites.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'ST MARYS MISSION-F-CDRR.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-11 10:25:31 am(F-MAPS)
+--------------------------------
+Order was successfully saved. Alupe DH-F-MAPS for Standalone Sites-Updated.xls
+
+2014-04-11 10:25:16 am(F-CDRR_packs)
+--------------------------------
+Order was successfully saved. Alupe DH-F-CDRR for Standalone Sites.xls
+
+2014-04-11 10:20:47 am(D-MAPS)
+--------------------------------
+A MAPS report already exists for this month !-Ekerenyo dhD-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+Order was successfully saved. Gatundu DH-D-MAPS.xls
+Order was successfully saved. Gesusu-D-MAPS.xls
+Order was successfully saved. IGUHU-D-MAPS.xls
+A MAPS report already exists for this month !-Kendu Bay-D-MAPS for Central Sites andDistrict Stores-Updated.xls
+A MAPS report already exists for this month !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+A MAPS report already exists for this month !-Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+A MAPS report already exists for this month !-Thika DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+
+2014-04-11 10:18:26 am(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Thika DH-D-CDRR..xls
+
+2014-04-11 10:18:17 am(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Mwingi DH-D-CDRR.xls
+
+2014-04-11 10:18:07 am(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Meru DH-D-CDRR.xls
+
+2014-04-11 10:17:54 am(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Kendu Bay-D-CDRR.xls
+
+2014-04-11 10:17:41 am(D-CDRR)
+--------------------------------
+Order was successfully saved. IGUHU-D-CDRR.xls
+
+2014-04-11 10:17:31 am(D-CDRR)
+--------------------------------
+Order was successfully saved. GESUSU-D-CDRR.xls
+
+2014-04-11 10:17:18 am(D-CDRR)
+--------------------------------
+Order was successfully saved. Gatundu-D-CDRR.xls
+
+2014-04-09 04:37:41 pm(D-MAPS)
+--------------------------------
+Order was successfully saved. Kendu Bay-D-MAPS for Central Sites andDistrict Stores-Updated.xls
+Order was successfully saved. Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+
+2014-04-09 03:52:44 pm(D-MAPS)
+--------------------------------
+A MAPS report already exists for this month !-
+Order was successfully saved. Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+Order was successfully saved. Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls
+A MAPS report already exists for this month !-
+
+2014-04-09 03:52:21 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Kendu Bay-D-CDRR for Central Sites and District Stores..xls
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-Mwingi DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:50:24 pm(D-MAPS)
+--------------------------------
+You can only report for March-2014 . Kindly check the period fields !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+
+2014-04-09 03:50:09 pm(D-CDRR)
+--------------------------------
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:49:05 pm(D-CDRR)
+--------------------------------
+
+
+2014-04-09 03:47:37 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-MAPS for Central Sites andDistrict Stores-Updated.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Thika DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+
+2014-04-09 03:46:04 pm(D-MAPS)
+--------------------------------
+A MAPS report already exists for this month !-
+You can only report for March-2014 . Kindly check the period fields !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+You can only report for March-2014 . Kindly check the period fields !-Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+A MAPS report already exists for this month !-
+
+2014-04-09 03:41:01 pm(D-MAPS)
+--------------------------------
+You can only report for March-2014 . Kindly check the period fields !-Meru level V Hospital-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+You can only report for March-2014 . Kindly check the period fields !-Mwingi DH-D-MAPS for Central Sites andDistrict Stores-Updated (1).xls The format should be dd/mm/yyyy
+
+2014-04-09 03:32:49 pm(D-CDRR)
+--------------------------------
+You can only report for March-2014. Kindly check the period fields !-Kendu Bay-D-CDRR for Central Sites and District Stores..xls The format should be dd/mm/yyyy
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 03:03:08 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-CDRR for Central Sites and District Stores..xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+A cdrr report already exists for this month !-Meru DH-D-CDRR for Central Sites and District Stores.xls
+Your facility Code in 'Mwingi DH-D-CDRR for Central Sites and District Stores.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+A cdrr report already exists for this month !-Thika DH-D-CDRR for Central Sites and District Stores.xls
+
+2014-04-09 02:55:48 pm(D-CDRR)
+--------------------------------
+Your facility Code in 'Kendu Bay-D-CDRR for Central Sites and District Stores..xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+Your facility Code in 'Mwingi DH-D-CDRR for Central Sites and District Stores.xls' file does not match any facility.  Kindly cross check the MFL code and / or check if the facility uploading is an ordering point.
+

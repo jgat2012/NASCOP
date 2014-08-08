@@ -31,13 +31,13 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function getEidADTPeriod() {
-		$sql = "SELECT dateinitiatedontreatment as period_begin FROM eid_master WHERE dateinitiatedontreatment!='' AND dateinitiatedontreatment<=CURDATE() AND dateinitiatedontreatment !='1970-01-01' GROUP BY YEAR(dateinitiatedontreatment),MONTH(dateinitiatedontreatment) ORDER BY dateinitiatedontreatment desc";
+		$sql = "SELECT LAST_DAY(dateinitiatedontreatment) as period_begin FROM eid_master WHERE dateinitiatedontreatment!='' AND dateinitiatedontreatment<=CURDATE() AND LAST_DAY( dateinitiatedontreatment ) IS NOT NULL  AND dateinitiatedontreatment !='1970-01-01' GROUP BY YEAR(dateinitiatedontreatment),MONTH(dateinitiatedontreatment) ORDER BY dateinitiatedontreatment desc";
 		$query = $this -> db -> query($sql);
 		return $results = $query -> result_array();
 	}
 
 	public function getEidPeriod() {
-		$sql = "SELECT enrollment_date as period_begin FROM eid_info GROUP BY YEAR(enrollment_date),MONTH(enrollment_date) ORDER BY enrollment_date desc";
+		$sql = "SELECT LAST_DAY(enrollment_date) as period_begin FROM eid_info WHERE enrollment_date !='1970-01-01' AND LAST_DAY( enrollment_date ) IS NOT NULL  GROUP BY YEAR(enrollment_date),MONTH(enrollment_date) ORDER BY enrollment_date desc";
 		$query = $this -> db -> query($sql);
 		return $results = $query -> result_array();
 	}
@@ -520,8 +520,7 @@ class Dashboard_Management extends MY_Controller {
 							$and
 							$and_check_cdrr
 							) tabl ON tabl.dr_id=dc.id
-							GROUP BY dc.id
-							ORDER BY dc.name
+							ORDER BY dc.name,dc.id DESC
 						";
 				//echo $sql;die();
 				$query = $this -> db -> query($sql);
@@ -1710,7 +1709,7 @@ class Dashboard_Management extends MY_Controller {
 			$tot_adtsites = $results[0]['total'];
 
 			//Sites reported by 10th
-			//echo $period;die();
+
 			if ($period != "") {
 				$tenth = date('Y-m-10', strtotime($period . "+1 month"));
 				$first = date('Y-m-01', strtotime($period . "+1 month"));
@@ -1720,12 +1719,21 @@ class Dashboard_Management extends MY_Controller {
 				$tenth = date('Y-m-10', strtotime($period));
 				$first = date('Y-m-01', strtotime($period));
 				$last_day = date('Y-m-t', strtotime($period));
+				$period.="-1 month";
 			}
+			$period_begin= date('Y-m-01', strtotime($period));
+			$period_end= date('Y-m-t', strtotime($period));
 
-			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
-							INNER JOIN maps m ON m.facility_id=c.facility_id
-							WHERE c.created BETWEEN '" . $first . "' AND  '" . $tenth . "'";
-			//INNER JOIN maps m ON m.period_begin=c.period_begin
+			$sql_tenth = "SELECT COUNT(DISTINCT(c.facility_id)) as total 
+			              FROM cdrr c
+						  INNER JOIN maps m ON m.facility_id=c.facility_id
+						  WHERE c.created 
+						  BETWEEN '$first' 
+						  AND '$tenth'
+						  AND c.period_begin='$period_begin'
+						  AND m.period_begin='$period_begin'
+						  AND c.period_end='$period_end'
+						  AND m.period_end='$period_end'";
 
 			$query = $this -> db -> query($sql_tenth);
 			$results = $query -> result_array();
@@ -1739,8 +1747,13 @@ class Dashboard_Management extends MY_Controller {
 			//Sites that have reported this month
 			$sql_report = "SELECT COUNT(DISTINCT(c.facility_id)) as total FROM cdrr c
 							INNER JOIN maps m ON m.facility_id=c.facility_id
-							WHERE c.created BETWEEN '" . $first . "' AND  '" . $last_day . "'";
-			//INNER JOIN maps m ON m.period_begin=c.period_begin
+							WHERE c.created 
+							BETWEEN '$first' 
+							AND  '$last_day'
+							AND c.period_begin='$period_begin'
+						    AND m.period_begin='$period_begin'
+						    AND c.period_end='$period_end'
+						    AND m.period_end='$period_end'";
 			$query = $this -> db -> query($sql_report);
 			$results = $query -> result_array();
 			$tot_reportsites = $results[0]['total'];
@@ -1883,10 +1896,16 @@ class Dashboard_Management extends MY_Controller {
 		}
 
 		if ($facility != 0) {
-			$conditions .= "AND em.facilitycode='$facility'";
+			if ($type == "retention") {
+               $conditions .= "AND ei.facility_code='$facility'";
+			}else{
+               $conditions .= "AND em.facilitycode='$facility'";
+			}	 
 		}
 		if ($county != 0) {
-			$conditions .= "AND c.id='$county'";
+			if ($type != "retention") {
+			   $conditions .= "AND c.id='$county'";
+			}
 		}
 
 		if ($type == "gender") {
@@ -1901,18 +1920,36 @@ class Dashboard_Management extends MY_Controller {
 		} else if ($type == "source") {
 			$column = "source";
 			$container = "chart_area_eid_source";
+		}else if ($type == "retention") {
+			$column = "status";
+			$container = "chart_area_eid_retention";
 		}
 
 		if ($type != "comparison" && $type != "summary") {
-			$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
-					FROM eid_info ei 
-					LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
-					LEFT JOIN counties c ON c.id=f.county
-					WHERE ei.enrollment_date
-					BETWEEN '$period_start'
-					AND '$period_end'
-					$conditions
-					GROUP BY ei.$column";
+				if ($type == "retention") {
+				 	if($county==0){
+				 		$county=90;
+				 	}
+					$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
+							FROM eid_info ei 
+							LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+							WHERE ei.enrollment_date
+							BETWEEN '$period_start'
+							AND '$period_end'
+							AND DATEDIFF(CURDATE(),ei.enrollment_date)>=$county
+							$conditions
+							GROUP BY ei.$column";
+				}else{
+					$sql = "SELECT ei.$column as label,COUNT( ei.$column ) AS total 
+							FROM eid_info ei 
+							LEFT JOIN facilities f ON f.facilitycode=ei.facility_code
+							LEFT JOIN counties c ON c.id=f.county
+							WHERE ei.enrollment_date
+							BETWEEN '$period_start'
+							AND '$period_end'
+							$conditions
+							GROUP BY ei.$column";
+						}
 		} else if ($type == "summary") {
 			$tbody = "";
 			$months = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
@@ -1931,7 +1968,7 @@ class Dashboard_Management extends MY_Controller {
 			echo $tbody;
 			exit();
 
-		} else {
+		}  else {
 			if ($facility != 0) {
 				$conditions_adt .= "AND ei.facility_code='$facility'";
 				$conditions_eid .= "AND em.facilitycode='$facility'";
@@ -2499,9 +2536,13 @@ class Dashboard_Management extends MY_Controller {
 
 	public function fix_bug($periods = array()) {
 		$current_selection = date('Y-m-01', strtotime("-1 month"));
+		$end_selection = date('Y-m-t', strtotime("-1 month"));
 		$count = 0;
 		foreach ($periods as $period) {
 			if (in_array($current_selection, $period)) {
+				$count++;
+			}
+			if (in_array($end_selection, $period)) {
 				$count++;
 			}
 		}

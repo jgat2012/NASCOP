@@ -1,10 +1,13 @@
 <style type="text/css">
 	.full-content {
 		width: 95%;
-		zoom: 100%;
+		zoom: 95%;
 	}
 	#facilities_map{
 		width:200px;
+	}
+	#settings_list{
+		font-size:0.8em;
 	}
 </style>
 <div class="container-fluid full-content">
@@ -46,6 +49,9 @@
 				</li>
 				<li>
 					<a href="#" class="api_sync" id="eid_sync">EID/HEI Sync</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="eid_mail">EID Mailing Lists</a>
 				</li>
 				<li class="divider"></li>
 				<li class="nav-header">
@@ -139,7 +145,7 @@
 			$("#create_setting").text("add drug");
 			$("#modal_header").text("Add Drug");
 		} else if(type == "sync_facility") {
-			$("#add_btn").hide();
+			$("#create_setting").text("add facility");
 			$("#modal_header").text("Add Facility");
 		} else if(type == "sync_regimen") {
 			$("#create_setting").text("add regimen");
@@ -168,6 +174,9 @@
 		}else if(type == "escm_facility") {
 			$("#add_btn").hide();
 			$("#modal_header").text("Add Facility");
+		}else if(type == "eid_mail") {
+			$("#create_setting").text("add email");
+			$("#modal_header").text("Add EID Email");
 		}
 
 		var link = my_url + "settings/modal/" + type
@@ -204,7 +213,7 @@
 				$("#create_setting").text("add drug");
 				$("#modal_header").text("Add Drug");
 			} else if(type == "sync_facility") {
-				$("#add_btn").hide();
+				$("#create_setting").text("add facility");
 				$("#modal_header").text("Add Facility");
 			} else if(type == "sync_regimen") {
 				$("#create_setting").text("add regimen");
@@ -231,8 +240,11 @@
 				$("#add_btn").hide();
 				$("#modal_header").text("Add Facility");
 			}else if(type == "gitlog") {
-			$("#add_btn").hide();
-			$("#modal_header").text("Add Log");
+			    $("#add_btn").hide();
+			    $("#modal_header").text("Add Log");
+		    }else if(type == "eid_mail") {
+				$("#create_setting").text("add email");
+				$("#modal_header").text("Add EID Email");
 		    }
 			var link = my_url + "settings/modal/" + type
 			$(".modal_btn").attr("href", link);
@@ -261,7 +273,7 @@
 				if(i == "id") {
 					var action_link = my_url + "settings/save/" + current + "/" + v
 					$("#modal_action").attr("action", action_link);
-				} else if(i == "facility" && v !=null) {
+				} else if(i == "facility" && v !=null && type=="sync_user") {
 					var family_planning = $.parseJSON(v);
 					if(family_planning != null || family_planning != " ") {
 						var fplan = family_planning.split(',');
@@ -363,6 +375,8 @@
 			var columns = new Array("Facility", "hash value","Status","last update");
 		}else if(type == "escm_facility") {
 			var columns = new Array("mfl code", "name", "category", "services", "options");
+		}else if(type == "eid_mail") {
+			var columns = new Array("Email Address", "Facility","options");
 		}
 		//Generate Columns
 		var thead = "<table id='setting_grid' class='table table-bordered table-hover table-condensed'><thead><tr>";

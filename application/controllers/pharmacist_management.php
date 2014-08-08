@@ -14,8 +14,8 @@ class Pharmacist_Management extends MY_Controller {
 		 *Get the unique_id's of those orders
 		 *Check for the top(limit)commodity stocks for those stocks
 		 */
-		$period = date('Y-m', strtotime($end_date . "- 1 month"));
-		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
+		$period = date('Y-m', strtotime($end_date));
+	    $start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
 		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
 
 		$order_list = array();
@@ -55,7 +55,7 @@ class Pharmacist_Management extends MY_Controller {
 		 *Get all facility information about those orders
 		 *Create table for this information
 		 */
-		$period = date('Y-m', strtotime($end_date . "- 1 month"));
+		$period = date('Y-m', strtotime($end_date));
 		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
 		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
 
@@ -136,7 +136,7 @@ class Pharmacist_Management extends MY_Controller {
 		 *Create table for this information
 		 */
 
-		$period = date('Y-m', strtotime($end_date . "- 1 month"));
+		$period = date('Y-m', strtotime($end_date));
 		$start_date = date('Y-m-01', strtotime($start_date . "- 1 month"));
 		$end_date = date('Y-m-t', strtotime($period . "- 1 month"));
 

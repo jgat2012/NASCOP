@@ -47,9 +47,9 @@ class Maps extends Doctrine_Record {
 	}
 
 	public function getFacilityMap($facility_id, $period_begin = "") {
-		$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("faciltiy_id='$facility_id'");
+		$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("facility_id='$facility_id'");
 		if ($period_begin != "") {
-			$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("faciltiy_id='$facility_id' and period_begin='$period_begin'");
+			$query = Doctrine_Query::create() -> select("*") -> from("maps") -> where("facility_id='$facility_id' and period_begin='$period_begin'");
 		}
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
