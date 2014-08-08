@@ -520,8 +520,7 @@ class Dashboard_Management extends MY_Controller {
 							$and
 							$and_check_cdrr
 							) tabl ON tabl.dr_id=dc.id
-							GROUP BY dc.id
-							ORDER BY dc.name
+							ORDER BY dc.name,dc.id DESC
 						";
 				//echo $sql;die();
 				$query = $this -> db -> query($sql);
