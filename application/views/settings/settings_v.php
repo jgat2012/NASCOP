@@ -53,6 +53,12 @@
 				<li>
 					<a href="#" class="setting_link" id="eid_mail">EID Mailing Lists</a>
 				</li>
+				<li>
+					<a href="#" class="setting_link" id="casco_list">CASCO Lists</a>
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="casco_mail">CASCO Mailing Lists</a>
+				</li>
 				<li class="divider"></li>
 				<li class="nav-header">
 					COMMON SETTINGS
@@ -177,7 +183,14 @@
 		}else if(type == "eid_mail") {
 			$("#create_setting").text("add email");
 			$("#modal_header").text("Add EID Email");
+		}else if(type == "casco_list") {
+			$("#create_setting").text("add List");
+			$("#modal_header").text("Add CASCO List");
+		}else if(type == "casco_mail") {
+			$("#create_setting").text("add email");
+			$("#modal_header").text("Add CASCO Email");
 		}
+
 
 		var link = my_url + "settings/modal/" + type
 		$(".modal_btn").attr("href", link);
@@ -245,7 +258,14 @@
 		    }else if(type == "eid_mail") {
 				$("#create_setting").text("add email");
 				$("#modal_header").text("Add EID Email");
-		    }
+		    }else if(type == "casco_list") {
+				$("#create_setting").text("add List");
+				$("#modal_header").text("Add CASCO List");
+			}else if(type == "casco_mail") {
+				$("#create_setting").text("add email");
+				$("#modal_header").text("Add CASCO Email");
+			}
+
 			var link = my_url + "settings/modal/" + type
 			$(".modal_btn").attr("href", link);
 			$(".modal-body").load(link);
@@ -377,6 +397,10 @@
 			var columns = new Array("mfl code", "name", "category", "services", "options");
 		}else if(type == "eid_mail") {
 			var columns = new Array("Email Address", "Facility","options");
+		}else if(type == "casco_list") {
+			var columns = new Array("Name", "County","options");
+		}else if(type == "casco_mail") {
+			var columns = new Array("Email Address", "Casco","County","options");
 		}
 		//Generate Columns
 		var thead = "<table id='setting_grid' class='table table-bordered table-hover table-condensed'><thead><tr>";
