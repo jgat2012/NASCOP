@@ -82,10 +82,16 @@ class Sync extends MY_Controller {
 		$post_array = $_POST;
 		$main_array = $post_array['json_data'];
 		$responses = json_decode($main_array, TRUE);
-		$sql = "DELETE FROM gitlog WHERE facility_code='$facility_code'";
-		$this -> db -> query($sql);
-		$this -> db -> insert_batch("gitlog", $responses);
-		echo json_encode(array('GITLOG Sync Success'));
+		if(!empty($responses)){
+			$facility_code=$responses[0]['facility_code'];
+			$sql = "DELETE FROM gitlog WHERE facility_code='$facility_code'";
+			$this -> db -> query($sql);
+			$this -> db -> insert("gitlog", $responses);
+			$message='GITLOG Sync Success';
+		}else{
+			$message='GITLOG Sync Failed';
+		}
+		echo json_encode(array($message));
 	}
 
 	public function save($link = "nascop", $type = "cdrr", $id = "") {

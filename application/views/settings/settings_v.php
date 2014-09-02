@@ -424,9 +424,6 @@
 			"bSort" : true,
 			"bSortClasses" : true,
 			"bStateSave" : true,
-			"sScrollX" : "100%",
-			"bScrollCollapse" : true,
-			"sScrollY" : "200px",
 			"bDestroy" : true,
 			"iCookieDuration" : 60 * 30,
 			"oSearch" : {
