@@ -83,7 +83,7 @@ class Sync extends MY_Controller {
 		$main_array = $post_array['json_data'];
 		$responses = json_decode($main_array, TRUE);
 		if(!empty($responses)){
-			$facility_code=$responses[0]['facility_code'];
+			$facility_code=$responses['facility_code'];
 			$sql = "DELETE FROM gitlog WHERE facility_code='$facility_code'";
 			$this -> db -> query($sql);
 			$this -> db -> insert("gitlog", $responses);
