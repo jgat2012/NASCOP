@@ -34,7 +34,7 @@ class settings extends MY_Controller {
 		} else if ($type == "user_emails") {
 			$columns = array("s.id", "s.email_address", "COUNT(ml.id) as total_lists", "s.active");
 		} else if ($type == "drugcode") {
-			$columns = array("id", "name", "unit", "pack_size", "category_id", "arv_drug", "n_map", "e_map", "active");
+			$columns = array("id", "name", "unit", "pack_size","price_pack","comments", "category_id", "arv_drug", "n_map", "e_map", "active");
 		} else if ($type == "facilities") {
 			$columns = array("s.id", "facilitycode", "name", "type", "c.county", "s.active", "facilitytype", "district", "s.county as county_id", "supported_by", "service_art", "service_pmtct", "service_pep", "supplied_by", "parent", "map", "IF(a.facility_id !='NULL','1','0') as adt_site");
 		} else if ($type == "regimen") {
@@ -46,6 +46,10 @@ class settings extends MY_Controller {
 			$columns = array("id", "code", "name", "category", "sponsors", "services", "district_id", "ordering", "service_point", "county_id");
 		} else if ($type == "eid_mail") {
 			$columns = array("s.id", "s.email as email_address", "f.name as facility","s.facility as code", "s.active");
+		}else if ($type == "casco_list") {
+			$columns = array("s.id", "s.name","c.county","s.county_id","s.active");
+		}else if ($type == "casco_mail") {
+			$columns = array("s.id", "s.email as email_address","s.casco_id", "cl.name as casco"," c.county", "s.active");
 		}
 
 		$iDisplayStart = $this -> input -> get_post('iDisplayStart', true);
@@ -109,6 +113,11 @@ class settings extends MY_Controller {
 			$this -> db -> join("facilities f", "f.facilitycode=s.facility_code", "left");
 		} else if ($type == "eid_mail") {
 			$this -> db -> join("facilities f", "f.facilitycode=s.facility", "left");
+		} else if ($type == "casco_list") {
+			$this -> db -> join("counties c", "c.id=s.county_id", "left");
+		} else if ($type == "casco_mail") {
+			$this -> db -> join("casco_list cl", "cl.id=s.casco_id", "left");
+			$this -> db -> join("counties c", "c.id=cl.county_id", "left");
 		}
 		$rResult = $this -> db -> get();
 		// Data set length after filtering
@@ -126,7 +135,7 @@ class settings extends MY_Controller {
 			$action_link = "delete";
 			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id"  && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
+				if ($i != "id" && $i !="casco_id"  && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
 					if($type == "eid_mail" && $i =="code"){
 					     //null
 					}else{
@@ -230,7 +239,7 @@ class settings extends MY_Controller {
 		} else if ($type == "user_emails") {
 			$inputs = array("Email Address" => "email_address", "Mailing List" => "mail_list");
 		} else if ($type == "drugcode") {
-			$inputs = array("name" => "name", "unit" => "unit", "pack size" => "pack_size", "category" => "category_id", "is ARV drug?" => "arv_drug", "nascop drug" => "n_map", "escm drug" => "e_map");
+			$inputs = array("name" => "name", "unit" => "unit", "pack size" => "pack_size","Price(USD)" => "price_pack","Comments" => "comments", "category" => "category_id", "is ARV drug?" => "arv_drug", "nascop drug" => "n_map", "escm drug" => "e_map");
 		} else if ($type == "facilities") {
 			$inputs = array("code" => "facilitycode", "name" => "name", "category" => "type", "type" => "facilitytype", "is ADT site?" => "adt_site", "county" => "county_id", "district" => "district", "supplier" => "supplied_by", "supporter" => "supported_by", "service ART" => "service_art", "service PEP" => "service_pep", "service PMTCT" => "service_pmtct", "parent" => "parent", "mapped facility" => "map");
 		} else if ($type == "regimen") {
@@ -239,6 +248,10 @@ class settings extends MY_Controller {
 			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district" => "district_id", "is ordering point?" => "ordering", " is service point?" => "service_point", "county" => "county_id");
 		} else if ($type == "eid_mail") {
 			$inputs = array("email address" => "email_address", "facility" => "facility");
+		}else if ($type == "casco_list") {
+			$inputs = array("casco name" => "name", "County" => "county_id");
+		}else if ($type == "casco_mail") {
+			$inputs = array("email address" => "email_address", "Casco" => "casco_id");
 		}
 
 		foreach ($inputs as $text => $input) {
@@ -272,6 +285,10 @@ class settings extends MY_Controller {
 					$textfield .= "<option value='" . $district['id'] . "'>" . $district['Name'] . "</option>";
 				}
 				$textfield .= "</select>";
+			} else if($input == "price_pack"){
+				$textfield = "<input type='text' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
+			} else if($input == "comments" && $type == "drugcode"){
+				$textfield = "<textarea style='height:78px;width:67%' id='" . $type . "_" . $input . "' name='" . $input . "' placeholder='Indicate date of price, source of the price - GF, GoK, USG, etc'></textarea>";
 			} else if ($input == "n_map" && $type == "drugcode") {
 				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
@@ -326,6 +343,14 @@ class settings extends MY_Controller {
 				$counties = Counties::getActive();
 				foreach ($counties as $county) {
 					$textfield .= "<option value='" . $county['id'] . "'>" . $county['county'] . "</option>";
+				}
+				$textfield .= "</select>";
+			}else if ($input == "casco_id") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$cascos = Casco_List::getActive();
+				foreach ($cascos as $casco) {
+					$textfield .= "<option value='" . $casco['id'] . "'>" . $casco['name'] . "</option>";
 				}
 				$textfield .= "</select>";
 			} else if ($input == "facilitytype" && $type == "facilities") {
@@ -469,7 +494,7 @@ class settings extends MY_Controller {
 		} else if ($type == "user_emails") {
 			$inputs = array("email_address" => "email_address", "mail_list" => "mail_list_holder");
 		} else if ($type == "drugcode") {
-			$inputs = array("name" => "name", "unit" => "unit", "pack_size" => "pack_size", "category_id" => "category", "arv_drug" => "arv_drug", "n_map" => "n_map", "e_map" => "e_map");
+			$inputs = array("name" => "name", "unit" => "unit", "pack_size" => "pack_size","price_pack" => "price_pack", "comments" => "comments", "category_id" => "category", "arv_drug" => "arv_drug", "n_map" => "n_map", "e_map" => "e_map");
 		} else if ($type == "facilities") {
 			$inputs = array("facilitycode" => "facilitycode", "name" => "name", "type" => "type", "facilitytype" => "facilitytype", "adt_site" => "adt_site", "county" => "county_id", "district" => "district", "supplied_by" => "supplied_by", "supported_by" => "supported_by", "service_art" => "service_art", "service_pep" => "service_pep", "service_pmtct" => "service_pmtct", "parent" => "parent", "map" => "map");
 		} else if ($type == "regimen") {
@@ -478,6 +503,10 @@ class settings extends MY_Controller {
 			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district_id" => "district_id", "ordering" => "ordering", "service_point" => "service_point", "county_id" => "county_id");
 		} else if ($type == "eid_mail") {
 			$inputs = array("email" => "email_address", "facility" => "facility");
+		} else if ($type == "casco_list") {
+			$inputs = array("name" => "name", "county_id" => "county_id");
+		} else if ($type == "casco_mail") {
+			$inputs = array("email" => "email_address", "casco_id" => "casco_id");
 		} 
 
 		foreach ($inputs as $index => $input) {
@@ -586,7 +615,7 @@ class settings extends MY_Controller {
 				$columns = array("category_id" => 0);
 			} else if ($type == "sync_user") {
 				$columns = array("status" => "A");
-			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen" || $type == "eid_mail") {
+			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen" || $type == "eid_mail" || $type == "casco_list" || $type == "casco_mail") {
 				$columns = array("active" => "1");
 			}
 			$this -> db -> where('id', $id);
@@ -620,7 +649,7 @@ class settings extends MY_Controller {
 				$columns = array("category_id" => 15);
 			} else if ($type == "sync_user") {
 				$columns = array("status" => "N");
-			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen" || $type == "eid_mail") {
+			} else if ($type == "mail_list" || $type == "user_emails" || $type == "drugcode" || $type == "facilities" || $type == "regimen" || $type == "eid_mail" || $type == "casco_list" || $type == "casco_mail") {
 				$columns = array("active" => "0");
 			}
 			$this -> db -> where('id', $id);
@@ -1236,14 +1265,84 @@ class settings extends MY_Controller {
 				$table."<br/>Regards,<br/>NASCOP SYSTEM team.";
 			    $response.=$this->send_notification($email_list,$message);
             }  
+            //summary of all children under two years that are lost to follow up,it should be sent to CASCO LIST
+            $this->send_casco_summary();
         }
         echo $response;
+	}
+
+	public function send_casco_summary(){
+		$period=3;
+        $period_days=$period*30;
+		$today=date('Y-m-d');
+        $last_day_of_month=date('Y-m-t');
+        $first_day=date('Y-m-01',strtotime("-".$period."months"));
+        $last_day=date('Y-m-t',strtotime("-".$period."months"));
+        $response="";
+		$casco_emails=array();
+        //get casco list emails
+        $sql="SELECT cm.email,cl.county_id,cl.name
+              FROM casco_mail cm
+              LEFT JOIN casco_list cl ON cl.id=cm.casco_id
+              WHERE cl.active='1'
+              AND cm.active='1'
+              GROUP BY cm.email,cl.county_id";
+        $query = $this -> db -> query($sql);
+	    $results = $query -> result_array();
+	    if($results){
+            foreach($results as $result){
+                $county=$result['county_id'];
+               	$email=$result['email'];
+               	$list_name=$result['name'];
+                $casco_emails[$county][]=$email;
+            }
+	    }
+
+    	foreach($casco_emails as $county=>$emails){
+	        $sql="SELECT ei.patient_no,f.name,ei.gender,ei.service,ei.regimen,ei.enrollment_date,ei.status
+		          FROM eid_info ei 
+		          LEFT JOIN facilities f ON f.facilitycode=ei.facility_code 
+		          WHERE f.county='$county' 
+		          AND ROUND(DATEDIFF(CURDATE(),ei.birth_date )/360)<2
+		          AND ei.status LIKE '%lost%'
+		          GROUP BY ei.status";
+			$query = $this -> db -> query($sql);
+		    $results = $query -> result_array();
+		    $table="<table border='1' width='100%' cellspacing='0.5' cellpadding='2'><caption>".strtoupper(@$list_name)."</caption>";
+		    $table.="<thead><tr><th>Patient CCC NO</th><th>Facility Name</th><th>Gender</th><th>Service</th><th>Regimen</th><th>Enrollment Date</th><th>Status</th></tr></thead><tbody>";
+		    if($results){
+	            foreach($results as $result){
+                  $table.="<tr>";
+                  $table.="<td>".strtoupper($result['patient_no'])."</td>";
+                  $table.="<td>".strtoupper($result['name'])."</td>";
+                  $table.="<td>".strtoupper($result['gender'])."</td>";
+                  $table.="<td>".strtoupper($result['service'])."</td>";
+                  $table.="<td>".strtoupper($result['regimen'])."</td>";
+                  $table.="<td>".date('d-M-Y',strtotime($result['enrollment_date']))."</td>";
+                  $table.="<td>".strtoupper($result['status'])."</td>";
+                  $table.="</tr>";
+	            }
+		    }else{
+		    	  $table.="<tr>";
+                  $table.="<td colspan='7'>no data available!</td>";
+                  $table.="</tr>";
+		    }
+		    $table.="</tbody></table>";
+		    $email_list=implode(",", $emails);
+
+		    $message = "Hello, <br/><br/>
+            This is the monthly summary of all children under two years that are lost to follow up for ".@$list_name." List.<br/>
+			Find the summary in the table below:<br/><br/>".
+			$table."<br/>Regards,<br/>NASCOP SYSTEM team.";
+		    $response.=$this->send_notification($email_list,$message);
+        }  
+
 	}
 
 	public function send_notification($email_address,$message){
 		$email_user = stripslashes('webadt.chai@gmail.com');
 		$email_password = stripslashes('WebAdt_052013');
-		$subject = "EID Monthly Retention Summary";
+		$subject = "NASCOP/EID Monthly Summary";
 		$email_sender_title = "NASCOP SYSTEM";
 
 		$config['mailtype'] = "html";

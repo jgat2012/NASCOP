@@ -60,7 +60,11 @@ class Sync_Facility extends Doctrine_Record {
 		return @$sync_facility[0];
 	}
 	
-	
+	public function getTotalNumberCounty($county) {
+		$query = Doctrine_Query::create() -> select("COUNT(*) as Total_Facilities") -> from("sync_facility") -> where("county_id = '$county'");
+		$count = $query -> execute();
+		return $count[0] -> Total_Facilities;
+	}
 
 	public function getCode($facility_id, $status_code = 0) {
 		if ($status_code == 0) {

@@ -1321,7 +1321,7 @@ a:hover {
 	color: red;
 	font-style: italic;
 }
-input[type='text'], input[type='email'], input[type='tel'], input[type='password'] {
+input[type='text'], input[type='email'], input[type='tel'], input[type='password'], input[type='number'] {
 	height: 30px;
 }
 legend {
@@ -1644,6 +1644,9 @@ td {
 }
 .nat_dashboard_rep select {
 	width: 20%;
+}
+select.big {
+	width: 45%;
 }
 .nat_dashboard_rep input {
 	width: 70%;

@@ -32,6 +32,11 @@ class Counties extends Doctrine_Record {
 		$counties = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $counties;
 	}
+	public function getCountyDetails($county_id) {
+		$query = Doctrine_Query::create() -> select("*") -> from("Counties")->where("id=$county_id");
+		$counties = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $counties;
+	}
 
 }//end class
 ?>

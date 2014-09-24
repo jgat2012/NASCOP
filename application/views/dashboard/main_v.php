@@ -54,8 +54,9 @@
 	 	}
 	 	else if(type=="two_p_menu"){//Two pager
 	 		  two_pager();
-	 	}
-		
+	 	}else if(type=="county_r_menu"){//County report
+			  county_report();
+		}
 		//When one clicks tab, keep it in session
 		$(".main_menu").live("click",function(){
 			$(".tab-pane").hide();
@@ -99,6 +100,9 @@
 	 	            else if(id=="two_p_menu"){//Two pager
 	 	            	 two_pager();
 	 	            }
+	 	            else if(id=="county_r_menu"){//County report
+	 	            	 county_report();
+				}
 				}
 			});
 			
@@ -480,8 +484,12 @@
 		  var eid_facility=$("#retention_eid_facility").val();
 	  	  var chart_area_eid_source_link = "<?php echo base_url().'dashboard_management/eid/retention/';?>"+eid_period+"/"+eid_facility+"/"+eid_range;
           $("#chart_area_eid_retention").load(chart_area_eid_source_link);
+		}else if(id=="btn_download_county_report"){//Button to download county reports
+			var period = $("#sel_period_cr").val();
+			var county = $("#sel_county_cr").val();
+			var link   = "<?php echo base_url().'dashboard_management/download/county_report/';?>"+period+"/0/"+county;
+			window.location = link;
 		}
-		
 		
 	});
 	
@@ -598,10 +606,12 @@
 	}
 	function two_pager(){
 		$("#two_pager_area").html('<div class="loadingDiv" style="margin:20% 0 20% 0;" ><img style="width: 30px;margin-left:50%" src="<?php echo asset_url().'img/loading_spin.gif' ?>"></div>');
+		
 	  	var two_pager_link = "<?php echo base_url().'dashboard_management/two_pager';?>";
         $("#two_pager_area").load(two_pager_link,function(){
-        	$("#TWO_PAGER").dataTable({
-		 		 "bJQueryUI" : true,
+        	
+        	$("#TWO_PAGER_listing").dataTable({
+		 		"bJQueryUI" : true,
 				"sPaginationType" : "full_numbers",
 				"sDom" : '<"H"Tfr>t<"F"ip>',
 				"oTableTools" : {
@@ -610,19 +620,51 @@
 				},
 				"bProcessing" : true,
 				"bServerSide" : false,
-			});
+			}).fnSort([[0,'desc']]);
         });
+        
 	}
+	
+	function county_report(){
+		$("#sel_period_cr").html("<option value=''>Loading Period...</option>");
+		var load_period = "<?php echo base_url().'dashboard_management/county_report/period';?>";
+		$("#sel_period_cr").load(load_period,function(){//After loading period, load counties
+        	$("#sel_county_cr").html("<option value=''>Loading Counties...</option>");
+        	var load_counties = "<?php echo base_url().'dashboard_management/county_report/counties';?>";
+        	$("#sel_period_cr").load(load_period,function(){//After loading period, load counties
+	        	$("#sel_county_cr").load(load_counties,function(){
+	        		 $('body').prepend( $('<link rel="stylesheet" type="text/css" />').attr('href', '<?php echo base_url() ?>assets/CSS/select2-3.4.8/select2.css') );
+					 $.getScript( "<?php echo base_url();?>assets/js/select2-3.4.8/select2.js",function(){
+					 	$("#sel_period_cr").select2({
+					 		width: 'resolve',
+					 		placeholder: "Select a Period",
+    						allowClear: true
+					 	});
+					 	$("#sel_county_cr").select2({
+					 		width: 'resolve',
+					 		placeholder: "Select a County",
+    						allowClear: true
+					 	});
+					 });
+	        	});
+	        });
+        });
+		
+	}
+	$(document).ready(function(){
+		
+	})
 </script>
 
 <div class="tabbable national_dashboard_content" style="margin-top:2%"> <!-- Only required for left/right tabs -->
-  <ul class="nav nav-tabs " style="width:60%; float: left">
+  <ul class="nav nav-tabs " style="width:80%; float: left">
   	<li id="ra_menu" class="active main_menu"><a href="#tab5" data-toggle="tab">Reporting Analysis</a></li>
   	<li id="pa_menu" class="main_menu" ><a href="#tab2" data-toggle="tab">Patient Analysis</a></li>
     <li id="ca_menu" class="main_menu" ><a href="#tab1" data-toggle="tab">Commodity Analysis</a></li>
     <li id="eid_menu" class="main_menu" ><a href="#tab8" data-toggle="tab">EID Analysis</a></li>
     <li id="up_menu" class="main_menu" ><a href="#tab7" data-toggle="tab">Ordering Upload</a></li>
     <li id="two_p_menu" class="main_menu" ><a href="#tab6" data-toggle="tab">2 Pager Download</a></li>
+    <li id="county_r_menu" class="main_menu" ><a href="#tab3" data-toggle="tab">County Report</a></li>
   </ul>
   <div>
   	<ol id="nd_breadcrumb" class="breadcrumb" style="text-align: right">
@@ -1146,12 +1188,52 @@
 	    </div>
 	    <!-- 2 Pager Download -->
 	    <div class="tab-pane nat_dashboard_rep" id="tab6">
-	    	<div class="container" style="width: 50%">
-	  			<div class="row-fluid" style="height:50%;">
+	    	<div class="container-fluid" style="width: 50%; margin: 0 auto">
+	  			<div class="row-fluid" >
+	  				<div class="span12">
 	  					<h3 class="dashboard_title">Kenya Anti-Retroviral medicines (ARVs) Stock Situation</h3>
 			    		<div id="two_pager_area"></div>
+			    	</div>
 	  			</div>
-			</div>  	
+			</div>  
+			
+	    </div> 
+	    <!-- County Report -->
+	    <div class="tab-pane nat_dashboard_rep" id="tab3">
+	    	<div class="container-fluid">
+	  			<div class="row-fluid" >
+	  				<div class="span6">
+	  					<h3 class="dashboard_title"></h3>
+			    		<div id="county_report_area_graph"></div>
+			    	</div>
+			    	<div class="span6">
+			    		<form class="form-horizontal">
+			    			<h3>County Report Download</h3>
+			    			  <div class="control-group">
+							    <label class="control-label" for="sel_period_cr">Select period</label>
+							    <div class="controls">
+							      <select name="sel_period_cr" id="sel_period_cr" class="big"></select>
+							    </div>
+							  </div>
+							  <div class="control-group">
+							    <label class="control-label" for="sel_county_cr">Select county</label>
+							    <div class="controls">
+							      <select name="sel_county_cr" id="sel_county_cr" class="big"></select>
+							    </div>
+							  </div>
+							 
+							  
+							  <div class="control-group">
+							    <div class="controls">
+							      <button type="button" id="btn_download_county_report" class="generate btn btn-warning">Download Report</button>
+							    </div>
+							  </div>
+						</form>
+			    		
+			    	</div>
+	  			</div>
+			</div>  
+			
 	    </div> 
     </div>
 </div>

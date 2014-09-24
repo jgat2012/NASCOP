@@ -54,6 +54,11 @@ class Facilities extends Doctrine_Record {
 		$count = $query -> execute();
 		return $count[0] -> Total_Facilities;
 	}
+	public static function getTotalNumberCounty($county = 0) {
+		$query = Doctrine_Query::create() -> select("COUNT(*) as Total_Facilities") -> from("Facilities") -> where("county = '$county'");
+		$count = $query -> execute();
+		return $count[0] -> Total_Facilities;
+	}
 
 	public static function getTotalNumberInfo($facility_code) {
 		$query = Doctrine_Query::create() -> select("COUNT(*) as Total_Facilities") -> from("Facilities") -> where("facilitycode = '$facility_code'");

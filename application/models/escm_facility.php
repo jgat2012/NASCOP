@@ -37,6 +37,12 @@ class Escm_Facility extends Doctrine_Record {
 		$escm_facility = $query -> execute();
 		return $escm_facility;
 	}
+	public function getTotalNumberCounty($county) {
+		$query = Doctrine_Query::create() -> select("COUNT(*) as Total_Facilities") -> from("escm_facility") -> where("county_id = '$county'");
+		$count = $query -> execute();
+		return $count[0] -> Total_Facilities;
+	}
+	
 
 	public function getAllHydrated() {
 		$query = Doctrine_Query::create() -> select("*") -> from("escm_facility") -> orderBy("name asc");;

@@ -168,7 +168,7 @@ class Dashboard_Management extends MY_Controller {
 		return $facilities;
 	}
 
-	public function download($type = "", $period = "", $pipeline = '') {
+	public function download($type = "", $period = "", $pipeline = "",$county="") {
 		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' ";
 		$and_check_cdrr = " AND c.status NOT LIKE '%receive%' AND c.status NOT LIKE '%delete%' AND c.status NOT LIKE '%prepare%' ";
 		if ($type == "SOH") {
@@ -547,7 +547,7 @@ class Dashboard_Management extends MY_Controller {
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 
 		}
-		//Patients BY ART Sites
+		//Current Patients BY ART Sites
 		else if ($type == 'ART_PATIENT') {
 			$period = date('Y-m-01', strtotime($period));
 
@@ -605,34 +605,16 @@ class Dashboard_Management extends MY_Controller {
 			//start looping through each facility
 			$y = 1;
 			$p = 9;
+			$id = "";
 			foreach ($results_f as $value) {
 				$id = $value['id'];
-				$code = $value['code'];
+				$f_code = $value['code'];
 				$name = $value['name'];
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $p, $y);
-				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $code);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $f_code);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $p, $name);
-
-				//Get regimen list
-				$sql_regimen = "
-								SELECT r.id,r.code, r.old_code, r.name,IFNULL(tabl.total,0) as total  FROM $regimen_table r
-								LEFT JOIN 
-								(
-								SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id
-								FROM maps_item mi
-								LEFT JOIN maps m ON m.id = mi.maps_id
-								LEFT JOIN $regimen_table r ON r.id = mi.regimen_id
-								LEFT JOIN $facility_table f ON f.id = m.facility_id
-								WHERE m.period_begin =  '$period_begin'
-								$and_check_maps
-								AND m.facility_id=$id
-								$and
-								) tabl ON tabl.reg_id=r.id
-								ORDER BY r.id
-								";
-				$query = $this -> db -> query($sql_regimen);
-				$results = $query -> result_array();
-
+				//Get total number of patients by Regimen for that facility
+				$results = $this ->getTotalPatientByART($regimen_table,$facility_table,$period_begin,$and_check_maps,$id);
 				//Get totals for each regimen, for the selected facility and append it to the sheet
 				$x = "E";
 				$total = 0;
@@ -644,7 +626,7 @@ class Dashboard_Management extends MY_Controller {
 					$name = $value['name'];
 					$t = $value['total'];
 					$total = $total + $t;
-
+	
 					if ($y == 1) {//Append regimen names, old code, new code only once when start looping
 						$objPHPExcel -> getActiveSheet() -> mergeCells($x . '1:' . $x . '5');
 						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '1', $name);
@@ -652,18 +634,46 @@ class Dashboard_Management extends MY_Controller {
 						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $old_code);
 					}
 					$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $t);
-					//Total for a  regimen
-
 					$x++;
-
+				}
+				if($total==0){//If facility did not report for that period, get the closest period for which the facility reported
+					$closest_period = $this ->getClosestReportingPeriod($id,"maps m",$and_check_maps,$period_begin);
+					//echo $closest_period. ' - '.$f_code.'<br>';
+					if($closest_period!=""){//If facility has reported at least once, get data for that period
+						$results = $this ->getTotalPatientByART($regimen_table,$facility_table,$closest_period,$and_check_maps,$id);
+						//Get totals for each regimen, for the selected facility and append it to the sheet
+						$x = "E";
+						$total = 0;
+						//Total for all the regimens for a facility
+						foreach ($results as $value) {
+							$r_id = $value['id'];
+							$code = $value['code'];
+							$old_code = $value['old_code'];
+							$name = $value['name'];
+							$t = $value['total'];
+							$total = $total + $t;
+			
+							if ($y == 1) {//Append regimen names, old code, new code only once when start looping
+								$objPHPExcel -> getActiveSheet() -> mergeCells($x . '1:' . $x . '5');
+								$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '1', $name);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '6', $code);
+								$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7', $old_code);
+							}
+							$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $t);
+							$x++;
+						}
+					}else{
+						$total = 0;
+					}
+					
 				}
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('D' . $p, $total);
 				//Total for all regimen for a facility
-
+				
 				$p++;
 				$y++;
 			}
-
+			//die();
 			$objPHPExcel -> getActiveSheet() -> getStyle('D1:D' . $p) -> getFont() -> setBold(true);
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 
@@ -978,14 +988,217 @@ class Dashboard_Management extends MY_Controller {
 			$objPHPExcel -> getActiveSheet() -> getStyle('I8:I' . $y) -> getFont() -> setBold(true);
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 
+		}elseif($type=="two_pager"){//DOWNLOAD TWO PAGER
+			$period_array = explode("-", $period);
+			$month = $period_array[0];
+			$year  = $period_array[1];
+			$get_patient_by_pipeline = $this ->getPatients("BYPIPELINE_ART",$period,"","","two_pager_download");
+			//echo "<pre>".var_dump($get_patient_by_pipeline)."</pre>";
+			$get_patient_art = $this ->adult_patients($period,"","","two_pager_download"); //ADULTS
+			$get_patient_art_paed = $this ->paed_patients($period,"","","two_pager_download");  //PAEDS
+			//Return PHPExcel Object
+			$objPHPExcel = $this ->getPatientsExcel('2page_template',$period,'',$get_patient_by_pipeline,$get_patient_art,$get_patient_art_paed);
+			
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A33',"Figure 1: Adult ARV Stock status at KEMSA and Kenya Pharma as at end ".$period." (based on Patient months-of-stock [PMoS])");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('D33',"Figure 2: Paediatric ARV Stock status at KEMSA and Kenya Pharma as at end ".$period." (based on Patient months-of-stock [PMoS])");
+		
+			
+			//Generate file
+			ob_start();
+			$filename = 'twopager '.$period.'.xlsx';
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+			$objWriter -> save($_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir/'.$filename);
+			$objPHPExcel -> disconnectWorksheets();
+			unset($objPHPExcel);
+			$file = $_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir'.$filename;
+			if (file_exists($file)) {
+				redirect(base_url().'assets/template/dir/'.$filename);
+			}
+		}elseif($type=="county_report"){//Download county reports
+			
+			$period_array = explode("-", $period);
+			$month = $period_array[0];
+			$year  = $period_array[1];
+			$county_id = $county;
+			$get_patient_by_pipeline = $this ->getPatients("BYPIPELINE_ART",$period,$county_id,"","two_pager_download");//Per county
+			$get_patient_art = $this ->adult_patients($period,"",$county_id,"two_pager_download"); //ADULTS
+			$get_patient_art_paed = $this ->paed_patients($period,"",$county_id,"two_pager_download");  //PAEDS
+			//Return PHPExcel Object
+			$objPHPExcel = $this ->getPatientsExcel('countyreport_template',$period,$county_id,$get_patient_by_pipeline,$get_patient_art,$get_patient_art_paed);
+			
+			
+			// ------------ Reporting Rate
+			$sheet = $objPHPExcel->getSheet(1);
+			//Get total number of facilities per county
+			$total_facility_kp = Escm_facility::getTotalNumberCounty($county_id);
+			$total_facility_kemsa = Sync_facility::getTotalNumberCounty($county_id);
+			$total_facilities = $total_facility_kemsa + $total_facility_kp;
+			
+			$period_begin = date("Y-m-01", strtotime($period));
+			//Get list of facilities that did not reported for this period
+			$sql_escm = "
+						SELECT ef.name,ef.code FROM escm_facility ef
+						LEFT JOIN counties c ON c.id = ef.county_id
+						WHERE ef.id NOT IN(
+											SELECT DISTINCT(facility_id) FROM maps m
+											LEFT JOIN escm_facility ef ON ef.id = m.facility_id
+											LEFT JOIN escm_maps em ON em.maps_id = m.id
+											LEFT JOIN counties c ON c.id = ef.county_id
+											WHERE period_begin = '$period_begin' 
+											AND em.maps_id IS NOT NULL
+											AND c.id = '$county_id' 
+											$and_check_maps
+											)
+						AND c.id = '$county_id'
+						
+							";
+			
+			$query = $this ->db ->query($sql_escm);
+			$result1 = $query ->result_array();
+			$total_kp = count($result1);
+			
+			$sql_nascop = "
+					SELECT ef.name,ef.code FROM sync_facility ef
+						LEFT JOIN counties c ON c.id = ef.county_id
+						WHERE ef.id NOT IN(
+											SELECT DISTINCT(facility_id) FROM maps m
+											LEFT JOIN sync_facility ef ON ef.id = m.facility_id
+											LEFT JOIN escm_maps em ON em.maps_id = m.id
+											LEFT JOIN counties c ON c.id = ef.county_id
+											WHERE period_begin = '$period_begin' 
+											AND em.maps_id IS NULL
+											AND c.id = '$county_id' 
+											$and_check_maps
+											)
+						AND c.id = '$county_id'
+					";
+			$query = $this ->db ->query($sql_nascop);
+			$result2 = $query ->result_array();
+			$total_kemsa = count($result2);
+			$total_not_reported = $total_kemsa+$total_kp;
+			$total_reported = $total_facilities - $total_not_reported;
+			$reporting_rate = 0;
+			if($total_facilities>0){
+				$reporting_rate =((int)$total_reported/(int)$total_facilities);
+			}
+			$county_details = Counties::getCountyDetails($county);
+			$countyname = ($county_details[0]['county'])." county";
+			$title =strtoupper($countyname. " Reporing Rate for ".$period);
+			$sheet-> SetCellValue("A1",$title);
+			$sheet -> SetCellValue("D2",$reporting_rate);
+			$sheet -> SetCellValue("D3",$total_facilities);
+			$sheet -> SetCellValue("D4",$total_reported);
+			$sheet -> SetCellValue("D5",$total_not_reported);
+			
+			//Sites that did not report
+			$x = "8";
+			foreach ($result1 as $key => $value) {
+				$sheet -> SetCellValue("A".$x,$value['code']);
+				$sheet -> SetCellValue("B".$x,$value['name']);
+				$sheet -> SetCellValue("D".$x,'Kenya Pharma');
+				$x++;
+			}
+			foreach ($result2 as $key => $value) {
+				$sheet -> SetCellValue("A".$x,$value['code']);
+				$sheet -> SetCellValue("B".$x,$value['name']);
+				$sheet -> SetCellValue("D".$x,'Kemsa');
+				$x++;
+			}
+			
+			ob_start();
+			$county_details = Counties::getCountyDetails($county);
+			$countyname = $county_details[0]['county'];
+			$filename = ucfirst($countyname). ' County Report for '.$period.'.xlsx';
+			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+			$this ->deleteAllFiles($_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir/');//Delete all files in folder first
+			$objWriter -> save($_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir/'.$filename);
+			$objPHPExcel -> disconnectWorksheets();
+			unset($objPHPExcel);
+			$file = $_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir/'.$filename;
+			
+			if (file_exists($file)) {
+				redirect(base_url().'assets/template/dir/'.$filename);
+			}
+			
 		}
 
+	}
+	
+	public function getPatientsExcel($template='',$period='',$county='1',$get_patient_by_pipeline='',$get_patient_art='',$get_patient_art_paed=''){
+		$countyname = "";
+		if($county!=""){
+			$county_details = Counties::getCountyDetails($county);
+			$countyname = $county_details[0]['county'];
+			$countyname = ' : '.strtoupper($countyname). ' COUNTY';
+		}
+		$inputFileType = 'Excel2007';
+		$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/template/'.$template.'.xlsx';
+		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+		$objPHPExcel = $objReader -> load($inputFileName);	
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('A3',"Kenya Anti-Retroviral medicines (ARVs) Stock Situation – ".str_replace('-',' ',$period).$countyname);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('A6',"As at end of ".$period);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D6',$get_patient_by_pipeline['total']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D7',$get_patient_by_pipeline['total_adults']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D8',$get_patient_by_pipeline['total_paeds']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('B14',$get_patient_by_pipeline['total_adult_kemsa']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('C14',$get_patient_by_pipeline['total_adult_kp']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D14',$get_patient_by_pipeline['total_adults']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('B15',$get_patient_by_pipeline['total_paed_kemsa']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('C15',$get_patient_by_pipeline['total_paed_kp']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D15',$get_patient_by_pipeline['total_paeds']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('B16',$get_patient_by_pipeline['total_kemsa']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('C16',$get_patient_by_pipeline['total_kp']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D16',$get_patient_by_pipeline['total']);
+		//ADULTS PATIENTS BY ART REGIMEN
+		$sum_adult = array_sum($get_patient_art);
+		if($sum_adult==0){
+			$sum_adult=1;
+		}
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G9',$get_patient_art[0]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H9',($get_patient_art[0]/$sum_adult));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G10',$get_patient_art[1]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H10',($get_patient_art[1]/$sum_adult));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G11',$get_patient_art[2]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H11',($get_patient_art[2]/$sum_adult));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G12',$get_patient_art[3]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H12',($get_patient_art[3]/$sum_adult));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G13',$get_patient_art[4]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H13',($get_patient_art[4]/$sum_adult));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G14',$get_patient_art[5]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H14',($get_patient_art[5]/$sum_adult));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G15',$get_patient_art[6]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H15',($get_patient_art[6]/$sum_adult));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G16',$get_patient_art[7]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H16',($get_patient_art[7]/$sum_adult));
+		//PAEDS PATIENTS BY ART REGIMEN
+		$sum_paeds = array_sum($get_patient_art_paed);
+		if($sum_paeds==0){
+			$sum_paeds=1;
+		}
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G18',$get_patient_art_paed[0]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H18',($get_patient_art_paed[0]/$sum_paeds));
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G19',$get_patient_art_paed[1]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H19',$get_patient_art_paed[1]/$sum_paeds);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G20',$get_patient_art_paed[2]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H20',$get_patient_art_paed[2]/$sum_paeds);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G21',$get_patient_art_paed[3]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H21',$get_patient_art_paed[3]/$sum_paeds);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G22',$get_patient_art_paed[4]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H22',$get_patient_art_paed[4]/$sum_paeds);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G23',$get_patient_art_paed[5]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H23',$get_patient_art_paed[5]/$sum_paeds);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G24',$get_patient_art_paed[6]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H24',$get_patient_art_paed[6]/$sum_paeds);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('G25',$get_patient_art_paed[7]);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('H25',$get_patient_art_paed[7]/$sum_paeds);
+		return $objPHPExcel;
+		
 	}
 
 	public function generateExcelDefaultStyle($title = "") {
 		$dir = "Export";
 		$inputFileType = 'Excel5';
-		$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/template/excel.xls';
+		$inputFileName = $_SERVER['DOCUMENT_ROOT'] . "/NASCOP/assets/template/excel.xls";
 		$objReader = PHPExcel_IOFactory::createReader($inputFileType);
 		$objPHPExcel = $objReader -> load($inputFileName);
 		/*Delete all files in export folder*/
@@ -1069,8 +1282,9 @@ class Dashboard_Management extends MY_Controller {
 		echo $this -> showTable($columns, $result, $links, $table_name);
 	}
 
-	public function getPatients($type = "ART_PATIENT", $period = "", $county = "", $facility = "") {
+	public function getPatients($type = "ART_PATIENT", $period = "", $county = "", $facility = "",$get_type="") {
 		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
+		$conditions = "";
 		if ($period == '') {
 			$current_period = date('Y-m-01', strtotime("-1 month"));
 			$join_maps = "INNER JOIN maps m ON m.id=mi.maps_id";
@@ -1079,6 +1293,10 @@ class Dashboard_Management extends MY_Controller {
 			$current_period = date('Y-m-01', strtotime($period));
 			$join_maps = "INNER JOIN maps m ON m.id=mi.maps_id";
 			$and = "AND m.period_begin='$current_period'";
+		}
+		
+		if($county!=""){
+			$conditions.=" AND c.id=$county";
 		}
 
 		$data = array();
@@ -1094,38 +1312,47 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN escm_regimen er ON er.id = mi.regimen_id
+							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = er.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NOT NULL 
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'";
+							AND sc.name NOT LIKE '%delete%'
+							$conditions";
 			//Non standard regimens
 			$sql_adult_kp_nr = "SELECT SUM( mi.total ) AS total_adult_kp
 							FROM nonstandard_maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN nonstandard_regimen er ON er.id = mi.regimen_id
+							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = er.category
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NOT NULL 
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'";
+							AND sc.name NOT LIKE '%delete%'
+							$conditions";
 
 			$sql_paed_kp = "SELECT SUM( mi.total ) AS total_paed_kp
 							FROM maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN escm_regimen er ON er.id = mi.regimen_id
+							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = er.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NOT NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
-							AND sc.name NOT LIKE '%delete%'";
+							AND sc.name NOT LIKE '%delete%'
+							$conditions";
 
 			//Non standard regimens pead
 			$sql_paed_kp_nr = "SELECT SUM( mi.total ) AS total_paed_kp
@@ -1133,12 +1360,15 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN nonstandard_regimen er ON er.id = mi.regimen_id
+							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = er.category
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NOT NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
-							AND sc.name NOT LIKE '%delete%'";
+							AND sc.name NOT LIKE '%delete%'
+							$conditions";
 
 			$query1 = $this -> db -> query($sql_adult_kp);
 			$query2 = $this -> db -> query($sql_paed_kp);
@@ -1175,38 +1405,47 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN nonstandard_regimen sr ON sr.id = mi.regimen_id
+							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = sr.category
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NULL 
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'";
+							AND sc.name NOT LIKE '%delete%'
+							$conditions";
 
 			$sql_adult_kem = "SELECT SUM( mi.total ) AS total_adult_kemsa
 							FROM maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN sync_regimen sr ON sr.id = mi.regimen_id
+							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = sr.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NULL 
 							AND sc.name LIKE  '%adult%'
 							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'";
+							AND sc.name NOT LIKE '%delete%'
+							$conditions";
 
 			$sql_paed_kem_nr = "SELECT SUM( mi.total ) AS total_paed_kemsa
 							FROM nonstandard_maps_item mi
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN nonstandard_regimen sr ON sr.id = mi.regimen_id
+							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = sr.category
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
 							AND sc.name NOT LIKE '%delete%'
+							$conditions
 							";
 
 			$sql_paed_kem = "SELECT SUM( mi.total ) AS total_paed_kemsa
@@ -1214,12 +1453,15 @@ class Dashboard_Management extends MY_Controller {
 							LEFT JOIN maps m ON m.id = mi.maps_id
 							LEFT JOIN escm_maps em ON em.maps_id = m.id
 							LEFT JOIN sync_regimen sr ON sr.id = mi.regimen_id
+							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
 							LEFT JOIN sync_category sc ON sc.id = sr.category_id
 							WHERE m.period_begin =  '" . $current_period . "'
 							$and_check_maps
 							AND em.maps_id IS NULL 
 							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
 							AND sc.name NOT LIKE '%delete%'
+							$conditions
 							";
 
 			$query1 = $this -> db -> query($sql_adult_kem);
@@ -1256,6 +1498,22 @@ class Dashboard_Management extends MY_Controller {
 			$total_adults = $tot_adult_kemsa + $tot_adult_kp;
 			$total_paeds = $tot_paed_kemsa + $tot_paed_kp;
 			$grand_total = $total_adults + $total_paeds;
+			
+			if($get_type=="two_pager_download"){//If downlading two pager data
+				$data =  array(
+							  "total"=>$grand_total,
+							  "total_kemsa"=>$total_kemsa,
+							  "total_kp"=>$total_kp,
+							  "total_adults"=>$total_adults,
+							  "total_paeds"=>$total_paeds,
+							  "total_adult_kemsa"=>$tot_adult_kemsa,
+							  "total_adult_kp"=>$tot_adult_kp,
+							  "total_paed_kemsa"=>$tot_paed_kemsa,
+							  "total_paed_kp"=>$tot_paed_kp
+								);
+				return $data;
+			}
+			
 			//Generate table for Number of Patients on ART
 			$tmpl = array('table_open' => '<table id="" class="table table-bordered table-striped dash_tables">');
 			$this -> table -> set_template($tmpl);
@@ -1356,6 +1614,7 @@ class Dashboard_Management extends MY_Controller {
 						foreach ($results as $value) {
 							if ($pipeline == "kemsa") {
 								$total = $value['total'];
+								
 								if ($index == "first_line") {
 									$value = strtoupper(str_replace(" ", "", $value['regimen_desc']));
 								} else if ($index == "second_line") {
@@ -1387,14 +1646,16 @@ class Dashboard_Management extends MY_Controller {
 			};
 
 			$values = array_map($add, $values1, $values2);
-
-			echo "<pre>";
-			print_r($values);
-			echo "</pre>";
+			//echo "<pre>";
+			//print_r($values);
+			//echo "</pre>";
 
 			$resultArray = array( array('name' => 'Number of Patients', 'data' => $values));
 			foreach ($regimens as $key => $value) {
 				$categories[$key] = $value;
+			}
+			if($get_type=="two_pager_download"){//If downlading two pager data
+				return $values;
 			}
 
 			$resultArray = json_encode($resultArray);
@@ -1531,7 +1792,10 @@ class Dashboard_Management extends MY_Controller {
 			};
 
 			$values = array_map($add, $values1, $values2);
-
+			
+			if($get_type=="two_pager_download"){//If downlading two pager data
+				return $values;
+			}
 			$regimens = array("AZT+3TC+NVP", "AZT+3TC+EFV", "ABC+3TC+NVP", "ABC+3TC+EFV", "ABC+3TC+LPv/r", "AZT+3TC+LPv/r", "2ND LINE", "OTHER REGIMENS");
 
 			$resultArray = array( array('name' => 'Number of Patients', 'data' => $values));
@@ -1845,7 +2109,7 @@ class Dashboard_Management extends MY_Controller {
 
 	public function showTable($columns, $data = array(), $links = array(), $table_name = "") {
 		$this -> load -> library('table');
-		$tmpl = array('table_open' => '<table id=' . $table_name . '_listing class="table table-bordered table-striped tbl_nat_dashboard">');
+		$tmpl = array('table_open' => '<table id="' . $table_name . '_listing" class="table table-bordered table-striped tbl_nat_dashboard">');
 		$this -> table -> set_template($tmpl);
 		$this -> table -> set_heading($columns);
 		$link_values = "";
@@ -2144,8 +2408,8 @@ class Dashboard_Management extends MY_Controller {
 		echo $this -> showTable($columns, $total_data, $links = array(), $table_name = "satellites");
 	}
 
-	public function adult_patients($period = "", $facility = 0, $county = 0) {
-		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
+	public function adult_patients($period = "", $facility = 0, $county = 0,$get_type="") {
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND sr.name NOT LIKE  '%pep%' ";
 		$conditions = "";
 		$regimens = array();
 
@@ -2165,10 +2429,10 @@ class Dashboard_Management extends MY_Controller {
 		$regimens["OTHER REGIMENS"] = 0;
 
 		if ($facility != 0) {
-			$conditions .= "AND m.facility_id='$facility'";
+			$conditions .= " AND m.facility_id='$facility'";
 		}
 		if ($county != 0) {
-			$conditions .= "AND c.id='$county'";
+			$conditions .= " AND c.id='$county'";
 		}
 		//scripts
 		$sql1_kp = "SELECT er.name,SUM(mi.total) as total
@@ -2178,6 +2442,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
@@ -2192,13 +2457,16 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
 						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
 						 $conditions";
-
-		$sql3_kp = "SELECT 'OTHER REGIMENS' as name,SUM(mi.total) as total
+		//Other regimens includiing non standard regimens
+		$sql3_kp = "SELECT 'OTHER REGIMENS' as name,SUM(total_adult_kp) as total
+					FROM(
+					SELECT SUM(mi.total) as total_adult_kp
 						 FROM maps_item mi 
 						 LEFT JOIN maps m ON m.id=mi.maps_id
 						 LEFT JOIN escm_maps em ON em.maps_id = m.id
@@ -2209,8 +2477,25 @@ class Dashboard_Management extends MY_Controller {
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
-						 AND sr.name LIKE '%Other Adult Regimen%'
-						 $conditions";
+						 AND sr.name LIKE '%adult%' AND er.code NOT IN('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B','AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
+						 $conditions
+						 
+					UNION ALL
+					
+						SELECT SUM( mi.total ) AS total_adult_kp
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
+							LEFT JOIN sync_category sr ON sr.id = nsr.category
+							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
+							LEFT JOIN counties c ON c.id=ef.county_id
+							WHERE m.period_begin =  '$period'
+							$and_check_maps
+							AND em.maps_id IS NOT NULL 
+							AND sr.name LIKE  '%adult%'
+							$conditions
+					) as table1";
 
 		$sql1_ke = "SELECT er.name,SUM(mi.total) as total
 						 FROM maps_item mi 
@@ -2219,6 +2504,7 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
 						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NULL 
@@ -2233,13 +2519,15 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
 						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NULL 
 						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
 						 $conditions";
-
-		$sql3_ke = "SELECT 'OTHER REGIMENS' as name,SUM(mi.total) as total
+		//Other regimens includiing non standard regimens
+		$sql3_ke = "SELECT 'OTHER REGIMENS' as name,SUM(total_adult_kemsa) as total
+					FROM(SELECT SUM(mi.total) as total_adult_kemsa
 						 FROM maps_item mi 
 						 LEFT JOIN maps m ON m.id=mi.maps_id
 						 LEFT JOIN escm_maps em ON em.maps_id = m.id
@@ -2250,8 +2538,25 @@ class Dashboard_Management extends MY_Controller {
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NULL 
-						 AND sr.name LIKE '%Other Adult Regimen%'
-						 $conditions";
+						 AND sr.name LIKE '%adult%' AND er.code NOT IN('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B','AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
+						 $conditions
+						 
+						 UNION ALL
+					
+						SELECT SUM( mi.total ) AS total_adult_kemsa
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
+							LEFT JOIN sync_category sr ON sr.id = nsr.category
+							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+							LEFT JOIN counties c ON c.id=ef.county_id
+							WHERE m.period_begin =  '$period'
+							$and_check_maps
+							AND em.maps_id IS NULL 
+							AND sr.name LIKE  '%adult%'
+							$conditions
+					) as table1";
 
 		//execute first lines of both
 		$query1 = $this -> db -> query($sql1_kp);
@@ -2315,6 +2620,11 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($regimens as $regimen) {
 			$values[] = (int)$regimen;
 		}
+		
+		if($get_type=="two_pager_download"){//If downlading two pager data
+			return $values;
+		}
+		
 		$resultArray = array( array('name' => 'Number of Patients', 'data' => $values));
 		$resultArray = json_encode($resultArray);
 		$categories = json_encode($categories);
@@ -2329,8 +2639,8 @@ class Dashboard_Management extends MY_Controller {
 		$this -> load -> view('dashboard/chart_report_bar_v', $data);
 	}
 
-	public function paed_patients($period = "", $facility = 0, $county = 0) {
-		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' ";
+	public function paed_patients($period = "", $facility = 0, $county = 0,$get_type="") {
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND sr.name NOT LIKE  '%pep%'";
 		$conditions = "";
 		$regimens = array();
 
@@ -2363,10 +2673,11 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
-						 AND er.code IN ('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B')
+						 AND er.code IN ('CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
 						 $conditions
 						 GROUP BY er.code";
 
@@ -2377,13 +2688,18 @@ class Dashboard_Management extends MY_Controller {
 						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
 						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
 						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
 						 AND er.code IN ('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
 						 $conditions";
-
-		$sql3_kp = "SELECT 'OTHER REGIMENS' as name,SUM(mi.total) as total
+		
+		//Other regimens, including non standard regimens
+		$sql3_kp = "SELECT 'OTHER REGIMENS' as name,SUM(total_paed_kp) as total
+						 FROM 
+						 (
+						 SELECT SUM(mi.total) as total_paed_kp
 						 FROM maps_item mi 
 						 LEFT JOIN maps m ON m.id=mi.maps_id
 						 LEFT JOIN escm_maps em ON em.maps_id = m.id
@@ -2394,37 +2710,27 @@ class Dashboard_Management extends MY_Controller {
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NOT NULL 
-						 AND sr.name LIKE '%Other Paediatric ART Regimen%'
-						 $conditions";
-
-		$sql1_ke = "SELECT er.name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND er.code IN ('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B')
+						 AND sr.name LIKE '%Paediatric%' AND er.code NOT IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B','CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
 						 $conditions
-						 GROUP BY er.code";
-
-		$sql2_ke = "SELECT '2ND LINE' as name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND er.code IN ('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
-						 $conditions";
-
-		$sql3_ke = "SELECT 'OTHER REGIMENS' as name,SUM(mi.total) as total
+						 
+						 UNION ALL
+						 
+						 SELECT SUM( mi.total ) AS total_paed_kp
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
+							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
+							LEFT JOIN sync_category sr ON sr.id = nsr.category
+							WHERE m.period_begin =  '$period'
+							$and_check_maps
+							AND em.maps_id IS NOT NULL 
+							AND (sr.name LIKE  '%paediatric%' OR sr.name LIKE  '%pediatric%')
+							$conditions
+						) as table1
+						 ";
+		$sql1_ke = "SELECT er.name,SUM(mi.total) as total
 						 FROM maps_item mi 
 						 LEFT JOIN maps m ON m.id=mi.maps_id
 						 LEFT JOIN escm_maps em ON em.maps_id = m.id
@@ -2435,9 +2741,58 @@ class Dashboard_Management extends MY_Controller {
 						 WHERE m.period_begin='$period'
 						 $and_check_maps
 						 AND em.maps_id IS NULL 
-						 AND sr.name LIKE '%Other Paediatric ART Regimen%'
+						 AND er.code IN ('CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
+						 $conditions
+						 GROUP BY er.code";
+
+		$sql2_ke = "SELECT '2ND LINE' as name,SUM(mi.total) as total
+						 FROM maps_item mi 
+						 LEFT JOIN maps m ON m.id=mi.maps_id
+						 LEFT JOIN escm_maps em ON em.maps_id = m.id
+						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
+						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
+						 WHERE m.period_begin='$period'
+						 $and_check_maps
+						 AND em.maps_id IS NULL 
+						 AND er.code IN ('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
 						 $conditions";
 
+		$sql3_ke = "SELECT 'OTHER REGIMENS' as name,SUM(total_paed_kemsa) as total
+						 FROM 
+						 (
+						 SELECT SUM(mi.total) as total_paed_kemsa
+						 FROM maps_item mi 
+						 LEFT JOIN maps m ON m.id=mi.maps_id
+						 LEFT JOIN escm_maps em ON em.maps_id = m.id
+						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
+						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+						 LEFT JOIN counties c ON c.id=ef.county_id
+						 LEFT JOIN sync_category sr ON sr.id=er.category_id
+						 WHERE m.period_begin='$period'
+						 $and_check_maps
+						 AND em.maps_id IS NULL 
+						 AND (sr.name LIKE  '%paediatric%' OR sr.name LIKE  '%pediatric%') AND er.code NOT IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B','CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
+						 $conditions
+						 
+						 UNION ALL
+						 
+						 SELECT SUM( mi.total ) AS total_paed_kemsa
+							FROM nonstandard_maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN escm_maps em ON em.maps_id = m.id
+							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
+							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
+						 	LEFT JOIN counties c ON c.id=ef.county_id
+							LEFT JOIN sync_category sr ON sr.id = nsr.category
+							WHERE m.period_begin =  '$period'
+							$and_check_maps
+							AND em.maps_id IS NULL 
+							AND (sr.name LIKE  '%paediatric%' OR sr.name LIKE  '%pediatric%')
+							$conditions
+						 ) as table1
+						 ";
 		//execute first lines of both
 		$query1 = $this -> db -> query($sql1_kp);
 		$query2 = $this -> db -> query($sql1_ke);
@@ -2499,6 +2854,11 @@ class Dashboard_Management extends MY_Controller {
 		foreach ($regimens as $regimen) {
 			$values[] = (int)$regimen;
 		}
+		
+		if($get_type=="two_pager_download"){//If downlading two pager data
+			return $values;
+		}
+		
 		$resultArray = array( array('name' => 'Number of Patients', 'data' => $values));
 		$resultArray = json_encode($resultArray);
 		$categories = json_encode($categories);
@@ -2515,23 +2875,82 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function two_pager() {
-
-		$files = Two_pager::getAllHydrated();
-		$list = '<table class="table table-bordered table-striped tbl_nat_dashboard" id="TWO_PAGER">
-	    			<thead>
-	    				<tr><th>No</th><th> Period</th><th>Action</th></tr>
-	    			</thead>
-	    			<tbody>';
-
-		$x = 1;
-		foreach ($files as $value) {
-			$list .= '<tr><td>' . $x . '</td><td>Stock Situation ' . $value['period'] . '</td><td><a href="' . base_url() . $value['link'] . '">Download</a></td></tr>';
-			$x++;
+		$columns = array('#', 'Reporting Period', 'Action');
+		$links = array('dashboard_management/download/two_pager' => '<i class="icon-download-alt"></i>download');
+		//Get eSCM orders
+		$escm_patients = Escm_Maps::getAll();
+		$list = "";
+		$order_list = array();
+		$maps_nascop = array();
+		$maps_escm = array();
+		$table_name = "TWO_PAGER";
+		$result = array();
+		if ($escm_patients) {
+			foreach ($escm_patients as $order_id) {
+				array_push($order_list, $order_id -> maps_id);
+			}
+			$list = "'" . implode("','", $order_list) . "'";
 		}
-		$list .= '				
-	    			</tbody>
-			    </table>';
-		echo $list;
+		$maps_nascop = Maps::getNascopPeriod($list);
+		$counter = 0;
+		foreach ($maps_nascop as $nascop) {
+			$result[$counter]['period'] = date('F-Y', strtotime($nascop['period_begin']));
+			$counter++;
+		}
+		$maps_escm = Maps::getEscmPeriod($list);
+		foreach ($maps_escm as $esm) {
+			$key = array_search('November-2013', $result);
+			$result[$counter]['period'] = date('F-Y', strtotime($esm['period_begin']));
+			$counter++;
+		}
+		$result = array_map("unserialize", array_unique(array_map("serialize", $result)));// Remove duplicates
+		echo $this -> showTable($columns, $result, $links, $table_name);
+		
+		
+	}
+	
+	public function county_report($type="period"){
+		if($type=="period"){//Get periods reported
+			//Get eSCM orders
+			$escm_patients = Escm_Maps::getAll();
+			$list = "";
+			$order_list = array();
+			$maps_nascop = array();
+			$maps_escm = array();
+			$result = array();
+			if ($escm_patients) {
+				foreach ($escm_patients as $order_id) {
+					array_push($order_list, $order_id -> maps_id);
+				}
+				$list = "'" . implode("','", $order_list) . "'";
+			}
+			$maps_nascop = Maps::getNascopPeriod($list);
+			$counter = 0;
+			foreach ($maps_nascop as $nascop) {
+				$result[$counter]= date('F-Y', strtotime($nascop['period_begin']));
+				$counter++;
+			}
+			$maps_escm = Maps::getEscmPeriod($list);
+			foreach ($maps_escm as $esm) {
+				$result[$counter]= date('F-Y', strtotime($esm['period_begin']));
+				$counter++;
+			}
+			$result = array_map("unserialize", array_unique(array_map("serialize", $result)));// Remove duplicates
+			$data = "";
+			foreach ($result as $key => $value) {
+				$data.="<option value='".$value."'>".$value."</option>";
+			}
+			echo $data;
+		}else if($type=="counties"){//Load counties 
+			$counties = Counties::getActive();
+			$data = "";
+			foreach ($counties as $key => $value) {
+				$data.="<option value='".$value['id']."'>".$value['county']."</option>";
+			}
+			echo $data;
+		}
+		
+		
 	}
 
 	public function fix_bug($periods = array()) {
@@ -2551,6 +2970,69 @@ class Dashboard_Management extends MY_Controller {
 			array_unshift($periods, array('id' => $current_selection, 'period_begin' => $current_selection));
 		}
 		return $periods;
+	}
+	
+	
+	public function getClosestReportingPeriod($facility_id="",$type="",$conditions="",$period=""){//get closest reporting period for facility(facilty id, maps or cdrr)
+		if($facility_id!=""){
+			if($type="maps m"){
+				$sql = "SELECT m.period_begin 
+						FROM $type WHERE facility_id ='$facility_id'
+						AND m.period_begin<'$period'  $conditions  ORDER BY m.period_begin DESC LIMIT 1";
+				
+			}else if($type="cdrr c"){
+				
+			}
+			$query = $this ->db ->query($sql);
+			$result = $query ->result_array();
+			if(count($result)>0){
+				return $result[0]['period_begin'];
+			}else{
+				return "";
+			}
+			
+		}
+	}
+	
+	public function getTotalPatientByART($regimen_table='',$facility_table='',$period_begin='',$and_check_maps='',$id='',$and=''){//Get total number of patients by Regimen for a facility for a certain period
+		if($period_begin!=''){
+			//Get regimen list
+			$sql_regimen = "
+							SELECT r.id,r.code, r.old_code, r.name,IFNULL(tabl.total,0) as total  FROM $regimen_table r
+							LEFT JOIN 
+							(
+							SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id
+							FROM maps_item mi
+							LEFT JOIN maps m ON m.id = mi.maps_id
+							LEFT JOIN $regimen_table r ON r.id = mi.regimen_id
+							LEFT JOIN $facility_table f ON f.id = m.facility_id
+							WHERE m.period_begin =  '$period_begin'
+							$and_check_maps
+							AND m.facility_id=$id
+							$and
+							) tabl ON tabl.reg_id=r.id
+							ORDER BY r.id
+							";
+			//echo $sql_regimen;die();
+			$query = $this -> db -> query($sql_regimen);
+			$results = $query -> result_array();
+			return $results;
+			
+		}
+		
+	}
+	
+	function deleteAllFiles($directory=""){
+		if($directory!=""){
+			foreach(glob("{$directory}/*") as $file)
+		    {
+		        if(is_dir($file)) { 
+		            deleteAllFiles($file);
+		        } else {
+		            unlink($file);
+		        }
+		    }
+		}
 	}
 
 	public function base_params($data) {
