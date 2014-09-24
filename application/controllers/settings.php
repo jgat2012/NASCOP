@@ -1,6 +1,6 @@
 <?php
 class settings extends MY_Controller {
-	var $esm_url = "https://api.kenyapharma.org/";
+	var $esm_url = "http://api.kenyapharma.org/";
 	var $eid_url = "http://nascop.org/eid/";
 	function __construct() {
 		parent::__construct();
@@ -690,7 +690,6 @@ class settings extends MY_Controller {
 		$password = "poltergeist";
 		$curl -> setBasicAuthentication($username, $password);
 		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
-		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
 
 		foreach ($links as $table => $link) {
 			$target_url = $url . $link;
@@ -733,7 +732,6 @@ class settings extends MY_Controller {
 		$password = "poltergeist";
 		$curl -> setBasicAuthentication($username, $password);
 		$curl -> setOpt(CURLOPT_RETURNTRANSFER, TRUE);
-		$curl -> setOpt(CURLOPT_SSL_VERIFYPEER, FALSE);
 
 		foreach ($links as $link) {
 			$target_url = $url . $link;
