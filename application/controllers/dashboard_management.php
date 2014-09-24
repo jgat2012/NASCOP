@@ -1105,6 +1105,67 @@ class Dashboard_Management extends MY_Controller {
 				$x++;
 			}
 			
+			//Commodities -- Issues
+			$sql = "
+				SELECT tabl1.name,tabl1.pack_size,tabl1.unit,tabl1.price_pack,tabl1.comments,SUM(tabl1.total) as total 
+				FROM(
+					(SELECT ci.drug_id,dc.name,dc.id,dc.pack_size,dc.unit,dc.price_pack,dc.comments, SUM(ci.resupply) as total  FROM cdrr_item ci
+					INNER JOIN cdrr c ON c.id = ci.cdrr_id
+					INNER JOIN sync_drug sd ON sd.id = ci.drug_id
+					INNER JOIN sync_facility ef ON ef.id = c.facility_id
+					LEFT JOIN escm_orders o ON o.cdrr_id = c.id
+					LEFT JOIN drugcode dc ON dc.n_map = sd.id
+					WHERE `status` LIKE '%dispatch%' AND `period_begin` = '$period_begin'
+					AND ef.county_id =  '$county_id' AND ci.resupply !=0
+					AND o.cdrr_id IS NULL
+					AND dc.name IS NOT NULL
+					GROUP BY ci.drug_id
+					ORDER BY `c`.`facility_id` ASC
+					)
+					UNION ALL
+					
+					(SELECT ci.drug_id,dc.name,dc.id,dc.pack_size,dc.unit,dc.price_pack,dc.comments, SUM(ci.resupply) as total  FROM cdrr_item ci
+					INNER JOIN cdrr c ON c.id = ci.cdrr_id
+					INNER JOIN escm_drug sd ON sd.id = ci.drug_id
+					INNER JOIN escm_facility ef ON ef.id = c.facility_id
+					LEFT JOIN escm_orders o ON o.cdrr_id = c.id
+					LEFT JOIN drugcode dc ON dc.n_map = sd.id
+					WHERE `status` LIKE '%dispatch%' AND `period_begin` = '$period_begin'
+					AND ef.county_id =  '$county_id' AND ci.resupply !=0
+					AND o.cdrr_id IS NOT NULL
+					AND dc.name IS NOT NULL
+					GROUP BY ci.drug_id
+					ORDER BY `c`.`facility_id` ASC
+					)
+				) as tabl1	
+				GROUP BY tabl1.drug_id	
+			";
+			//echo $sql;die();
+			$query = $this ->db ->query($sql);
+			$result2 = $query ->result_array();
+			$y = '4';
+			$sheet = $objPHPExcel->getSheet(2);
+			$sheet_title = "COMMODITIES - ISSUES : ".$countyname;
+			$sheet -> SetCellValue("A1",$sheet_title);
+			foreach ($result2 as $key => $value) {
+				$name = $value['name'];
+				$unit = $value['unit'];
+				$pack_size = $value['pack_size'];
+				$price = $value['price_pack'];
+				$total = $value['total'];
+				if($price==NULL || $price==''){
+					$price=0;
+				}
+				$total_price = $price * $price;
+				$sheet -> SetCellValue("A".$y,$name);//Commodity
+				$sheet -> SetCellValue("B".$y,$unit);//Unit
+				$sheet -> SetCellValue("C".$y,$pack_size);//Pack Size
+				$sheet -> SetCellValue("D".$y,$total);//Amount
+				$sheet -> SetCellValue("E".$y,$price);//Unit Price($)
+				//$sheet -> SetCellValue("D".$y,$total_price);//Total Price
+				$y++;
+			}
+			
 			ob_start();
 			$county_details = Counties::getCountyDetails($county);
 			$countyname = $county_details[0]['county'];
