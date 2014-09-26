@@ -713,6 +713,7 @@ class Dashboard_Management extends MY_Controller {
 						GROUP BY mi.regimen_id ORDER BY r.code,reg_name ) tabl ON tabl.cat_id=c.id
 						WHERE c.name NOT LIKE '%delete%'
 						";
+			echo $sql_regimen;die();
 			$query = $this -> db -> query($sql_regimen);
 			$results = $query -> result_array();
 
@@ -1005,15 +1006,18 @@ class Dashboard_Management extends MY_Controller {
 			
 			//Generate file
 			ob_start();
-			$filename = 'twopager '.$period.'.xlsx';
+			$filename = ucfirst('two pager for '.$period).'.xlsx';
 			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
+			$this ->deleteAllFiles($_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir/');//Delete all files in folder first
 			$objWriter -> save($_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir/'.$filename);
 			$objPHPExcel -> disconnectWorksheets();
 			unset($objPHPExcel);
-			$file = $_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir'.$filename;
+			$file = $_SERVER['DOCUMENT_ROOT'].'/NASCOP/assets/template/dir/'.$filename;
+			
 			if (file_exists($file)) {
 				redirect(base_url().'assets/template/dir/'.$filename);
 			}
+			
 		}elseif($type=="county_report"){//Download county reports
 			
 			$period_array = explode("-", $period);
@@ -1185,9 +1189,9 @@ class Dashboard_Management extends MY_Controller {
 
 	}
 	
-	public function getPatientsExcel($template='',$period='',$county='1',$get_patient_by_pipeline='',$get_patient_art='',$get_patient_art_paed=''){
+	public function getPatientsExcel($template='',$period='',$county=0,$get_patient_by_pipeline='',$get_patient_art='',$get_patient_art_paed=''){
 		$countyname = "";
-		if($county!=""){
+		if($county!=0){
 			$county_details = Counties::getCountyDetails($county);
 			$countyname = $county_details[0]['county'];
 			$countyname = ' : '.strtoupper($countyname). ' COUNTY';
@@ -1252,7 +1256,90 @@ class Dashboard_Management extends MY_Controller {
 		$objPHPExcel -> getActiveSheet() -> SetCellValue('H24',$get_patient_art_paed[6]/$sum_paeds);
 		$objPHPExcel -> getActiveSheet() -> SetCellValue('G25',$get_patient_art_paed[7]);
 		$objPHPExcel -> getActiveSheet() -> SetCellValue('H25',$get_patient_art_paed[7]/$sum_paeds);
+		
+		//Get Average Scale Up Rate(12months rolling) for ART
+		$avgscale_data = $this ->getAverageScaleUpART($county,$period);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('A17','D. Average scale-up rate (12 months rolling) for ART: '.$avgscale_data['total_avg'].' patients per month');
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D18',$avgscale_data['tot_avg_kemsa']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('B19',$avgscale_data['avg_adult_kemsa']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D19',$avgscale_data['avg_paeds_kemsa']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D20',$avgscale_data['tot_avg_kp']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('D21',$avgscale_data['avg_paeds_kp']);
+		$objPHPExcel -> getActiveSheet() -> SetCellValue('B21',$avgscale_data['avg_adult_kp']);
 		return $objPHPExcel;
+		
+	}
+	
+	public function getAverageScaleUpART($county=0,$period=''){
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' ";
+		$conditions = "";
+		$data  = "";
+		$period_begin = date('Y-m-01', strtotime($period));
+		if($county!=0){
+			$county_details = Counties::getCountyDetails($county);
+			$countyname = $county_details[0]['county'];
+			$countyname = ' : '.strtoupper($countyname). ' COUNTY';
+			$conditions = " AND f.county_id = '$county'";
+		}
+		$twelvemonthback = date("Y-m-01", strtotime( date( $period_begin )." -12 months"));
+		//Kenya Pharma
+		$sql_kp = "SELECT SUM( m.art_adult ) AS tot_adult, SUM( m.art_child ) AS tot_paeds, m.period_begin
+				FROM maps m
+				LEFT JOIN escm_facility f ON f.id = m.facility_id
+				LEFT JOIN escm_maps em ON em.maps_id = m.id
+				WHERE m.status NOT LIKE  '%delete%'
+				AND m.status NOT LIKE  '%prepare%'
+				AND m.status NOT LIKE  '%receive%'
+				AND (
+				m.period_begin
+				BETWEEN  '$twelvemonthback'
+				AND  '$period_begin'
+				)
+				AND em.maps_id IS NOT NULL
+				$conditions";
+		$query = $this ->db ->query($sql_kp);
+		$result1 = $query ->result_array();
+		$count = count($result1);
+		
+		$tot_adult_kp = $result1[0]['tot_adult'];
+		$tot_paeds_kp = $result1[0]['tot_paeds'];
+		$avg_adult_kp = (int)($tot_adult_kp/12);
+		$avg_paeds_kp = (int)($tot_paeds_kp/12);
+		$tot_avg_kp = $avg_adult_kp + $avg_paeds_kp;
+		
+		//Kemsa
+		$sql_kemsa = "SELECT SUM( m.art_adult ) AS tot_adult, SUM( m.art_child ) AS tot_paeds, m.period_begin
+				FROM maps m
+				LEFT JOIN sync_facility f ON f.id = m.facility_id
+				LEFT JOIN escm_maps em ON em.maps_id = m.id
+				WHERE m.status NOT LIKE  '%delete%'
+				AND m.status NOT LIKE  '%prepare%'
+				AND m.status NOT LIKE  '%receive%'
+				AND (
+				m.period_begin
+				BETWEEN  '$twelvemonthback'
+				AND  '$period_begin'
+				)
+				AND em.maps_id IS NULL
+				$conditions";
+		$query = $this ->db ->query($sql_kemsa);
+		$result2 = $query ->result_array();
+		$count = count($result2);
+		
+		$tot_adult_kemsa = $result2[0]['tot_adult'];
+		$tot_paeds_kemsa = $result2[0]['tot_paeds'];
+		$avg_adult_kemsa = (int)($tot_adult_kemsa/12);
+		$avg_paeds_kemsa = (int)($tot_paeds_kemsa/12);
+		$tot_avg_kemsa = $avg_adult_kemsa + $avg_paeds_kemsa;
+		
+		$data['avg_adult_kemsa'] = $avg_adult_kemsa;
+		$data['avg_adult_kp'] = $avg_adult_kp;
+		$data['avg_paeds_kemsa'] = $avg_paeds_kemsa;
+		$data['avg_paeds_kp'] = $avg_paeds_kp;
+		$data['tot_avg_kemsa'] = $tot_avg_kemsa;
+		$data['tot_avg_kp'] = $tot_avg_kp;
+		$data['total_avg'] = number_format($tot_avg_kemsa + $tot_avg_kp);
+		return $data;
 		
 	}
 
