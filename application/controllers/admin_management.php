@@ -704,6 +704,33 @@ class admin_management extends MY_Controller {
 		// Return string with times
 		return implode(", ", $times);
 	}
+	public function guidelineUpload(){
+		$this -> load -> helper('file');
+		$this->load->library('upload');
+		$path = "./assets/guidelines/";
+		$files = $_FILES["files"];
+		//echo var_dump($path);die();
+		$title = "Guideline";
+		$this->upload->initialize(array(
+	        "upload_path"   => $path,
+	        'allowed_types' => 'doc|docx|xls|xlsx|pdf',
+	    ));
+
+       // $this->load->library('upload', $config);
+
+         //Perform upload.
+        if($this->upload->do_multi_upload('files')){
+            //Code to run upon successful upload.
+            //print_r($this->upload->get_multi_upload_data());
+			$this ->session ->set_flashdata("message","<div class='alert alert-info'><button type='button' class='close' data-dismiss='alert'>&times;</button>Guidelines successfully uploaded</div>"); 
+        }else{
+        	$this ->session ->set_flashdata("message","<div class='alert alert-warning'><button type='button' class='close' data-dismiss='alert'>&times;</button>".$this->upload->display_errors()."</div>"); 
+        }
+		redirect("home_controller/home");
+	}	
+	
+	
+
 
 	public function base_params($data) {
 		$data['content_view'] = "admin/add_param_a";
