@@ -124,3 +124,29 @@
 </div>
 <!-- Modal Historical Reports upload end-->
 
+<!-- Modal Historical Reports upload password-->
+<div id="guideline_upload" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<form action="<?php echo base_url().'admin_management/guidelineUpload' ?>" method="post" enctype="multipart/form-data">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+				×
+			</button>
+			<h3 id="myModalLabel">Guidelines Uploads</h3>
+		</div>
+		<div class="modal-body">
+		    <div class="form-group">
+		      <label class="alert alert-info" >Please Select guidelines to upload (word,excel,pdf). You can select more than one file</label>
+		      <input type="file"  name="files[]" size="30" multiple="multiple"  required="required" accept=".xls, .xlsx, .pdf, .doc, .docx"/>
+		    </div>
+			  
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">
+				Cancel
+			</button>
+			<input type="submit" class="btn btn-primary" name="btn_submit" id="btn_submit" value="Save ">
+		</div>
+	</form>
+</div>
+<!-- Modal Historical Reports upload end-->
+

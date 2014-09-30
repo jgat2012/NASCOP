@@ -394,6 +394,7 @@ $(document).ready(function(){
 		
 		?>
 		<div class="center-content">
+			<?php echo @$this ->session ->flashdata("message");?>
 		<?php
 		$this->load->view('dashboard/pharmacist');
 		?>
