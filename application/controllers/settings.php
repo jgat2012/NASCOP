@@ -24,7 +24,7 @@ class settings extends MY_Controller {
 		if ($type == "sync_drug") {
 			$columns = array("id", "name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight", "category_id");
 		} else if ($type == "sync_facility") {
-			$columns = array("id", "code", "name", "category", "sponsors", "services", "district_id", "ordering", "service_point", "county_id");
+			$columns = array("id", "code", "name", "category", "sponsors", "services", "district_id", "ordering", "service_point", "county_id" ,"parent_id");
 		} else if ($type == "sync_regimen") {
 			$columns = array("id", "code", "name", "description", "old_code", "category_id");
 		} else if ($type == "sync_user") {
@@ -135,7 +135,7 @@ class settings extends MY_Controller {
 			$action_link = "delete";
 			$action_icon = "<i class='icon-remove'></i>";
 			foreach ($row as $i => $v) {
-				if ($i != "id" && $i !="casco_id"  && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
+				if ($i != "id" && $i !="parent_id" && $i !="casco_id"  && $i != "regimen_category" && $i != "facilitytype" && $i != "district" && $i != "supported_by" && $i != "service_art" && $i != "service_pmtct" && $i != "service_pep" && $i != "supplied_by" && $i != "parent" && $i != "map" && $i != "adt_site" && $i != "line" && $i != "type_of_service" && $i != "arv_drug" && $i != "n_map" && $i != "e_map" && $i != "map" && $i != "creator_id" && $i != "facility" && $i != "category_id" && $i != "status" && $i != "old_code" && $i != "district_id" && $i != "ordering" && $i != "service_point" && $i != "county_id" && $i != "sponsors" && $i != "active") {
 					if($type == "eid_mail" && $i =="code"){
 					     //null
 					}else{
@@ -207,12 +207,12 @@ class settings extends MY_Controller {
 				}
 				$links = "<a href='" . site_url("settings/modal") . "/" . $type . "' item_id='" . $id . "' class='edit_item' role='button' data-toggle='modal' data-mydata='" . json_encode($row) . "'><i class='icon-pencil'></i></a>";
 				$links .= "  ";
-				if ($type != "sync_facility" || $type != "gitlog") {
+				if ($type != "sync_facility" && $type != "gitlog") {
 					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
 				}
 			} else {
 				if ($type != "sync_facility" || $type != "gitlog") {
-					$links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
+				    $links .= anchor("settings/" . $action_link . "/" . $type . "/" . $id, $action_icon, array("class" => "delete"));
 				}
 			}
 			$myrow[] = $links;
@@ -229,7 +229,7 @@ class settings extends MY_Controller {
 		if ($type == "sync_drug") {
 			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight", "Category" => "category_id");
 		} else if ($type == "sync_facility") {
-			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district" => "district_id", "is ordering point?" => "ordering", " is service point?" => "service_point", "county" => "county_id");
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district" => "district_id", "is ordering point?" => "ordering", " is service point?" => "service_point", "county" => "county_id", "Parent Facility" => "parent_id");
 		} else if ($type == "sync_regimen") {
 			$inputs = array("code" => "code", "name" => "name", "description" => "description", "old_code" => "old_code");
 		} else if ($type == "sync_user") {
@@ -277,7 +277,15 @@ class settings extends MY_Controller {
 				$textfield = "<input type='hidden' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
 			} else if ($input == "email_address") {
 				$textfield = "<input type='email' required='required' id='" . $type . "_" . $input . "' name='" . $input . "'/>";
-			} else if ($input == "district_id") {
+			} else if ($input == "parent_id") {
+				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
+				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
+				$facilities = Sync_Facility::getAllHydrated();
+				foreach ($facilities as $facility) {
+					$textfield .= "<option value='" . $facility['id'] . "'>" . $facility['name'] . "</option>";
+				}
+				$textfield .= "</select>";
+			}else if ($input == "district_id") {
 				$textfield = "<select id='" . $type . "_" . $input . "' name='" . $input . "'>";
 				$textfield .= "<option value='0' selected='selected'>--Select One--</option>";
 				$districts = District::getActive();
@@ -484,7 +492,7 @@ class settings extends MY_Controller {
 		if ($type == "sync_drug") {
 			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight","category_id" => "Category");
 		} else if ($type == "sync_facility") {
-			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district_id" => "district_id", "ordering" => "ordering", "service_point" => "service_point", "county_id" => "county_id");
+			$inputs = array("code" => "code", "name" => "name", "category" => "category", "sponsors" => "sponsors", "services" => "services", "district_id" => "district_id", "ordering" => "ordering", "service_point" => "service_point", "county_id" => "county_id", "parent_id" => "parent_id");
 		} else if ($type == "sync_regimen") {
 			$inputs = array("code" => "code", "name" => "name", "description" => "description");
 		} else if ($type == "sync_user") {
