@@ -1745,6 +1745,7 @@ class Order extends MY_Controller {
 		if ($user_id) {
 			return $user_id['id'];
 		} else {
+			$details['password'] = md5("12345");
 			$this -> db -> insert("sync_user", $details);
 			return $this -> db -> insert_id();
 		}
