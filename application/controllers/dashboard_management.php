@@ -9,6 +9,41 @@ class Dashboard_Management extends MY_Controller {
 		ini_set('memory_limit', '2048M');
 		$this -> load -> library('PHPExcel');
 	}
+	function getAllFiles($directory='http://41.57.109.241/NASCOP/assets/guidelines/',$count='1'){
+		$ftp_server = "41.57.109.241";
+		$ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
+		$ftp_username = "Administrator";
+		$ftp_userpass = "ch@1server.";
+		$login = ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
+		
+		$local_file = "./assets/guidelines/";
+		$server_file = "http://41.57.109.241/NASCOP/assets/guidelines/2pager_template.xlsx";
+		
+		// download server file
+		if (ftp_get($ftp_conn, $local_file, $server_file, FTP_ASCII))
+		  {
+		  echo "Successfully written to $local_file.";
+		  }
+		else
+		  {
+		  echo "Error downloading $server_file.";
+		  }
+		
+		// close connection
+		ftp_close($ftp_conn);
+				
+		if($directory!=""){
+			echo count(glob("{$directory}/*"));
+			foreach(glob("{$directory}/*") as $file)
+		    {//Loop through directory to get files
+		        if(is_dir($file)) { //If content is folder, loop through it to get files
+		            getAllFiles($file,$count);
+		        } else {//If content is file, your download code should pull from here and file is the file name
+		            echo $count++;
+		        }
+		    }
+		}
+	}
 
 	public function index() {
 		$data['content_view'] = "home_v";
