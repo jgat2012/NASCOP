@@ -16,6 +16,8 @@ class Escm_Drug extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('escm_drug');
+		$this -> hasMany('escm_drug_merge as drug', array('local' => 'id', 'foreign' => 'drug_id'));
+		$this -> hasMany('escm_drug_merge as merged_with', array('local' => 'id', 'foreign' => 'merged_with'));
 	}
 
 	public function getAll() {
@@ -64,6 +66,22 @@ class Escm_Drug extends Doctrine_Record {
 		$query = Doctrine_Query::create() -> select("id") -> from("escm_drug") -> where("name='$drug_name'  $and") ->limit('1');
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug;
+	}
+	
+	public function getNotMergedDrugs(){
+		$query = Doctrine_Query::create() -> select("sdm.drug_id, d.name,d.abbreviation,d.strength,d.formulation,d.unit,d.packsize") 
+									      -> from("escm_drug d")-> leftJoin('d.drug sdm')-> where("sdm.drug_id IS NULL OR (sdm.drug_id=sdm.merged_with AND sdm.visible='1')");
+		$result = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		//return $query->getSqlQuery();
+		return $result;
+	}
+	
+	public function getDrugs(){
+		$query = Doctrine_Query::create() -> select("d.name,d.abbreviation,d.strength,d.formulation,d.unit,d.packsize") 
+									      -> from("escm_drug d");
+		$result = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		//return $query->getSqlQuery();
+		return $result;
 	}
 
 }

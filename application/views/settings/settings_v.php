@@ -1,3 +1,4 @@
+
 <style type="text/css">
 	.full-content {
 		width: 95%;
@@ -33,6 +34,9 @@
 				<li class="divider"></li>
 				<li class="nav-header">
 					eSCM SETTINGS
+				</li>
+				<li>
+					<a href="#" class="setting_link" id="escm_drug">eSCM DRUGS</a>
 				</li>
 				<li>
 					<a href="#" class="setting_link" id="escm_facility">eSCM FACILITIES</a>
@@ -98,10 +102,12 @@
 			</ul>
 			<!--Tables-->
 			<div class="row-fluid">
-				<div class="span2">
+				<div class="span5">
 					<a  href="<?php echo site_url("settings/modal/sync_drug");?>"  role="button" id="add_btn" class="btn btn-primary modal_btn" data-toggle="modal"><i class="icon-plus-sign"></i> <span id="create_setting"> add drug</span></a>
+					<a  href="<?php echo site_url("settings/modal/merge_drug");?>"  role="button" id="merge_drug_btn" class="btn btn-info modal_btn_merge" data-toggle="modal"><i class="icon-plus-sign"></i> <span id=""> Merge drugs</span></a>
+					<a  href="<?php echo site_url("settings/modal/merged_drug");?>"  role="button" id="merged_drug_btn" class="btn btn-success modal_btn_merged" data-toggle="modal"> <span id=""> Merged drugs</span></a>
 				</div>
-				<div class="span10">
+				<div class="span7">
 					<?php echo $this -> session -> flashdata("alert_message");?>
 				</div>
 			</div>
@@ -120,7 +126,7 @@
 						<button class="btn" data-dismiss="modal" aria-hidden="true">
 							Close
 						</button>
-						<button class="btn btn-primary">
+						<button class="btn btn-primary" id="btn_save">
 							Save changes
 						</button>
 					</div>
@@ -134,11 +140,15 @@
 		$("#facilities_map").searchable();
         var my_url = "<?php echo base_url(); ?>";
 		//default link
-		var type = "<?php if($this -> session -> userdata("nav_link") !=""){echo $this -> session -> userdata("nav_link");}else{echo "sync_drug";} ?>";
+		var type = "sync_drug";
+		//var type = "<?php if($this -> session -> userdata("nav_link")){
+								if($this -> session -> userdata("nav_link")!=""){echo $this -> session -> userdata("nav_link");
+									}}
+					   ?>";
 		var url = my_url + "settings/get/" + type;		
 		var div_id = "#table_grid";
 		getTable(type, url, div_id);
-
+		
 		//set default active in nav list
 		$("#settings_list>li").removeClass("active");
 		$('#settings_list li').each(function(n, v) {
@@ -146,9 +156,14 @@
 			active_nav.closest('li').addClass('active');
 		});
 		$("#add_btn").show();
+		$("#merge_drug_btn").hide();
+		$("#merged_drug_btn").hide();
 		//add button label
 		if(type == "sync_drug") {
 			$("#create_setting").text("add drug");
+			$("#merge_drug_btn").show();
+			$("#merged_drug_btn").show();
+			$(".modal_btn_merge").attr("href", my_url + "settings/modal/sync_drug_merge");
 			$("#modal_header").text("Add Drug");
 		} else if(type == "sync_facility") {
 			$("#create_setting").text("add facility");
@@ -180,6 +195,11 @@
 		}else if(type == "escm_facility") {
 			$("#add_btn").hide();
 			$("#modal_header").text("Add Facility");
+		}else if(type == "escm_drug") {
+			$("#add_btn").hide();
+			$("#merge_drug_btn").show();
+			$("#merged_drug_btn").show();
+			$(".modal_btn_merge").attr("href", my_url + "settings/modal/escm_drug_merge");
 		}else if(type == "eid_mail") {
 			$("#create_setting").text("add email");
 			$("#modal_header").text("Add EID Email");
@@ -211,7 +231,7 @@
 			$("#settings_list>li").removeClass("active");
 			$(this).closest('li').addClass('active');
 
-			var type = $(this).attr("id");
+			type = $(this).attr("id");
 			var url = my_url + "settings/get/" + type;
 
 			getTable(type, url, div_id);
@@ -220,10 +240,14 @@
 			$("#current_setting").text(type);
 
 			$("#add_btn").show();
-
+			$("#merge_drug_btn").hide();
+			$("#merged_drug_btn").hide();
 			//add button label
 			if(type == "sync_drug") {
 				$("#create_setting").text("add drug");
+				$("#merge_drug_btn").show();
+				$("#merged_drug_btn").show();
+				$(".modal_btn_merge").attr("href", my_url + "settings/modal/sync_drug_merge");
 				$("#modal_header").text("Add Drug");
 			} else if(type == "sync_facility") {
 				$("#create_setting").text("add facility");
@@ -252,6 +276,11 @@
 			}else if(type == "escm_facility") {
 				$("#add_btn").hide();
 				$("#modal_header").text("Add Facility");
+			}else if(type == "escm_drug") {
+				$("#add_btn").hide();
+				$("#merge_drug_btn").show();
+				$("#merged_drug_btn").show();
+				$(".modal_btn_merge").attr("href", my_url + "settings/modal/sync_drug_merge");
 			}else if(type == "gitlog") {
 			    $("#add_btn").hide();
 			    $("#modal_header").text("Add Log");
@@ -318,8 +347,11 @@
 			$("#modal_template").modal('show');
 			$("#facilities_map").searchable();
 		});
-
+		
+		
 		$("#add_btn").click(function() {
+			$("#modal_template").css("width","560");
+			$("#modal_template").css("margin-left","-280");
 			var current = $("#current_setting").text();
 			var action_link = my_url + "settings/save/" + current
 
@@ -335,8 +367,112 @@
 				$("#user_emails_mail_list").multiselect("uncheckAll");
 				$("#modal_template").modal('show');		
 			}else{
-			    $("#modal_template").modal('show');			
+			    $("#modal_template").modal('show');	
 			}
+			var link = my_url + "settings/modal/" + type
+			$(".modal-body").load(link);
+		});
+		
+		$("#merge_drug_btn").live("click",function(){//When merge button click
+			//Css
+			$("#modal_template").css("width","560");
+			$("#modal_template").css("margin-left","-280");
+			$(".full-content").css("zoom","1");
+			$(".modal-body").html("");
+			if(type=="escm_drug"){
+				var current = "escm_drug_merge";
+			}else if(type=="sync_drug"){
+				var current = "sync_drug_merge";
+			}
+			$("#modal_header").text("Merge Drug");
+			var action_link = my_url + "settings/save/" + current;
+			$("#modal_action").attr("action", action_link);
+		    $("#modal_template").modal('show');
+		    var link = my_url + "settings/modal/" + current;
+			$(".modal_btn").attr("href", link);
+			$(".modal-body").load(link);
+			if (typeof check_pulled_select=== 'undefined') {
+			    //Call select 2 classes
+				setTimeout(function(){
+					$('body').prepend( $('<link rel="stylesheet" type="text/css" />').attr('href', '<?php echo base_url() ?>assets/CSS/select2-3.4.8/select2.css') );
+					 $.getScript( "<?php echo base_url();?>assets/js/select2-3.4.8/select2.js",function(){
+					 	check_pulled_select="";
+					 	$(".select2").select2({
+					 		width: 'resolve',
+					 		placeholder: "Select one or more drugs to merge",
+							allowClear: true
+					 	});
+					 	$(".select22").select2({
+					 		width: 'resolve',
+					 		placeholder: "Select a drug to merge with",
+							allowClear: true
+					 	});
+					 });
+				}, 2000);
+			}else{
+				setTimeout(function(){
+					$(".select2").select2({
+				 		width: 'resolve',
+				 		placeholder: "Select one or more drugs to merge",
+						allowClear: true
+				 	});
+				 	$(".select22").select2({
+				 		width: 'resolve',
+				 		placeholder: "Select a drug to merge with",
+						allowClear: true
+				 	});
+				}, 2000);
+			}
+			
+		});
+		
+		//Merged drug button clicked
+		$("#merged_drug_btn").live("click",function(){//When merged button click
+			$("#btn_save").hide();
+			if(type=="escm_drug"){
+				var current = "escm_drug_merge";
+			}else if(type=="sync_drug"){
+				var current = "sync_drug_merge";
+			}
+			$("#modal_header").text("Merged Drug");
+			var action_link = my_url + "settings/unmerge/" + current;
+			$("#modal_action").attr("action", action_link);
+			$(".modal-body").html("");
+		    $("#modal_template").modal('show');
+		    var link = my_url + "settings/merged_drugs/" + current;
+			$(".modal_btn").attr("href", link);
+			//$(".modal-body").load(link);
+			var dataSet = "";
+			$("#modal_template").css("width","70%");
+			$("#modal_template").css("margin-left","-35%");
+			$.ajax({
+				url : link,
+				type : 'POST',
+				dataType : 'json',
+				success : function(data) {
+					var dataSet=data;
+					$('.modal-body').html( '<table cellpadding="0" cellspacing="1" border="0" class="table-hovered table-striped table-bordered" id="tbl_merged_drugs"></table>' );
+					$('#tbl_merged_drugs').dataTable( {
+				        "aaData": dataSet,
+				        "aoColumns": [
+				            { "sTitle": "Name","sWidth" :"45%"},
+				            { "sTitle": "Merged With","sWidth" :"45%"},
+				            { "sTitle": "Merged","sWidth" :"10%" }
+				        ],
+				        "sDom": '<"toolbar">frtip', 
+				        "bFilter": true,  
+				        "bAutoWidth": false,
+				        "bJQueryUI" : true,
+				        "bSort" : false
+					});
+					
+				}
+			});	
+			
+			
+ 
+			
+			
 		});
 		//escm sync function
 		$(".api_sync").click(function() {
@@ -393,6 +529,8 @@
 			var columns = new Array("code", "name", "category","options");
 		}else if(type == "gitlog") {
 			var columns = new Array("Facility", "hash value","Status","last update");
+		}else if(type == "escm_drug") {
+			var columns = new Array("name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight", "options");
 		}else if(type == "escm_facility") {
 			var columns = new Array("mfl code", "name", "category", "services", "options");
 		}else if(type == "eid_mail") {
