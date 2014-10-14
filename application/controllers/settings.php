@@ -688,7 +688,8 @@ class settings extends MY_Controller {
 					$mail_list = explode(",", $mail_list);
 				}
 			} else if ($index == "email" && $type=="sync_user" && $id == null) {
-				$password = "";
+				$password = "12345";
+				/*
 				$characters = strtoupper("abcdefghijklmnopqrstuvwxyz");
 				$characters = $characters . 'abcdefghijklmnopqrstuvwxyz0123456789';
 				$password_length = 6;
@@ -696,9 +697,10 @@ class settings extends MY_Controller {
 				for ($i = 0; $i < $password_length; $i++) {
 					$password .= $characters[rand(0, strlen($characters) - 1)];
 				}
+				*/
 				$save_data[$index] = $this -> input -> post($input);
 				$save_data["password"] = md5($password);
-				$this -> send_password($this -> input -> post($input), $password);
+				//$this -> send_password($this -> input -> post($input), $password);
 
 			} else if ($index == "creator_id" && $id == null) {
 				$save_data[$index] = $this -> session -> userdata("user_id");
@@ -728,7 +730,6 @@ class settings extends MY_Controller {
 		if ($type == "facilities") {
 			unset($save_data['adt_site']);
 		}
-
 		//insert or update
 		if ($id == null) {
 			$this -> db -> insert($type, $save_data);
