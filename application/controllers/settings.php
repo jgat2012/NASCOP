@@ -615,7 +615,7 @@ class settings extends MY_Controller {
 		}
 	}
 	
-	public function insert_default_merged(){
+	public function insert_default_merged(){//Insert all drugs
 		if(!$this ->session ->userdata("facility")){//If session does not exist, take to dashboard
 			redirect("dashboard_management");
 		}else{
@@ -623,6 +623,7 @@ class settings extends MY_Controller {
 			$this ->db ->query("DELETE FROM escm_drug_merge WHERE drug_id = merged_with");
 			$this ->db ->query("INSERT INTO sync_drug_merge(`drug_id`,`merged_with`) (SELECT id,id FROM sync_drug)");
 			$this ->db ->query("INSERT INTO escm_drug_merge(`drug_id`,`merged_with`) (SELECT id,id FROM escm_drug)");
+			echo "<span class='alert alert-info'>Merging settings was successful !</span>";
 		}
 	}
 	

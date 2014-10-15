@@ -107,7 +107,7 @@
 					<a  href="<?php echo site_url("settings/modal/merge_drug");?>"  role="button" id="merge_drug_btn" class="btn btn-info modal_btn_merge" data-toggle="modal"><i class="icon-plus-sign"></i> <span id=""> Merge drugs</span></a>
 					<a  href="<?php echo site_url("settings/modal/merged_drug");?>"  role="button" id="merged_drug_btn" class="btn btn-success modal_btn_merged" data-toggle="modal"> <span id=""> Merged drugs</span></a>
 				</div>
-				<div class="span7">
+				<div class="span7" id="alert-message">
 					<?php echo $this -> session -> flashdata("alert_message");?>
 				</div>
 			</div>
@@ -137,6 +137,24 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
+		
+		//Sync escm and sync drugs merge
+		if (typeof synced=== 'undefined') {
+			var _url ="<?php echo base_url().'settings/insert_default_merged';?>";
+			var request = $.ajax({
+					url : _url,
+					type : 'post',
+					dataType : "html"
+				});
+				request.done(function(data) {
+					$("#alert-message").html(data);
+				});
+				request.fail(function(jqXHR, textStatus) {
+					alert("An error occured while updating merged drugs : " + textStatus + ". Please contact your system administrator!");
+				});
+		}
+		
+		
 		$("#facilities_map").searchable();
         var my_url = "<?php echo base_url(); ?>";
 		//default link

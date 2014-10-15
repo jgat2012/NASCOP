@@ -1,8 +1,3 @@
-//Load datatables settings
-
-/**
- * End of datatables settings
- */
 
 /**
  *Change password validation
@@ -11,6 +6,9 @@ $(document).ready(function() {
 	setTimeout(function() {
 		$(".message,.alert").fadeOut("2000");
 	}, 30000);
+	var base_url = $("#base_url").val();
+	
+	
 	//Progress Bar
 	function progress(percent, $element) {
 		var progressBarWidth = percent * $element.width() / 100;
@@ -50,7 +48,7 @@ $(document).ready(function() {
 			alert("incorrect phone format used");
 		}
 	});
-	var base_url = $("#base_url").val();
+	
 	$('.dataTables').dataTable({
 		"bJQueryUI" : true,
 		"sPaginationType" : "full_numbers",
