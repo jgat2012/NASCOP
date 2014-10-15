@@ -1,4 +1,5 @@
 <?php
+error_reporting(1);
 class settings extends MY_Controller {
 	var $esm_url = "http://api.kenyapharma.org/";
 	var $eid_url = "http://nascop.org/eid/";
@@ -42,6 +43,8 @@ class settings extends MY_Controller {
 		} else if ($type == "gitlog") {
 			$columns = array("s.id", "f.name", "hash_value", "update_time");
 			$hash = $this -> github_updater -> get_hash();
+		} else if ($type == "escm_drug") {
+			$columns = array("id", "name", "abbreviation", "strength", "packsize", "formulation", "unit", "weight", "category_id");
 		} else if ($type == "escm_facility") {
 			$columns = array("id", "code", "name", "category", "sponsors", "services", "district_id", "ordering", "service_point", "county_id");
 		} else if ($type == "eid_mail") {
@@ -222,9 +225,10 @@ class settings extends MY_Controller {
 	}
 
 	public function modal($type = "sync_drug") {
+		//echo Sync_drug::getNotMergedDrugs();die();
 		$content = "";
 		$group_div = "<div class='control-group'>";
-		$control_div = "<div class='controls'>";
+		$control_div = "<div class='controls' style='margin-left:0px'>";
 		$close_div = "</div>";
 		if ($type == "sync_drug") {
 			$inputs = array("name" => "name", "abbreviation" => "abbreviation", "strength" => "strength", "packsize" => "packsize", "formulation" => "formulation", "unit" => "unit", "weight" => "weight", "Category" => "category_id");
@@ -252,6 +256,8 @@ class settings extends MY_Controller {
 			$inputs = array("casco name" => "name", "County" => "county_id");
 		}else if ($type == "casco_mail") {
 			$inputs = array("email address" => "email_address", "Casco" => "casco_id");
+		}else if ($type == "sync_drug_merge" || $type=="escm_drug_merge") {
+			$inputs = array(""=>"");
 		}
 
 		foreach ($inputs as $text => $input) {
@@ -471,7 +477,43 @@ class settings extends MY_Controller {
 					$textfield .= "<option value='" . $list -> id . "'>" . " " . $list -> name . "</option>";
 				}
 				$textfield .= "</select><input type='hidden' id='" . $input . "_holder' name='" . $input . "_holder' />";
+			} else if ($type == "sync_drug_merge" || $type=="escm_drug_merge") {
+				//Get drugs to merge
+				if($type == "sync_drug_merge"){
+					$drugs = Sync_drug::getNotMergedDrugs();
+					$all_drugs = Sync_drug::getDrugs();
+					$textfield = "
+						<br><div>Drugs</div>
+						<div><select multiple id='merge_$type' name='merge_".$type."[]' class='input input-xxlarge select2'>";
+						foreach ($drugs as $key => $value) {
+							$textfield.="<option value='".$value['id']."'>".$value['name']."(".$value['abbreviation'].") ".$value['strength']." [".$value['unit']." - ".$value['packsize']."] </option>";
+						}
+					$textfield.="</select></div>
+						<div>Merge with</div>";
+					$textfield.="<div><select id='mergewith_$type' name='mergewith_$type' class='input input-xxlarge select2'>";
+						foreach ($all_drugs as $key => $value) {
+							$textfield.="<option value='".$value['id']."'>".$value['name']."(".$value['abbreviation'].") ".$value['strength']." [".$value['unit']." - ".$value['packsize']."] </option>";
+						}
+					$textfield.="</select></div>";
+				}else if($type=="escm_drug_merge"){
+					$drugs = Escm_drug::getNotMergedDrugs();
+					$all_drugs = Escm_drug::getDrugs();
+					$textfield = "
+						<br><div>Drugs</div>
+						<div><select multiple id='merge_$type' name='merge_".$type."[]' class='input input-xxlarge select2'>";
+						foreach ($drugs as $key => $value) {
+							$textfield.="<option value='".$value['id']."'>".$value['name']."(".$value['abbreviation'].") ".$value['strength']." [".$value['unit']." - ".$value['packsize']."] </option>";
+						}
+					$textfield.="</select></div>
+						<div>Merge with</div>";
+					$textfield.="<div><select id='mergewith_$type' name='mergewith_$type' class='input input-xxlarge select2'>";
+						foreach ($all_drugs as $key => $value) {
+							$textfield.="<option value='".$value['id']."'>".$value['name']."(".$value['abbreviation'].") ".$value['strength']." [".$value['unit']." - ".$value['packsize']."] </option>";
+						}
+					$textfield.="</select></div>";
+				}
 			}
+				
 			$content .= $textfield;
 			$content .= $close_div;
 			$content .= $close_div;
@@ -479,8 +521,115 @@ class settings extends MY_Controller {
 		$this -> session -> set_userdata("nav_link", $type);
 		echo $content;
 	}
+	
+	public function merged_drugs($table="sync_drug_merge"){
+		if(!$this ->session ->userdata("facility")){
+			redirect("dashboard_management");
+		}else{
+			$drugs = array();
+			$data = array();
+			//Get list of merged drugs
+			if($table=="sync_drug_merge"){
+				$drugs = Sync_drug_merge::getMergedDrugDetails();
+			}else if($table=="escm_drug_merge"){
+				$drugs = Escm_drug_merge::getMergedDrugDetails();
+			}
+			//echo "<pre>".json_encode($drugs)."</pre>";die();
+			$tmpl = array ( 'table_open'  => '<table border="1" cellpadding="2" cellspacing="1" class="datatable" id="tbl_merged_drugs">' );
 
+			$this->table->set_template($tmpl);
+			$this->table->set_heading('ID','Name', 'Merged With','Merged');
+			foreach ($drugs as $key => $value) {//Build table
+				$row = $value['name']."(".$value['abbreviation'].") ".$value['strength']." [".$value['unit']." - ".$value['packsize']."]";
+				$mrow = $value['m_name']."(".$value['m_abbreviation'].") ".$value['m_strength']." [".$value['m_unit']." - ".$value['m_packsize']."]";
+				$checked = "<input type='checkbox' name='merged_cb[]' id='merged_cb' checked value='".$value['id']."'>";
+				$this->table->add_row(array($key+1,$row,$mrow, $checked));
+				$data[] = array($row,$mrow,$checked);
+			}
+			echo json_encode($data);
+			//echo $this->table->generate();
+		}
+	}
+
+	public function unmerge($table="sync_drug_merge"){//Unmerge drugs
+		
+		if(!$this ->session ->userdata("facility")){//If session does not exist, take to dashboard
+			redirect("dashboard_management");
+		}else{//Delete unmerged drugs;
+			$ids = $this ->input ->post("merged_cb");
+			$id = implode(",",$ids);
+			//Get drugs to unmerge
+			if($id!=""){
+				if($table=="sync_drug_merge"){
+					$drugs = Sync_drug_merge::getDrugsToUnmerge($id);
+				}else if($table=="escm_drug_merge"){
+					$drugs = Escm_drug_merge::getDrugsToUnmerge($id);
+				}
+				
+				if($drugs){
+					foreach ($drugs as $key => $value) {
+						$ids1[] =$value['id'];//Ids of rows to delete
+						$drug_ids[] = $value['drug_id'];//Ids of drugs to update
+					}
+					$ids2 = implode(",",$ids1);
+					$drugs_ids= implode(",",$drug_ids);
+					$sql = "DELETE FROM $table WHERE  id IN ($ids2)";
+					$res = $this ->db ->query($sql);
+					if($this ->db ->affected_rows()>0){
+						$this -> session -> set_flashdata("alert_message", "<span class='alert alert-info'>".$this ->db ->affected_rows()." Drug(s) successfully unmerged !</span>");
+					}
+					$sql = "UPDATE $table SET visible = 1 WHERE drug_id IN($drugs_ids)";
+					$res = $this ->db ->query($sql);
+				}
+				
+				
+			}else{//If all drugs are being unmerged
+				$sql = "DELETE FROM $table WHERE drug_id!=merged_with";
+				$res = $this ->db ->query($sql);
+				if($this ->db ->affected_rows()>0){
+					$this -> session -> set_flashdata("alert_message", "<span class='alert alert-info'>".$this ->db ->affected_rows()." Drug(s) successfully unmerged !</span>");
+				}
+				$sql = "UPDATE $table SET visible = 1";
+				$res = $this ->db ->query($sql);
+			}
+			
+			//Get single drugs
+			$sql = "SELECT id FROM $table WHERE drug_id = merged_with";
+			$res =$this ->db ->query($sql);
+			$result = $res ->result_array();
+			$ids1= array();
+			foreach ($result as $key => $value) {
+				$ids1[] =$value['id'];
+			}
+			$ids2 = implode(",",$ids1);
+			
+			if($table=="sync_drug_merge"){
+				$type = "sync_drug";
+			}else if($table=="escm_drug_merge"){
+				$type = "escm_drug";
+			}
+			
+			$this -> session -> set_userdata("nav_link", $type);
+			redirect("settings");
+				
+		}
+	}
+	
+	public function insert_default_merged(){//Insert all drugs
+		if(!$this ->session ->userdata("facility")){//If session does not exist, take to dashboard
+			redirect("dashboard_management");
+		}else{
+			$this ->db ->query("DELETE FROM sync_drug_merge WHERE drug_id = merged_with");
+			$this ->db ->query("DELETE FROM escm_drug_merge WHERE drug_id = merged_with");
+			$this ->db ->query("INSERT INTO sync_drug_merge(`drug_id`,`merged_with`) (SELECT id,id FROM sync_drug)");
+			$this ->db ->query("INSERT INTO escm_drug_merge(`drug_id`,`merged_with`) (SELECT id,id FROM escm_drug)");
+			echo "<span class='alert alert-info'>Merging settings was successful !</span>";
+		}
+	}
+	
+	
 	public function save($type = "sync_drug", $id = null) {
+		
 		$save_data = array();
 		$success_class = "<div class='alert alert-success'>";
 		$error_class = "<div class='alert alert-error'>";
@@ -515,7 +664,15 @@ class settings extends MY_Controller {
 			$inputs = array("name" => "name", "county_id" => "county_id");
 		} else if ($type == "casco_mail") {
 			$inputs = array("email" => "email_address", "casco_id" => "casco_id");
-		} 
+		} else if ($type == "sync_drug_merge"){
+			$to_be_merged = $this ->input ->post("merge_sync_drug_merge");//Drugs being merged
+			$mergewith = $this ->input ->post("mergewith_sync_drug_merge");//Main drug
+			$inputs = array("drug_id" => $to_be_merged, "merged_with" => $mergewith);
+		} else if ($type == "escm_drug_merge"){
+			$to_be_merged = $this ->input ->post("merge_escm_drug_merge");//Drugs being merged
+			$mergewith = $this ->input ->post("mergewith_escm_drug_merge");//Main drug
+			$inputs = array("drug_id" => $to_be_merged, "merged_with" => $mergewith);
+		}
 
 		foreach ($inputs as $index => $input) {
 			if ($index == "facility_list") {
@@ -556,11 +713,21 @@ class settings extends MY_Controller {
 					$supplied_by = $this -> input -> post("supplied_by");
 					$this -> db -> insert("adt_sites", array("facility_id" => $facility_id, "pipeline" => $supplied_by));
 				}
+			} else if($type == "sync_drug_merge" || $type == "escm_drug_merge" ) {
+				$drugs_id = $inputs['drug_id'];
+				$merged_with = $inputs['merged_with'];
+				foreach ($drugs_id as $key => $value) {
+					$this -> db -> insert($type,array("drug_id" =>$value, "merged_with" =>$merged_with));
+					if($this->db->affected_rows()>0){//Visible is zero meaning it will not included in generating county report
+						$this -> db ->query("UPDATE $type SET visible =0 WHERE drug_id = $value AND merged_with = $value");
+					}
+					
+				}
+				break;
 			} else {
 				$save_data[$index] = $this -> input -> post($input);
 			}
 		}
-
 		if ($type == "facilities") {
 			unset($save_data['adt_site']);
 		}
@@ -612,6 +779,8 @@ class settings extends MY_Controller {
 		redirect("settings");
 
 	}
+	
+
 	public function enable($type = "sync_drug", $id = null) {
 		$info_class = "<div class='alert alert-info'>";
 		$error_class = "<div class='alert alert-error'>";

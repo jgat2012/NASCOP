@@ -696,7 +696,6 @@ class Dashboard_Management extends MY_Controller {
 				//Check for maps that came from kenya Pharma
 				$and .= ' and m.id IN (SELECT maps_id FROM escm_maps)';
 			}
-
 			$sql_regimen = "
 						SELECT c.id as cat_id,c.name as cat_name,tabl.reg_name as regimen_name,tabl.code as regimen_code,tabl.old_code,tabl.total as total FROM sync_category c
 						LEFT JOIN 
@@ -1088,7 +1087,7 @@ class Dashboard_Management extends MY_Controller {
 			$county_details = Counties::getCountyDetails($county);
 			$countyname = ($county_details[0]['county'])." county";
 			$title =strtoupper($countyname. " Reporing Rate for ".$period);
-			$sheet-> SetCellValue("A1",$title);
+			$sheet -> SetCellValue("A1",$title);
 			$sheet -> SetCellValue("D2",$reporting_rate);
 			$sheet -> SetCellValue("D3",$total_facilities);
 			$sheet -> SetCellValue("D4",$total_reported);
@@ -1112,39 +1111,38 @@ class Dashboard_Management extends MY_Controller {
 			//Commodities -- Issues
 			$sql = "
 				SELECT tabl1.name,tabl1.pack_size,tabl1.unit,tabl1.price_pack,tabl1.comments,SUM(tabl1.total) as total 
-				FROM(
-					(SELECT ci.drug_id,dc.name,dc.id,dc.pack_size,dc.unit,dc.price_pack,dc.comments, SUM(ci.resupply) as total  FROM cdrr_item ci
-					INNER JOIN cdrr c ON c.id = ci.cdrr_id
-					INNER JOIN sync_drug sd ON sd.id = ci.drug_id
-					INNER JOIN sync_facility ef ON ef.id = c.facility_id
-					LEFT JOIN escm_orders o ON o.cdrr_id = c.id
-					LEFT JOIN drugcode dc ON dc.n_map = sd.id
-					WHERE `status` LIKE '%dispatch%' AND `period_begin` = '$period_begin'
-					AND ef.county_id =  '$county_id' AND ci.resupply !=0
-					AND o.cdrr_id IS NULL
-					AND dc.name IS NOT NULL
-					GROUP BY ci.drug_id
-					ORDER BY `c`.`facility_id` ASC
-					)
-					UNION ALL
-					
-					(SELECT ci.drug_id,dc.name,dc.id,dc.pack_size,dc.unit,dc.price_pack,dc.comments, SUM(ci.resupply) as total  FROM cdrr_item ci
-					INNER JOIN cdrr c ON c.id = ci.cdrr_id
-					INNER JOIN escm_drug sd ON sd.id = ci.drug_id
-					INNER JOIN escm_facility ef ON ef.id = c.facility_id
-					LEFT JOIN escm_orders o ON o.cdrr_id = c.id
-					LEFT JOIN drugcode dc ON dc.n_map = sd.id
-					WHERE `status` LIKE '%dispatch%' AND `period_begin` = '$period_begin'
-					AND ef.county_id =  '$county_id' AND ci.resupply !=0
-					AND o.cdrr_id IS NOT NULL
-					AND dc.name IS NOT NULL
-					GROUP BY ci.drug_id
-					ORDER BY `c`.`facility_id` ASC
-					)
+				FROM
+				( 
+					(
+					SELECT ci.drug_id,dc.name,dc.id,dc.pack_size,dc.unit,dc.price_pack,dc.comments, SUM(ci.resupply) as total 
+						FROM cdrr_item ci 
+						INNER JOIN cdrr c ON c.id = ci.cdrr_id 
+						INNER JOIN sync_drug sd ON sd.id = ci.drug_id 
+						INNER JOIN sync_facility ef ON ef.id = c.facility_id 
+						LEFT JOIN escm_orders o ON o.cdrr_id = c.id 
+						LEFT JOIN drugcode dc ON dc.n_map = sd.id 
+						LEFT JOIN sync_drug_merge sdm ON sdm.drug_id = ci.drug_id
+						WHERE `status` LIKE '%dispatch%' AND `period_begin` = '$period_begin' AND ef.county_id = '$county_id' AND ci.resupply !=0 
+						AND visible = '1'
+						AND o.cdrr_id IS NULL AND dc.name IS NOT NULL GROUP BY sdm.merged_with ORDER BY `c`.`facility_id` ASC 
+					) UNION ALL 
+					(
+					SELECT ci.drug_id,dc.name,dc.id,dc.pack_size,dc.unit,dc.price_pack,dc.comments, SUM(ci.resupply) as total 
+						FROM cdrr_item ci 
+						INNER JOIN cdrr c ON c.id = ci.cdrr_id 
+						INNER JOIN escm_drug sd ON sd.id = ci.drug_id 
+						INNER JOIN escm_facility ef ON ef.id = c.facility_id 
+						LEFT JOIN escm_orders o ON o.cdrr_id = c.id 
+						LEFT JOIN drugcode dc ON dc.n_map = sd.id 
+						LEFT JOIN escm_drug_merge sdm ON sdm.drug_id = ci.drug_id
+						WHERE `status` LIKE '%dispatch%' AND `period_begin` = '$period_begin' AND ef.county_id = '$county_id' AND ci.resupply !=0 
+						AND visible = '1'
+						AND o.cdrr_id IS NOT NULL AND dc.name IS NOT NULL GROUP BY sdm.merged_with ORDER BY `c`.`facility_id` ASC 
+					) 
 				) as tabl1	
-				GROUP BY tabl1.drug_id	
+				GROUP BY tabl1.drug_id
+				
 			";
-			//echo $sql;die();
 			$query = $this ->db ->query($sql);
 			$result2 = $query ->result_array();
 			$y = '4';

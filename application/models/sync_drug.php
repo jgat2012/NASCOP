@@ -16,6 +16,8 @@ class Sync_Drug extends Doctrine_Record {
 
 	public function setUp() {
 		$this -> setTableName('sync_drug');
+		$this -> hasMany('sync_drug_merge as drug', array('local' => 'id', 'foreign' => 'drug_id'));
+		$this -> hasMany('sync_drug_merge as merged_with', array('local' => 'id', 'foreign' => 'merged_with'));
 	}
 
 	public function getAll() {
@@ -65,6 +67,22 @@ class Sync_Drug extends Doctrine_Record {
 		$sync_drug = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_drug;
 	}
+	
+	public function getNotMergedDrugs(){
+		$query = Doctrine_Query::create() -> select("sdm.drug_id, d.name,d.abbreviation,d.strength,d.formulation,d.unit,d.packsize") 
+									      -> from("sync_drug d")-> leftJoin('d.drug sdm')-> where("sdm.drug_id IS NULL OR (sdm.drug_id=sdm.merged_with AND sdm.visible='1')");
+		$result = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		//return $query->getSqlQuery();
+		return $result;
+	}
+	public function getDrugs(){
+		$query = Doctrine_Query::create() -> select("d.name,d.abbreviation,d.strength,d.formulation,d.unit,d.packsize") 
+									      -> from("sync_drug d");
+		$result = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		//return $query->getSqlQuery();
+		return $result;
+	}
+	
 
 }
 ?>

@@ -263,7 +263,7 @@ if(isset($reports)|| isset($report_title)){
 				<li><a href="#historical_upload" data-toggle="modal"><i class="icon-upload"></i>Historical Reports Upload</a></li>	
 				<li><a href="#guideline_upload" data-toggle="modal"><i class="icon-upload"></i>Guidelines Upload</a></li>			
 			    <li class="divider"></li>
-			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>Paediatric Summary</a></li>
+			    <li><a href="#" target="_blank"><i class="icon-book"></i>Paediatric Summary</a></li>
 			    <li><a href="<?php echo base_url().'user_manual.pdf' ?>" target="_blank"><i class="icon-book"></i>User Manual</a></li>	
 			
 				<?php
