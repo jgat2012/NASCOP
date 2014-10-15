@@ -696,7 +696,6 @@ class Dashboard_Management extends MY_Controller {
 				//Check for maps that came from kenya Pharma
 				$and .= ' and m.id IN (SELECT maps_id FROM escm_maps)';
 			}
-
 			$sql_regimen = "
 						SELECT c.id as cat_id,c.name as cat_name,tabl.reg_name as regimen_name,tabl.code as regimen_code,tabl.old_code,tabl.total as total FROM sync_category c
 						LEFT JOIN 
