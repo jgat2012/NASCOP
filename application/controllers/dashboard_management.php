@@ -463,12 +463,12 @@ class Dashboard_Management extends MY_Controller {
 			if ($pipeline == 'kemsa') {
 				$drug_table = 'sync_drug';
 				$facility_table = 'sync_facility';
-				$results_f = Sync_Facility::getAllHydrated();
+				$results_f = Sync_Facility::getOrderingPoint();
 				$and .= ' and c.id NOT IN (SELECT cdrr_id FROM escm_orders)';
 			} else if ($pipeline == 'kenya_pharma') {
 				$drug_table = ' escm_drug';
 				$facility_table = 'escm_facility';
-				$results_f = Escm_Facility::getAllHydrated();
+				$results_f = Escm_Facility::getOrderingPoint();
 				$and .= ' and c.id IN (SELECT cdrr_id FROM escm_orders)';
 			}
 			$filename = "Facility Cons by ARV Medicine";
@@ -565,14 +565,14 @@ class Dashboard_Management extends MY_Controller {
 				$cols = 'r.id,r.code,r.description';
 				//Check for maps that came from Kemsa
 				$and .= ' and m.id NOT IN (SELECT maps_id FROM escm_maps)';
-				$results_f = Sync_Facility::getAllHydrated();
+				$results_f = Sync_Facility::getOrderingPoint();
 			} else if ($pipeline == 'kenya_pharma') {
 				$facility_table = 'escm_facility';
 				$regimen_table = 'escm_regimen';
 				$cols = 'r.id,r.code,r.description';
 				//Check for maps that came from kenya Pharma
 				$and .= ' and m.id IN (SELECT maps_id FROM escm_maps)';
-				$results_f = Escm_Facility::getAllHydrated();
+				$results_f = Escm_Facility::getOrderingPoint();
 			}
 
 			//Generate excel start here

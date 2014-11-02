@@ -45,6 +45,12 @@ class Sync_Facility extends Doctrine_Record {
 		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $sync_facility;
 	}
+	
+	public function getOrderingPoint(){
+		$query = Doctrine_Query::create() -> select("*") -> from("sync_facility")-> where("ordering='1'") -> orderBy("name asc");;
+		$escm_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return $escm_facility;
+	}
 
 	public function getId($facility_code, $status_code = 0) {
 		if ($status_code == 0) {

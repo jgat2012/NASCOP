@@ -446,7 +446,6 @@
 		
 		//Merged drug button clicked
 		$("#merged_drug_btn").live("click",function(){//When merged button click
-			$("#btn_save").hide();
 			if(type=="escm_drug"){
 				var current = "escm_drug_merge";
 			}else if(type=="sync_drug"){

@@ -860,6 +860,7 @@ class settings extends MY_Controller {
 		$links = array();
 		$links['escm_drug'] = "drugs";
 		$links['escm_regimen'] = "regimen";
+		$links['escm_facility'] = "facilities";
 
 		$curl = new Curl();
 		$url = $this -> esm_url;
