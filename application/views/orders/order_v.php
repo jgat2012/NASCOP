@@ -7,8 +7,46 @@
 	}
 	?>
 	<p></p>
+	<?php //echo $order_table;?>
 	<!--<a href="<?php echo base_url().'order/clear_all' ?>" class="btn btn-danger" style="float:right;"><i class="icon-remove"></i> Remove All</a>-->
-	<?php echo $order_table;?>
+	<div class="tabbable"> <!-- Only required for left/right tabs -->
+	  <ul class="nav nav-tabs pills">
+	    <li class="active order_tab"><a href="#kemsa_tab" data-toggle="tab">Kemsa Orders</a></li>
+	    <li class="order_tab"><a href="#kp_tab" data-toggle="tab">KP Orders</a></li>
+	  </ul>
+	  <div class="tab-content">
+	    <div class="tab-pane active" id="kemsa_tab">
+	      <?php //echo $order_table;?>
+	      <table class="table table-bordered table-condensed table-hover" id="order_listing_kemsa">
+	      	<thead>
+	      		<tr>
+					<th>#CDRR-ID</th>
+					<th>#MAPS-ID</th>
+					<th>Period Beginning</th>
+					<th>Status</th>
+					<th>Facility Name</th>
+					<th>Options</th>
+				</tr>
+            </thead>
+	      </table>
+	    </div>
+	    <div class="tab-pane" id="kp_tab">
+	      <table class="table table-bordered table-condensed table-hover" id="order_listing_kp">
+	      	<thead>
+	      		<tr>
+					<th>#CDRR-ID</th>
+					<th>#MAPS-ID</th>
+					<th>Period Beginning</th>
+					<th>Status</th>
+					<th>Facility Name</th>
+					<th>Options</th>
+				</tr>
+            </thead>
+	      </table>
+	    </div>
+	  </div>
+	</div>
+	
 </div>
 <div id="select_satellite" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div id="excel_upload" style="text-align:center;">
@@ -34,27 +72,32 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function() {
-		var oTable = $('#my_orders').dataTable({
-			"bJQueryUI" : true,
+		
+		//Patient Listing DataTables
+		var oTable = $('#order_listing_kemsa').dataTable({
+				        "bProcessing": true,
+				        "sAjaxSource": 'order/getorders/kemsa',
+				        "bJQueryUI" : true,
+						"sPaginationType" : "full_numbers",
+						"bStateSave" : true,
+						"sDom" : '<"H"T<"clear">lfr>t<"F"ip>',
+						"bAutoWidth" : false,
+						"bDeferRender" : true,
+						"bInfo" : true
+				  });
+		$('#order_listing_kp').dataTable({
+	        "bProcessing": true,
+	        "sAjaxSource": 'order/getorders/kp',
+	        "bJQueryUI" : true,
 			"sPaginationType" : "full_numbers",
+			"bStateSave" : true,
+			"sDom" : '<"H"T<"clear">lfr>t<"F"ip>',
 			"bAutoWidth" : false,
 			"bDeferRender" : true,
-			"bInfo" : true,
-			"bProcessing" : true,
-			"bSort" : true,
-			"bSortClasses" : true,
-			"bStateSave" : true,
-			"sScrollX" : "100%",
-			"bScrollCollapse" : true,
-			"sScrollY" : "200px",
-			"sCookiePrefix" :"nascop_orders_"
-			});
-		oTable.fnSort([[0, 'desc']]);
-		$(".upload").click(function() {
-			var upload_type = $(this).attr("id");
-			$("#myModalLabel").text(upload_type + " Upload");
-			$("#upload_type").val(upload_type);
-		});
+			"bInfo" : true
+	    });
+	
+		
 	});
 
 </script>

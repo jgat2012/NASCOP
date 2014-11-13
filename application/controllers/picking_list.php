@@ -100,17 +100,41 @@ class Picking_List extends MY_Controller {
 
 	public function get_orders() {
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
-		$sql = "SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
-				FROM cdrr c
-				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
-				LEFT JOIN facilities f ON f.facilitycode=sf.code
-				LEFT JOIN maps m ON sf.id=m.facility_id
-				WHERE m.facility_id=c.facility_id
-				AND (c.code='D-CDRR' OR c.code='F-CDRR_packs')
-				AND m.period_begin=c.period_begin
-				AND m.period_end=c.period_end
-				AND c.status='dispatched'
-				AND c.order_id='0'";
+		$sql = "SELECT t1.id,t1.cdrr_id,t1.period_begin,t1.status_name,t1.facility_name
+					FROM
+				(
+					(
+					SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+					FROM cdrr c
+					LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+					LEFT JOIN facilities f ON f.facilitycode=sf.code
+					LEFT JOIN maps m ON sf.id=m.facility_id
+					WHERE m.facility_id=c.facility_id
+					AND (c.code='D-CDRR' OR c.code='F-CDRR_packs')
+					AND m.period_begin=c.period_begin
+					AND m.period_end=c.period_end
+					AND c.status='dispatched'
+					AND c.order_id='0'
+					AND c.id NOT IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
+					
+					) UNION ALL
+					(
+					SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+					FROM cdrr c
+					LEFT JOIN escm_facility sf ON sf.id=c.facility_id
+					LEFT JOIN facilities f ON f.facilitycode=sf.code
+					LEFT JOIN maps m ON sf.id=m.facility_id
+					WHERE m.facility_id=c.facility_id
+					AND (c.code='D-CDRR' OR c.code='F-CDRR_packs')
+					AND m.period_begin=c.period_begin
+					AND m.period_end=c.period_end
+					AND c.status='dispatched'
+					AND c.order_id='0'
+					AND c.id IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
+					)
+				) as t1
+				
+				";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		$links = array("order/view_order" => "checkbox");
@@ -119,12 +143,30 @@ class Picking_List extends MY_Controller {
 
 	public function get_orders_list($list_id, $status) {
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Facility Name', 'Options');
-		$sql = "SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,sf.name as facility_name
-				FROM cdrr c
-				LEFT JOIN sync_facility sf ON sf.id=c.facility_id
-				LEFT JOIN facilities f ON f.facilitycode=sf.code
-				WHERE c.order_id='$list_id'
-				GROUP BY c.id";
+		$sql = "SELECT t1.id,t1.cdrr_id,t1.period_begin,t1.facility_name
+					FROM
+				(
+					(
+						SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,sf.name as facility_name
+						FROM cdrr c
+						LEFT JOIN sync_facility sf ON sf.id=c.facility_id
+						LEFT JOIN facilities f ON f.facilitycode=sf.code
+						WHERE c.order_id='$list_id'
+						AND c.id NOT IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
+						GROUP BY c.id
+					) UNION ALL
+					(
+						SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,sf.name as facility_name
+						FROM cdrr c
+						LEFT JOIN escm_facility sf ON sf.id=c.facility_id
+						LEFT JOIN facilities f ON f.facilitycode=sf.code
+						WHERE c.order_id='$list_id'
+						AND c.id IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
+						GROUP BY c.id
+					)
+				) as t1
+				
+				";
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		$links = array("picking_list/view_commodities" => "view commodities", "picking_list/remove_order" => "remove order");

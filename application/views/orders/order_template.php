@@ -21,23 +21,23 @@
     <?php 
     if($order_array[0]['status_name']!="dispatched"){
     ?>
-    <a href="<?php echo site_url("order/move_order/review/" . $cdrr_id."/".$maps_id);?>" class="btn">Send back for Review</a>
+    <a href="<?php echo site_url("order/move_order/review/" . $cdrr_id."/".$maps_id."/".$order_supplier);?>" class="btn">Send back for Review</a>
     <?php
     if($order_array[0]['status_name']=="approved"){
     ?>
-    <a href="<?php echo site_url("order/move_order/received/" . $cdrr_id."/".$maps_id);?>" class="btn">Received</a>
+    <a href="<?php echo site_url("order/move_order/received/" . $cdrr_id."/".$maps_id."/".$order_supplier);?>" class="btn">Received</a>
     <?php
 	} else if($order_array[0]['status_name']=="received"){
     ?>
-    <a href="<?php echo site_url("order/move_order/rationalized/" . $cdrr_id."/".$maps_id);?>" class="btn">Rationalized</a>
+    <a href="<?php echo site_url("order/move_order/rationalized/" . $cdrr_id."/".$maps_id."/".$order_supplier);?>" class="btn">Rationalized</a>
      <?php
 	} else if($order_array[0]['status_name']=="rationalized"){
     ?>
-    <a href="<?php echo site_url("order/move_order/packed/" . $cdrr_id."/".$maps_id);?>" class="delivery btn">Delivery Note Entered</a>
+    <a href="<?php echo site_url("order/move_order/packed/" . $cdrr_id."/".$maps_id."/".$order_supplier);?>" class="delivery btn">Delivery Note Entered</a>
      <?php
 	} else if($order_array[0]['status_name']=="packed"){
     ?>
-    <a href="<?php echo site_url("order/move_order/dispatched/" . $cdrr_id."/".$maps_id);?>" class="btn">Dispatched</a>
+    <a href="<?php echo site_url("order/move_order/dispatched/" . $cdrr_id."/".$maps_id."/".$order_supplier);?>" class="btn">Dispatched</a>
     <?php
 	}}
     ?>

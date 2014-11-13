@@ -67,7 +67,20 @@ class Escm_Facility extends Doctrine_Record {
 		$escm_facility = $query -> execute();
 		return $escm_facility[0];
 	}
+	
+	public function getCode($facility_id, $status_code = 0) {
+		if ($status_code == 0) {
+			$conditions = "id='$facility_id' and ordering='1'";
+		} else if ($status_code == 3) {
+			$conditions = "id='$facility_id' and category like '%standalone%'";
+		} else {
+			$conditions = "id='$facility_id' and service_point='1'";
+		}
 
+		$query = Doctrine_Query::create() -> select("code") -> from("escm_facility") -> where("$conditions");
+		$sync_facility = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
+		return @$sync_facility[0];
+	}
 }
 ?>
 

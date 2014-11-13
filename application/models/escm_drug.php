@@ -42,8 +42,8 @@ class Escm_Drug extends Doctrine_Record {
 	public function getActiveList() {
 		$drug_name = "CONCAT_WS('] ',CONCAT_WS(' [',name,abbreviation),CONCAT_WS(' ',strength,formulation)) as Drug,unit as Unit_Name,packsize as Pack_Size,category_id as Category";
 		$query = Doctrine_Query::create() -> select("id,$drug_name") -> from("escm_drug") -> where("category_id='1' or category_id='2' or category_id='3'") -> orderBy("category_id asc");
-		$sync_drug = $query -> execute();
-		return $sync_drug;
+		$escm_drug = $query -> execute();
+		return $escm_drug;
 	}
 
 	public function getPackSize($id) {

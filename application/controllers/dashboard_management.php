@@ -712,7 +712,7 @@ class Dashboard_Management extends MY_Controller {
 						GROUP BY mi.regimen_id ORDER BY r.code,reg_name ) tabl ON tabl.cat_id=c.id
 						WHERE c.name NOT LIKE '%delete%'
 						";
-			echo $sql_regimen;die();
+			//echo $sql_regimen;die();
 			$query = $this -> db -> query($sql_regimen);
 			$results = $query -> result_array();
 
