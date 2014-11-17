@@ -614,7 +614,7 @@ class Dashboard_Management extends MY_Controller {
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $f_code);
 				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $p, $name);
 				//Get total number of patients by Regimen for that facility
-				$results = $this ->getTotalPatientByART($regimen_table,$facility_table,$period_begin,$and_check_maps,$id);
+				$results = $this ->getTotalPatientByART($regimen_table,$facility_table,$period_begin,$and_check_maps,$id,$and);
 				//Get totals for each regimen, for the selected facility and append it to the sheet
 				$x = "E";
 				$total = 0;
@@ -640,7 +640,7 @@ class Dashboard_Management extends MY_Controller {
 					$closest_period = $this ->getClosestReportingPeriod($id,"maps m",$and_check_maps,$period_begin);
 					//echo $closest_period. ' - '.$f_code.'<br>';
 					if($closest_period!=""){//If facility has reported at least once, get data for that period
-						$results = $this ->getTotalPatientByART($regimen_table,$facility_table,$closest_period,$and_check_maps,$id);
+						$results = $this ->getTotalPatientByART($regimen_table,$facility_table,$closest_period,$and_check_maps,$id,$and);
 						//Get totals for each regimen, for the selected facility and append it to the sheet
 						$x = "E";
 						$total = 0;
@@ -1450,195 +1450,30 @@ class Dashboard_Management extends MY_Controller {
 			$data['container'] = 'report_by_pipeline';
 			$data['title'] = 'Total Patients By Pipeline';
 			$data['chartTitle'] = 'No of Patients on ART By Pipeline';
-
-			//kenya pharma
-			//Adults patients from Kenya Pharma
-			$sql_adult_kp = "SELECT SUM( mi.total ) AS total_adult_kp
-							FROM maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN escm_regimen er ON er.id = mi.regimen_id
-							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = er.category_id
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NOT NULL 
-							AND sc.name LIKE  '%adult%'
-							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'
-							$conditions";
-			//Non standard regimens
-			$sql_adult_kp_nr = "SELECT SUM( mi.total ) AS total_adult_kp
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen er ON er.id = mi.regimen_id
-							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = er.category
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NOT NULL 
-							AND sc.name LIKE  '%adult%'
-							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'
-							$conditions";
-
-			$sql_paed_kp = "SELECT SUM( mi.total ) AS total_paed_kp
-							FROM maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN escm_regimen er ON er.id = mi.regimen_id
-							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = er.category_id
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NOT NULL 
-							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
-							AND sc.name NOT LIKE '%delete%'
-							$conditions";
-
-			//Non standard regimens pead
-			$sql_paed_kp_nr = "SELECT SUM( mi.total ) AS total_paed_kp
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen er ON er.id = mi.regimen_id
-							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = er.category
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NOT NULL 
-							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
-							AND sc.name NOT LIKE '%delete%'
-							$conditions";
-
-			$query1 = $this -> db -> query($sql_adult_kp);
-			$query2 = $this -> db -> query($sql_paed_kp);
-			$query3 = $this -> db -> query($sql_adult_kp_nr);
-			$query4 = $this -> db -> query($sql_paed_kp_nr);
-
-			$result1 = $query1 -> result_array();
-			$result2 = $query2 -> result_array();
-			$result3 = $query3 -> result_array();
-			$result4 = $query4 -> result_array();
-
+			$totals = $this ->getTotalPatientARTByPipeline($current_period,$and_check_maps,$conditions);
+			
 			$tot_adult_kp = 0;
 			$tot_paed_kp = 0;
 			$total_kp = 0;
-			if (count($result1) > 0) {
-				$tot_adult_kp = (int)$result1[0]['total_adult_kp'];
-				// Check if non standard regimens exist
-				if (count($result3) > 0) {
-					$tot_adult_kp += (int)$result3[0]['total_adult_kp'];
-				}
-			}
-			if (count($result2) > 0) {
-				$tot_paed_kp = (int)$result2[0]['total_paed_kp'];
-				// Check if non standard regimens exist
-				if (count($result4) > 0) {
-					$tot_paed_kp += (int)$result4[0]['total_paed_kp'];
-				}
-			}
-			$total_kp = $tot_adult_kp + $tot_paed_kp;
-
-			//kemsa
-			$sql_adult_kem_nr = "SELECT SUM( mi.total ) AS total_adult_kemsa
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen sr ON sr.id = mi.regimen_id
-							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = sr.category
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NULL 
-							AND sc.name LIKE  '%adult%'
-							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'
-							$conditions";
-
-			$sql_adult_kem = "SELECT SUM( mi.total ) AS total_adult_kemsa
-							FROM maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN sync_regimen sr ON sr.id = mi.regimen_id
-							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = sr.category_id
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NULL 
-							AND sc.name LIKE  '%adult%'
-							AND sc.name NOT LIKE  '%pep%'
-							AND sc.name NOT LIKE '%delete%'
-							$conditions";
-
-			$sql_paed_kem_nr = "SELECT SUM( mi.total ) AS total_paed_kemsa
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen sr ON sr.id = mi.regimen_id
-							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = sr.category
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NULL 
-							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
-							AND sc.name NOT LIKE '%delete%'
-							$conditions
-							";
-
-			$sql_paed_kem = "SELECT SUM( mi.total ) AS total_paed_kemsa
-							FROM maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN sync_regimen sr ON sr.id = mi.regimen_id
-							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sc ON sc.id = sr.category_id
-							WHERE m.period_begin =  '" . $current_period . "'
-							$and_check_maps
-							AND em.maps_id IS NULL 
-							AND (sc.name LIKE  '%paediatric%' OR sc.name LIKE  '%pediatric%')
-							AND sc.name NOT LIKE '%delete%'
-							$conditions
-							";
-
-			$query1 = $this -> db -> query($sql_adult_kem);
-			$query2 = $this -> db -> query($sql_paed_kem);
-			$query3 = $this -> db -> query($sql_adult_kem_nr);
-			$query4 = $this -> db -> query($sql_paed_kem_nr);
-
-			$result1 = $query1 -> result_array();
-			$result2 = $query2 -> result_array();
-			$result3 = $query3 -> result_array();
-			$result4 = $query4 -> result_array();
-
 			$tot_adult_kemsa = 0;
 			$tot_paed_kemsa = 0;
 			$total_kemsa = 0;
-
-			if (count($result1) > 0) {
-				$tot_adult_kemsa = (int)$result1[0]['total_adult_kemsa'];
-				// Check if non standard regimens exist
-				if (count($result3) > 0) {
-					$tot_adult_kemsa += (int)$result3[0]['total_adult_kemsa'];
+			
+			if($totals){
+				foreach ($totals as $key => $value) {
+					if($totals[$key]["supplier"]=="kenya_pharma" && $totals[$key]["type"]=="adult"){
+						$tot_adult_kp = $totals[$key]["total"];
+					}else if($totals[$key]["supplier"]=="kenya_pharma" && $totals[$key]["type"]=="paed"){
+						$tot_paed_kp = $totals[$key]["total"];
+					}else if($totals[$key]["supplier"]=="kemsa" && $totals[$key]["type"]=="adult"){
+						$tot_adult_kemsa = $totals[$key]["total"];
+					}else if($totals[$key]["supplier"]=="kemsa" && $totals[$key]["type"]=="paed"){
+						$tot_paed_kemsa = $totals[$key]["total"];
+					}
 				}
-
+				
 			}
-			if (count($result2) > 0) {
-				$tot_paed_kemsa = (int)$result2[0]['total_paed_kemsa'];
-				// Check if non standard regimens exist
-				if (count($result4) > 0) {
-					$tot_paed_kemsa += (int)$result4[0]['total_paed_kemsa'];
-				}
-			}
+			$total_kp = $tot_adult_kp + $tot_paed_kp;
 			$total_kemsa = $tot_adult_kemsa + $tot_paed_kemsa;
 
 			$total_adults = $tot_adult_kemsa + $tot_adult_kp;
@@ -2555,7 +2390,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function adult_patients($period = "", $facility = 0, $county = 0,$get_type="") {
-		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND sr.name NOT LIKE  '%pep%' ";
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' AND r.name NOT LIKE  '%pep%' AND r.name NOT LIKE  '%pmtct%' ";
 		$conditions = "";
 		$regimens = array();
 
@@ -2581,185 +2416,67 @@ class Dashboard_Management extends MY_Controller {
 			$conditions .= " AND c.id='$county'";
 		}
 		//scripts
-		$sql1_kp = "SELECT er.name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NOT NULL 
-						 AND er.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
-						 $conditions
-						 GROUP BY er.code";
-
-		$sql2_kp = "SELECT '2ND LINE' as name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NOT NULL 
-						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
-						 $conditions";
-		//Other regimens includiing non standard regimens
-		$sql3_kp = "SELECT 'OTHER REGIMENS' as name,SUM(total_adult_kp) as total
-					FROM(
-					SELECT SUM(mi.total) as total_adult_kp
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NOT NULL 
-						 AND sr.name LIKE '%adult%' AND er.code NOT IN('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B','AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
-						 $conditions
-						 
-					UNION ALL
-					
-						SELECT SUM( mi.total ) AS total_adult_kp
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
-							LEFT JOIN sync_category sr ON sr.id = nsr.category
-							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-							LEFT JOIN counties c ON c.id=ef.county_id
-							WHERE m.period_begin =  '$period'
-							$and_check_maps
-							AND em.maps_id IS NOT NULL 
-							AND sr.name LIKE  '%adult%'
-							$conditions
-					) as table1";
-
-		$sql1_ke = "SELECT er.name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND er.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
-						 $conditions
-						 GROUP BY er.code";
-
-		$sql2_ke = "SELECT '2ND LINE' as name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND er.code IN ('AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
-						 $conditions";
-		//Other regimens includiing non standard regimens
-		$sql3_ke = "SELECT 'OTHER REGIMENS' as name,SUM(total_adult_kemsa) as total
-					FROM(SELECT SUM(mi.total) as total_adult_kemsa
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND sr.name LIKE '%adult%' AND er.code NOT IN('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B','AS1A','AS1B','AS2A','AS2B','AS2C','AS3A','AS4A')
-						 $conditions
-						 
-						 UNION ALL
-					
-						SELECT SUM( mi.total ) AS total_adult_kemsa
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
-							LEFT JOIN sync_category sr ON sr.id = nsr.category
-							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-							LEFT JOIN counties c ON c.id=ef.county_id
-							WHERE m.period_begin =  '$period'
-							$and_check_maps
-							AND em.maps_id IS NULL 
-							AND sr.name LIKE  '%adult%'
-							$conditions
-					) as table1";
-
-		//execute first lines of both
-		$query1 = $this -> db -> query($sql1_kp);
-		$query2 = $this -> db -> query($sql1_ke);
-		$results1 = $query1 -> result_array();
-		$results2 = $query2 -> result_array();
-		if ($results1) {
-			foreach ($results1 as $value) {
-				$label = strtoupper(str_replace(" ", "", $value['name']));
+		$sql ="
+		SELECT id,regimen_type,SUM(total) as total FROM
+		(
+			(
+				SELECT DISTINCT(r.id),IF(r.code LIKE '%AS%','2ND_LINE',
+								IF(r.code NOT IN('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B'),'OTHER_REGIMENS',r.name)) as regimen_type,r.code, r.old_code,SUM(IFNULL(tabl.total,0) )as total ,sc.name
+				FROM escm_regimen r
+				LEFT JOIN 
+				(
+				 SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id 
+					FROM maps_item mi 
+					LEFT JOIN maps m ON m.id = mi.maps_id 
+					LEFT JOIN escm_regimen r ON r.id = mi.regimen_id 
+					LEFT JOIN escm_facility f ON f.id = m.facility_id 
+					WHERE m.period_begin = '$period' 
+					$and_check_maps
+					AND f.ordering='1'
+					AND m.id IN (SELECT maps_id FROM escm_maps) 
+				) tabl ON tabl.reg_id=r.id 
+				LEFT JOIN sync_category sc ON sc.id = r.category_id
+				WHERE sc.name NOT LIKE '%deleted%' AND sc.name NOT LIKE '%pep%' AND  sc.name NOT LIKE '%pmtct%'
+				AND sc.name LIKE '%adult%'
+				GROUP BY regimen_type ORDER BY r.id
+			)
+			UNION ALL
+			(
+				SELECT DISTINCT(r.id),IF(r.code LIKE '%AS%','2ND_LINE',
+								IF(r.code NOT IN('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B'),'OTHER_REGIMENS',r.name)) as regimen_type,r.code, r.old_code,SUM(IFNULL(tabl.total,0) )as total ,sc.name
+				FROM sync_regimen r
+				LEFT JOIN 
+				(
+				 SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id 
+					FROM maps_item mi 
+					LEFT JOIN maps m ON m.id = mi.maps_id 
+					LEFT JOIN sync_regimen r ON r.id = mi.regimen_id 
+					LEFT JOIN sync_facility f ON f.id = m.facility_id 
+					WHERE m.period_begin = '$period' 
+					$and_check_maps 
+					AND f.ordering='1'
+					AND m.id NOT IN (SELECT maps_id FROM escm_maps) 
+				) tabl ON tabl.reg_id=r.id 
+				LEFT JOIN sync_category sc ON sc.id = r.category_id
+				WHERE sc.name NOT LIKE '%deleted%' AND sc.name NOT LIKE '%pep%' AND  sc.name NOT LIKE '%pmtct%'
+				AND sc.name LIKE '%adult%'
+				GROUP BY regimen_type ORDER BY r.id
+			)
+		) as table1 
+		GROUP BY regimen_type
+		ORDER BY id
+		";
+		//echo $sql;die();
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			foreach ($results as $value) {
+				$label = strtoupper(str_replace(" ", "", $value['regimen_type']));
+				$label = str_replace("_", " ", $label);
 				$regimens[$label] = $value['total'];
 			}
 		}
 
-		if ($results2) {
-			foreach ($results2 as $value) {
-				$label = strtoupper(str_replace(" ", "", $value['name']));
-				$regimens[$label] = $regimens[$label] + $value['total'];
-			}
-		}
-
-		//execute second line
-		$query1 = $this -> db -> query($sql2_kp);
-		$query2 = $this -> db -> query($sql2_ke);
-		$results1 = $query1 -> result_array();
-		$results2 = $query2 -> result_array();
-		if ($results1) {
-			foreach ($results1 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $value['total'];
-			}
-		}
-
-		if ($results2) {
-			foreach ($results2 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $regimens[$label] + $value['total'];
-			}
-		}
-
-		//execute others
-		$query1 = $this -> db -> query($sql3_kp);
-		$query2 = $this -> db -> query($sql3_ke);
-		$results1 = $query1 -> result_array();
-		$results2 = $query2 -> result_array();
-		if ($results1) {
-			foreach ($results1 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $value['total'];
-			}
-		}
-
-		if ($results2) {
-			foreach ($results2 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $regimens[$label] + $value['total'];
-			}
-		}
 
 		$categories = array("D4T+3TC+NVP", "D4T+3TC+EFV", "AZT+3TC+NVP", "AZT+3TC+EFV", "TDF+3TC+NVP", "TDF+3TC+EFV", "2ND LINE", "OTHER REGIMENS");
 
@@ -2786,7 +2503,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 
 	public function paed_patients($period = "", $facility = 0, $county = 0,$get_type="") {
-		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND sr.name NOT LIKE  '%pep%'";
+		$and_check_maps = " AND m.status NOT LIKE '%delete%' AND m.status NOT LIKE '%prepare%' AND m.status NOT LIKE '%receive%' AND r.name NOT LIKE  '%pep%' AND r.name NOT LIKE  '%pmtct%' ";
 		$conditions = "";
 		$regimens = array();
 
@@ -2811,190 +2528,68 @@ class Dashboard_Management extends MY_Controller {
 		if ($county != 0) {
 			$conditions .= "AND c.id='$county'";
 		}
-		//scripts
-		$sql1_kp = "SELECT er.name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NOT NULL 
-						 AND er.code IN ('CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
-						 $conditions
-						 GROUP BY er.code";
 
-		$sql2_kp = "SELECT '2ND LINE' as name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NOT NULL 
-						 AND er.code IN ('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
-						 $conditions";
+		$sql ="
+		SELECT id,regimen_type,SUM(total) as total FROM
+		(
+			(
+				SELECT DISTINCT(r.id),IF(r.code LIKE '%CS%','2ND_LINE',
+								IF(r.code NOT IN('CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C'),'OTHER_REGIMENS',r.name)) as regimen_type,r.code, r.old_code,SUM(IFNULL(tabl.total,0) )as total ,sc.name
+				FROM escm_regimen r
+				LEFT JOIN 
+				(
+				 SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id 
+					FROM maps_item mi 
+					LEFT JOIN maps m ON m.id = mi.maps_id 
+					LEFT JOIN escm_regimen r ON r.id = mi.regimen_id 
+					LEFT JOIN escm_facility f ON f.id = m.facility_id 
+					WHERE m.period_begin = '$period' 
+					$and_check_maps
+					AND f.ordering='1'
+					AND m.id IN (SELECT maps_id FROM escm_maps) 
+				) tabl ON tabl.reg_id=r.id 
+				LEFT JOIN sync_category sc ON sc.id = r.category_id
+				WHERE sc.name NOT LIKE '%deleted%' AND sc.name NOT LIKE '%pep%' AND  sc.name NOT LIKE '%pmtct%'
+				AND sc.name LIKE '%paed%'
+				GROUP BY regimen_type ORDER BY r.id
+			)
+			UNION ALL
+			(
+				SELECT DISTINCT(r.id),IF(r.code LIKE '%CS%','2ND_LINE',
+								IF(r.code NOT IN('CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C'),'OTHER_REGIMENS',r.name)) as regimen_type,r.code, r.old_code,SUM(IFNULL(tabl.total,0) )as total ,sc.name
+				FROM sync_regimen r
+				LEFT JOIN 
+				(
+				 SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id 
+					FROM maps_item mi 
+					LEFT JOIN maps m ON m.id = mi.maps_id 
+					LEFT JOIN sync_regimen r ON r.id = mi.regimen_id 
+					LEFT JOIN sync_facility f ON f.id = m.facility_id 
+					WHERE m.period_begin = '$period' 
+					$and_check_maps 
+					AND f.ordering='1'
+					AND m.id NOT IN (SELECT maps_id FROM escm_maps) 
+				) tabl ON tabl.reg_id=r.id 
+				LEFT JOIN sync_category sc ON sc.id = r.category_id
+				WHERE sc.name NOT LIKE '%deleted%' AND sc.name NOT LIKE '%pep%' AND  sc.name NOT LIKE '%pmtct%'
+				AND sc.name LIKE '%paed%'
+				GROUP BY regimen_type ORDER BY r.id
+			)
+		) as table1 
+		GROUP BY regimen_type
+		ORDER BY id
+		";
+		//echo ($sql);die();
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		if ($results) {
+			foreach ($results as $value) {
+				$label = strtoupper(str_replace(" ", "", $value['regimen_type']));
+				$label = str_replace("_", " ", $label);
+				$regimens[$label] = $value['total'];
+			}
+		}
 		
-		//Other regimens, including non standard regimens
-		$sql3_kp = "SELECT 'OTHER REGIMENS' as name,SUM(total_paed_kp) as total
-						 FROM 
-						 (
-						 SELECT SUM(mi.total) as total_paed_kp
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN escm_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NOT NULL 
-						 AND sr.name LIKE '%Paediatric%' AND er.code NOT IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B','CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
-						 $conditions
-						 
-						 UNION ALL
-						 
-						 SELECT SUM( mi.total ) AS total_paed_kp
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
-							LEFT JOIN escm_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sr ON sr.id = nsr.category
-							WHERE m.period_begin =  '$period'
-							$and_check_maps
-							AND em.maps_id IS NOT NULL 
-							AND (sr.name LIKE  '%paediatric%' OR sr.name LIKE  '%pediatric%')
-							$conditions
-						) as table1
-						 ";
-		$sql1_ke = "SELECT er.name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND er.code IN ('CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
-						 $conditions
-						 GROUP BY er.code";
-
-		$sql2_ke = "SELECT '2ND LINE' as name,SUM(mi.total) as total
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND er.code IN ('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
-						 $conditions";
-
-		$sql3_ke = "SELECT 'OTHER REGIMENS' as name,SUM(total_paed_kemsa) as total
-						 FROM 
-						 (
-						 SELECT SUM(mi.total) as total_paed_kemsa
-						 FROM maps_item mi 
-						 LEFT JOIN maps m ON m.id=mi.maps_id
-						 LEFT JOIN escm_maps em ON em.maps_id = m.id
-						 LEFT JOIN sync_regimen er ON er.id=mi.regimen_id
-						 LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 LEFT JOIN counties c ON c.id=ef.county_id
-						 LEFT JOIN sync_category sr ON sr.id=er.category_id
-						 WHERE m.period_begin='$period'
-						 $and_check_maps
-						 AND em.maps_id IS NULL 
-						 AND (sr.name LIKE  '%paediatric%' OR sr.name LIKE  '%pediatric%') AND er.code NOT IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B','CF1A',  'CF1B', 'CF2A' , 'CF2B',  'CF2D' ,'CF1C')
-						 $conditions
-						 
-						 UNION ALL
-						 
-						 SELECT SUM( mi.total ) AS total_paed_kemsa
-							FROM nonstandard_maps_item mi
-							LEFT JOIN maps m ON m.id = mi.maps_id
-							LEFT JOIN escm_maps em ON em.maps_id = m.id
-							LEFT JOIN nonstandard_regimen nsr ON nsr.id = mi.regimen_id
-							LEFT JOIN sync_facility ef ON ef.id=m.facility_id
-						 	LEFT JOIN counties c ON c.id=ef.county_id
-							LEFT JOIN sync_category sr ON sr.id = nsr.category
-							WHERE m.period_begin =  '$period'
-							$and_check_maps
-							AND em.maps_id IS NULL 
-							AND (sr.name LIKE  '%paediatric%' OR sr.name LIKE  '%pediatric%')
-							$conditions
-						 ) as table1
-						 ";
-		//execute first lines of both
-		$query1 = $this -> db -> query($sql1_kp);
-		$query2 = $this -> db -> query($sql1_ke);
-		$results1 = $query1 -> result_array();
-		$results2 = $query2 -> result_array();
-		if ($results1) {
-			foreach ($results1 as $value) {
-				$label = strtoupper(str_replace(" ", "", $value['name']));
-				$regimens[$label] = $value['total'];
-			}
-		}
-
-		if ($results2) {
-			foreach ($results2 as $value) {
-				$label = strtoupper(str_replace(" ", "", $value['name']));
-				$regimens[$label] = @$regimens[$label] + $value['total'];
-			}
-		}
-
-		//execute second line
-		$query1 = $this -> db -> query($sql2_kp);
-		$query2 = $this -> db -> query($sql2_ke);
-		$results1 = $query1 -> result_array();
-		$results2 = $query2 -> result_array();
-		if ($results1) {
-			foreach ($results1 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $value['total'];
-			}
-		}
-
-		if ($results2) {
-			foreach ($results2 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $regimens[$label] + $value['total'];
-			}
-		}
-
-		//execute others
-		$query1 = $this -> db -> query($sql3_kp);
-		$query2 = $this -> db -> query($sql3_ke);
-		$results1 = $query1 -> result_array();
-		$results2 = $query2 -> result_array();
-		if ($results1) {
-			foreach ($results1 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $value['total'];
-			}
-		}
-
-		if ($results2) {
-			foreach ($results2 as $value) {
-				$label = $value['name'];
-				$regimens[$label] = $regimens[$label] + $value['total'];
-			}
-		}
 		$categories = array("AZT+3TC+NVP", "AZT+3TC+EFV", "ABC+3TC+NVP", "ABC+3TC+EFV", "ABC+3TC+LPV/R", "AZT+3TC+LPV/R", "2ND LINE", "OTHER REGIMENS");
 
 		foreach ($regimens as $regimen) {
@@ -3144,7 +2739,7 @@ class Dashboard_Management extends MY_Controller {
 		if($period_begin!=''){
 			//Get regimen list
 			$sql_regimen = "
-							SELECT r.id,r.code, r.old_code, r.name,IFNULL(tabl.total,0) as total  FROM $regimen_table r
+							SELECT DISTINCT(r.id),r.code, r.old_code, r.name,IFNULL(tabl.total,0) as total  FROM $regimen_table r
 							LEFT JOIN 
 							(
 							SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id
@@ -3159,7 +2754,6 @@ class Dashboard_Management extends MY_Controller {
 							) tabl ON tabl.reg_id=r.id
 							ORDER BY r.id
 							";
-			//echo $sql_regimen;die();
 			$query = $this -> db -> query($sql_regimen);
 			$results = $query -> result_array();
 			return $results;
@@ -3167,8 +2761,66 @@ class Dashboard_Management extends MY_Controller {
 		}
 		
 	}
+	public function getTotalPatientARTByPipeline($period_begin='',$and_check_maps='',$conditions=''){
+		$sql = "
+			SELECT type,total,supplier FROM 
+				(
+					(
+						SELECT IF(sc.name LIKE '%adult%','adult','paed') as type,SUM(IFNULL(tabl.total,0) )as total,'kenya_pharma' as supplier
+						FROM escm_regimen r
+						LEFT JOIN 
+						(
+						 SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id 
+							FROM maps_item mi 
+							LEFT JOIN maps m ON m.id = mi.maps_id 
+							LEFT JOIN escm_regimen r ON r.id = mi.regimen_id 
+							LEFT JOIN escm_facility f ON f.id = m.facility_id 
+							LEFT JOIN counties c ON c.id=f.county_id
+							WHERE m.period_begin = '$period_begin' 
+							$and_check_maps
+							AND m.status NOT LIKE '%receive%' 
+							AND f.ordering='1'
+							AND m.id IN (SELECT maps_id FROM escm_maps) 
+						) tabl ON tabl.reg_id=r.id 
+						LEFT JOIN sync_category sc ON sc.id = r.category_id
+						WHERE sc.name NOT LIKE '%deleted%' AND sc.name NOT LIKE '%pep%' AND  sc.name NOT LIKE '%pmtct%'
+						$conditions
+						GROUP BY type
+						ORDER BY r.id
+					)
+					UNION ALL
+					(
+						SELECT IF(sc.name LIKE '%adult%','adult','paed') as type,SUM(IFNULL(tabl.total,0) )as total,'kemsa' as supplier
+						FROM escm_regimen r
+						LEFT JOIN 
+						(
+						 SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id 
+							FROM maps_item mi 
+							LEFT JOIN maps m ON m.id = mi.maps_id 
+							LEFT JOIN sync_regimen r ON r.id = mi.regimen_id 
+							LEFT JOIN sync_facility f ON f.id = m.facility_id 
+							LEFT JOIN counties c ON c.id=f.county_id
+							WHERE m.period_begin = '$period_begin' 
+							$and_check_maps 
+							AND m.status NOT LIKE '%receive%' 
+							AND f.ordering='1'
+							AND m.id NOT IN (SELECT maps_id FROM escm_maps) 
+						) tabl ON tabl.reg_id=r.id 
+						LEFT JOIN sync_category sc ON sc.id = r.category_id
+						WHERE sc.name NOT LIKE '%deleted%' AND sc.name NOT LIKE '%pep%' AND  sc.name NOT LIKE '%pmtct%'
+						$conditions
+						GROUP BY type
+						ORDER BY r.id
+					)
+				) as table1
+		";
+		$query = $this ->db ->query($sql);
+		$results = $query ->result_array();
+		return $results;
+		
+	}
 	
-	function deleteAllFiles($directory=""){
+	public function deleteAllFiles($directory=""){
 		if($directory!=""){
 			foreach(glob("{$directory}/*") as $file)
 		    {

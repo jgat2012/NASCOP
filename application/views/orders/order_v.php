@@ -74,20 +74,20 @@
 	$(document).ready(function() {
 		
 		//Patient Listing DataTables
-		var oTable = $('#order_listing_kemsa').dataTable({
-				        "bProcessing": true,
-				        "sAjaxSource": 'order/getorders/kemsa',
-				        "bJQueryUI" : true,
-						"sPaginationType" : "full_numbers",
-						"bStateSave" : true,
-						"sDom" : '<"H"T<"clear">lfr>t<"F"ip>',
-						"bAutoWidth" : false,
-						"bDeferRender" : true,
-						"bInfo" : true
-				  });
 		$('#order_listing_kp').dataTable({
 	        "bProcessing": true,
 	        "sAjaxSource": 'order/getorders/kp',
+	        "bJQueryUI" : true,
+			"sPaginationType" : "full_numbers",
+			"bStateSave" : true,
+			"sDom" : '<"H"T<"clear">lfr>t<"F"ip>',
+			"bAutoWidth" : false,
+			"bDeferRender" : true,
+			"bInfo" : true
+	    });
+		$('#order_listing_kemsa').dataTable({
+	        "bProcessing": true,
+	        "sAjaxSource": 'order/getorders/kemsa',
 	        "bJQueryUI" : true,
 			"sPaginationType" : "full_numbers",
 			"bStateSave" : true,
