@@ -682,40 +682,9 @@ class Dashboard_Management extends MY_Controller {
 		//Patients By Regimen
 		elseif ($type == 'BYREG_PATIENT') {
 			$period = date('Y-m-01', strtotime($period));
-			$facility_table = '';
-			$regimen_table = '';
-			$and = '';
-			if ($pipeline == 'kemsa') {
-				$regimen_table = 'sync_regimen';
-				$facility_table = 'sync_facility';
-				//Check for maps that came from kemsa
-				$and .= ' and m.id NOT IN (SELECT maps_id FROM escm_maps)';
-			} else if ($pipeline == 'kenya_pharma') {
-				$regimen_table = 'escm_regimen';
-				$facility_table = 'escm_facility';
-				//Check for maps that came from kenya Pharma
-				$and .= ' and m.id IN (SELECT maps_id FROM escm_maps)';
-			}
-			$sql_regimen = "
-						SELECT c.id as cat_id,c.name as cat_name,tabl.reg_name as regimen_name,tabl.code as regimen_code,tabl.old_code,tabl.total as total FROM sync_category c
-						LEFT JOIN 
-						(
-						SELECT  SUM(mi.total) as total, mi.regimen_id,r.code,r.old_code,r.name as reg_name, r.id as reg_id,c.id as cat_id 
-						FROM maps_item mi 
-						LEFT JOIN maps m ON m.id = mi.maps_id 
-						LEFT JOIN $regimen_table r ON r.id = mi.regimen_id 
-						LEFT JOIN escm_facility f ON f.id = m.facility_id
-						LEFT JOIN sync_category c ON c.id=r.category_id
-						WHERE m.period_begin = '$period' 
-						$and
-						$and_check_maps
-						GROUP BY mi.regimen_id ORDER BY r.code,reg_name ) tabl ON tabl.cat_id=c.id
-						WHERE c.name NOT LIKE '%delete%'
-						";
-			//echo $sql_regimen;die();
-			$query = $this -> db -> query($sql_regimen);
-			$results = $query -> result_array();
-
+			
+			$results = $this ->getTotalPatientsByRegimen($period,$pipeline,$and_check_maps);
+			//echo $results;die();
 			$period = date('F-Y', strtotime($period));
 			$filename = "Patients By Regimen";
 			$dir = "Export";
@@ -750,7 +719,7 @@ class Dashboard_Management extends MY_Controller {
 
 				$cat_id = $results[$a]['cat_id'];
 				$cat_name = $results[$a]['cat_name'];
-				$code = $value['regimen_code'];
+				$code = $value['code'];
 				$regimen_desc = $value['regimen_name'];
 				$total = $value['total'];
 
@@ -812,37 +781,8 @@ class Dashboard_Management extends MY_Controller {
 			$facility_table = '';
 			$regimen_table = '';
 			$where = ' ';
-			if ($pipeline == 'kemsa') {
-				$regimen_table = 'sync_regimen';
-				$facility_table = 'sync_facility';
-				$where .= ' where m.id NOT IN (SELECT maps_id FROM escm_maps)';
-			} else if ($pipeline == 'kenya_pharma') {
-				$regimen_table = 'escm_regimen';
-				$facility_table = 'escm_facility';
-				$where .= ' where m.id IN (SELECT maps_id FROM escm_maps)';
-			}
-			$sql = "
+			$results = $this->getTotalPatientScale($pipeline,$and_check_maps);
 			
-			SELECT c.id,c.name,tabl.period_begin,SUM(tabl.total) as total FROM sync_category c
-			LEFT JOIN 
-			(
-			SELECT mi.total,m.period_begin, mi.regimen_id,r.code,r.old_code,r.name as reg_name, r.id as reg_id,c.id as cat_id 
-			FROM maps_item mi 
-			LEFT JOIN maps m ON m.id = mi.maps_id 
-			LEFT JOIN $regimen_table r ON r.id = mi.regimen_id 
-			LEFT JOIN $facility_table f ON f.id = m.facility_id
-			LEFT JOIN sync_category c ON c.id=r.category_id
-			$where
-			$and_check_maps
-			ORDER BY r.code,reg_name ) tabl ON tabl.cat_id=c.id
-			WHERE c.name NOT LIKE '%delete%'
-			GROUP BY  c.name,tabl.period_begin ORDER BY tabl.period_begin,c.name
-			
-			";
-
-			//die($sql);
-			$query = $this -> db -> query($sql);
-			$results = $query -> result_array();
 			$count = count($results);
 			if ($count > 0) {
 				$first_period = $results[0]['period_begin'];
@@ -858,7 +798,7 @@ class Dashboard_Management extends MY_Controller {
 			}
 
 			//Generate excel sheet
-			$period = date('F-Y', strtotime($period));
+
 			$filename = "ART Patients Scale Up Trends";
 			$dir = "Export";
 			$objPHPExcel = $this -> generateExcelDefaultStyle($filename);
@@ -904,17 +844,14 @@ class Dashboard_Management extends MY_Controller {
 			$tot_pmtct_mother = 0;
 			$tot_pmtct_infant = 0;
 			$total = 0;
-			foreach ($results as $value) {
+			foreach ($results as $key=>$value) {
 				$period = date('M-Y', strtotime($value['period_begin']));
-				$cat_name = strtolower($value['name']);
+				$total = $value['total'];
+				$cat_name = strtolower($value['cat_name']);
 				//Regimen category
-
+				//echo $cat_name." - ".$period." - ".$total."<br>";
 				$patient_category = '';
-				if ($cat_name == 'adult art first line' || $cat_name == 'adult art second line' || $cat_name == 'other adult regimen') {
-					$patient_category = 'adult art patients';
-				} else if ($cat_name == 'paediatric first line' || $cat_name == 'paediatric second line' || $cat_name == 'other paediatric art regimen') {
-					$patient_category = 'paediatric art patients';
-				} else if ($cat_name == 'pep adult') {
+				if ($cat_name == 'pep adult') {
 					$patient_category = 'pep adults';
 				} else if ($cat_name == 'pep child') {
 					$patient_category = 'pep children';
@@ -922,9 +859,11 @@ class Dashboard_Management extends MY_Controller {
 					$patient_category = 'pmtct infants';
 				} else if ($cat_name == 'pmtct regimens for pregnant women') {
 					$patient_category = 'pmtct mothers';
+				} else{
+					$patient_category = $cat_name;
 				}
 
-				$total = $value['total'];
+				
 				if ($x == 0) {
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $y, $period);
 					if ($patient_category == 'adult art patients') {$tot_art_adult += $total;
@@ -983,8 +922,9 @@ class Dashboard_Management extends MY_Controller {
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('G' . $z, $tot_pmtct_infant);
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('H' . $z, $tot_pmtct_mother);
 					$objPHPExcel -> getActiveSheet() -> SetCellValue('I' . $z, ($tot_pmtct_mother + $tot_pmtct_infant + $tot_pep_adult + $tot_pep_child + $tot_art_child + $tot_art_adult));
-				};
+				}
 			}
+			//die();
 			$objPHPExcel -> getActiveSheet() -> getStyle('I8:I' . $y) -> getFont() -> setBold(true);
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 
@@ -1504,299 +1444,7 @@ class Dashboard_Management extends MY_Controller {
 			$this -> table -> add_row('', '<h5>TOTAL</h5>', '<b><center>' . number_format($total_kemsa) . '</center></b>', '<b><center>' . number_format($total_kp) . '</center></b>', '<b><center>' . number_format($grand_total) . '</center></b>');
 			$table_display = $this -> table -> generate();
 			echo $table_display;
-		} elseif ($type == "ADULT_ART") {//Current Adult Patients on ART
-			//Bar Chart
-			$data = array();
-			$list = array();
-			$dataArray = array();
-			$columns = array();
-			$total_series = array();
-			$series = array();
-			$categories = array();
-			$pipelines = array("kemsa", "kenya_pharma");
-			$values1 = array(0, 0, 0, 0, 0, 0, 0, 0);
-			$values2 = array(0, 0, 0, 0, 0, 0, 0, 0);
-
-			foreach ($pipelines as $pipeline) {
-				if ($pipeline == "kemsa") {
-					$regimen_table = "sync_regimen";
-				} else if ($pipeline == "kenya_pharma") {
-					$join_kp = "SELECT mr.name as regimen_desc,test.total
-                                FROM escm_regimen mr
-                                LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total
-								FROM escm_regimen r
-								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								$join_maps
-								WHERE(r.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
-								$and
-								$and_check_maps
-								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								WHERE mr.code IN ('AF1A',  'AF1B',  'AF2A',  'AF2B',  'AF3A',  'AF3B')
-								GROUP BY mr.code";
-
-					$join1_kp = "SELECT mr.name as regimen_desc,test.total
-                                FROM escm_regimen mr
-                                LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total
-								FROM escm_regimen r
-								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								$join_maps
-								WHERE(r.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
-								$and
-								$and_check_maps
-								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								WHERE mr.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')
-								GROUP BY mr.code";
-
-					$join2_kp = "SELECT mr.name as regimen_desc,test.total
-                                FROM escm_regimen mr
-                                LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total,r.category_id
-								FROM escm_regimen r
-								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								LEFT JOIN sync_category sc ON sc.id=r.category_id
-								$join_maps
-								WHERE sc.name LIKE '%Other Adult Regimen%'
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps)
-								$and
-								$and_check_maps
-								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								LEFT JOIN sync_category sc1 ON sc1.id=test.category_id
-								WHERE sc1.name LIKE '%Other Adult Regimen%'
-								GROUP BY mr.code";
-					$regimen_table = "escm_regimen";
-				}
-				$regimens = array("D4T+3TC+NVP", "D4T+3TC+EFV", "AZT+3TC+NVP", "AZT+3TC+EFV", "TDF+3TC+NVP", "TDF+3TC+EFV", "2ND LINE", "OTHER REGIMENS");
-
-				$regimen_lines['first_line'] = "WHERE r.code IN('AF1A','AF1B','AF2A','AF2B','AF3A','AF3B') GROUP BY r.code";
-				$regimen_lines['second_line'] = "WHERE r.code IN('AS1A','AS1B','AS2A','AS2B','AS3A','AS3B','AS4A','AS4B')";
-				$regimen_lines['other_lines'] = "LEFT JOIN sync_category sc ON sc.id=r.category_id WHERE sc.name LIKE '%Other Adult Regimen%'";
-
-				foreach ($regimen_lines as $index => $regimen_list) {
-					//Query to retrieve patients in this regimens
-					$sql = "SELECT r.name as regimen_desc,SUM(mi.total)as total
-					        FROM $regimen_table r
-					        LEFT JOIN maps_item mi ON mi.regimen_id=r.id
-					        $regimen_list";
-
-					if ($pipeline == "kenya_pharma" && $index == "first_line") {
-						$sql = $join_kp;
-					} else if ($pipeline == "kenya_pharma" && $index == "second_line") {
-						$sql = $join1_kp;
-					} else if ($pipeline == "kenya_pharma" && $index == "other_lines") {
-						$sql = $join2_kp;
-					}
-					$query = $this -> db -> query($sql);
-					$results = $query -> result_array();
-					if ($results) {
-						foreach ($results as $value) {
-							if ($pipeline == "kemsa") {
-								$total = $value['total'];
-								
-								if ($index == "first_line") {
-									$value = strtoupper(str_replace(" ", "", $value['regimen_desc']));
-								} else if ($index == "second_line") {
-									$value = "2ND LINE";
-								} else if ($index == "other_lines") {
-									$value = "OTHER REGIMENS";
-								}
-								$key = array_search($value, $regimens);
-								$values1[$key] = @(int)$total;
-							} else if ($pipeline == "kenya_pharma") {
-								$total = $value['total'];
-								if ($index == "first_line") {
-									$value = strtoupper(str_replace(" ", "", $value['regimen_desc']));
-								} else if ($index == "second_line") {
-									$value = "2ND LINE";
-								} else if ($index == "other_lines") {
-									$value = "OTHER REGIMENS";
-								}
-								$key = array_search($value, $regimens);
-								$values2[$key] = @(int)$total;
-							}
-						}
-					}
-				}
-			}
-
-			$add = function($a, $b) {
-				return $a + $b;
-			};
-
-			$values = array_map($add, $values1, $values2);
-			//echo "<pre>";
-			//print_r($values);
-			//echo "</pre>";
-
-			$resultArray = array( array('name' => 'Number of Patients', 'data' => $values));
-			foreach ($regimens as $key => $value) {
-				$categories[$key] = $value;
-			}
-			if($get_type=="two_pager_download"){//If downlading two pager data
-				return $values;
-			}
-
-			$resultArray = json_encode($resultArray);
-			//var_dump($resultArray);die();
-			$categories = json_encode($categories);
-			$data['resultArraySize'] = 7;
-			$data['container'] = 'report_adult_chart';
-			$data['chartType'] = 'bar';
-			$data['chartTitle'] = 'Adult Patients on ART';
-			$data['categories'] = $categories;
-			$data['yAxix'] = 'No of Patients';
-			$data['name'] = 'Adult Patients';
-			$data['resultArray'] = $resultArray;
-			$this -> load -> view('dashboard/chart_report_bar_v', $data);
-
-		} elseif ($type == "PAED_ART") {//Bar Chart
-			$data = array();
-			$list = array();
-			$dataArray = array();
-			$columns = array();
-			$total_series = array();
-			$series = array();
-			$categories = array();
-			$pipelines = array("kemsa", "kenya_pharma");
-			$values1 = array(0, 0, 0, 0, 0, 0, 0, 0);
-			$values2 = array(0, 0, 0, 0, 0, 0, 0, 0);
-
-			foreach ($pipelines as $pipeline) {
-				if ($pipeline == "kemsa") {
-					$regimen_table = "sync_regimen";
-				} else if ($pipeline == "kenya_pharma") {
-					$join_kp = "SELECT mr.name as regimen_desc,test.total
-                                FROM escm_regimen mr
-                                LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total
-								FROM escm_regimen r
-								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								$join_maps
-								WHERE(r.code IN ('CF1A',  'CF1B', 'CF1C'  ,'CF2A',  'CF2B','CF2C', 'CF2D' ,'CF3A',  'CF3B')
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
-								$and
-								$and_check_maps
-								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								WHERE mr.code IN ('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B')
-								GROUP BY mr.code";
-
-					$join1_kp = "SELECT mr.name as regimen_desc,test.total
-                                FROM escm_regimen mr
-                                LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total
-								FROM escm_regimen r
-								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								$join_maps
-								WHERE(r.code IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps))
-								$and
-								$and_check_maps
-								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								WHERE mr.code IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')
-								GROUP BY mr.code";
-
-					$join2_kp = "SELECT mr.name as regimen_desc,test.total
-                                FROM escm_regimen mr
-                                LEFT JOIN 
-								(SELECT r.id AS regimen_id, SUM( mi.total ) AS total,r.category_id
-								FROM escm_regimen r
-								LEFT JOIN maps_item mi ON mi.regimen_id = r.id
-								LEFT JOIN sync_category sc ON sc.id=r.category_id
-								$join_maps
-								WHERE sc.name LIKE '%Other Paediatric ART Regimen%'
-								AND mi.maps_id IN(SELECT maps_id FROM escm_maps)
-								$and
-								$and_check_maps
-								GROUP BY r.code) as test ON mr.id=test.regimen_id
-								LEFT JOIN sync_category sc1 ON sc1.id=test.category_id
-								WHERE sc1.name LIKE '%Other Paediatric ART Regimen%'
-								GROUP BY mr.code";
-					$regimen_table = "escm_regimen";
-				}
-				$regimens = array("D4T+3TC+NVP", "D4T+3TC+EFV", "AZT+3TC+NVP", "AZT+3TC+EFV", "TDF+3TC+NVP", "TDF+3TC+EFV", "2ND LINE", "OTHER REGIMENS");
-
-				$regimen_lines['first_line'] = "WHERE r.code IN('CF1A',  'CF1B', 'CF1C' , 'CF2A',  'CF2B' ,'CF2C',  'CF2D', 'CF3A',  'CF3B') GROUP BY r.code";
-				$regimen_lines['second_line'] = "WHERE r.code IN('CS1A',  'CS1B', 'CS1C'  ,'CS2A', 'CS2B','CS2C', 'CS2D' ,'CS3A',  'CS3B')";
-				$regimen_lines['other_lines'] = "LEFT JOIN sync_category sc ON sc.id=r.category_id WHERE sc.name LIKE '%Other Paediatric ART Regimen%'";
-
-				foreach ($regimen_lines as $index => $regimen_list) {
-					//Query to retrieve patients in this regimens
-					$sql = "SELECT r.name as regimen_desc,SUM(mi.total)as total
-					        FROM $regimen_table r
-					        LEFT JOIN maps_item mi ON mi.regimen_id=r.id
-					        $regimen_list";
-
-					if ($pipeline == "kenya_pharma" && $index == "first_line") {
-						$sql = $join_kp;
-					} else if ($pipeline == "kenya_pharma" && $index == "second_line") {
-						$sql = $join1_kp;
-					} else if ($pipeline == "kenya_pharma" && $index == "other_lines") {
-						$sql = $join2_kp;
-					}
-					$query = $this -> db -> query($sql);
-					$results = $query -> result_array();
-					if ($results) {
-						foreach ($results as $value) {
-							if ($pipeline == "kemsa") {
-								$total = $value['total'];
-								if ($index == "first_line") {
-									$value = strtoupper(str_replace(" ", "", $value['regimen_desc']));
-								} else if ($index == "second_line") {
-									$value = "2ND LINE";
-								} else if ($index == "other_lines") {
-									$value = "OTHER REGIMENS";
-								}
-								$key = array_search($value, $regimens);
-								$values1[$key] = @(int)$total;
-							} else if ($pipeline == "kenya_pharma") {
-								$total = $value['total'];
-								if ($index == "first_line") {
-									$value = strtoupper(str_replace(" ", "", $value['regimen_desc']));
-								} else if ($index == "second_line") {
-									$value = "2ND LINE";
-								} else if ($index == "other_lines") {
-									$value = "OTHER REGIMENS";
-								}
-								$key = array_search($value, $regimens);
-								$values2[$key] = @(int)$total;
-							}
-						}
-					}
-				}
-			}
-
-			$add = function($a, $b) {
-				return $a + $b;
-			};
-
-			$values = array_map($add, $values1, $values2);
-			
-			if($get_type=="two_pager_download"){//If downlading two pager data
-				return $values;
-			}
-			$regimens = array("AZT+3TC+NVP", "AZT+3TC+EFV", "ABC+3TC+NVP", "ABC+3TC+EFV", "ABC+3TC+LPv/r", "AZT+3TC+LPv/r", "2ND LINE", "OTHER REGIMENS");
-
-			$resultArray = array( array('name' => 'Number of Patients', 'data' => $values));
-
-			foreach ($regimens as $key => $value) {
-				$categories[$key] = $value;
-			}
-			$resultArray = json_encode($resultArray);
-			$categories = json_encode($categories);
-			$data['resultArraySize'] = 7;
-			$data['container'] = 'report_paed_chart';
-			$data['chartType'] = 'bar';
-			$data['title'] = 'Reporting Analysis';
-			$data['chartTitle'] = 'Paediatric Patients on ART';
-			$data['categories'] = $categories;
-			$data['yAxix'] = 'No of Patients';
-			$data['name'] = 'Paediatric Patients';
-			$data['resultArray'] = $resultArray;
-			$this -> load -> view('dashboard/chart_report_bar_v', $data);
-		} else {
+		}else {
 			$columns = array('#', 'Reporting Period', 'Pipeline', 'Action');
 			$links = array('dashboard_management/download/' . $type => '<i class="icon-download-alt"></i>download');
 			//Get eSCM orders
@@ -2818,6 +2466,88 @@ class Dashboard_Management extends MY_Controller {
 		$results = $query ->result_array();
 		return $results;
 		
+	}
+	
+	public function getTotalPatientsByRegimen($period="",$pipeline="",$and_check_maps=""){//Patients By Regimen Report
+		$facility_table = '';
+		$regimen_table = '';
+		$and = '';
+		if ($pipeline == 'kemsa') {
+			$regimen_table = 'sync_regimen';
+			$facility_table = 'sync_facility';
+			//Check for maps that came from kemsa
+			$and .= ' AND m.id NOT IN (SELECT maps_id FROM escm_maps)';
+		} else if ($pipeline == 'kenya_pharma') {
+			$regimen_table = 'escm_regimen';
+			$facility_table = 'escm_facility';
+			//Check for maps that came from kenya Pharma
+			$and .= ' AND m.id IN (SELECT maps_id FROM escm_maps)';
+		}
+		
+		$sql = "
+				SELECT DISTINCT(r.id),r.code, r.old_code, r.name as regimen_name,SUM(IFNULL(tabl.total,0) )as total ,sc.id as cat_id,sc.name as cat_name
+				FROM $regimen_table r
+				LEFT JOIN 
+				(
+				 SELECT m.facility_id, f.name as facility_name, mi.total, mi.regimen_id, r.id as reg_id 
+					FROM maps_item mi 
+					LEFT JOIN maps m ON m.id = mi.maps_id 
+					LEFT JOIN $regimen_table r ON r.id = mi.regimen_id 
+					LEFT JOIN $facility_table f ON f.id = m.facility_id 
+					WHERE m.period_begin = '$period' 
+					$and_check_maps
+					AND m.status NOT LIKE '%receive%' 
+					AND f.ordering='1'
+					$and
+				
+				) tabl ON tabl.reg_id=r.id 
+				LEFT JOIN sync_category sc ON sc.id = r.category_id
+				WHERE sc.name NOT LIKE '%deleted%' AND sc.name NOT LIKE '%pep%' AND  sc.name NOT LIKE '%pmtct%'
+				GROUP BY id ORDER BY cat_id ASC
+				";
+		$query = $this ->db ->query($sql);
+		$results = $query ->result_array();
+		return $results;
+		
+	}
+	
+	public function getTotalPatientScale($pipeline="",$and_check_maps=""){//Get total patients scale up
+		$facility_table = '';
+		$regimen_table = '';
+		$and = '';
+		if ($pipeline == 'kemsa') {
+			$regimen_table = 'sync_regimen';
+			$facility_table = 'sync_facility';
+			//Check for maps that came from kemsa
+			$and .= ' AND m.id NOT IN (SELECT maps_id FROM escm_maps)';
+		} else if ($pipeline == 'kenya_pharma') {
+			$regimen_table = 'escm_regimen';
+			$facility_table = 'escm_facility';
+			//Check for maps that came from kenya Pharma
+			$and .= ' AND m.id IN (SELECT maps_id FROM escm_maps)';
+		}
+		$sql ="
+			SELECT c.id,IF(c.name LIKE '%adult art%','adult art patients',
+					IF(c.name LIKE '%paediatric%','paediatric art patients',c.name)) as cat_name,tabl.period_begin,SUM(tabl.total) as total 
+				FROM sync_category c 
+				LEFT JOIN 
+				(
+					SELECT mi.total,m.period_begin, mi.regimen_id,r.code,r.old_code,r.name as reg_name, r.id as reg_id,c.id as cat_id 
+					FROM maps_item mi 
+					LEFT JOIN maps m ON m.id = mi.maps_id 
+					LEFT JOIN escm_regimen r ON r.id = mi.regimen_id 
+					LEFT JOIN escm_facility f ON f.id = m.facility_id 
+					LEFT JOIN sync_category c ON c.id=r.category_id 
+					WHERE f.ordering='1'
+					$and_check_maps
+					$and 
+					ORDER BY r.code,reg_name 
+				) tabl ON tabl.cat_id=c.id
+				WHERE c.name NOT LIKE '%delete%'
+				GROUP BY cat_name,tabl.period_begin ORDER BY tabl.period_begin,cat_name";
+		$query = $this -> db -> query($sql);
+		$results = $query -> result_array();
+		return $results;
 	}
 	
 	public function deleteAllFiles($directory=""){
