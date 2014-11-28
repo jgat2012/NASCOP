@@ -544,10 +544,25 @@
 	 * Commodity Analysis functions
 	 */
 	function commodity_analysis(){
-		  var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
+		  //var soh_link="<?php echo base_url().'dashboard_management/getCommodity/SOH';?>";
+		  var mos_link="<?php echo base_url().'dashboard_management/getCommodity/MOS';?>";
 		  var cons_link="<?php echo base_url().'dashboard_management/getCommodity/CONS';?>";
-		  $("#SOH_grid").load(soh_link, function() {
+		  /*$("#SOH_grid").load(soh_link, function() {
 	           var oTable1= $("#SOH_listing").dataTable({
+			 		 "bJQueryUI" : true,
+					"sPaginationType" : "full_numbers",
+					"sDom" : '<"H"Tfr>t<"F"ip>',
+					"oTableTools" : {
+						"sSwfPath" : base_url + "scripts/datatable/copy_csv_xls_pdf.swf",
+						"aButtons" : ["copy", "print", "xls", "pdf"]
+					},
+					"bProcessing" : true,
+					"bServerSide" : false,
+			    });
+			    oTable1.fnSort([[0,'desc']]);
+	       });*/
+	       $("#MOS_grid").load(mos_link, function() {
+	           var oTable1= $("#MOS_listing").dataTable({
 			 		 "bJQueryUI" : true,
 					"sPaginationType" : "full_numbers",
 					"sDom" : '<"H"Tfr>t<"F"ip>',
@@ -817,8 +832,8 @@
 					<div id="CONS_grid"></div>
 			    </div>
 			    <div class="two_block span6" id="s_consumption">
-					<h3 class="dashboard_title">Stock Status</h3>
-					<div id="SOH_grid"></div>
+					<h3 class="dashboard_title">Facility MOS</h3>
+					<div id="MOS_grid"></div>
 			    </div>
 			</div>
 		</div>

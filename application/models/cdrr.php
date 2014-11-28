@@ -22,6 +22,7 @@ class Cdrr extends Doctrine_Record {
 	public function setUp() {
 		$this -> setTableName('cdrr');
 		$this -> hasOne('Sync_Facility as Facility', array('local' => 'facility_id', 'foreign' => 'id'));
+		$this -> hasOne('Escm_Facility as Escmfacility', array('local' => 'facility_id', 'foreign' => 'id'));
 		$this -> hasOne('maps as map', array('local' => 'period_begin', 'foreign' => 'period_begin'));
 	}
 
@@ -60,9 +61,9 @@ class Cdrr extends Doctrine_Record {
 	public function getNascopPeriod($id_list) {
 		$and = "";
 		if ($id_list != "") {
-			$and = "and id NOT IN($id_list)";
+			$and = "and c.id NOT IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='F-CDRR_units' $and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr c") -> where("f.ordering='1' $and")->leftJoin("c.Facility as f") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}
@@ -70,9 +71,9 @@ class Cdrr extends Doctrine_Record {
 	public function getEscmPeriod($id_list) {
 		$and = "";
 		if ($id_list != "") {
-			$and = "and id IN($id_list)";
+			$and = "and c.id IN($id_list)";
 		}
-		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr") -> where("code !='F-CDRR_units' $and") -> groupBy("period_begin");
+		$query = Doctrine_Query::create() -> select("period_begin") -> from("cdrr c") -> where("f.ordering='1' $and") ->leftJoin("c.Escmfacility as f") -> groupBy("period_begin");
 		$items = $query -> execute(array(), Doctrine::HYDRATE_ARRAY);
 		return $items;
 	}

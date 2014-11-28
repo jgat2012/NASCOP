@@ -454,7 +454,109 @@ class Dashboard_Management extends MY_Controller {
 			}
 
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
-		} else if ($type == "CONS") {// Stock consumption
+		} 
+		else if($type == "MOS"){
+			
+			$dir = "Export";
+			$inputFileType = 'Excel5';
+			$inputFileName = $_SERVER['DOCUMENT_ROOT'] . '/NASCOP/assets/template/excel.xls';
+			$objReader = PHPExcel_IOFactory::createReader($inputFileType);
+			$objPHPExcel = $objReader -> load($inputFileName);
+
+			$filename = "Month of Stock";
+			$dir = "Export";
+			$objPHPExcel = $this -> generateExcelDefaultStyle($filename);
+			$objPHPExcel -> setActiveSheetIndex(0);
+			$objPHPExcel -> getDefaultStyle() -> getFont() -> setName('Book Antiqua') -> setSize(10);
+			$objPHPExcel -> getActiveSheet() -> getColumnDimension("B") -> setAutoSize(true);
+			$objPHPExcel -> getActiveSheet() -> getColumnDimension("C") -> setAutoSize(true);
+			$objPHPExcel -> getActiveSheet() -> getRowDimension('7') -> setRowHeight(-1);
+			$objPHPExcel -> getActiveSheet() -> getRowDimension('6') -> setRowHeight(-1);
+			$objPHPExcel -> getActiveSheet() ->mergeCells("A1:B1");
+			$objPHPExcel -> getActiveSheet() ->mergeCells("A2:B2");
+			$objPHPExcel -> getActiveSheet() -> getStyle('E7:AN7') -> getAlignment() -> setWrapText(true);
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A1', "Period : ".$period);
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('A2', "Pipeline : ".str_replace('_', ' ',$pipeline));
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('D6', "Name");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('D7', "Abbreviation");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('D8', "Strength");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('B7', "MFL Code");
+			$objPHPExcel -> getActiveSheet() -> SetCellValue('C7', "Name");
+			
+			$period = date('Y-m-01', strtotime($period));
+			$drug_table = '';
+			$facility_table = '';
+			$and = '';
+			
+			if ($pipeline == 'kemsa') {
+				$drug_table = 'sync_drug';
+				$facility_table = 'sync_facility';
+				$results_f = Sync_Facility::getOrderingPoint();
+				$and .= ' and c.id NOT IN (SELECT cdrr_id FROM escm_orders)';
+			} else if ($pipeline == 'kenya_pharma') {
+				$drug_table = ' escm_drug';
+				$facility_table = 'escm_facility';
+				$results_f = Escm_Facility::getOrderingPoint();
+				$and .= ' and c.id IN (SELECT cdrr_id FROM escm_orders)';
+			}
+			$y = 1;
+			$p = 9;
+			//Looping through each facility
+			foreach ($results_f as $value) {
+				$facility_id = $value['id'];
+				$f_code = $value['code'];
+				$name = $value['name'];
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('A' . $p, $y);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('B' . $p, $f_code);
+				$objPHPExcel -> getActiveSheet() -> SetCellValue('C' . $p, $name);
+				
+				
+				
+				//Get aggregated stock on hand for that facility for that period
+				$results = $this ->getFacilitySOH($drug_table,$facility_table,$period,$and_check_cdrr,$facility_id,$and);
+				
+				$x = "E";
+				$total = 0;
+				//Total for all the drugs for a facility
+				foreach ($results as $value) {
+					$drug_id  		= $value['drug_id'];
+					$name  			= $value['name'];
+					$abbreviation  	= $value['abbreviation'];
+					$strength  		= $value['strength'];
+					$aggr_soh		= $value['total'];
+					if ($y == 1) {//Append drug names, drug strength only once when start looping
+						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '6',$name);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '7',  $abbreviation);
+						$objPHPExcel -> getActiveSheet() -> SetCellValue($x . '8', $strength);
+						$objPHPExcel -> getActiveSheet() -> getColumnDimension($x) -> setWidth(15);
+					}
+					
+					/*
+					 * Get Facility MOS
+					 * Formula :MOS =(Facility stock on hand/AMC); AMC = Average Month consumption 
+					 */
+					 
+					//Get facility AMC
+					$avg_cons = $this->getAMC($facility_id,$period,$drug_table,$facility_table,$drug_id,$and_check_cdrr,$and);
+					if($avg_cons==0){
+						$avg_cons=1;
+					}
+					$mos =  number_format($aggr_soh/$avg_cons,0);
+					//echo "Drug : ".$abbreviation." -  MFL : ".$f_code." -  Aggr SOH :".$aggr_soh." -  AVG CONS :".$avg_cons."<br>";
+					
+					$objPHPExcel -> getActiveSheet() -> SetCellValue($x . $p, $mos);
+					$x++;
+				}
+				
+				$p++;
+				$y++;
+			}//die();
+			
+			$objPHPExcel -> getActiveSheet() -> freezePane('E9');
+			$this -> generateExcel($filename, $dir, $objPHPExcel);
+			
+		}
+		else if ($type == "CONS") {// Stock consumption
 			$period = date('Y-m-01', strtotime($period));
 			$drug_table = '';
 			$facility_table = '';
@@ -547,6 +649,8 @@ class Dashboard_Management extends MY_Controller {
 			$this -> generateExcel($filename, $dir, $objPHPExcel);
 
 		}
+		
+		
 		//Current Patients BY ART Sites
 		else if ($type == 'ART_PATIENT') {
 			$period = date('Y-m-01', strtotime($period));
@@ -1328,6 +1432,33 @@ class Dashboard_Management extends MY_Controller {
 		$table_name = $type;
 
 		if ($type == "CONS") {
+			//Get eSCM orders
+			$escm_orders = Escm_Orders::getAll();
+			$list = "";
+			$order_list = array();
+			$cdrr_nascop = array();
+			$cdrr_escm = array();
+			$result = array();
+			if ($escm_orders) {
+				foreach ($escm_orders as $order_id) {
+					array_push($order_list, $order_id -> cdrr_id);
+				}
+				$list = "'" . implode("','", $order_list) . "'";
+			}
+			$cdrr_nascop = Cdrr::getNascopPeriod($list);
+			$counter = 0;
+			foreach ($cdrr_nascop as $nascop) {
+				$result[$counter]['period'] = date('F-Y', strtotime($nascop['period_begin']));
+				$result[$counter]['pipeline'] = "Kemsa";
+				$counter++;
+			}
+			$cdrr_escm = Cdrr::getEscmPeriod($list);
+			foreach ($cdrr_escm as $esm) {
+				$result[$counter]['period'] = date('F-Y', strtotime($esm['period_begin']));
+				$result[$counter]['pipeline'] = "Kenya Pharma";
+				$counter++;
+			}
+		} else if ($type == "MOS") {
 			//Get eSCM orders
 			$escm_orders = Escm_Orders::getAll();
 			$list = "";
@@ -2384,6 +2515,7 @@ class Dashboard_Management extends MY_Controller {
 	}
 	
 	public function getTotalPatientByART($regimen_table='',$facility_table='',$period_begin='',$and_check_maps='',$id='',$and=''){//Get total number of patients by Regimen for a facility for a certain period
+		$results = array();
 		if($period_begin!=''){
 			//Get regimen list
 			$sql_regimen = "
@@ -2548,6 +2680,87 @@ class Dashboard_Management extends MY_Controller {
 		$query = $this -> db -> query($sql);
 		$results = $query -> result_array();
 		return $results;
+	}
+	
+	public function getFacilitySOH($drug_table='',$facility_table='',$period_begin='',$and_check_cdrr='',$id='',$and=''){
+		
+		 
+		 $sql = "
+		 		SELECT DISTINCT(d.id) as drug_id,d.name,d.abbreviation,d.strength,IFNULL(tabl.aggr_on_hand,0) as total  
+						FROM $drug_table d
+						LEFT JOIN 
+						(
+						SELECT ci.aggr_on_hand,c.period_begin,dc.id as drug_id
+						FROM cdrr_item ci 
+						LEFT JOIN cdrr c ON c.id = ci.cdrr_id 
+						LEFT JOIN $drug_table dc ON dc.id = ci.drug_id 
+						LEFT JOIN $facility_table f ON f.id = c.facility_id  
+						WHERE c.period_begin ='$period_begin'
+						$and_check_cdrr
+						$and
+						AND c.facility_id=$id
+						) tabl ON tabl.drug_id=d.id
+						ORDER BY drug_id
+		 			";
+		 $query = $this ->db ->query($sql);
+		 $results = $query->result_array();
+		 return $results;
+		
+	}
+	
+	public function getAMC($facility_id='',$period='',$drug_table='',$facility_table='',$drug_id='',$and_check_cdrr='',$and=''){
+		$three_month_back = date('Y-m-d', strtotime(date($period, mktime()) . " - 2 months"));
+
+		$sql = "SELECT COUNT(DISTINCT(c.period_begin))  as total_months,c.facility_id,ci.drug_id
+				FROM cdrr c
+				LEFT JOIN cdrr_item ci ON ci.cdrr_id  = c.id
+				LEFT JOIN $facility_table f ON f.id = c.facility_id
+				LEFT JOIN $drug_table d ON d.id = ci.drug_id
+				WHERE f.ordering = '1'
+				$and_check_cdrr
+				$and
+				AND c.facility_id='$facility_id'
+				AND drug_id = '$drug_id'
+				ORDER BY drug_id"	;
+		$query = $this ->db ->query($sql);
+		$results = $query ->result_array();
+		$total_months = $results[0]["total_months"];
+		$count_back = 1;
+		$avg_cons 	= 0;
+		if($total_months<1){
+			$count_back = 0 ;
+		}
+		else if($total_months>2){
+			$count_back = 3;
+		}else{
+			$count_back = $total_months ;
+		}
+		//Get avg consumption
+		$sql = "SELECT FLOOR(AVG(tabl.aggr_consumed))as avg_cons
+				FROM
+					(
+					SELECT c.period_begin,c.facility_id,ci.drug_id,ci.aggr_consumed,c.code,c.status,c.updated
+					FROM cdrr c
+					LEFT JOIN cdrr_item ci ON ci.cdrr_id  = c.id
+					LEFT JOIN $facility_table f ON f.id = c.facility_id
+					LEFT JOIN $drug_table d ON d.id = ci.drug_id
+					WHERE f.ordering = '1'
+					$and_check_cdrr
+					$and
+					AND c.facility_id='$facility_id'
+					AND drug_id = '1'
+					AND period_begin <='$period'
+					GROUP BY period_begin 
+					ORDER BY period_begin DESC
+					LIMIT $count_back
+					) as tabl";
+		$query = $this ->db ->query($sql);
+		$results = $query ->result_array();
+		if(count($results)>0){
+			$avg_cons = $results[0]['avg_cons'];
+		}
+		
+		return $avg_cons;
 	}
 	
 	public function deleteAllFiles($directory=""){
