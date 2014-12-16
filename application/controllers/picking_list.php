@@ -99,12 +99,14 @@ class Picking_List extends MY_Controller {
 	}
 
 	public function get_orders() {
+		$current_pediod = date("Y-m-01");
+		$last_month = date('Y-m-01',strtotime("last month"));
 		$columns = array('#', '#CDRR-ID', 'Period Beginning', 'Status', 'Facility Name', 'Options');
 		$sql = "SELECT t1.id,t1.cdrr_id,t1.period_begin,t1.status_name,t1.facility_name
 					FROM
 				(
 					(
-					SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+					SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),IF(f.name IS NULL,sf.name,f.name))as facility_name
 					FROM cdrr c
 					LEFT JOIN sync_facility sf ON sf.id=c.facility_id
 					LEFT JOIN facilities f ON f.facilitycode=sf.code
@@ -119,7 +121,7 @@ class Picking_List extends MY_Controller {
 					
 					) UNION ALL
 					(
-					SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),f.name)as facility_name
+					SELECT c.id,IF(c.code='D-CDRR',CONCAT('D-CDRR#',c.id),CONCAT('F-CDRR#',c.id)) as cdrr_id,c.period_begin,c.status as status_name,IF(c.code='1',CONCAT(f.name,CONCAT(' ','Dispensing Point')),IF(f.name IS NULL,sf.name,f.name))as facility_name
 					FROM cdrr c
 					LEFT JOIN escm_facility sf ON sf.id=c.facility_id
 					LEFT JOIN facilities f ON f.facilitycode=sf.code
@@ -129,7 +131,8 @@ class Picking_List extends MY_Controller {
 					AND m.period_begin=c.period_begin
 					AND m.period_end=c.period_end
 					AND c.status='dispatched'
-					AND c.order_id='0'
+					AND (c.order_id='0' OR c.order_id is NULL)
+					AND c.period_begin >='$last_month'
 					AND c.id IN (SELECT cdrr_id FROM escm_orders GROUP BY cdrr_id)
 					)
 				) as t1

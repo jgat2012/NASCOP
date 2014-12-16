@@ -296,7 +296,7 @@ class User_Management extends MY_Controller {
 					$data['inactive'] = true;
 					$data['title'] = "System Login";
 					$this -> load -> view("login_v", $data);
-				} else if (($today_time - $create_time) > (90 * 24 * 3600) && $logged_in -> Access -> Indicator != "nascop_administrator") {
+				} /*else if (($today_time - $create_time) > (90 * 24 * 3600) && $logged_in -> Access -> Indicator != "nascop_administrator") {
 					$user_id = Users::getUserID($username);
 					$this -> session -> set_userdata('user_id', $user_id);
 					$data['title'] = "System Login";
@@ -304,7 +304,7 @@ class User_Management extends MY_Controller {
 					$data['login_attempt'] = "Your Password Has Expired.<br/>Please Click <a href='change_password'>Here</a> to Change your Current Password";
 					$this -> load -> view("login_v", $data);
 
-				} else if ($logged_in -> Active == "1" && $logged_in -> Signature != 1) {
+				}*/ else if ($logged_in -> Active == "1" && $logged_in -> Signature != 1) {
 					$user_id = Users::getUserID($username);
 					$this -> session -> set_userdata('user_id', $user_id);
 					$facility_details = Facilities::getCurrentFacility($logged_in -> Facility_Code);
@@ -344,9 +344,9 @@ class User_Management extends MY_Controller {
 
 	private function _submit_validate() {
 		// validation rules
-		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|min_length[4]|max_length[30]');
+		$this -> form_validation -> set_rules('username', 'Username', 'trim|required|min_length[2]|max_length[30]');
 
-		$this -> form_validation -> set_rules('password', 'Password', 'trim|required|min_length[6]|max_length[30]');
+		$this -> form_validation -> set_rules('password', 'Password', 'trim|required|min_length[2]|max_length[30]');
 
 		return $this -> form_validation -> run();
 	}
