@@ -509,6 +509,7 @@ class Order extends MY_Controller {
 	public function import_order($type = "") {
 		$this -> load -> helper('file');
 		$ret = array();
+		ini_set('max_file_uploads', '200');
 		if ($type == "") {
 			$code = $this -> input -> post("upload_type");
 			$status = "approved";
